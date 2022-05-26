@@ -12,8 +12,12 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import { U } from 'win32-api';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+
+// See win32 documentation https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-app
+const WM_APP = 0x8000;
 
 export default class AppUpdater {
   constructor() {
@@ -91,6 +95,57 @@ const createWindow = async () => {
       mainWindow.minimize();
     } else {
       mainWindow.show();
+    }
+
+    const user32 = U.load(); // load all apis defined in lib/{dll}/api from user32.dll
+
+    const title = 'Hello Electron React!\0'; // null-terminated string
+    const lpszWindow = Buffer.from(title, 'ucs2');
+    const hWnd = user32.FindWindowExW(0, 0, null, lpszWindow);
+
+    if (
+      (typeof hWnd === 'number' && hWnd > 0) ||
+      (typeof hWnd === 'bigint' && hWnd > 0) ||
+      (typeof hWnd === 'string' && hWnd.length > 0)
+    ) {
+      console.log('buf: ', hWnd);
+
+      // Change title of the Calculator
+      const res = user32.SetWindowTextW(
+        hWnd,
+        Buffer.from('Node-Calculator\0', 'ucs2')
+      );
+
+      if (!res) {
+        console.log('SetWindowTextW failed');
+      } else {
+        console.log('window title changed');
+      }
+    }
+
+    const peaceTitle = 'Peace window messages'; // "Peter's Equalizer APO Configuration Extension (Peace) 1.6.1.2\0"
+    const peaceLpszWindow = Buffer.from(peaceTitle, 'ucs2');
+    const peaceHWnd = user32.FindWindowExW(0, 0, null, peaceLpszWindow);
+
+    if (
+      (typeof peaceHWnd === 'number' && peaceHWnd > 0) ||
+      (typeof peaceHWnd === 'bigint' && peaceHWnd > 0) ||
+      (typeof peaceHWnd === 'string' && peaceHWnd.length > 0)
+    ) {
+      console.log('buf: ', peaceHWnd);
+
+      // Send message to toggle maximize setting
+      try {
+        const res = user32.SendMessageW(peaceHWnd, WM_APP + 1, 6, 0);
+
+        if (!res) {
+          console.log('SendMessageW failed', res);
+        } else {
+          console.log('msg sent');
+        }
+      } catch (e) {
+        console.log(e);
+      }
     }
   });
 
