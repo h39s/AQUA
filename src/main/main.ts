@@ -18,6 +18,7 @@ import { resolveHtmlPath } from './util';
 
 // See win32 documentation https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-app
 const WM_APP = 0x8000;
+const user32 = U.load(); // load all apis defined in lib/{dll}/api from user32.dll
 
 export default class AppUpdater {
   constructor() {
@@ -28,11 +29,28 @@ export default class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+const peaceTitle = 'Peace window messages'; // "Peter's Equalizer APO Configuration Extension (Peace) 1.6.1.2\0"
+const peaceLpszWindow = Buffer.from(peaceTitle, 'ucs2');
+const peaceHWnd = user32.FindWindowExW(0, 0, null, peaceLpszWindow);
+console.log('buf: ', peaceHWnd);
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+ipcMain.on('peace', async (_event, arg) => {
+  const messageCode = parseInt(arg[0], 10) || 1;
+  const wParam = parseInt(arg[1], 10) || 6;
+  const lParam = parseInt(arg[2], 10) || 0;
+
+  // Send message to toggle maximize setting
+  try {
+    user32.SendMessageW(peaceHWnd, WM_APP + messageCode, wParam, lParam);
+  } catch (e) {
+    console.log(e);
+  }
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -96,57 +114,6 @@ const createWindow = async () => {
     } else {
       mainWindow.show();
     }
-
-    const user32 = U.load(); // load all apis defined in lib/{dll}/api from user32.dll
-
-    const title = 'Hello Electron React!\0'; // null-terminated string
-    const lpszWindow = Buffer.from(title, 'ucs2');
-    const hWnd = user32.FindWindowExW(0, 0, null, lpszWindow);
-
-    if (
-      (typeof hWnd === 'number' && hWnd > 0) ||
-      (typeof hWnd === 'bigint' && hWnd > 0) ||
-      (typeof hWnd === 'string' && hWnd.length > 0)
-    ) {
-      console.log('buf: ', hWnd);
-
-      // Change title of the Calculator
-      const res = user32.SetWindowTextW(
-        hWnd,
-        Buffer.from('Node-Calculator\0', 'ucs2')
-      );
-
-      if (!res) {
-        console.log('SetWindowTextW failed');
-      } else {
-        console.log('window title changed');
-      }
-    }
-
-    const peaceTitle = 'Peace window messages'; // "Peter's Equalizer APO Configuration Extension (Peace) 1.6.1.2\0"
-    const peaceLpszWindow = Buffer.from(peaceTitle, 'ucs2');
-    const peaceHWnd = user32.FindWindowExW(0, 0, null, peaceLpszWindow);
-
-    if (
-      (typeof peaceHWnd === 'number' && peaceHWnd > 0) ||
-      (typeof peaceHWnd === 'bigint' && peaceHWnd > 0) ||
-      (typeof peaceHWnd === 'string' && peaceHWnd.length > 0)
-    ) {
-      console.log('buf: ', peaceHWnd);
-
-      // Send message to toggle maximize setting
-      try {
-        const res = user32.SendMessageW(peaceHWnd, WM_APP + 1, 6, 0);
-
-        if (!res) {
-          console.log('SendMessageW failed', res);
-        } else {
-          console.log('msg sent');
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    }
   });
 
   mainWindow.on('closed', () => {
@@ -182,6 +149,15 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
+    const foundPeace =
+      (typeof peaceHWnd === 'number' && peaceHWnd > 0) ||
+      (typeof peaceHWnd === 'bigint' && peaceHWnd > 0) ||
+      (typeof peaceHWnd === 'string' && peaceHWnd.length > 0);
+
+    if (!foundPeace) {
+      app.quit();
+    }
+
     createWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the

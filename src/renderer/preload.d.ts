@@ -1,4 +1,4 @@
-import { Channels } from 'main/preload';
+import { Channels } from 'main/api';
 
 declare global {
   interface Window {
