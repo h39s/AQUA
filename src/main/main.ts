@@ -40,14 +40,20 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'));
 });
 
-ipcMain.on('peace', async (_event, arg) => {
+ipcMain.on('peace', async (event, arg) => {
   const messageCode = parseInt(arg[0], 10) || 1;
   const wParam = parseInt(arg[1], 10) || 6;
   const lParam = parseInt(arg[2], 10) || 0;
 
   // Send message to toggle maximize setting
   try {
-    user32.SendMessageW(peaceHWnd, WM_APP + messageCode, wParam, lParam);
+    const res = user32.SendMessageW(
+      peaceHWnd,
+      WM_APP + messageCode,
+      wParam,
+      lParam
+    );
+    event.reply('peace', res);
   } catch (e) {
     console.log(e);
   }

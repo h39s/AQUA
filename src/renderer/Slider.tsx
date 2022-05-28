@@ -1,4 +1,5 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { getMainPreAmp, setMainPreAmp } from './equalizerApi';
 
 interface ISliderContent {
   min: number;
@@ -8,16 +9,6 @@ interface ISliderContent {
 }
 
 const SliderContent = ({ min, max, value, onChange }: ISliderContent) => {
-  const [isDragging, setIsDragging] = useState(false);
-
-  const onMouseMove = (e: MouseEvent) => {
-    if (e.button !== 0) {
-      return;
-    }
-
-    setIsDragging(true);
-  };
-
   return (
     <div>
       <div className="slider-content-bar" />
@@ -37,9 +28,18 @@ export default function Slider() {
   const MAX = 30;
   const [preAmpGain, setPreAmpGain] = useState(0);
 
+  useEffect(() => {
+    const fetchResults = async () => {
+      const initGain = await getMainPreAmp();
+      setPreAmpGain(initGain);
+    };
+
+    fetchResults();
+  }, []);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue: number = parseInt(e.target.value, 10);
-    window.electron.ipcRenderer.sendMessage('peace', [5, 1, newValue * 1000]);
+    setMainPreAmp(newValue);
     setPreAmpGain(newValue);
   };
 

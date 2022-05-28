@@ -18,10 +18,18 @@ const once = (channel: Channels, func: (...args: unknown[]) => void) => {
   ipcRenderer.once(channel, (_event, ...args) => func(...args));
 };
 
+const removeListener = (
+  channel: Channels,
+  func: (...args: unknown[]) => void
+) => {
+  ipcRenderer.removeListener(channel, (_event, ...args) => func(...args));
+};
+
 export default {
   ipcRenderer: {
     sendMessage,
     on,
     once,
+    removeListener,
   },
 };
