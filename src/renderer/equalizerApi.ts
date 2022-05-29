@@ -8,7 +8,7 @@ export const getMainPreAmp = (): Promise<number> => {
   window.electron.ipcRenderer.sendMessage('peace', [5, 5, 0]);
 
   return new Promise((resolve, reject) => {
-    // let timer: any;
+    let timer: NodeJS.Timeout;
 
     const responseHandler = (arg: unknown) => {
       const result = arg as number;
@@ -25,13 +25,12 @@ export const getMainPreAmp = (): Promise<number> => {
 
       // Round up any lower gain values up to -30
       resolve(Math.max(gain, -30));
-      // clearTimeout(timer);
+      clearTimeout(timer);
     };
 
     window.electron.ipcRenderer.once('peace', responseHandler);
 
-    // timer =
-    setTimeout(() => {
+    timer = setTimeout(() => {
       reject(new Error('Timeout waiting for a response'));
       window.electron.ipcRenderer.removeListener('peace', responseHandler);
     }, TIMEOUT);
@@ -40,8 +39,11 @@ export const getMainPreAmp = (): Promise<number> => {
 
 /**
  * Adjusts the main preamplification gain value
- * @param {number} gain - new gain value in ms
+ * @param {number} gain - new gain value in [-30, 30]
  */
 export const setMainPreAmp = (gain: number) => {
+  if (gain > 30 || gain < -30) {
+    throw new Error('Invalid gain value - outside of range [-30, 30]');
+  }
   window.electron.ipcRenderer.sendMessage('peace', [5, 1, gain * 1000]);
 };

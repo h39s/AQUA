@@ -19,7 +19,7 @@ body {
   align-items: center;
 }
 
-button {
+/* button {
   background-color: white;
   padding: 10px 20px;
   border-radius: 10px;
@@ -52,11 +52,20 @@ a {
 a:hover {
   opacity: 1;
   text-decoration: none;
+} */
+
+.row {
+  display: flex;
+  flex-direction: row;
 }
 
-.Hello {
+.col {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+}
+
+.center {
+  align-content: center;
   align-items: center;
-  margin: 20px 0;
+  justify-content: center;
 }

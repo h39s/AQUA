@@ -3,13 +3,36 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 
-.slider-content-bar {
-  background-color: #ade8f4;
-  width: 20px;
-  height: 60px;
+.slider input[type='range'] {
+  -webkit-appearance: slider-vertical;
+  width: 10px;
 }
 
-.slider-content-bar:hover {
-  transform: scale(1.05);
-  opacity: 1;
+.slider2 input[type='range'] {
+  -webkit-appearance: slider-vertical;
+  width: 10px;
+}
+
+.slider-top {
+  width: 30px;
+  height: 20px;
+  background-color: white;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.slider-bottom {
+  width: 30px;
+  height: 20px;
+  background-color: white;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+}
+
+.slider-bottom:hover {
+  background-color: #ade8f4;
+}
+
+.slider input[type='number']::-webkit-outer-spin-button,
+.slider input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
