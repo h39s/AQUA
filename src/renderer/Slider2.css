@@ -1,0 +1,8 @@
+.slider2 {
+  gap: 4px;
+}
+
+.slider2 input[type='range'] {
+  -webkit-appearance: slider-vertical;
+  width: 10px;
+}

@@ -1,7 +1,7 @@
-import { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { getMainPreAmp, setMainPreAmp } from './equalizerApi';
 import { clamp } from './utils';
-import './Slider.css';
+import './Slider2.css';
 
 export default function Slider2() {
   const MIN = -30;

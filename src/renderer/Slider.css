@@ -3,12 +3,11 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 
-.slider input[type='range'] {
-  -webkit-appearance: slider-vertical;
-  width: 10px;
+.slider {
+  gap: 4px;
 }
 
-.slider2 input[type='range'] {
+.slider input[type='range'] {
   -webkit-appearance: slider-vertical;
   width: 10px;
 }
@@ -20,6 +19,11 @@
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
 }
 
+.slider-top:hover,
+.slider-top:focus {
+  background-color: #ade8f4;
+}
+
 .slider-bottom {
   width: 30px;
   height: 20px;
@@ -27,12 +31,11 @@
   clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
 }
 
-.slider-bottom:hover {
+.slider-bottom:hover,
+.slider-bottom:focus {
   background-color: #ade8f4;
 }
 
-.slider input[type='number']::-webkit-outer-spin-button,
-.slider input[type='number']::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+.slider label {
+  width: 100%;
 }
