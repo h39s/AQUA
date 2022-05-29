@@ -158,7 +158,7 @@ export default function Slider() {
           onInput={handleChangeNumberInput}
           onKeyDown={(e) => listenForEnter(e, handleSubmitNumberInput)}
         />
-        Pre-Amplification Gain
+        Pre-Amplification Gain (dB)
       </label>
     </div>
   );
