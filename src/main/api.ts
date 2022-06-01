@@ -1,6 +1,6 @@
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'ipc-example' | 'peace';
+export type Channels = 'peace';
 
 const sendMessage = (channel: Channels, args: unknown[]) => {
   ipcRenderer.send(channel, args);

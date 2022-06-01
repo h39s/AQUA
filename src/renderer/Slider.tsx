@@ -28,11 +28,12 @@ export default function Slider() {
   useEffect(() => {
     const fetchResults = async () => {
       try {
+        // TODO: figure out invalid result when interface type wasn't selected
         const initGain = await getMainPreAmp();
+        console.log('result from getMainPreAmp', initGain);
         setPreAmpGain(initGain);
         setInputGain(initGain);
       } catch (e) {
-        console.log(e);
         setWasPeaceFound(false);
       }
     };
@@ -44,8 +45,12 @@ export default function Slider() {
   const handleChangeGain = async (newValue: number) => {
     setPreAmpGain(newValue);
     setInputGain(newValue);
-    const res = await setMainPreAmp(newValue);
-    console.log('result from setMainPreAmp', res);
+    try {
+      const res = await setMainPreAmp(newValue);
+      console.log('result from setMainPreAmp', res);
+    } catch (e) {
+      setWasPeaceFound(false);
+    }
   };
 
   const handleDeltaChangeGain = (isIncrement: boolean) => {

@@ -31,26 +31,25 @@ export default class AppUpdater {
 let mainWindow: BrowserWindow | null = null;
 const peaceTitle = 'Peace window messages'; // "Peter's Equalizer APO Configuration Extension (Peace) 1.6.1.2\0"
 const peaceLpszWindow = Buffer.from(peaceTitle, 'ucs2');
-const peaceHWnd = user32.FindWindowExW(0, 0, null, peaceLpszWindow);
-console.log('buf: ', peaceHWnd);
-
-const foundPeace = () =>
-  (typeof peaceHWnd === 'number' && peaceHWnd > 0) ||
-  (typeof peaceHWnd === 'bigint' && peaceHWnd > 0) ||
-  (typeof peaceHWnd === 'string' && peaceHWnd.length > 0);
-
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
 
 ipcMain.on('peace', async (event, arg) => {
+  const peaceHWnd = user32.FindWindowExW(0, 0, null, peaceLpszWindow);
+  console.log('handler: ', peaceHWnd);
+
+  const foundPeace =
+    (typeof peaceHWnd === 'number' && peaceHWnd > 0) ||
+    (typeof peaceHWnd === 'bigint' && peaceHWnd > 0) ||
+    (typeof peaceHWnd === 'string' && peaceHWnd.length > 0);
+
+  if (!foundPeace) {
+    event.reply('peace', { error: 'Peace not found' });
+  }
+
   const messageCode = parseInt(arg[0], 10) || 1;
   const wParam = parseInt(arg[1], 10) || 6;
   const lParam = parseInt(arg[2], 10) || 0;
 
-  // Send message to toggle maximize setting
+  // Send message to Peace
   try {
     const res = user32.SendMessageW(
       peaceHWnd,
@@ -59,9 +58,9 @@ ipcMain.on('peace', async (event, arg) => {
       lParam
     );
     console.log('reseived result', res);
-    event.reply('peace', res);
+    event.reply('peace', { result: res });
   } catch (e) {
-    console.log(e);
+    event.reply('peace', { error: e });
   }
 });
 
