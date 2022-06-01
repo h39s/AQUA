@@ -34,6 +34,11 @@ const peaceLpszWindow = Buffer.from(peaceTitle, 'ucs2');
 const peaceHWnd = user32.FindWindowExW(0, 0, null, peaceLpszWindow);
 console.log('buf: ', peaceHWnd);
 
+const foundPeace = () =>
+  (typeof peaceHWnd === 'number' && peaceHWnd > 0) ||
+  (typeof peaceHWnd === 'bigint' && peaceHWnd > 0) ||
+  (typeof peaceHWnd === 'string' && peaceHWnd.length > 0);
+
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
@@ -53,6 +58,7 @@ ipcMain.on('peace', async (event, arg) => {
       wParam,
       lParam
     );
+    console.log('reseived result', res);
     event.reply('peace', res);
   } catch (e) {
     console.log(e);
@@ -84,7 +90,7 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
-const createWindow = async () => {
+const createMainWindow = async () => {
   if (isDebug) {
     await installExtensions();
   }
@@ -155,20 +161,11 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
-    const foundPeace =
-      (typeof peaceHWnd === 'number' && peaceHWnd > 0) ||
-      (typeof peaceHWnd === 'bigint' && peaceHWnd > 0) ||
-      (typeof peaceHWnd === 'string' && peaceHWnd.length > 0);
-
-    if (!foundPeace) {
-      app.quit();
-    }
-
-    createWindow();
+    createMainWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
-      if (mainWindow === null) createWindow();
+      if (mainWindow === null) createMainWindow();
     });
   })
   .catch(console.log);
