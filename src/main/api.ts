@@ -1,10 +1,6 @@
-import { ipcRenderer, IpcRendererEvent } from 'electron';
+import { app, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'internal' | 'peace';
-
-export enum InternalEvent {
-  CLOSE = 0,
-}
+export type Channels = 'peace';
 
 const sendMessage = (channel: Channels, args: unknown[]) => {
   ipcRenderer.send(channel, args);
@@ -29,11 +25,14 @@ const removeListener = (
   ipcRenderer.removeListener(channel, (_event, ...args) => func(...args));
 };
 
+const closeApp = () => app.quit();
+
 export default {
   ipcRenderer: {
     sendMessage,
     on,
     once,
     removeListener,
+    closeApp,
   },
 };

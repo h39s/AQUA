@@ -1,14 +1,15 @@
 import { createContext } from 'react';
+import { ErrorDescription } from '../common/errors';
 
 export interface IPeaceFoundContext {
-  wasPeaceFound: boolean;
-  setWasPeaceFound: (newValue: boolean) => void;
+  peaceError: ErrorDescription | undefined;
+  setPeaceError: (newValue?: ErrorDescription) => void;
 }
 
 const defaultPeaceFoundContext: IPeaceFoundContext = {
-  wasPeaceFound: false,
+  peaceError: undefined,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  setWasPeaceFound: (_newValue: boolean) => {},
+  setPeaceError: (_newValue?: ErrorDescription) => {},
 };
 
 export const PeaceFoundContext = createContext(defaultPeaceFoundContext);

@@ -13,11 +13,10 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { U } from 'win32-api';
-import { InternalEvent } from './api';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import registry from './registry';
-import { errors } from '../common/errors';
+import { ErrorCode } from '../common/errors';
 
 // See win32 documentation https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-app
 const WM_APP = 0x8000;
@@ -38,7 +37,8 @@ const peaceLpszWindow = Buffer.from(peaceTitle, 'ucs2');
 ipcMain.on('peace', async (event, arg) => {
   const peaceInstalled = await registry.isPeaceInstalled();
   if (!peaceInstalled) {
-    event.reply('peace', { error: errors[1] });
+    event.reply('peace', { error: ErrorCode.PEACE_NOT_INSTALLED });
+    return;
   }
 
   const peaceHWnd = user32.FindWindowExW(0, 0, null, peaceLpszWindow);
@@ -49,7 +49,8 @@ ipcMain.on('peace', async (event, arg) => {
     (typeof peaceHWnd === 'string' && peaceHWnd.length > 0);
 
   if (!foundPeace) {
-    event.reply('peace', { error: errors[2] });
+    event.reply('peace', { error: ErrorCode.PEACE_NOT_RUNNING });
+    return;
   }
 
   const messageCode = parseInt(arg[0], 10) || 0;
@@ -57,32 +58,17 @@ ipcMain.on('peace', async (event, arg) => {
   const lParam = parseInt(arg[2], 10) || 0;
 
   // Send message to Peace
-  try {
-    const res = user32.SendMessageW(
-      peaceHWnd,
-      WM_APP + messageCode,
-      wParam,
-      lParam
-    );
-    if (res === 4294967295) {
-      event.reply('peace', { error: errors[3] });
-    }
-    event.reply('peace', { result: res });
-  } catch (e) {
-    console.log(e);
-    event.reply('peace', { error: { short_error: e, solution: '' } });
+  const res = user32.SendMessageW(
+    peaceHWnd,
+    WM_APP + messageCode,
+    wParam,
+    lParam
+  );
+  if (res === 4294967295) {
+    event.reply('peace', { error: ErrorCode.PEACE_NOT_READY });
+    return;
   }
-});
-
-ipcMain.on('internal', (_event, arg) => {
-  const id = arg[0] as number;
-  switch (id) {
-    case InternalEvent.CLOSE:
-      app.quit();
-      break;
-    default:
-      break;
-  }
+  event.reply('peace', { result: res });
 });
 
 if (process.env.NODE_ENV === 'production') {

@@ -1,3 +1,4 @@
+import { ErrorDescription } from 'common/errors';
 import {
   ChangeEvent,
   KeyboardEvent,
@@ -23,23 +24,24 @@ export default function Slider() {
   const [isIncreasing, setIsIncreasing] = useState(false);
   const [isDecreasing, setIsDecreasing] = useState(false);
 
-  const { setWasPeaceFound } = useContext(PeaceFoundContext);
+  const { peaceError, setPeaceError } = useContext(PeaceFoundContext);
 
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        // TODO: figure out invalid result when interface type wasn't selected
         const initGain = await getMainPreAmp();
         console.log('result from getMainPreAmp', initGain);
         setPreAmpGain(initGain);
         setInputGain(initGain);
       } catch (e) {
-        setWasPeaceFound(false);
+        setPeaceError(e as ErrorDescription);
       }
     };
 
-    fetchResults();
-  }, [setWasPeaceFound]);
+    if (!peaceError) {
+      fetchResults();
+    }
+  }, [peaceError, setPeaceError]);
 
   // Helpers for adjusting the preamp gain value
   const handleChangeGain = async (newValue: number) => {
@@ -49,7 +51,7 @@ export default function Slider() {
       const res = await setMainPreAmp(newValue);
       console.log('result from setMainPreAmp', res);
     } catch (e) {
-      setWasPeaceFound(false);
+      setPeaceError(e as ErrorDescription);
     }
   };
 

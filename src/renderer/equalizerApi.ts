@@ -1,11 +1,13 @@
-const TIMEOUT = 1000;
+import { ErrorCode, getErrorDescription } from 'common/errors';
+
+const TIMEOUT = 10000;
 
 interface TSuccess {
   result: number;
 }
 
 interface TError {
-  error: string;
+  error: ErrorCode;
 }
 
 type TResult = TSuccess | TError;
@@ -28,7 +30,7 @@ const promisifyResult = <Type>(
     window.electron.ipcRenderer.once('peace', handler);
 
     timer = setTimeout(() => {
-      reject(new Error('Timeout waiting for a response'));
+      reject(getErrorDescription(ErrorCode.PEACE_TIMEOUT));
       window.electron.ipcRenderer.removeListener('peace', handler);
     }, TIMEOUT);
   });
@@ -47,7 +49,7 @@ export const getMainPreAmp = (): Promise<number> => {
     reject: (reason?: any) => void
   ) => {
     if ('error' in arg) {
-      reject(new Error(arg.error));
+      reject(getErrorDescription(arg.error));
     }
     const { result } = arg as TSuccess;
     const OVERFLOW_OFFSET = 4294967296;
@@ -85,7 +87,7 @@ export const setMainPreAmp = (gain: number) => {
     reject: (reason?: any) => void
   ) => {
     if ('error' in arg) {
-      reject(new Error(arg.error));
+      reject(getErrorDescription(arg.error));
     }
 
     const { result } = arg as TSuccess;
@@ -106,7 +108,7 @@ export const getProgramState = () => {
     reject: (reason?: any) => void
   ) => {
     if ('error' in arg) {
-      reject(arg.error);
+      reject(getErrorDescription(arg.error));
     }
 
     const { result } = arg as TSuccess;
