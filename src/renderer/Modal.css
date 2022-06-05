@@ -1,5 +1,4 @@
 .modal {
-  /* display: none; Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
   left: 0;
@@ -24,9 +23,13 @@
   font-size: 24px;
 }
 
-.modal .close {
-  color: #aaa;
-  float: right;
+.modal .footer {
+  justify-content: flex-end;
+}
+
+.modal button.close {
+  border: 1px solid #888;
+  border-radius: 4px;
 }
 
 .modal .close:hover,

@@ -9,10 +9,11 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { U } from 'win32-api';
+import { InternalEvent } from './api';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
@@ -45,8 +46,8 @@ ipcMain.on('peace', async (event, arg) => {
     event.reply('peace', { error: 'Peace not found' });
   }
 
-  const messageCode = parseInt(arg[0], 10) || 1;
-  const wParam = parseInt(arg[1], 10) || 6;
+  const messageCode = parseInt(arg[0], 10) || 0;
+  const wParam = parseInt(arg[1], 10) || 0;
   const lParam = parseInt(arg[2], 10) || 0;
 
   // Send message to Peace
@@ -58,9 +59,23 @@ ipcMain.on('peace', async (event, arg) => {
       lParam
     );
     console.log('reseived result', res);
+    if (res === 4294967295) {
+      event.reply('peace', { error: 'Peace not ready yet.' });
+    }
     event.reply('peace', { result: res });
   } catch (e) {
     event.reply('peace', { error: e });
+  }
+});
+
+ipcMain.on('internal', (_event, arg) => {
+  const id = arg[0] as number;
+  switch (id) {
+    case InternalEvent.CLOSE:
+      app.quit();
+      break;
+    default:
+      break;
   }
 });
 

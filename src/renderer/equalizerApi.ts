@@ -93,3 +93,24 @@ export const setMainPreAmp = (gain: number) => {
   };
   return promisifyResult(responseHandler);
 };
+
+/**
+ * Get program state for Peace. We will use this as a health check call
+ */
+export const getProgramState = () => {
+  window.electron.ipcRenderer.sendMessage('peace', [0, 0]);
+
+  const responseHandler = (
+    arg: TResult,
+    resolve: (value: number | PromiseLike<number>) => void,
+    reject: (reason?: any) => void
+  ) => {
+    if ('error' in arg) {
+      reject(new Error(arg.error));
+    }
+
+    const { result } = arg as TSuccess;
+    resolve(result);
+  };
+  return promisifyResult(responseHandler);
+};

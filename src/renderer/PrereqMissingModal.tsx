@@ -3,11 +3,13 @@ import './Modal.css';
 interface IPrereqMissingModalProps {
   show: boolean;
   onClose: () => void;
+  onRetry: () => void;
 }
 
 export default function PrereqMissingModal({
   show,
   onClose,
+  onRetry,
 }: IPrereqMissingModalProps) {
   return (
     <>
@@ -21,9 +23,12 @@ export default function PrereqMissingModal({
                 Please install and launch it, then retry.
               </p>
             </div>
-            <div className="footer">
-              <button type="button" className="close" onClick={onClose}>
+            <div className="footer row">
+              <button type="button" className="close" onClick={onRetry}>
                 Retry
+              </button>
+              <button type="button" className="close" onClick={onClose}>
+                Close
               </button>
             </div>
           </div>

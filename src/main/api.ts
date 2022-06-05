@@ -1,6 +1,10 @@
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'peace';
+export type Channels = 'internal' | 'peace';
+
+export enum InternalEvent {
+  CLOSE = 0,
+}
 
 const sendMessage = (channel: Channels, args: unknown[]) => {
   ipcRenderer.send(channel, args);
