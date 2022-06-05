@@ -35,7 +35,6 @@ const peaceLpszWindow = Buffer.from(peaceTitle, 'ucs2');
 
 ipcMain.on('peace', async (event, arg) => {
   const peaceHWnd = user32.FindWindowExW(0, 0, null, peaceLpszWindow);
-  console.log('handler: ', peaceHWnd);
 
   const foundPeace =
     (typeof peaceHWnd === 'number' && peaceHWnd > 0) ||
@@ -58,7 +57,6 @@ ipcMain.on('peace', async (event, arg) => {
       wParam,
       lParam
     );
-    console.log('reseived result', res);
     if (res === 4294967295) {
       event.reply('peace', { error: 'Peace not ready yet.' });
     }

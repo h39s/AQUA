@@ -26,9 +26,16 @@ button {
 }
 
 button:hover {
-  /* transform: scale(1.01); */
   background-color: #efefef;
   opacity: 1;
+}
+
+button:focus {
+  background-color: #adadad;
+}
+
+button:disabled {
+  background-color: #adadad;
 }
 
 /*
