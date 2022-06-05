@@ -16,6 +16,8 @@ import { U } from 'win32-api';
 import { InternalEvent } from './api';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import registry from './registry';
+import { errors } from '../common/errors';
 
 // See win32 documentation https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-app
 const WM_APP = 0x8000;
@@ -34,6 +36,11 @@ const peaceTitle = 'Peace window messages'; // "Peter's Equalizer APO Configurat
 const peaceLpszWindow = Buffer.from(peaceTitle, 'ucs2');
 
 ipcMain.on('peace', async (event, arg) => {
+  const peaceInstalled = await registry.isPeaceInstalled();
+  if (!peaceInstalled) {
+    event.reply('peace', { error: errors[1] });
+  }
+
   const peaceHWnd = user32.FindWindowExW(0, 0, null, peaceLpszWindow);
 
   const foundPeace =
@@ -42,7 +49,7 @@ ipcMain.on('peace', async (event, arg) => {
     (typeof peaceHWnd === 'string' && peaceHWnd.length > 0);
 
   if (!foundPeace) {
-    event.reply('peace', { error: 'Peace not found' });
+    event.reply('peace', { error: errors[2] });
   }
 
   const messageCode = parseInt(arg[0], 10) || 0;
@@ -58,11 +65,12 @@ ipcMain.on('peace', async (event, arg) => {
       lParam
     );
     if (res === 4294967295) {
-      event.reply('peace', { error: 'Peace not ready yet.' });
+      event.reply('peace', { error: errors[3] });
     }
     event.reply('peace', { result: res });
   } catch (e) {
-    event.reply('peace', { error: e });
+    console.log(e);
+    event.reply('peace', { error: { short_error: e, solution: '' } });
   }
 });
 

@@ -106,7 +106,7 @@ export const getProgramState = () => {
     reject: (reason?: any) => void
   ) => {
     if ('error' in arg) {
-      reject(new Error(arg.error));
+      reject(arg.error);
     }
 
     const { result } = arg as TSuccess;
