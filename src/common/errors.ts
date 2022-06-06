@@ -14,7 +14,8 @@ export type ErrorDescription = {
 export const errors: Record<ErrorCode, ErrorDescription> = {
   [ErrorCode.PEACE_NOT_INSTALLED]: {
     shortError: 'Peace not installed.',
-    action: 'Please install and launch PeaceGUI before retrying.',
+    action:
+      'Please install PeaceGUI and launch Peace outside of the Peace Installation GUI before retrying.',
     code: ErrorCode.PEACE_NOT_INSTALLED,
   },
   [ErrorCode.PEACE_NOT_RUNNING]: {
