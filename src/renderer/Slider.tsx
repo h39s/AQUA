@@ -1,5 +1,14 @@
-import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { ErrorDescription } from 'common/errors';
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  useEffect,
+  useContext,
+  useRef,
+  useState,
+} from 'react';
 import { getMainPreAmp, setMainPreAmp } from './equalizerApi';
+import { PeaceFoundContext } from './PeaceFoundContext';
 import { clamp, useInterval } from './utils';
 import './Slider.css';
 
@@ -15,21 +24,35 @@ export default function Slider() {
   const [isIncreasing, setIsIncreasing] = useState(false);
   const [isDecreasing, setIsDecreasing] = useState(false);
 
+  const { peaceError, setPeaceError } = useContext(PeaceFoundContext);
+
   useEffect(() => {
     const fetchResults = async () => {
-      const initGain = await getMainPreAmp();
-      setPreAmpGain(initGain);
-      setInputGain(initGain);
+      try {
+        const initGain = await getMainPreAmp();
+        console.log('result from getMainPreAmp', initGain);
+        setPreAmpGain(initGain);
+        setInputGain(initGain);
+      } catch (e) {
+        setPeaceError(e as ErrorDescription);
+      }
     };
 
-    fetchResults();
-  }, []);
+    if (!peaceError) {
+      fetchResults();
+    }
+  }, [peaceError, setPeaceError]);
 
   // Helpers for adjusting the preamp gain value
-  const handleChangeGain = (newValue: number) => {
-    setMainPreAmp(newValue);
+  const handleChangeGain = async (newValue: number) => {
     setPreAmpGain(newValue);
     setInputGain(newValue);
+    try {
+      const res = await setMainPreAmp(newValue);
+      console.log('result from setMainPreAmp', res);
+    } catch (e) {
+      setPeaceError(e as ErrorDescription);
+    }
   };
 
   const handleDeltaChangeGain = (isIncrement: boolean) => {

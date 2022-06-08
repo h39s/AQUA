@@ -9,12 +9,14 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { U } from 'win32-api';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import registry from './registry';
+import { ErrorCode } from '../common/errors';
 
 // See win32 documentation https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-app
 const WM_APP = 0x8000;
@@ -31,32 +33,42 @@ export default class AppUpdater {
 let mainWindow: BrowserWindow | null = null;
 const peaceTitle = 'Peace window messages'; // "Peter's Equalizer APO Configuration Extension (Peace) 1.6.1.2\0"
 const peaceLpszWindow = Buffer.from(peaceTitle, 'ucs2');
-const peaceHWnd = user32.FindWindowExW(0, 0, null, peaceLpszWindow);
-console.log('buf: ', peaceHWnd);
-
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
 
 ipcMain.on('peace', async (event, arg) => {
-  const messageCode = parseInt(arg[0], 10) || 1;
-  const wParam = parseInt(arg[1], 10) || 6;
+  const peaceInstalled = await registry.isPeaceInstalled();
+  if (!peaceInstalled) {
+    event.reply('peace', { error: ErrorCode.PEACE_NOT_INSTALLED });
+    return;
+  }
+
+  const peaceHWnd = user32.FindWindowExW(0, 0, null, peaceLpszWindow);
+
+  const foundPeace =
+    (typeof peaceHWnd === 'number' && peaceHWnd > 0) ||
+    (typeof peaceHWnd === 'bigint' && peaceHWnd > 0) ||
+    (typeof peaceHWnd === 'string' && peaceHWnd.length > 0);
+
+  if (!foundPeace) {
+    event.reply('peace', { error: ErrorCode.PEACE_NOT_RUNNING });
+    return;
+  }
+
+  const messageCode = parseInt(arg[0], 10) || 0;
+  const wParam = parseInt(arg[1], 10) || 0;
   const lParam = parseInt(arg[2], 10) || 0;
 
-  // Send message to toggle maximize setting
-  try {
-    const res = user32.SendMessageW(
-      peaceHWnd,
-      WM_APP + messageCode,
-      wParam,
-      lParam
-    );
-    event.reply('peace', res);
-  } catch (e) {
-    console.log(e);
+  // Send message to Peace
+  const res = user32.SendMessageW(
+    peaceHWnd,
+    WM_APP + messageCode,
+    wParam,
+    lParam
+  );
+  if (res === 4294967295) {
+    event.reply('peace', { error: ErrorCode.PEACE_NOT_READY });
+    return;
   }
+  event.reply('peace', { result: res });
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -84,7 +96,7 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
-const createWindow = async () => {
+const createMainWindow = async () => {
   if (isDebug) {
     await installExtensions();
   }
@@ -155,20 +167,11 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
-    const foundPeace =
-      (typeof peaceHWnd === 'number' && peaceHWnd > 0) ||
-      (typeof peaceHWnd === 'bigint' && peaceHWnd > 0) ||
-      (typeof peaceHWnd === 'string' && peaceHWnd.length > 0);
-
-    if (!foundPeace) {
-      app.quit();
-    }
-
-    createWindow();
+    createMainWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
-      if (mainWindow === null) createWindow();
+      if (mainWindow === null) createMainWindow();
     });
   })
   .catch(console.log);
