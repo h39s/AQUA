@@ -120,6 +120,7 @@ const createMainWindow = async () => {
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
+  mainWindow.webContents.openDevTools();
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 

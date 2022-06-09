@@ -1,4 +1,15 @@
+import path = require('path');
+import { app } from 'electron';
+
 const regedit = require('regedit').promisified;
+
+const regeditNonPromise = require('regedit');
+
+const vbsDirectory = path.join(
+  path.dirname(app.getPath('exe')),
+  './resources/vbs'
+);
+regeditNonPromise.setExternalVBSLocation(vbsDirectory);
 
 const isPeaceInstalled = async () => {
   const registryKey =
