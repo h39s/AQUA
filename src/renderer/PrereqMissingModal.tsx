@@ -1,4 +1,4 @@
-import './Modal.css';
+import './styles/Modal.scss';
 
 interface IPrereqMissingModalProps {
   isLoading: boolean;
@@ -27,20 +27,10 @@ export default function PrereqMissingModal({
           </p>
         </div>
         <div className="footer row">
-          <button
-            type="button"
-            disabled={isLoading}
-            className="close"
-            onClick={onRetry}
-          >
+          <button type="button" disabled={isLoading} onClick={onRetry}>
             Retry
           </button>
-          <button
-            type="button"
-            disabled={isLoading}
-            className="close"
-            onClick={handleClose}
-          >
+          <button type="button" disabled={isLoading} onClick={handleClose}>
             Close
           </button>
         </div>

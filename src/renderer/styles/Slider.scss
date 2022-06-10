@@ -1,0 +1,117 @@
+@import 'color';
+
+$slider-track-height: 8px;
+$slider-thumb-height: 20px;
+
+%slider-thumb {
+  -webkit-appearance: none;
+  cursor: pointer;
+  height: $slider-thumb-height;
+  width: $slider-thumb-height;
+  border-radius: calc($slider-thumb-height / 2);
+  background: $secondary-default;
+  // TODO: clean up styles for focused slider
+  // box-shadow: 0px 0px 4px rgba(255, 255, 255, 0.25);
+  margin-top: calc(-1 * ($slider-thumb-height) / 4 - 1px);
+}
+
+.slider {
+  gap: 4px;
+
+  input[type='range'] {
+    -webkit-appearance: none;
+    height: 8px;
+    width: 150px;
+    background: transparent;
+    transform: rotate(-90deg);
+    margin: 75px 0px;
+
+    &:focus {
+      outline: none;
+
+      &::-webkit-slider-runnable-track {
+        // border: -2px solid $white;
+        // background: $secondary-dark;
+        box-shadow: 0px 0px 0px 2px white;
+      }
+    }
+
+    &::-webkit-slider-runnable-track {
+      cursor: pointer;
+      height: 8px;
+      width: 100%;
+      border-radius: 4px;
+      background: $secondary-light;
+    }
+
+    &::-webkit-slider-thumb {
+      @extend %slider-thumb;
+    }
+  }
+
+  label {
+    width: 100%;
+  }
+}
+
+// /* All the same stuff for Firefox */
+// input[type="range"]::-moz-range-thumb {
+//   @extend %slider-thumb;
+// }
+
+// /* All the same stuff for IE */
+// input[type="range"]::-ms-thumb {
+//   @extend %slider-thumb;
+// }
+
+%slider-arrow {
+  display: flex;
+
+  &:focus-visible {
+    outline: 2px solid $white;
+  }
+
+  &:hover {
+    color: $white;
+    cursor: pointer;
+
+    path {
+      fill: $secondary-dark;
+    }
+  }
+
+  &:active {
+    path {
+      fill: $secondary-dark;
+      filter: brightness(
+        0.8
+      ); // alternative for achieving the $secondary-darker color
+    }
+  }
+
+  &:disabled {
+    path {
+      fill: $primary-light;
+    }
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: none;
+    path {
+      fill: $secondary-dark;
+      filter: brightness(0.8);
+    }
+    box-shadow: 0px 0px 0px 2px white;
+  }
+}
+
+.slider-top {
+  @extend %slider-arrow;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.slider-bottom {
+  @extend %slider-arrow;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+}

@@ -8,9 +8,11 @@ import {
   useState,
 } from 'react';
 import { getMainPreAmp, setMainPreAmp } from './equalizerApi';
+import SliderArrowIcon from './icons/SliderArrowIcon';
 import { PeaceFoundContext } from './PeaceFoundContext';
 import { clamp, useInterval } from './utils';
-import './Slider.css';
+import './styles/Slider.scss';
+// import UpArrowIcon from '../../assets/slider-up-arrow.svg';
 
 export default function Slider() {
   const MIN = -30;
@@ -147,12 +149,14 @@ export default function Slider() {
         ref={increaseButtonRef}
         role="button"
         aria-label="Increase pre-amplification gain"
-        className="slider-top"
+        className="center slider-top"
         onMouseDown={() => handleArrowInput(true)}
         onMouseUp={stopIncrement}
         onKeyDown={(e) => listenForEnter(e, () => handleDeltaChangeGain(true))}
         tabIndex={0}
-      />
+      >
+        <SliderArrowIcon type="up" />
+      </div>
       <input
         type="range"
         min={MIN}
@@ -164,12 +168,14 @@ export default function Slider() {
         ref={decreaseButtonRef}
         role="button"
         aria-label="Decrease pre-amplification gain"
-        className="slider-bottom"
+        className="center slider-bottom"
         onMouseDown={() => handleArrowInput(false)}
         onMouseUp={stopDecrement}
         onKeyDown={(e) => listenForEnter(e, () => handleDeltaChangeGain(false))}
         tabIndex={0}
-      />
+      >
+        <SliderArrowIcon type="down" />
+      </div>
       <label htmlFor="input gain" className="col center">
         <input
           type="text"

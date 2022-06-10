@@ -1,0 +1,65 @@
+@import './color';
+@import './spacing';
+
+body {
+  position: relative;
+  color: white;
+  height: 100vh;
+  background: $primary-dark;
+  font-family: sans-serif;
+  overflow-y: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+button {
+  color: $black;
+  background: $secondary-default;
+  padding: $spacing-s $spacing-m;
+  margin: $spacing-xs;
+  border: none;
+  border-radius: 4px;
+
+  &.small {
+    padding: $spacing-xs $spacing-s;
+    height: fit-content;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $white;
+  }
+
+  &:hover {
+    color: $white;
+    background: $secondary-dark;
+    cursor: pointer;
+  }
+
+  &:active {
+    color: $white;
+    background: $secondary-darker;
+  }
+
+  &:disabled {
+    color: $black;
+    background: $primary-light;
+    cursor: default;
+  }
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+.center {
+  align-content: center;
+  align-items: center;
+  justify-content: center;
+}

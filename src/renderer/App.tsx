@@ -1,7 +1,7 @@
 import { ErrorDescription } from 'common/errors';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css';
+import './styles/App.scss';
 import { getProgramState } from './equalizerApi';
 import EqualizerEnablerSwitch from './EqualizerEnablerSwitch';
 import { PeaceFoundContext } from './PeaceFoundContext';
