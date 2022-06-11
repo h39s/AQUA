@@ -1,13 +1,17 @@
-import { ErrorCode, getErrorDescription } from 'common/errors';
+import {
+  ErrorCode,
+  ErrorDescription,
+  getErrorDescription,
+} from 'common/errors';
 
 const TIMEOUT = 10000;
 
-interface TSuccess {
+export interface TSuccess {
   result: number;
 }
 
-interface TError {
-  error: ErrorCode;
+export interface TError {
+  errorCode: ErrorCode;
 }
 
 type TResult = TSuccess | TError;
@@ -17,7 +21,8 @@ const promisifyResult = <Type>(
     arg: TResult,
     resolve: (value: Type | PromiseLike<Type>) => void,
     reject: (reason?: any) => void
-  ) => void
+  ) => void,
+  channel: string
 ) => {
   return new Promise<Type>((resolve, reject) => {
     let timer: NodeJS.Timeout;
@@ -27,31 +32,54 @@ const promisifyResult = <Type>(
       clearTimeout(timer);
     };
 
-    window.electron.ipcRenderer.once('peace', handler);
+    window.electron.ipcRenderer.once(channel, handler);
 
     timer = setTimeout(() => {
       reject(getErrorDescription(ErrorCode.PEACE_TIMEOUT));
-      window.electron.ipcRenderer.removeListener('peace', handler);
+      window.electron.ipcRenderer.removeListener(channel, handler);
     }, TIMEOUT);
   });
 };
+
+const buildResponseHandler = <Type>(
+  resultEvaluator: (
+    result: number,
+    resolve: (value: Type | PromiseLike<Type>) => void,
+    reject: (reason?: ErrorDescription) => void
+  ) => void
+) => {
+  return (
+    arg: TResult,
+    resolve: (value: Type | PromiseLike<Type>) => void,
+    reject: (reason?: any) => void
+  ) => {
+    if ('errorCode' in arg) {
+      reject(getErrorDescription(arg.errorCode));
+      return;
+    }
+    const { result } = arg as TSuccess;
+    resultEvaluator(result, resolve, reject);
+  };
+};
+
+const setterResponseHandler = buildResponseHandler<void>(
+  (result, resolve, reject) => {
+    if (result !== 1) {
+      reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
+    }
+    resolve();
+  }
+);
 
 /**
  * Get the current main preamplification gain value
  * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
  */
 export const getMainPreAmp = (): Promise<number> => {
-  window.electron.ipcRenderer.sendMessage('peace', [5, 5, 0]);
+  const channel = 'getMainPreAmp';
+  window.electron.ipcRenderer.sendMessage('peace', [channel, 5, 5, 0]);
 
-  const responseHandler = (
-    arg: TResult,
-    resolve: (value: number | PromiseLike<number>) => void,
-    reject: (reason?: any) => void
-  ) => {
-    if ('error' in arg) {
-      reject(getErrorDescription(arg.error));
-    }
-    const { result } = arg as TSuccess;
+  const responseHandler = buildResponseHandler<number>((result, resolve) => {
     const OVERFLOW_OFFSET = 4294967296;
 
     // If gain is larger than 30, assume overflow occured.
@@ -67,8 +95,8 @@ export const getMainPreAmp = (): Promise<number> => {
 
     // Round up any lower gain values up to -30
     resolve(Math.max(gain, -30));
-  };
-  return promisifyResult(responseHandler);
+  });
+  return promisifyResult(responseHandler, channel);
 };
 
 /**
@@ -76,43 +104,83 @@ export const getMainPreAmp = (): Promise<number> => {
  * @param {number} gain - new gain value in [-30, 30]
  */
 export const setMainPreAmp = (gain: number) => {
+  const channel = 'setMainPreAmp';
   if (gain > 30 || gain < -30) {
     throw new Error('Invalid gain value - outside of range [-30, 30]');
   }
-  window.electron.ipcRenderer.sendMessage('peace', [5, 1, gain * 1000]);
-
-  const responseHandler = (
-    arg: TResult,
-    resolve: (value: number | PromiseLike<number>) => void,
-    reject: (reason?: any) => void
-  ) => {
-    if ('error' in arg) {
-      reject(getErrorDescription(arg.error));
-    }
-
-    const { result } = arg as TSuccess;
-    resolve(result);
-  };
-  return promisifyResult(responseHandler);
+  window.electron.ipcRenderer.sendMessage('peace', [
+    channel,
+    5,
+    1,
+    gain * 1000,
+  ]);
+  return promisifyResult(setterResponseHandler, channel);
 };
 
 /**
  * Get program state for Peace. We will use this as a health check call
+ * @returns { Promise<void> } exception if Peace is not okay.
  */
 export const getProgramState = () => {
-  window.electron.ipcRenderer.sendMessage('peace', [0, 0]);
+  const channel = 'getProgramState';
+  window.electron.ipcRenderer.sendMessage('peace', [channel, 0, 0]);
+  return promisifyResult(setterResponseHandler, channel);
+};
 
-  const responseHandler = (
-    arg: TResult,
-    resolve: (value: number | PromiseLike<number>) => void,
-    reject: (reason?: any) => void
-  ) => {
-    if ('error' in arg) {
-      reject(getErrorDescription(arg.error));
+/**
+ * Enable Equalizer
+ * @returns { Promise<void> } exception if failed.
+ */
+export const enableEqualizer = () => {
+  const channel = 'enableEqualizer';
+  window.electron.ipcRenderer.sendMessage('peace', [channel, 3, 0]);
+  const responseHandler = buildResponseHandler<void>(
+    (result, resolve, reject) => {
+      if (result !== 1) {
+        reject(getErrorDescription(0));
+      }
+      resolve();
     }
+  );
+  return promisifyResult(responseHandler, channel);
+};
 
-    const { result } = arg as TSuccess;
-    resolve(result);
-  };
-  return promisifyResult(responseHandler);
+/**
+ * Disable Equalizer
+ * @returns { Promise<void> } exception if failed.
+ */
+export const disableEqualizer = () => {
+  const channel = 'disableEqualizer';
+  window.electron.ipcRenderer.sendMessage('peace', [channel, 3, 1]);
+  const responseHandler = buildResponseHandler<void>(
+    (result, resolve, reject) => {
+      if (result !== 2) {
+        reject(getErrorDescription(0));
+      }
+      resolve();
+    }
+  );
+  return promisifyResult(responseHandler, channel);
+};
+
+/**
+ * Get the current equalizer status
+ * @returns { Promise<boolean> } true for on, false for off, exception otherwise
+ */
+export const getEqualizerStatus = () => {
+  const channel = 'getEqualizerStatus';
+  window.electron.ipcRenderer.sendMessage('peace', [channel, 3, 3, 0]);
+
+  const responseHandler = buildResponseHandler<boolean>(
+    (result, resolve, reject) => {
+      if (result === 1) {
+        resolve(true);
+      } else if (result === 2) {
+        resolve(false);
+      } else {
+        reject(getErrorDescription(0));
+      }
+    }
+  );
+  return promisifyResult(responseHandler, channel);
 };

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import { getProgramState } from './equalizerApi';
+import EqualizerEnablerSwitch from './EqualizerEnablerSwitch';
 import { PeaceFoundContext } from './PeaceFoundContext';
 import PrereqMissingModal from './PrereqMissingModal';
 import Slider from './Slider';
@@ -10,6 +11,7 @@ import Slider from './Slider';
 const AppContent = () => {
   return (
     <div className="row">
+      <EqualizerEnablerSwitch id="equalizerEnabler" />
       <Slider />
     </div>
   );

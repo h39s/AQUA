@@ -1,4 +1,5 @@
 export enum ErrorCode {
+  PEACE_UNKNOWN_ERROR = 0,
   PEACE_NOT_INSTALLED = 1,
   PEACE_NOT_RUNNING = 2,
   PEACE_NOT_READY = 3,
@@ -12,6 +13,11 @@ export type ErrorDescription = {
 };
 
 export const errors: Record<ErrorCode, ErrorDescription> = {
+  [ErrorCode.PEACE_UNKNOWN_ERROR]: {
+    shortError: 'Unknown error occured with Peace.',
+    action: 'Please restart PeaceGUI and try again.',
+    code: ErrorCode.PEACE_UNKNOWN_ERROR,
+  },
   [ErrorCode.PEACE_NOT_INSTALLED]: {
     shortError: 'Peace not installed.',
     action:

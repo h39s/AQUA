@@ -30,7 +30,6 @@ export default function Slider() {
     const fetchResults = async () => {
       try {
         const initGain = await getMainPreAmp();
-        console.log('result from getMainPreAmp', initGain);
         setPreAmpGain(initGain);
         setInputGain(initGain);
       } catch (e) {
@@ -48,8 +47,7 @@ export default function Slider() {
     setPreAmpGain(newValue);
     setInputGain(newValue);
     try {
-      const res = await setMainPreAmp(newValue);
-      console.log('result from setMainPreAmp', res);
+      await setMainPreAmp(newValue);
     } catch (e) {
       setPeaceError(e as ErrorDescription);
     }

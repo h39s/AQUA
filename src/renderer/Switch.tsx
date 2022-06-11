@@ -18,7 +18,6 @@ export default function Switch({
 }: ISwitchProps) {
   const { peaceError } = useContext(PeaceFoundContext);
   useEffect(() => {
-    console.log(`peaceError ${peaceError}`);
     if (!peaceError) {
       onLoad();
     }
