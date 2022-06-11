@@ -1,4 +1,4 @@
-import { app, ipcRenderer, IpcRendererEvent } from 'electron';
+import { ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels = 'peace';
 
@@ -25,7 +25,9 @@ const removeListener = (
   ipcRenderer.removeListener(channel, (_event, ...args) => func(...args));
 };
 
-const closeApp = () => app.quit();
+const closeApp = () => {
+  ipcRenderer.send('quit-app', []);
+};
 
 export default {
   ipcRenderer: {
