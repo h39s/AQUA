@@ -1,17 +1,17 @@
 @import 'color';
+@import 'button-state';
 
 $slider-track-height: 8px;
 $slider-thumb-height: 20px;
 
 %slider-thumb {
+  @extend %button-state;
   -webkit-appearance: none;
   cursor: pointer;
   height: $slider-thumb-height;
   width: $slider-thumb-height;
   border-radius: calc($slider-thumb-height / 2);
   background: $secondary-default;
-  // TODO: clean up styles for focused slider
-  // box-shadow: 0px 0px 4px rgba(255, 255, 255, 0.25);
   margin-top: calc(-1 * ($slider-thumb-height) / 4 - 1px);
 }
 
@@ -26,12 +26,17 @@ $slider-thumb-height: 20px;
     transform: rotate(-90deg);
     margin: 75px 0px;
 
-    &:focus {
+    --range: calc(var(--max) - var(--min));
+    --ratio: calc((var(--val) - var(--min)) / var(--range));
+    --sx: calc(
+      0.5 *#{$slider-thumb-height} + var(--ratio) *
+        (100% - #{$slider-thumb-height})
+    );
+
+    &:focus-visible {
       outline: none;
 
       &::-webkit-slider-runnable-track {
-        // border: -2px solid $white;
-        // background: $secondary-dark;
         box-shadow: 0px 0px 0px 2px white;
       }
     }
@@ -41,7 +46,8 @@ $slider-thumb-height: 20px;
       height: 8px;
       width: 100%;
       border-radius: 4px;
-      background: $secondary-light;
+      background: linear-gradient($secondary-dark, $secondary-dark) 0 /
+        var(--sx) 100% no-repeat $secondary-light;
     }
 
     &::-webkit-slider-thumb {
@@ -53,16 +59,6 @@ $slider-thumb-height: 20px;
     width: 100%;
   }
 }
-
-// /* All the same stuff for Firefox */
-// input[type="range"]::-moz-range-thumb {
-//   @extend %slider-thumb;
-// }
-
-// /* All the same stuff for IE */
-// input[type="range"]::-ms-thumb {
-//   @extend %slider-thumb;
-// }
 
 %slider-arrow {
   display: flex;

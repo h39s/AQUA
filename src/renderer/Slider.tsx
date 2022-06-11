@@ -1,6 +1,7 @@
 import { ErrorDescription } from 'common/errors';
 import {
   ChangeEvent,
+  CSSProperties,
   KeyboardEvent,
   useEffect,
   useContext,
@@ -163,6 +164,14 @@ export default function Slider() {
         max={MAX}
         value={preAmpGain}
         onChange={handleRangeInput}
+        style={
+          // Set css variables for determining upper/lower track
+          {
+            '--min': MIN,
+            '--max': MAX,
+            '--val': preAmpGain,
+          } as CSSProperties
+        }
       />
       <div
         ref={decreaseButtonRef}

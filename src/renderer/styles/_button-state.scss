@@ -1,0 +1,26 @@
+// Button state styles used across components
+
+%button-state {
+  background: $secondary-default;
+
+  &:focus-visible {
+    outline: 2px solid $white;
+  }
+
+  &:hover {
+    color: $white;
+    background: $secondary-dark;
+    cursor: pointer;
+  }
+
+  &:active {
+    color: $white;
+    background: $secondary-darker;
+  }
+
+  &:disabled {
+    color: $black;
+    background: $primary-light;
+    cursor: default;
+  }
+}
