@@ -3,6 +3,11 @@
 $switch-button-height: 24px;
 $switch-padding: 8px;
 
+.switch {
+  width: min-content;
+  height: min-content;
+}
+
 // Default unchecked switch label styles
 .switch-label {
   display: flex;
@@ -34,6 +39,7 @@ $switch-padding: 8px;
   height: 0;
   width: 0;
   opacity: 0;
+  position: absolute;
 
   // Apply same style regardless of checked state when focused
   &:focus-visible + .switch-label,

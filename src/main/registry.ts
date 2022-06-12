@@ -2,8 +2,6 @@ import path from 'path';
 import { app } from 'electron';
 import { promisified as regedit, setExternalVBSLocation } from 'regedit';
 
-// TODO: test that the import change here works for packaged apps!
-
 const vbsDirectory = path.join(
   path.dirname(app.getPath('exe')),
   './resources/vbs'

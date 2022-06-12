@@ -174,7 +174,7 @@
   },
   "build": {
     "productName": "AQUA",
-    "appId": "org.erb.AQUA",
+    "appId": "org.jaty.AQUA",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [

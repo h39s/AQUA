@@ -1,4 +1,4 @@
-import { KeyboardEvent, useEffect, useContext, useState } from 'react';
+import { KeyboardEvent, useEffect, useContext } from 'react';
 import { PeaceFoundContext } from './PeaceFoundContext';
 import './styles/Switch.scss';
 
@@ -17,41 +17,31 @@ export default function Switch({
   onLoad,
 }: ISwitchProps) {
   const { peaceError } = useContext(PeaceFoundContext);
-  const [isKeyDown, setIsKeyDown] = useState(false);
   useEffect(() => {
     if (!peaceError) {
       onLoad();
     }
   }, [onLoad, peaceError]);
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.code === 'Enter' && !isKeyDown) {
-      handleToggle();
-      setIsKeyDown(true);
-    }
-  };
-
   const handleKeyUp = (e: KeyboardEvent) => {
     if (e.code === 'Enter') {
-      setIsKeyDown(false);
+      handleToggle();
     }
   };
 
   return (
-    <>
+    <label className="switch" htmlFor={id}>
       <input
         checked={isOn}
         onChange={handleToggle}
-        onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
         className="switch-checkbox"
         id={id}
         type="checkbox"
       />
-      {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-      <label className="switch-label" htmlFor={id}>
+      <div className="switch-label">
         <span className="switch-button" />
-      </label>
-    </>
+      </div>
+    </label>
   );
 }
