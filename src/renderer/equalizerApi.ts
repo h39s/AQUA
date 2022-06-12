@@ -20,7 +20,7 @@ const promisifyResult = <Type>(
   responseHandler: (
     arg: TResult,
     resolve: (value: Type | PromiseLike<Type>) => void,
-    reject: (reason?: any) => void
+    reject: (reason?: ErrorDescription) => void
   ) => void,
   channel: string
 ) => {
@@ -51,7 +51,7 @@ const buildResponseHandler = <Type>(
   return (
     arg: TResult,
     resolve: (value: Type | PromiseLike<Type>) => void,
-    reject: (reason?: any) => void
+    reject: (reason?: ErrorDescription) => void
   ) => {
     if ('errorCode' in arg) {
       reject(getErrorDescription(arg.errorCode));
