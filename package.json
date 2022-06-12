@@ -67,6 +67,7 @@
   },
   "jest": {
     "moduleDirectories": [
+      "src",
       "node_modules",
       "release/app/node_modules"
     ],
