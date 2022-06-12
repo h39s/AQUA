@@ -17,6 +17,7 @@ import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import registry from './registry';
 import { ErrorCode } from '../common/errors';
+import { TSuccess, TError } from '../renderer/equalizerApi';
 
 // See win32 documentation https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-app
 const WM_APP = 0x8000;
@@ -35,9 +36,11 @@ const peaceTitle = 'Peace window messages'; // "Peter's Equalizer APO Configurat
 const peaceLpszWindow = Buffer.from(peaceTitle, 'ucs2');
 
 ipcMain.on('peace', async (event, arg) => {
+  const channel: string = arg[0];
   const peaceInstalled = await registry.isPeaceInstalled();
   if (!peaceInstalled) {
-    event.reply('peace', { error: ErrorCode.PEACE_NOT_INSTALLED });
+    const reply: TError = { errorCode: ErrorCode.PEACE_NOT_INSTALLED };
+    event.reply(channel, reply);
     return;
   }
 
@@ -49,13 +52,14 @@ ipcMain.on('peace', async (event, arg) => {
     (typeof peaceHWnd === 'string' && peaceHWnd.length > 0);
 
   if (!foundPeace) {
-    event.reply('peace', { error: ErrorCode.PEACE_NOT_RUNNING });
+    const reply: TError = { errorCode: ErrorCode.PEACE_NOT_RUNNING };
+    event.reply(channel, reply);
     return;
   }
 
-  const messageCode = parseInt(arg[0], 10) || 0;
-  const wParam = parseInt(arg[1], 10) || 0;
-  const lParam = parseInt(arg[2], 10) || 0;
+  const messageCode = parseInt(arg[1], 10) || 0;
+  const wParam = parseInt(arg[2], 10) || 0;
+  const lParam = parseInt(arg[3], 10) || 0;
 
   // Send message to Peace
   const res = user32.SendMessageW(
@@ -65,10 +69,12 @@ ipcMain.on('peace', async (event, arg) => {
     lParam
   );
   if (res === 4294967295) {
-    event.reply('peace', { error: ErrorCode.PEACE_NOT_READY });
+    const reply: TError = { errorCode: ErrorCode.PEACE_NOT_READY };
+    event.reply(channel, reply);
     return;
   }
-  event.reply('peace', { result: res });
+  const reply: TSuccess = { result: res };
+  event.reply(channel, reply);
 });
 
 if (process.env.NODE_ENV === 'production') {
