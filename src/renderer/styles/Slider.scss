@@ -1,30 +1,20 @@
 @import 'color';
 @import 'button-state';
 
+$slider-track-width: 150px;
 $slider-track-height: 8px;
 $slider-thumb-height: 20px;
-
-%slider-thumb {
-  @extend %button-state;
-  -webkit-appearance: none;
-  cursor: pointer;
-  height: $slider-thumb-height;
-  width: $slider-thumb-height;
-  border-radius: calc($slider-thumb-height / 2);
-  background: $secondary-default;
-  margin-top: calc(-1 * ($slider-thumb-height) / 4 - 1px);
-}
 
 .slider {
   gap: 4px;
 
   input[type='range'] {
     -webkit-appearance: none;
-    height: 8px;
-    width: 150px;
+    height: $slider-track-height;
+    width: $slider-track-width;
     background: transparent;
     transform: rotate(-90deg);
-    margin: 75px 0px;
+    margin: calc($slider-track-width / 2) 0px;
 
     --range: calc(var(--max) - var(--min));
     --ratio: calc((var(--val) - var(--min)) / var(--range));
@@ -43,7 +33,7 @@ $slider-thumb-height: 20px;
 
     &::-webkit-slider-runnable-track {
       cursor: pointer;
-      height: 8px;
+      height: $slider-track-height;
       width: 100%;
       border-radius: 4px;
       background: linear-gradient($secondary-dark, $secondary-dark) 0 /
@@ -51,7 +41,13 @@ $slider-thumb-height: 20px;
     }
 
     &::-webkit-slider-thumb {
-      @extend %slider-thumb;
+      @extend %button-state;
+      -webkit-appearance: none;
+      cursor: pointer;
+      height: $slider-thumb-height;
+      width: $slider-thumb-height;
+      border-radius: calc($slider-thumb-height / 2);
+      margin-top: calc(-1 * ($slider-thumb-height) / 4 - 1px);
     }
   }
 
@@ -62,10 +58,6 @@ $slider-thumb-height: 20px;
 
 %slider-arrow {
   display: flex;
-
-  &:focus-visible {
-    outline: 2px solid $white;
-  }
 
   &:hover {
     color: $white;
@@ -85,20 +77,21 @@ $slider-thumb-height: 20px;
     }
   }
 
-  &:disabled {
+  &[aria-disabled='true'] {
+    cursor: default;
+
     path {
       fill: $primary-light;
     }
-    cursor: default;
   }
 
   &:focus-visible {
     outline: none;
+
     path {
-      fill: $secondary-dark;
-      filter: brightness(0.8);
+      stroke: white;
+      stroke-width: 2px;
     }
-    box-shadow: 0px 0px 0px 2px white;
   }
 }
 

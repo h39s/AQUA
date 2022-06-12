@@ -154,7 +154,8 @@ export default function Slider() {
         onMouseDown={() => handleArrowInput(true)}
         onMouseUp={stopIncrement}
         onKeyDown={(e) => listenForEnter(e, () => handleDeltaChangeGain(true))}
-        tabIndex={0}
+        tabIndex={peaceError ? -1 : 0}
+        aria-disabled={!!peaceError}
       >
         <SliderArrowIcon type="up" />
       </div>
@@ -164,6 +165,7 @@ export default function Slider() {
         max={MAX}
         value={preAmpGain}
         onChange={handleRangeInput}
+        disabled={!!peaceError}
         style={
           // Set css variables for determining upper/lower track
           {
@@ -181,7 +183,8 @@ export default function Slider() {
         onMouseDown={() => handleArrowInput(false)}
         onMouseUp={stopDecrement}
         onKeyDown={(e) => listenForEnter(e, () => handleDeltaChangeGain(false))}
-        tabIndex={0}
+        tabIndex={peaceError ? -1 : 0}
+        aria-disabled={!!peaceError}
       >
         <SliderArrowIcon type="down" />
       </div>
@@ -193,6 +196,7 @@ export default function Slider() {
           value={inputGain}
           onInput={handleChangeNumberInput}
           onKeyDown={(e) => listenForEnter(e, handleSubmitNumberInput)}
+          disabled={!!peaceError}
         />
         Pre-Amplification Gain (dB)
       </label>

@@ -32,12 +32,13 @@ export default function Switch({
   return (
     <label className="switch" htmlFor={id}>
       <input
-        checked={isOn}
-        onChange={handleToggle}
-        onKeyUp={handleKeyUp}
-        className="switch-checkbox"
         id={id}
         type="checkbox"
+        checked={isOn}
+        className="switch-checkbox"
+        onChange={handleToggle}
+        onKeyUp={handleKeyUp}
+        disabled={!!peaceError}
       />
       <div className="switch-label">
         <span className="switch-button" />
