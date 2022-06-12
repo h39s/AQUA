@@ -1,15 +1,15 @@
-import './Switch.css';
-import { useEffect, useContext, ChangeEventHandler } from 'react';
+import { KeyboardEvent, useEffect, useContext } from 'react';
 import { PeaceFoundContext } from './PeaceFoundContext';
+import './styles/Switch.scss';
 
 interface ISwitchProps {
   isOn: boolean | undefined;
-  handleToggle: ChangeEventHandler<HTMLInputElement>;
+  handleToggle: () => void;
   id: string;
   onLoad: () => void;
 }
 
-// Taken from https://upmostly.com/tutorials/build-a-react-switch-toggle-component
+// Structure taken from https://upmostly.com/tutorials/build-a-react-switch-toggle-component
 export default function Switch({
   isOn,
   handleToggle,
@@ -23,23 +23,26 @@ export default function Switch({
     }
   }, [onLoad, peaceError]);
 
+  const handleKeyUp = (e: KeyboardEvent) => {
+    if (e.code === 'Enter') {
+      handleToggle();
+    }
+  };
+
   return (
-    <>
+    <label className="switch" htmlFor={id}>
       <input
-        checked={isOn}
-        onChange={handleToggle}
-        className="react-switch-checkbox"
         id={id}
         type="checkbox"
+        checked={isOn}
+        className="switch-checkbox"
+        onChange={handleToggle}
+        onKeyUp={handleKeyUp}
+        disabled={!!peaceError}
       />
-      {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-      <label
-        style={{ background: isOn ? '#06D6A0' : '' }}
-        className="react-switch-label"
-        htmlFor={id}
-      >
-        <span className="react-switch-button" />
-      </label>
-    </>
+      <div className="switch-label">
+        <span className="switch-button" />
+      </div>
+    </label>
   );
 }

@@ -1,0 +1,106 @@
+@import 'color';
+@import 'button-state';
+
+$slider-track-width: 150px;
+$slider-track-height: 8px;
+$slider-thumb-height: 20px;
+
+.slider {
+  gap: 4px;
+
+  input[type='range'] {
+    -webkit-appearance: none;
+    height: $slider-track-height;
+    width: $slider-track-width;
+    background: transparent;
+    transform: rotate(-90deg);
+    margin: calc($slider-track-width / 2) 0px;
+
+    --range: calc(var(--max) - var(--min));
+    --ratio: calc((var(--val) - var(--min)) / var(--range));
+    --sx: calc(
+      0.5 *#{$slider-thumb-height} + var(--ratio) *
+        (100% - #{$slider-thumb-height})
+    );
+
+    &:focus-visible {
+      outline: none;
+
+      &::-webkit-slider-runnable-track {
+        box-shadow: 0px 0px 0px 2px white;
+      }
+    }
+
+    &::-webkit-slider-runnable-track {
+      cursor: pointer;
+      height: $slider-track-height;
+      width: 100%;
+      border-radius: 4px;
+      background: linear-gradient($secondary-dark, $secondary-dark) 0 /
+        var(--sx) 100% no-repeat $secondary-light;
+    }
+
+    &::-webkit-slider-thumb {
+      @extend %button-state;
+      -webkit-appearance: none;
+      cursor: pointer;
+      height: $slider-thumb-height;
+      width: $slider-thumb-height;
+      border-radius: calc($slider-thumb-height / 2);
+      margin-top: calc(-1 * ($slider-thumb-height) / 4 - 1px);
+    }
+  }
+
+  label {
+    width: 100%;
+  }
+}
+
+%slider-arrow {
+  display: flex;
+
+  &:hover {
+    color: $white;
+    cursor: pointer;
+
+    path {
+      fill: $secondary-dark;
+    }
+  }
+
+  &:active {
+    path {
+      fill: $secondary-dark;
+      filter: brightness(
+        0.8
+      ); // alternative for achieving the $secondary-darker color
+    }
+  }
+
+  &[aria-disabled='true'] {
+    cursor: default;
+
+    path {
+      fill: $primary-light;
+    }
+  }
+
+  &:focus-visible {
+    outline: none;
+
+    path {
+      stroke: white;
+      stroke-width: 2px;
+    }
+  }
+}
+
+.slider-top {
+  @extend %slider-arrow;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.slider-bottom {
+  @extend %slider-arrow;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+}
