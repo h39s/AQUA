@@ -1,0 +1,103 @@
+@import 'color';
+
+$switch-button-height: 24px;
+$switch-padding: 8px;
+
+// Default unchecked switch label styles
+.switch-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  width: calc($switch-button-height * 2 + $switch-padding);
+  height: calc($switch-button-height + $switch-padding);
+  border-radius: calc($switch-button-height + $switch-padding);
+  background: $secondary-dark;
+  position: relative;
+  transition: background-color 0.2s;
+
+  // Default unchecked switch button styles
+  .switch-button {
+    content: '';
+    position: absolute;
+    top: $switch-padding / 2;
+    left: $switch-padding / 2;
+    width: $switch-button-height;
+    height: $switch-button-height;
+    background: $secondary-default;
+    border-radius: $switch-button-height;
+    transition: 0.2s;
+  }
+}
+
+.switch-checkbox {
+  height: 0;
+  width: 0;
+  opacity: 0;
+
+  // Apply same style regardless of checked state when focused
+  &:focus-visible + .switch-label,
+  &:focus-visible + .switch-label .switch-button {
+    outline: 2px solid $white;
+  }
+
+  &:not(:checked) {
+    // Unchecked and enabled input
+    &:not(:disabled) + .switch-label {
+      &:hover .switch-button {
+        box-shadow: 0px 0px 4px 1px rgba(255, 255, 255, 0.36);
+        cursor: pointer;
+      }
+
+      &:active .switch-button {
+        box-shadow: 0px 0px 4px 1px rgba(255, 255, 255, 0.36);
+        background: $secondary-light;
+      }
+    }
+
+    // Unchecked and disabled input
+    &:disabled + .switch-label {
+      background: $primary-default;
+      cursor: default;
+
+      .switch-button {
+        background: $primary-light;
+      }
+    }
+  }
+
+  &:checked {
+    // Default checked input styles
+    + .switch-label {
+      background: $secondary-light;
+
+      .switch-button {
+        left: calc(100% - $switch-padding / 2);
+        transform: translateX(-100%);
+      }
+    }
+
+    // Checked and enabled input
+    &:not(:disabled) + .switch-label {
+      &:hover .switch-button {
+        box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.36);
+        cursor: pointer;
+      }
+
+      &:active .switch-button {
+        box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.36);
+        background: $secondary-darker;
+      }
+    }
+
+    // Checked and disabled input
+    &:disabled + .switch-label {
+      background: $primary-light;
+      cursor: default;
+
+      .switch-button {
+        background: $primary-default;
+      }
+    }
+  }
+}
