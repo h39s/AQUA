@@ -77,6 +77,10 @@ ipcMain.on('peace', async (event, arg) => {
   event.reply(channel, reply);
 });
 
+ipcMain.on('quit-app', () => {
+  app.quit();
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
