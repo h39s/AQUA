@@ -4,7 +4,7 @@
     ".prettierrc": "jsonc",
     ".eslintignore": "ignore"
   },
-  
+
   "eslint.validate": [
     "javascript",
     "javascriptreact",
@@ -15,6 +15,13 @@
   "javascript.validate.enable": false,
   "javascript.format.enable": false,
   "typescript.format.enable": false,
+
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.formatDocument": true,
+    "source.fixAll.eslint": true
+  },
 
   "search.exclude": {
     ".git": true,
