@@ -12,16 +12,16 @@ import path from 'path';
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import { U } from 'win32-api';
+import {
+  getPeaceWindowHandle,
+  isPeaceRunning,
+  sendPeaceCommand,
+} from '../common/peaceIPC';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import registry from './registry';
 import { ErrorCode } from '../common/errors';
 import { TSuccess, TError } from '../renderer/equalizerApi';
-
-// See win32 documentation https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-app
-const WM_APP = 0x8000;
-const user32 = U.load(); // load all apis defined in lib/{dll}/api from user32.dll
 
 export default class AppUpdater {
   constructor() {
@@ -32,8 +32,6 @@ export default class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
-const peaceTitle = 'Peace window messages'; // "Peter's Equalizer APO Configuration Extension (Peace) 1.6.1.2\0"
-const peaceLpszWindow = Buffer.from(peaceTitle, 'ucs2');
 
 ipcMain.on('peace', async (event, arg) => {
   const channel: string = arg[0];
@@ -44,12 +42,8 @@ ipcMain.on('peace', async (event, arg) => {
     return;
   }
 
-  const peaceHWnd = user32.FindWindowExW(0, 0, null, peaceLpszWindow);
-
-  const foundPeace =
-    (typeof peaceHWnd === 'number' && peaceHWnd > 0) ||
-    (typeof peaceHWnd === 'bigint' && peaceHWnd > 0) ||
-    (typeof peaceHWnd === 'string' && peaceHWnd.length > 0);
+  const peaceHWnd = getPeaceWindowHandle();
+  const foundPeace = isPeaceRunning(peaceHWnd);
 
   if (!foundPeace) {
     const reply: TError = { errorCode: ErrorCode.PEACE_NOT_RUNNING };
@@ -62,12 +56,7 @@ ipcMain.on('peace', async (event, arg) => {
   const lParam = parseInt(arg[3], 10) || 0;
 
   // Send message to Peace
-  const res = user32.SendMessageW(
-    peaceHWnd,
-    WM_APP + messageCode,
-    wParam,
-    lParam
-  );
+  const res = sendPeaceCommand(peaceHWnd, messageCode, wParam, lParam);
   if (res === 4294967295) {
     const reply: TError = { errorCode: ErrorCode.PEACE_NOT_READY };
     event.reply(channel, reply);
