@@ -34,7 +34,9 @@
     "start:main": "cross-env NODE_ENV=development electronmon -r ts-node/register/transpile-only .",
     "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
-    "test": "jest"
+    "test": "jest",
+    "test:unit": "jest --testMatch **/__tests__/unit_tests/*.ts?(x)",
+    "test:cucumber": "jest --testMatch **/__tests__/cucumber_tests/*.ts?(x)"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -97,9 +99,11 @@
     },
     "testMatch": [
       "**/__tests__/*_tests/*.ts?(x)"
-    ]
+    ],
+    "transformIgnorePatterns": ["/node_modules/(?!(uuid)/)", "\\.pnp\\.[^\\\/]+$"]
   },
   "dependencies": {
+    "electron-chromedriver": "^19.0.0",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.7",
     "electron-updater": "^5.0.1",

@@ -7,7 +7,9 @@ import {
   thenPeaceFrequencyGain,
 } from './shared_steps/peace';
 
-const feature = loadFeature('features/set_band_gain.feature');
+const feature = loadFeature(
+  './src/__tests__/cucumber_tests/features/set_band_gain.feature'
+);
 
 defineFeature(feature, (test) => {
   test('Move slider to bottom', ({ given, when, then }) => {

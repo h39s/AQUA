@@ -18,6 +18,8 @@ export const thenPeaceFrequencyGain = (then: DefineStepFunction) => {
   then(
     /^Peace should show gain of (\d+)dB for frequency (\d+)Hz$/,
     (gain: number, frequency: number) => {
+      console.log(`gain: ${gain}`);
+      console.log(`frequency: ${frequency}`);
       // TODO ask peace for gain of a specific frequency
     }
   );
