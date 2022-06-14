@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
-import Switch from '../renderer/Switch';
+import Switch from '../../renderer/Switch';
 
 describe('Switch', () => {
   const id = 'switch';
