@@ -3,17 +3,17 @@ import { PeaceFoundContext } from './PeaceFoundContext';
 import './styles/Switch.scss';
 
 interface ISwitchProps {
-  isOn: boolean | undefined;
-  handleToggle: () => void;
   id: string;
+  isOn: boolean;
+  handleToggle: () => void;
   onLoad: () => void;
 }
 
 // Structure taken from https://upmostly.com/tutorials/build-a-react-switch-toggle-component
 export default function Switch({
+  id,
   isOn,
   handleToggle,
-  id,
   onLoad,
 }: ISwitchProps) {
   const { peaceError } = useContext(PeaceFoundContext);
@@ -35,12 +35,13 @@ export default function Switch({
         id={id}
         type="checkbox"
         checked={isOn}
+        aria-checked={isOn}
         className="switch-checkbox"
         onChange={handleToggle}
         onKeyUp={handleKeyUp}
         disabled={!!peaceError}
       />
-      <div className="switch-label">
+      <div role="button" className="switch-label" aria-label={id}>
         <span className="switch-button" />
       </div>
     </label>

@@ -41,9 +41,9 @@ export default function EqualizerEnablerSwitch({
 
   return (
     <Switch
+      id={id}
       isOn={equalizerEnabled}
       handleToggle={handleToggleEqualizer}
-      id={id}
       onLoad={equalizerEnablerOnLoad}
     />
   );
