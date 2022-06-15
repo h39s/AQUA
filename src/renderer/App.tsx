@@ -3,14 +3,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './styles/App.scss';
 import { getProgramState } from './equalizerApi';
+import MainContent from './MainContent';
 import { PeaceFoundContext } from './PeaceFoundContext';
 import PrereqMissingModal from './PrereqMissingModal';
 import SideBar from './SideBar';
 
 const AppContent = () => {
   return (
-    <div className="row">
+    <div className="full row">
       <SideBar />
+      <MainContent />
     </div>
   );
 };

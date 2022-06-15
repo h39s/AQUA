@@ -12,6 +12,11 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+
+  #root {
+    height: 100%;
+    width: 100%;
+  }
 }
 
 button {
@@ -38,9 +43,27 @@ button {
   flex-direction: column;
 }
 
+.full {
+  height: 100%;
+  width: 100%;
+}
+
 .center {
   align-content: center;
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+
+$content-width: 80%;
+
+.sideBar {
+  height: 100%;
+  width: calc(100% - $content-width);
+  gap: $spacing-m;
+}
+
+.mainContent {
+  height: 100%;
+  width: $content-width;
 }

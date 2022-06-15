@@ -3,8 +3,9 @@ import {
   ErrorDescription,
   getErrorDescription,
 } from 'common/errors';
+import { clamp } from './utils';
 
-const TIMEOUT = 10000;
+const TIMEOUT = 15000;
 
 export interface TSuccess {
   result: number;
@@ -117,6 +118,80 @@ export const setMainPreAmp = (gain: number) => {
 };
 
 /**
+ * Get the current main preamplification gain value
+ * @param {number} index - index of the slider being adjusted
+ * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
+ */
+export const getGain = (index: number): Promise<number> => {
+  const channel = `getGain${index}`;
+  window.electron.ipcRenderer.sendMessage('peace', [
+    channel,
+    100 + index,
+    5,
+    0,
+  ]);
+
+  const responseHandler = buildResponseHandler<number>((result, resolve) => {
+    const OVERFLOW_OFFSET = 4294967296;
+
+    // If gain is larger than 30, assume overflow occured.
+    // If adjusting overflow gives a positive value, default to -30
+    if (result / 1000 > 30 && (result - OVERFLOW_OFFSET) / 1000 > 0) {
+      resolve(-30);
+      return;
+    }
+
+    const gain =
+      result / 1000 > 30 ? (result - OVERFLOW_OFFSET) / 1000 : result / 1000;
+
+    // Round up any lower gain values up to -30
+    resolve(Math.max(gain, -30));
+  });
+  return promisifyResult(responseHandler, channel);
+};
+
+/**
+ * Adjusts the main preamplification gain value
+ * @param {number} index - index of the slider being adjusted
+ * @param {number} gain - new gain value in [-30, 30]
+ */
+export const setGain = (index: number, gain: number) => {
+  const channel = `setGain${index}`;
+  if (gain > 30 || gain < -30) {
+    throw new Error('Invalid gain value - outside of range [-30, 30]');
+  }
+  window.electron.ipcRenderer.sendMessage('peace', [
+    channel,
+    100 + index,
+    1,
+    gain * 1000,
+  ]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+// GUICtrlSetData($Frequency,SendPeaceMessage(100+Number(GUICtrlRead($Slider)),8,0,"Slider " & Number(GUICtrlRead($Slider)) & " frequency # Hz"))
+/**
+ * Get the current main preamplification gain value
+ * @param {number} index - index of the slider being adjusted
+ * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
+ */
+export const getFrequency = (index: number): Promise<number> => {
+  const channel = `getFrequency${index}`;
+  window.electron.ipcRenderer.sendMessage('peace', [
+    channel,
+    100 + index,
+    8,
+    0,
+  ]);
+
+  const responseHandler = buildResponseHandler<number>((result, resolve) => {
+    const gain = clamp(result, 10, 22050);
+    resolve(gain);
+  });
+  return promisifyResult(responseHandler, channel);
+};
+
+/**
  * Get program state for Peace. We will use this as a health check call
  * @returns { Promise<void> } exception if Peace is not okay.
  */
@@ -130,7 +205,7 @@ export const getProgramState = (): Promise<void> => {
  * Enable Equalizer
  * @returns { Promise<void> } exception if failed.
  */
-export const enableEqualizer = () => {
+export const enableEqualizer = (): Promise<void> => {
   const channel = 'enableEqualizer';
   window.electron.ipcRenderer.sendMessage('peace', [channel, 3, 0]);
   const responseHandler = buildResponseHandler<void>(
@@ -148,7 +223,7 @@ export const enableEqualizer = () => {
  * Disable Equalizer
  * @returns { Promise<void> } exception if failed.
  */
-export const disableEqualizer = () => {
+export const disableEqualizer = (): Promise<void> => {
   const channel = 'disableEqualizer';
   window.electron.ipcRenderer.sendMessage('peace', [channel, 3, 1]);
   const responseHandler = buildResponseHandler<void>(

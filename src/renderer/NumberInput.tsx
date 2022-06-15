@@ -8,6 +8,7 @@ interface INumberInputProps {
   min: number;
   max: number;
   isDisabled: boolean;
+  showLabel: boolean;
   handleChange: (newValue: number | '' | '-') => void;
   handleSubmit: (newValue: number) => void;
 }
@@ -18,6 +19,7 @@ const NumberInput = ({
   min,
   max,
   isDisabled,
+  showLabel,
   handleChange,
   handleSubmit,
 }: INumberInputProps) => {
@@ -62,7 +64,7 @@ const NumberInput = ({
         onKeyDown={listenForEnter}
         disabled={isDisabled}
       />
-      {name}
+      {showLabel && name}
     </label>
   );
 };

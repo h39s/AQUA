@@ -7,15 +7,21 @@ const SideBar = () => {
   const MAX = 30;
 
   return (
-    <div className="col">
-      <EqualizerEnablerSwitch id="equalizerEnabler" />
-      <Slider
-        name="Pre-Amplification Gain (dB)"
-        min={MIN}
-        max={MAX}
-        getValue={getMainPreAmp}
-        setValue={setMainPreAmp}
-      />
+    <div className="col sideBar center">
+      <div>
+        <h3>Enable</h3>
+        <EqualizerEnablerSwitch id="equalizerEnabler" />
+      </div>
+      <div>
+        <h3>Pre-Amp Gain (dB)</h3>
+        <Slider
+          name="Pre-Amplification Gain (dB)"
+          min={MIN}
+          max={MAX}
+          getValue={getMainPreAmp}
+          setValue={setMainPreAmp}
+        />
+      </div>
     </div>
   );
 };
