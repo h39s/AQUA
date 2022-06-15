@@ -1,0 +1,26 @@
+@import 'color';
+@import 'spacing';
+
+.numberInput {
+  gap: $spacing-s;
+
+  input[type='text'] {
+    background: $primary-dark;
+    border: 2px solid $secondary-default;
+    border-radius: 4px;
+    color: $white;
+    padding: $spacing-xs;
+    height: 24px;
+    width: 24px;
+    text-align: center;
+
+    &:focus-visible {
+      outline: 2px solid $white;
+    }
+
+    &:disabled {
+      background: $primary-light;
+      color: $primary-lighter;
+    }
+  }
+}

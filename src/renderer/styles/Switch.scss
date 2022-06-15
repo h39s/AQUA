@@ -51,12 +51,12 @@ $switch-padding: 8px;
     // Unchecked and enabled input
     &:not(:disabled) + .switch-label {
       &:hover .switch-button {
-        box-shadow: 0px 0px 4px 1px rgba(255, 255, 255, 0.36);
+        box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.36);
         cursor: pointer;
       }
 
       &:active .switch-button {
-        box-shadow: 0px 0px 4px 1px rgba(255, 255, 255, 0.36);
+        box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.36);
         background: $secondary-light;
       }
     }

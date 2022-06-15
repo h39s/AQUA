@@ -85,7 +85,6 @@ export const getMainPreAmp = (): Promise<number> => {
     // If gain is larger than 30, assume overflow occured.
     // If adjusting overflow gives a positive value, default to -30
     if (result / 1000 > 30 && (result - OVERFLOW_OFFSET) / 1000 > 0) {
-      console.log('erroneous gain, default to -30');
       resolve(-30);
       return;
     }
@@ -121,7 +120,7 @@ export const setMainPreAmp = (gain: number) => {
  * Get program state for Peace. We will use this as a health check call
  * @returns { Promise<void> } exception if Peace is not okay.
  */
-export const getProgramState = () => {
+export const getProgramState = (): Promise<void> => {
   const channel = 'getProgramState';
   window.electron.ipcRenderer.sendMessage('peace', [channel, 0, 0]);
   return promisifyResult(setterResponseHandler, channel);
@@ -167,7 +166,7 @@ export const disableEqualizer = () => {
  * Get the current equalizer status
  * @returns { Promise<boolean> } true for on, false for off, exception otherwise
  */
-export const getEqualizerStatus = () => {
+export const getEqualizerStatus = (): Promise<boolean> => {
   const channel = 'getEqualizerStatus';
   window.electron.ipcRenderer.sendMessage('peace', [channel, 3, 3, 0]);
 
