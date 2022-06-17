@@ -10,8 +10,14 @@ export const whenSetFrequencyGain = (
     async (frequency: number, position: string) => {
       console.log(`frequency: ${frequency}`);
       console.log(`position: ${position}`);
-      // TODO use webdriver io to move slider
-      console.log(await webdriver.driver);
+      const sliderElem = await webdriver.driver.$('#test');
+      let endElem;
+      if (position === 'top') {
+        endElem = await webdriver.driver.$('#testup');
+      } else if (position === 'bottom') {
+        endElem = await webdriver.driver.$('#testdown');
+      }
+      sliderElem.dragAndDrop(endElem);
     }
   );
 };
@@ -26,7 +32,7 @@ export const givenSetFrequencyGain = (
       console.log(`frequency: ${frequency}`);
       console.log(`position: ${position}`);
       // TODO use webdriver io get slider position
-      console.log(await webdriver.driver);
+      console.log(webdriver.driver);
     }
   );
 };

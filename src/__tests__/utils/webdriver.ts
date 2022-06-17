@@ -10,18 +10,10 @@ const options: RemoteOptions = {
     browserName: 'chrome',
     'goog:chromeOptions': {
       binary: path.join(
-        // __dirname,
-        // '..',
-        // '..',
-        // '..',
-        // 'release',
-        // 'build',
-        // 'AQUA 0.0.2.exe'
-        'C:/Users/milkr/AppData/Local/Programs/aqua/AQUA.exe'
-      ), // Path to your Electron binary.
-      args: [
-        /* cli arguments */
-      ], // Optional, perhaps 'app=' + /path/to/your/app/
+        process.env.USERPROFILE ? process.env.USERPROFILE : '',
+        'AppData/Local/Programs/aqua/AQUA.exe'
+      ),
+      args: [],
     },
   },
 };
@@ -32,9 +24,13 @@ export const startChromeDriver = () => {
   if (chromeDriverProcess !== undefined) {
     throw new Error('chromedriver already started.');
   }
-  console.log(__dirname);
-  chromeDriverProcess = spawn('ls', ['--url-base=wd/hub', '--port=9515']);
-  console.log(chromeDriverProcess);
+  chromeDriverProcess = spawn('chromedriver.exe', ['--port=9515'], {
+    shell: true,
+    cwd: path.join(
+      __dirname,
+      '../../../node_modules/electron-chromedriver/bin'
+    ),
+  });
   return true;
 };
 
@@ -42,6 +38,7 @@ export const stopChromeDriver = () => {
   if (chromeDriverProcess === undefined) {
     return true;
   }
+
   return chromeDriverProcess.kill(9);
 };
 
@@ -52,4 +49,4 @@ export default async function getWebDriver() {
   return remote(options);
 }
 
-export type Driver = ReturnType<typeof getWebDriver>;
+export type Driver = Awaited<ReturnType<typeof getWebDriver>>;

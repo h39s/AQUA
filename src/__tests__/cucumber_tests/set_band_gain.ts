@@ -1,6 +1,10 @@
 import { loadFeature, defineFeature } from 'jest-cucumber';
 import getRandomValuesPolyPony from 'get-random-values-polypony'; // Need this to fix jest-cucumber's reliance on uuid's getRandomValues
-import { stopChromeDriver } from '__tests__/utils/webdriver';
+import {
+  Driver,
+  startChromeDriver,
+  stopChromeDriver,
+} from '__tests__/utils/webdriver';
 import { givenAquaIsNotRunning, whenAquaIsLaunched } from './shared_steps/aqua';
 import { whenSetFrequencyGain } from './shared_steps/aquaSlider';
 import {
@@ -12,11 +16,12 @@ import {
 // shim the getRandomValues function used in uuid which is used by jest-cucumber
 // so that it works in electron environment.
 getRandomValuesPolyPony.polyfill();
-// startChromeDriver();
+startChromeDriver();
 
 const feature = loadFeature(
   './src/__tests__/cucumber_tests/features/set_band_gain.feature'
 );
+const webdriver: { driver: Driver } = { driver: undefined };
 
 defineFeature(feature, (test) => {
   test('Move slider to bottom', async ({ given, when, then }) => {
@@ -24,14 +29,16 @@ defineFeature(feature, (test) => {
     givenPeaceIsRunning(given);
     givenAquaIsNotRunning(given);
 
-    const driver = { driver: undefined };
-    whenAquaIsLaunched(when, driver);
-    whenSetFrequencyGain(when, driver);
+    whenAquaIsLaunched(when, webdriver);
+    whenSetFrequencyGain(when, webdriver);
 
-    thenPeaceFrequencyGain(then, driver);
+    thenPeaceFrequencyGain(then);
   }, 30000);
 });
 
 afterAll(() => {
+  if (webdriver.driver) {
+    webdriver.driver.deleteSession();
+  }
   stopChromeDriver();
 });
