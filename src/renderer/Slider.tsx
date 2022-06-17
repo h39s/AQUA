@@ -1,5 +1,5 @@
 import { ErrorDescription } from 'common/errors';
-import { useEffect, useContext, useState } from 'react';
+import { useEffect, useContext, useState, useMemo } from 'react';
 import NumberInput from './NumberInput';
 import RangeInput from './RangeInput';
 import { PeaceFoundContext } from './PeaceFoundContext';
@@ -14,20 +14,28 @@ interface ISliderProps {
 }
 
 const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
-  const [preAmpGain, setPreAmpGain] = useState<number>(0);
-  const [inputGain, setInputGain] = useState<number | '' | '-'>(0);
+  const [rangeValue, setRangeValue] = useState<number>(0);
+  const [inputValue, setInputValue] = useState<number | '' | '-'>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { peaceError, setPeaceError } = useContext(PeaceFoundContext);
 
+  const isDisabled = useMemo(
+    () => !!peaceError || isLoading,
+    [peaceError, isLoading]
+  );
+
   useEffect(() => {
     const fetchResults = async () => {
+      setIsLoading(true);
       try {
         const initValue = await getValue();
-        setPreAmpGain(initValue);
-        setInputGain(initValue);
+        setRangeValue(initValue);
+        setInputValue(initValue);
       } catch (e) {
         setPeaceError(e as ErrorDescription);
       }
+      setIsLoading(false);
     };
     if (!peaceError) {
       fetchResults();
@@ -36,8 +44,8 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
 
   // Helpers for adjusting the preamp gain value
   const handleChangeGain = async (newValue: number) => {
-    setPreAmpGain(newValue);
-    setInputGain(newValue);
+    setRangeValue(newValue);
+    setInputValue(newValue);
     try {
       await setValue(newValue);
     } catch (e) {
@@ -49,20 +57,20 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
     <div className="col center slider">
       <RangeInput
         name={name}
-        value={preAmpGain}
+        value={rangeValue}
         min={min}
         max={max}
         handleChange={handleChangeGain}
-        isDisabled={!!peaceError}
+        isDisabled={isDisabled}
       />
       <NumberInput
         name={name}
-        value={inputGain}
+        value={inputValue}
         min={min}
         max={max}
-        handleChange={setInputGain}
+        handleChange={setInputValue}
         handleSubmit={handleChangeGain}
-        isDisabled={!!peaceError}
+        isDisabled={isDisabled}
         showLabel={false}
       />
     </div>

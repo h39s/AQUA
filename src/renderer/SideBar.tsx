@@ -1,6 +1,7 @@
 import { getMainPreAmp, setMainPreAmp } from './equalizerApi';
 import EqualizerEnablerSwitch from './EqualizerEnablerSwitch';
 import Slider from './Slider';
+import './styles/SideBar.scss';
 
 const SideBar = () => {
   const MIN = -30;

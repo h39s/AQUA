@@ -8,6 +8,7 @@ body {
   height: 100vh;
   background: $primary-dark;
   font-family: sans-serif;
+  font-size: 1em;
   overflow-y: hidden;
   display: flex;
   justify-content: center;
@@ -53,17 +54,4 @@ button {
   align-items: center;
   justify-content: center;
   text-align: center;
-}
-
-$content-width: 80%;
-
-.sideBar {
-  height: 100%;
-  width: calc(100% - $content-width);
-  gap: $spacing-m;
-}
-
-.mainContent {
-  height: 100%;
-  width: $content-width;
 }

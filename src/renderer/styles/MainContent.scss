@@ -1,0 +1,30 @@
+@import './constant';
+@import './spacing';
+
+$band-height: 280px;
+
+.mainContent {
+  height: 100%;
+  width: $content-width;
+  gap: $spacing-s;
+
+  .bandLabel {
+    height: $band-height;
+    justify-content: space-between;
+
+    div {
+      justify-content: space-around;
+      height: 100%;
+    }
+
+    .gainLabel {
+      margin: $spacing-s 0;
+    }
+  }
+
+  .band {
+    height: $band-height;
+    width: 72px;
+    gap: $spacing-s;
+  }
+}

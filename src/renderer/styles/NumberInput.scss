@@ -19,7 +19,7 @@
     }
 
     &:disabled {
-      background: $primary-light;
+      border: 2px solid $primary-lighter;
       color: $primary-lighter;
     }
   }

@@ -5,7 +5,8 @@ import {
 } from 'common/errors';
 import { clamp } from './utils';
 
-const TIMEOUT = 15000;
+const TIMEOUT = 10000;
+const OVERFLOW_OFFSET = 4294967296;
 
 export interface TSuccess {
   result: number;
@@ -81,20 +82,23 @@ export const getMainPreAmp = (): Promise<number> => {
   window.electron.ipcRenderer.sendMessage('peace', [channel, 5, 5, 0]);
 
   const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    const OVERFLOW_OFFSET = 4294967296;
+    const MAX_GAIN = 30;
+    const MIN_GAIN = -30;
 
     // If gain is larger than 30, assume overflow occured.
     // If adjusting overflow gives a positive value, default to -30
-    if (result / 1000 > 30 && (result - OVERFLOW_OFFSET) / 1000 > 0) {
-      resolve(-30);
+    if (result / 1000 > MAX_GAIN && (result - OVERFLOW_OFFSET) / 1000 > 0) {
+      resolve(MIN_GAIN);
       return;
     }
 
     const gain =
-      result / 1000 > 30 ? (result - OVERFLOW_OFFSET) / 1000 : result / 1000;
+      result / 1000 > MAX_GAIN
+        ? (result - OVERFLOW_OFFSET) / 1000
+        : result / 1000;
 
     // Round up any lower gain values up to -30
-    resolve(Math.max(gain, -30));
+    resolve(Math.max(gain, MIN_GAIN));
   });
   return promisifyResult(responseHandler, channel);
 };
@@ -132,22 +136,27 @@ export const getGain = (index: number): Promise<number> => {
   ]);
 
   const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    const OVERFLOW_OFFSET = 4294967296;
+    const MAX_GAIN = 30;
+    const MIN_GAIN = -30;
 
     // If gain is larger than 30, assume overflow occured.
     // If adjusting overflow gives a positive value, default to -30
-    if (result / 1000 > 30 && (result - OVERFLOW_OFFSET) / 1000 > 0) {
-      resolve(-30);
+    if (result / 1000 > MAX_GAIN && (result - OVERFLOW_OFFSET) / 1000 > 0) {
+      resolve(MIN_GAIN);
       return;
     }
 
     const gain =
-      result / 1000 > 30 ? (result - OVERFLOW_OFFSET) / 1000 : result / 1000;
+      result / 1000 > MAX_GAIN
+        ? (result - OVERFLOW_OFFSET) / 1000
+        : result / 1000;
 
     // Round up any lower gain values up to -30
-    resolve(Math.max(gain, -30));
+    resolve(Math.max(gain, MIN_GAIN));
   });
   return promisifyResult(responseHandler, channel);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // return new Promise((resolve, _reject) => resolve(0));
 };
 
 /**
@@ -185,8 +194,16 @@ export const getFrequency = (index: number): Promise<number> => {
   ]);
 
   const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    const gain = clamp(result, 10, 22050);
-    resolve(gain);
+    const MAX_FREQUENCY = 22050;
+    const MIN_FREQUENCY = 10;
+
+    // If result is larger than the max value, assume overflow occured.
+    if (result > MAX_FREQUENCY) {
+      resolve(10);
+    }
+
+    const frequency = clamp(result, MIN_FREQUENCY, MAX_FREQUENCY);
+    resolve(frequency);
   });
   return promisifyResult(responseHandler, channel);
 };
