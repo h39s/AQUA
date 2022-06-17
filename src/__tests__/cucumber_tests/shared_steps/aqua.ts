@@ -1,4 +1,7 @@
 import { DefineStepFunction } from 'jest-cucumber';
+import getWebDriver, { Driver } from '__tests__/utils/webdriver';
+
+// let webdriver: Driver;
 
 export const givenAquaIsNotRunning = (given: DefineStepFunction) => {
   given('Aqua is not running', () => {
@@ -6,8 +9,17 @@ export const givenAquaIsNotRunning = (given: DefineStepFunction) => {
   });
 };
 
-export const whenAquaIsLaunched = (when: DefineStepFunction) => {
+export const whenAquaIsLaunched = (
+  when: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
   when('Aqua is launched', () => {
-    // Use spectron to launch
+    webdriver.driver = getWebDriver();
+    console.log(webdriver);
   });
 };
+
+// export const getDriver = () => {
+//   console.log(webdriver);
+//   return webdriver;
+// };

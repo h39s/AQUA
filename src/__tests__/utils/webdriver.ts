@@ -1,4 +1,7 @@
-import webdriverio, { RemoteOptions } from 'webdriverio';
+import { remote, RemoteOptions } from 'webdriverio';
+import path from 'path';
+
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 
 const options: RemoteOptions = {
   hostname: 'localhost', // Use localhost as chrome driver server
@@ -6,7 +9,16 @@ const options: RemoteOptions = {
   capabilities: {
     browserName: 'chrome',
     'goog:chromeOptions': {
-      binary: '/Path-to-Your-App/electron', // Path to your Electron binary.
+      binary: path.join(
+        // __dirname,
+        // '..',
+        // '..',
+        // '..',
+        // 'release',
+        // 'build',
+        // 'AQUA 0.0.2.exe'
+        'C:/Users/milkr/AppData/Local/Programs/aqua/AQUA.exe'
+      ), // Path to your Electron binary.
       args: [
         /* cli arguments */
       ], // Optional, perhaps 'app=' + /path/to/your/app/
@@ -14,6 +26,30 @@ const options: RemoteOptions = {
   },
 };
 
+let chromeDriverProcess: ChildProcessWithoutNullStreams | undefined;
+
+export const startChromeDriver = () => {
+  if (chromeDriverProcess !== undefined) {
+    throw new Error('chromedriver already started.');
+  }
+  console.log(__dirname);
+  chromeDriverProcess = spawn('ls', ['--url-base=wd/hub', '--port=9515']);
+  console.log(chromeDriverProcess);
+  return true;
+};
+
+export const stopChromeDriver = () => {
+  if (chromeDriverProcess === undefined) {
+    return true;
+  }
+  return chromeDriverProcess.kill(9);
+};
+
 export default async function getWebDriver() {
-  return webdriverio.remote(options);
+  // if (chromeDriverProcess === undefined) {
+  //   throw new Error('chrome driver not started.');
+  // }
+  return remote(options);
 }
+
+export type Driver = ReturnType<typeof getWebDriver>;
