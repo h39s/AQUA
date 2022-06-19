@@ -2,6 +2,7 @@ import {
   ChangeEvent,
   CSSProperties,
   KeyboardEvent,
+  useCallback,
   useRef,
   useState,
 } from 'react';
@@ -33,13 +34,16 @@ const RangeInput = ({
   const [isIncreasing, setIsIncreasing] = useState(false);
   const [isDecreasing, setIsDecreasing] = useState(false);
 
-  const handleDeltaChangeGain = (isIncrement: boolean) => {
-    if (value < max && isIncrement) {
-      handleChange(value + 1);
-    } else if (value > min && !isIncrement) {
-      handleChange(value - 1);
-    }
-  };
+  const handleDeltaChangeGain = useCallback(
+    (isIncrement: boolean) => {
+      if (value < max && isIncrement) {
+        handleChange(value + 1);
+      } else if (value > min && !isIncrement) {
+        handleChange(value - 1);
+      }
+    },
+    [handleChange, max, min, value]
+  );
 
   // Hooks for continuously increasing/decreasing gain
   useInterval(
@@ -53,34 +57,46 @@ const RangeInput = ({
   );
 
   // Handlers for pausing continous change of the gain
-  const stopIncrement = () => {
+  const stopIncrement = useCallback(() => {
     setIsIncreasing(false);
     increaseButtonRef.current?.removeEventListener('mouseleave', stopIncrement);
-  };
+  }, []);
 
-  const stopDecrement = () => {
+  const stopDecrement = useCallback(() => {
     setIsDecreasing(false);
     decreaseButtonRef.current?.removeEventListener('mouseleave', stopDecrement);
-  };
+  }, []);
 
   // Handlers for various input types
-  const handleArrowInput = (isIncrement: boolean) => {
-    if (isIncrement) {
-      // Manually alter gain once to simulate click
-      handleDeltaChangeGain(true);
+  const handleArrowInput = useCallback(
+    (isIncrement: boolean) => {
+      if (isDisabled) {
+        return;
+      }
+      if (isIncrement) {
+        // Manually alter gain once to simulate click
+        handleDeltaChangeGain(true);
 
-      // Begin timer for continous adjustment
-      setIsIncreasing(true);
-      increaseButtonRef.current?.addEventListener('mouseleave', stopIncrement);
-    } else {
-      // Manually alter gain once to simulate click
-      handleDeltaChangeGain(false);
+        // Begin timer for continous adjustment
+        setIsIncreasing(true);
+        increaseButtonRef.current?.addEventListener(
+          'mouseleave',
+          stopIncrement
+        );
+      } else {
+        // Manually alter gain once to simulate click
+        handleDeltaChangeGain(false);
 
-      // Begin timer for continous adjustment
-      setIsDecreasing(true);
-      decreaseButtonRef.current?.addEventListener('mouseleave', stopDecrement);
-    }
-  };
+        // Begin timer for continous adjustment
+        setIsDecreasing(true);
+        decreaseButtonRef.current?.addEventListener(
+          'mouseleave',
+          stopDecrement
+        );
+      }
+    },
+    [handleDeltaChangeGain, isDisabled, stopDecrement, stopIncrement]
+  );
 
   const handleRangeInput = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue: number = clamp(parseInt(e.target.value, 10), min, max);

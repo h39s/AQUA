@@ -56,7 +56,7 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
   return (
     <div className="col center slider">
       <RangeInput
-        name={name}
+        name={`${name}-range`}
         value={rangeValue}
         min={min}
         max={max}
@@ -64,7 +64,7 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
         isDisabled={isDisabled}
       />
       <NumberInput
-        name={name}
+        name={`${name}-number`}
         value={inputValue}
         min={min}
         max={max}

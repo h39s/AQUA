@@ -49,6 +49,7 @@ $range-thumb-height: 20px;
     &:disabled::-webkit-slider-runnable-track {
       background: linear-gradient($primary-default, $primary-default) 0 /
         var(--sx) 100% no-repeat $primary-lighter;
+      cursor: default;
     }
 
     &::-webkit-slider-thumb {
@@ -94,6 +95,13 @@ $range-thumb-height: 20px;
 
     path {
       fill: $primary-light;
+    }
+
+    &:active {
+      path {
+        // ensure that the brightness doesn't change when pressed
+        filter: brightness(1);
+      }
     }
   }
 
