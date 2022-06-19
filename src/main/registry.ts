@@ -15,7 +15,6 @@ if (app) {
     __dirname,
     '../../../node_modules/regedit/vbs'
   );
-  console.log(vbsDirectory);
   setExternalVBSLocation(vbsDirectory);
 }
 

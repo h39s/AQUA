@@ -20,9 +20,9 @@ export const givenPeaceIsRunning = (given: DefineStepFunction) => {
       if (foundPeace) {
         return;
       }
-      // Wait 500 ms before trying again
+      // Wait 1s before trying again
       // eslint-disable-next-line no-await-in-loop
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
     throw new Error('Peace not running');
     // TODO find a way to start peace

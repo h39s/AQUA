@@ -18,6 +18,8 @@ export const whenSetFrequencyGain = (
         endElem = await webdriver.driver.$('#testdown');
       }
       sliderElem.dragAndDrop(endElem);
+      // wait 500 ms for the action.
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
   );
 };

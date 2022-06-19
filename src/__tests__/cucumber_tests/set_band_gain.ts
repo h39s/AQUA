@@ -13,10 +13,12 @@ import {
   thenPeaceFrequencyGain,
 } from './shared_steps/peace';
 
+// jest.useFakeTimers();
+
 // shim the getRandomValues function used in uuid which is used by jest-cucumber
 // so that it works in electron environment.
 getRandomValuesPolyPony.polyfill();
-startChromeDriver();
+const chromeDriver = startChromeDriver();
 
 const feature = loadFeature(
   './src/__tests__/cucumber_tests/features/set_band_gain.feature'
@@ -29,7 +31,7 @@ defineFeature(feature, (test) => {
     givenPeaceIsRunning(given);
     givenAquaIsNotRunning(given);
 
-    whenAquaIsLaunched(when, webdriver);
+    whenAquaIsLaunched(when, webdriver, chromeDriver);
     whenSetFrequencyGain(when, webdriver);
 
     thenPeaceFrequencyGain(then);
@@ -38,7 +40,7 @@ defineFeature(feature, (test) => {
 
 afterAll(() => {
   if (webdriver.driver) {
-    webdriver.driver.deleteSession();
+    // webdriver.driver.deleteSession();
   }
-  stopChromeDriver();
+  stopChromeDriver(chromeDriver);
 });

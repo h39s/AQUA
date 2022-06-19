@@ -18,34 +18,28 @@ const options: RemoteOptions = {
   },
 };
 
-let chromeDriverProcess: ChildProcessWithoutNullStreams | undefined;
-
 export const startChromeDriver = () => {
-  if (chromeDriverProcess !== undefined) {
-    throw new Error('chromedriver already started.');
-  }
-  chromeDriverProcess = spawn('chromedriver.exe', ['--port=9515'], {
+  return spawn('chromedriver.exe', ['--port=9515'], {
     shell: true,
     cwd: path.join(
       __dirname,
       '../../../node_modules/electron-chromedriver/bin'
     ),
   });
-  return true;
 };
 
-export const stopChromeDriver = () => {
-  if (chromeDriverProcess === undefined) {
-    return true;
-  }
-
+export const stopChromeDriver = (
+  chromeDriverProcess: ChildProcessWithoutNullStreams
+) => {
   return chromeDriverProcess.kill(9);
 };
 
-export default async function getWebDriver() {
-  // if (chromeDriverProcess === undefined) {
-  //   throw new Error('chrome driver not started.');
-  // }
+export default async function getWebDriver(
+  chromeDriverProcess: ChildProcessWithoutNullStreams
+) {
+  if (chromeDriverProcess === undefined) {
+    throw new Error('chrome driver not started.');
+  }
   return remote(options);
 }
 
