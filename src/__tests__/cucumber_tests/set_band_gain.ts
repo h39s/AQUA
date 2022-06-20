@@ -34,7 +34,7 @@ defineFeature(feature, (test) => {
     whenAquaIsLaunched(when, webdriver, chromeDriver);
     whenSetFrequencyGain(when, webdriver);
 
-    thenPeaceFrequencyGain(then);
+    thenPeaceFrequencyGain(then, webdriver);
   }, 30000);
 });
 

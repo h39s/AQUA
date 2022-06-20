@@ -16,6 +16,6 @@ export const whenAquaIsLaunched = (
   when('Aqua is launched', async () => {
     webdriver.driver = await getWebDriver(chromeDriverProcess);
     // Wait 2 seconds for the app to launch and load screen
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 10000));
   });
 };

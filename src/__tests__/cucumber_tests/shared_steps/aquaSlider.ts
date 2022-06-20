@@ -8,18 +8,18 @@ export const whenSetFrequencyGain = (
   when(
     /^I set gain of slider of frequency (\d+)Hz to (top|middle|bottom)$/,
     async (frequency: number, position: string) => {
-      console.log(`frequency: ${frequency}`);
-      console.log(`position: ${position}`);
-      const sliderElem = await webdriver.driver.$('#test');
-      let endElem;
+      const sliderElem = await webdriver.driver.$(
+        `[name="${frequency}-range"]`
+      );
+      const coord = { x: 0, y: 0 };
       if (position === 'top') {
-        endElem = await webdriver.driver.$('#testup');
+        coord.y = -100;
       } else if (position === 'bottom') {
-        endElem = await webdriver.driver.$('#testdown');
+        coord.y = 100;
       }
-      sliderElem.dragAndDrop(endElem);
+      sliderElem.dragAndDrop(coord);
       // wait 500 ms for the action.
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   );
 };

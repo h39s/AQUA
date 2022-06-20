@@ -3,12 +3,12 @@ import {
   ErrorDescription,
   getErrorDescription,
 } from 'common/errors';
+import {
+  peaceFrequencyOutputToNormal,
+  peaceGainOutputToDb,
+} from 'common/peaceConversions';
 
 const TIMEOUT = 10000;
-
-// Peace returns numerical values as unsigned integers
-// This is the offset for the value -1000, used when fetching gain values
-const OVERFLOW_OFFSET = 4294967296;
 
 export interface TSuccess {
   result: number;
@@ -84,23 +84,7 @@ export const getMainPreAmp = (): Promise<number> => {
   window.electron.ipcRenderer.sendMessage('peace', [channel, 5, 5, 0]);
 
   const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    const MAX_GAIN = 30;
-    const MIN_GAIN = -30;
-
-    // If gain is larger than MAX_GAIN, assume that Peace returned an unsigned negative number
-    // If after adjusting for the unsigned number gives a positive value, default to -30
-    if (result / 1000 > MAX_GAIN && (result - OVERFLOW_OFFSET) / 1000 > 0) {
-      resolve(MIN_GAIN);
-      return;
-    }
-
-    const gain =
-      result / 1000 > MAX_GAIN
-        ? (result - OVERFLOW_OFFSET) / 1000 // Unsigned negative case
-        : result / 1000; // Positive value case
-
-    // Round up any lower gain values up to -30
-    resolve(Math.max(gain, MIN_GAIN));
+    resolve(peaceGainOutputToDb(result));
   });
   return promisifyResult(responseHandler, channel);
 };
@@ -138,23 +122,7 @@ export const getGain = (index: number): Promise<number> => {
   ]);
 
   const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    const MAX_GAIN = 30;
-    const MIN_GAIN = -30;
-
-    // If gain is larger than MAX_GAIN, assume that Peace returned an unsigned negative number
-    // If after adjusting for the unsigned number gives a positive value, default to -30
-    if (result / 1000 > MAX_GAIN && (result - OVERFLOW_OFFSET) / 1000 > 0) {
-      resolve(MIN_GAIN);
-      return;
-    }
-
-    const gain =
-      result / 1000 > MAX_GAIN
-        ? (result - OVERFLOW_OFFSET) / 1000 // Unsigned negative case
-        : result / 1000; // Positive value case
-
-    // Round up any lower gain values up to MIN_GAIN
-    resolve(Math.max(gain, MIN_GAIN));
+    resolve(peaceGainOutputToDb(result));
   });
   return promisifyResult(responseHandler, channel);
 };
@@ -193,18 +161,7 @@ export const getFrequency = (index: number): Promise<number> => {
   ]);
 
   const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    const MAX_FREQUENCY = 22050;
-    const MIN_FREQUENCY = 10;
-
-    // If gain is larger than the MAX_FREQUENCY, assume that Peace returned an unsigned negative number
-    // Since frequency shouldn't be negative, default to the MIN_FREQUENCY
-    if (result > MAX_FREQUENCY) {
-      resolve(MIN_FREQUENCY);
-    }
-
-    // Round up any lower frequency values up to MIN_FREQUENCY
-    const frequency = Math.max(result, MIN_FREQUENCY);
-    resolve(frequency);
+    resolve(peaceFrequencyOutputToNormal(result));
   });
   return promisifyResult(responseHandler, channel);
 };

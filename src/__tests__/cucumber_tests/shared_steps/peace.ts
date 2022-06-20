@@ -1,12 +1,18 @@
-import { getPeaceWindowHandle, isPeaceRunning } from 'common/peaceIPC';
+import { peaceGainOutputToDb } from 'common/peaceConversions';
+import {
+  getPeaceWindowHandle,
+  isPeaceRunning,
+  sendPeaceCommand,
+} from 'common/peaceIPC';
 import { DefineStepFunction } from 'jest-cucumber';
-// import registry from '../../../main/registry';
+import { Driver } from '__tests__/utils/webdriver';
+import registry from '../../../main/registry';
 
 export const givenPeaceIsInstalled = (given: DefineStepFunction) => {
   given('Peace is installed', async () => {
-    // if (!(await registry.isPeaceInstalled())) {
-    //   throw new Error('Peace not installed');
-    // }
+    if (!(await registry.isPeaceInstalled())) {
+      throw new Error('Peace not installed');
+    }
     // TODO find a way to install peace
   });
 };
@@ -29,13 +35,31 @@ export const givenPeaceIsRunning = (given: DefineStepFunction) => {
   });
 };
 
-export const thenPeaceFrequencyGain = (then: DefineStepFunction) => {
+export const thenPeaceFrequencyGain = (
+  then: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
   then(
-    /^Peace should show gain of (\d+)dB for frequency (\d+)Hz$/,
-    async (gain: number, frequency: number) => {
-      console.log(`gain: ${gain}`);
-      console.log(`frequency: ${frequency}`);
-      // TODO ask peace for gain of a specific frequency
+    /^Peace should show gain of (-?\d+)dB for frequency (\d+)Hz$/,
+    async (gain: string, frequency: string) => {
+      const sliderElems = await webdriver.driver
+        .$('.mainContent')
+        .$$('div*=Hz');
+      for (let i = 0; i < sliderElems.length; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        const text = await sliderElems[i].getText();
+        if (text === `${frequency} Hz`) {
+          // eslint-disable-next-line no-await-in-loop
+          const peaceHWnd = getPeaceWindowHandle();
+          if (!isPeaceRunning(peaceHWnd)) {
+            throw new Error('Peace is not running.');
+          }
+          const peaceGain = sendPeaceCommand(peaceHWnd, 100 + i + 1, 5, 0);
+          expect(peaceGainOutputToDb(peaceGain)).toBe(parseInt(gain, 10));
+          return;
+        }
+      }
+      throw new Error(`${frequency} Hz gain band not found.`);
     }
   );
 };
