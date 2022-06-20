@@ -6,6 +6,10 @@ import {
 
 const TIMEOUT = 10000;
 
+// Peace returns numerical values as unsigned integers
+// This is the offset for the value -1000, used when fetching gain values
+const OVERFLOW_OFFSET = 4294967296;
+
 export interface TSuccess {
   result: number;
 }
@@ -80,21 +84,23 @@ export const getMainPreAmp = (): Promise<number> => {
   window.electron.ipcRenderer.sendMessage('peace', [channel, 5, 5, 0]);
 
   const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    const OVERFLOW_OFFSET = 4294967296;
+    const MAX_GAIN = 30;
+    const MIN_GAIN = -30;
 
-    // If gain is larger than 30, assume overflow occured.
-    // If adjusting overflow gives a positive value, default to -30
-    if (result / 1000 > 30 && (result - OVERFLOW_OFFSET) / 1000 > 0) {
-      console.log('erroneous gain, default to -30');
-      resolve(-30);
+    // If gain is larger than MAX_GAIN, assume that Peace returned an unsigned negative number
+    // If after adjusting for the unsigned number gives a positive value, default to -30
+    if (result / 1000 > MAX_GAIN && (result - OVERFLOW_OFFSET) / 1000 > 0) {
+      resolve(MIN_GAIN);
       return;
     }
 
     const gain =
-      result / 1000 > 30 ? (result - OVERFLOW_OFFSET) / 1000 : result / 1000;
+      result / 1000 > MAX_GAIN
+        ? (result - OVERFLOW_OFFSET) / 1000 // Unsigned negative case
+        : result / 1000; // Positive value case
 
     // Round up any lower gain values up to -30
-    resolve(Math.max(gain, -30));
+    resolve(Math.max(gain, MIN_GAIN));
   });
   return promisifyResult(responseHandler, channel);
 };
@@ -118,10 +124,96 @@ export const setMainPreAmp = (gain: number) => {
 };
 
 /**
+ * Get the current main preamplification gain value
+ * @param {number} index - index of the slider being adjusted
+ * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
+ */
+export const getGain = (index: number): Promise<number> => {
+  const channel = `getGain${index}`;
+  window.electron.ipcRenderer.sendMessage('peace', [
+    channel,
+    100 + index,
+    5,
+    0,
+  ]);
+
+  const responseHandler = buildResponseHandler<number>((result, resolve) => {
+    const MAX_GAIN = 30;
+    const MIN_GAIN = -30;
+
+    // If gain is larger than MAX_GAIN, assume that Peace returned an unsigned negative number
+    // If after adjusting for the unsigned number gives a positive value, default to -30
+    if (result / 1000 > MAX_GAIN && (result - OVERFLOW_OFFSET) / 1000 > 0) {
+      resolve(MIN_GAIN);
+      return;
+    }
+
+    const gain =
+      result / 1000 > MAX_GAIN
+        ? (result - OVERFLOW_OFFSET) / 1000 // Unsigned negative case
+        : result / 1000; // Positive value case
+
+    // Round up any lower gain values up to MIN_GAIN
+    resolve(Math.max(gain, MIN_GAIN));
+  });
+  return promisifyResult(responseHandler, channel);
+};
+
+/**
+ * Adjusts the main preamplification gain value
+ * @param {number} index - index of the slider being adjusted
+ * @param {number} gain - new gain value in [-30, 30]
+ */
+export const setGain = (index: number, gain: number) => {
+  const channel = `setGain${index}`;
+  if (gain > 30 || gain < -30) {
+    throw new Error('Invalid gain value - outside of range [-30, 30]');
+  }
+  window.electron.ipcRenderer.sendMessage('peace', [
+    channel,
+    100 + index,
+    1,
+    gain * 1000,
+  ]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Get the current main preamplification gain value
+ * @param {number} index - index of the slider being adjusted
+ * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
+ */
+export const getFrequency = (index: number): Promise<number> => {
+  const channel = `getFrequency${index}`;
+  window.electron.ipcRenderer.sendMessage('peace', [
+    channel,
+    100 + index,
+    8,
+    0,
+  ]);
+
+  const responseHandler = buildResponseHandler<number>((result, resolve) => {
+    const MAX_FREQUENCY = 22050;
+    const MIN_FREQUENCY = 10;
+
+    // If gain is larger than the MAX_FREQUENCY, assume that Peace returned an unsigned negative number
+    // Since frequency shouldn't be negative, default to the MIN_FREQUENCY
+    if (result > MAX_FREQUENCY) {
+      resolve(MIN_FREQUENCY);
+    }
+
+    // Round up any lower frequency values up to MIN_FREQUENCY
+    const frequency = Math.max(result, MIN_FREQUENCY);
+    resolve(frequency);
+  });
+  return promisifyResult(responseHandler, channel);
+};
+
+/**
  * Get program state for Peace. We will use this as a health check call
  * @returns { Promise<void> } exception if Peace is not okay.
  */
-export const getProgramState = () => {
+export const getProgramState = (): Promise<void> => {
   const channel = 'getProgramState';
   window.electron.ipcRenderer.sendMessage('peace', [channel, 0, 0]);
   return promisifyResult(setterResponseHandler, channel);
@@ -131,7 +223,7 @@ export const getProgramState = () => {
  * Enable Equalizer
  * @returns { Promise<void> } exception if failed.
  */
-export const enableEqualizer = () => {
+export const enableEqualizer = (): Promise<void> => {
   const channel = 'enableEqualizer';
   window.electron.ipcRenderer.sendMessage('peace', [channel, 3, 0]);
   const responseHandler = buildResponseHandler<void>(
@@ -149,7 +241,7 @@ export const enableEqualizer = () => {
  * Disable Equalizer
  * @returns { Promise<void> } exception if failed.
  */
-export const disableEqualizer = () => {
+export const disableEqualizer = (): Promise<void> => {
   const channel = 'disableEqualizer';
   window.electron.ipcRenderer.sendMessage('peace', [channel, 3, 1]);
   const responseHandler = buildResponseHandler<void>(
@@ -167,7 +259,7 @@ export const disableEqualizer = () => {
  * Get the current equalizer status
  * @returns { Promise<boolean> } true for on, false for off, exception otherwise
  */
-export const getEqualizerStatus = () => {
+export const getEqualizerStatus = (): Promise<boolean> => {
   const channel = 'getEqualizerStatus';
   window.electron.ipcRenderer.sendMessage('peace', [channel, 3, 3, 0]);
 

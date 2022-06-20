@@ -8,10 +8,16 @@ body {
   height: 100vh;
   background: $primary-dark;
   font-family: sans-serif;
+  font-size: 1em;
   overflow-y: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
+
+  #root {
+    height: 100%;
+    width: 100%;
+  }
 }
 
 button {
@@ -38,8 +44,14 @@ button {
   flex-direction: column;
 }
 
+.full {
+  height: 100%;
+  width: 100%;
+}
+
 .center {
   align-content: center;
   align-items: center;
   justify-content: center;
+  text-align: center;
 }
