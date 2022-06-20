@@ -18,7 +18,7 @@ export const whenSetFrequencyGain = (
         coord.y = 100;
       }
       sliderElem.dragAndDrop(coord);
-      // wait 500 ms for the action.
+      // wait 1000 ms for the action.
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   );

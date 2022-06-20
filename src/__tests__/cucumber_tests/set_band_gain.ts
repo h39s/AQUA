@@ -13,8 +13,6 @@ import {
   thenPeaceFrequencyGain,
 } from './shared_steps/peace';
 
-// jest.useFakeTimers();
-
 // shim the getRandomValues function used in uuid which is used by jest-cucumber
 // so that it works in electron environment.
 getRandomValuesPolyPony.polyfill();
