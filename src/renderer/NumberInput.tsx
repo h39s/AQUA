@@ -2,14 +2,16 @@ import { ChangeEvent, KeyboardEvent } from 'react';
 import './styles/NumberInput.scss';
 import { clamp } from './utils';
 
+export type TNumberInput = number | '' | '-';
+
 interface INumberInputProps {
   name: string;
-  value: number | '' | '-';
+  value: TNumberInput;
   min: number;
   max: number;
   isDisabled: boolean;
   showLabel: boolean;
-  handleChange: (newValue: number | '' | '-') => void;
+  handleChange: (newValue: TNumberInput) => void;
   handleSubmit: (newValue: number) => void;
 }
 

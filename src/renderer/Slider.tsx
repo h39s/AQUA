@@ -1,6 +1,6 @@
 import { ErrorDescription } from 'common/errors';
 import { useEffect, useContext, useState, useMemo } from 'react';
-import NumberInput from './NumberInput';
+import NumberInput, { TNumberInput } from './NumberInput';
 import RangeInput from './RangeInput';
 import { PeaceFoundContext } from './PeaceFoundContext';
 import './styles/Slider.scss';
@@ -15,7 +15,7 @@ interface ISliderProps {
 
 const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
   const [rangeValue, setRangeValue] = useState<number>(0);
-  const [inputValue, setInputValue] = useState<number | '' | '-'>(0);
+  const [inputValue, setInputValue] = useState<TNumberInput>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { peaceError, setPeaceError } = useContext(PeaceFoundContext);

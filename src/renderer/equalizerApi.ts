@@ -3,9 +3,11 @@ import {
   ErrorDescription,
   getErrorDescription,
 } from 'common/errors';
-import { clamp } from './utils';
 
 const TIMEOUT = 10000;
+
+// Peace returns numerical values as unsigned integers
+// This is the offset for the value -1000, used when fetching gain values
 const OVERFLOW_OFFSET = 4294967296;
 
 export interface TSuccess {
@@ -85,8 +87,8 @@ export const getMainPreAmp = (): Promise<number> => {
     const MAX_GAIN = 30;
     const MIN_GAIN = -30;
 
-    // If gain is larger than 30, assume overflow occured.
-    // If adjusting overflow gives a positive value, default to -30
+    // If gain is larger than MAX_GAIN, assume that Peace returned an unsigned negative number
+    // If after adjusting for the unsigned number gives a positive value, default to -30
     if (result / 1000 > MAX_GAIN && (result - OVERFLOW_OFFSET) / 1000 > 0) {
       resolve(MIN_GAIN);
       return;
@@ -94,8 +96,8 @@ export const getMainPreAmp = (): Promise<number> => {
 
     const gain =
       result / 1000 > MAX_GAIN
-        ? (result - OVERFLOW_OFFSET) / 1000
-        : result / 1000;
+        ? (result - OVERFLOW_OFFSET) / 1000 // Unsigned negative case
+        : result / 1000; // Positive value case
 
     // Round up any lower gain values up to -30
     resolve(Math.max(gain, MIN_GAIN));
@@ -139,8 +141,8 @@ export const getGain = (index: number): Promise<number> => {
     const MAX_GAIN = 30;
     const MIN_GAIN = -30;
 
-    // If gain is larger than 30, assume overflow occured.
-    // If adjusting overflow gives a positive value, default to -30
+    // If gain is larger than MAX_GAIN, assume that Peace returned an unsigned negative number
+    // If after adjusting for the unsigned number gives a positive value, default to -30
     if (result / 1000 > MAX_GAIN && (result - OVERFLOW_OFFSET) / 1000 > 0) {
       resolve(MIN_GAIN);
       return;
@@ -148,15 +150,13 @@ export const getGain = (index: number): Promise<number> => {
 
     const gain =
       result / 1000 > MAX_GAIN
-        ? (result - OVERFLOW_OFFSET) / 1000
-        : result / 1000;
+        ? (result - OVERFLOW_OFFSET) / 1000 // Unsigned negative case
+        : result / 1000; // Positive value case
 
-    // Round up any lower gain values up to -30
+    // Round up any lower gain values up to MIN_GAIN
     resolve(Math.max(gain, MIN_GAIN));
   });
   return promisifyResult(responseHandler, channel);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // return new Promise((resolve, _reject) => resolve(0));
 };
 
 /**
@@ -178,7 +178,6 @@ export const setGain = (index: number, gain: number) => {
   return promisifyResult(setterResponseHandler, channel);
 };
 
-// GUICtrlSetData($Frequency,SendPeaceMessage(100+Number(GUICtrlRead($Slider)),8,0,"Slider " & Number(GUICtrlRead($Slider)) & " frequency # Hz"))
 /**
  * Get the current main preamplification gain value
  * @param {number} index - index of the slider being adjusted
@@ -197,12 +196,14 @@ export const getFrequency = (index: number): Promise<number> => {
     const MAX_FREQUENCY = 22050;
     const MIN_FREQUENCY = 10;
 
-    // If result is larger than the max value, assume overflow occured.
+    // If gain is larger than the MAX_FREQUENCY, assume that Peace returned an unsigned negative number
+    // Since frequency shouldn't be negative, default to the MIN_FREQUENCY
     if (result > MAX_FREQUENCY) {
-      resolve(10);
+      resolve(MIN_FREQUENCY);
     }
 
-    const frequency = clamp(result, MIN_FREQUENCY, MAX_FREQUENCY);
+    // Round up any lower frequency values up to MIN_FREQUENCY
+    const frequency = Math.max(result, MIN_FREQUENCY);
     resolve(frequency);
   });
   return promisifyResult(responseHandler, channel);
