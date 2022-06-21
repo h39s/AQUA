@@ -31,7 +31,7 @@ export const givenPeaceIsRunning = (given: DefineStepFunction) => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
     throw new Error('Peace not running');
-    // TODO find a way to start peace
+    // For now, we need to manually start peace before running end-to-end tests
   });
 };
 

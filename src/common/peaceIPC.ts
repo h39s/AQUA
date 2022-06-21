@@ -4,7 +4,7 @@ import { UINT_PTR, LONG_PTR, HANDLE } from 'win32-def/dist/lib/win.model';
 // See win32 documentation https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-app
 const WM_APP = 0x8000;
 const user32 = U.load(); // load all apis defined in lib/{dll}/api from user32.dll
-const peaceTitle = 'Peace window messages'; // "Peter's Equalizer APO Configuration Extension (Peace) 1.6.1.2\0"
+const peaceTitle = 'Peace window messages';
 const peaceLpszWindow = Buffer.from(peaceTitle, 'ucs2');
 
 export const getPeaceWindowHandle = () => {

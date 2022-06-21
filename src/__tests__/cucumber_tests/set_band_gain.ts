@@ -38,7 +38,7 @@ defineFeature(feature, (test) => {
 
 afterAll(() => {
   if (webdriver.driver) {
-    // webdriver.driver.deleteSession();
+    webdriver.driver.deleteSession();
   }
   stopChromeDriver(chromeDriver);
 });
