@@ -34,7 +34,9 @@
     "start:main": "cross-env NODE_ENV=development electronmon -r ts-node/register/transpile-only .",
     "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
-    "test": "jest"
+    "test": "jest",
+    "test:unit": "jest --testMatch **/__tests__/unit_tests/*.ts?(x)",
+    "test:cucumber": "jest --testMatch **/__tests__/cucumber_tests/*.ts?(x)"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -94,7 +96,14 @@
     ],
     "transform": {
       "\\.(ts|tsx|js|jsx)$": "ts-jest"
-    }
+    },
+    "testMatch": [
+      "**/__tests__/*_tests/*.ts?(x)"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(uuid)/)",
+      "\\.pnp\\.[^\\/]+$"
+    ]
   },
   "dependencies": {
     "electron-debug": "^3.2.0",
@@ -129,6 +138,7 @@
     "detect-port": "^1.3.0",
     "electron": "^18.2.3",
     "electron-builder": "^23.0.3",
+    "electron-chromedriver": "^18.0.0",
     "electron-devtools-installer": "^3.2.0",
     "electron-notarize": "^1.2.1",
     "electron-rebuild": "^3.2.7",
@@ -146,10 +156,12 @@
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.5.0",
     "file-loader": "^6.2.0",
+    "get-random-values-polypony": "^1.0.0",
     "html-webpack-plugin": "^5.5.0",
     "husky": "^8.0.1",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^28.1.0",
+    "jest-cucumber": "^3.0.1",
     "jest-environment-jsdom": "^28.1.0",
     "lint-staged": "^12.4.1",
     "mini-css-extract-plugin": "^2.6.0",
@@ -167,6 +179,7 @@
     "ts-node": "^10.7.0",
     "typescript": "^4.6.4",
     "url-loader": "^4.1.1",
+    "webdriverio": "^7.20.2",
     "webpack": "^5.72.1",
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.9.2",
