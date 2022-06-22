@@ -167,6 +167,26 @@ export const getFrequency = (index: number): Promise<number> => {
 };
 
 /**
+ * Get the current main preamplification gain value
+ * @param {number} index - index of the slider being adjusted
+ * @param {frequency} index - index of the slider being adjusted
+ */
+export const setFrequency = (index: number, frequency: number) => {
+  const channel = `setFrequency${index}`;
+  window.electron.ipcRenderer.sendMessage('peace', [
+    channel,
+    100 + index,
+    6,
+    frequency,
+  ]);
+
+  const responseHandler = buildResponseHandler<number>((result, resolve) => {
+    resolve(peaceFrequencyOutputToNormal(result));
+  });
+  return promisifyResult(responseHandler, channel);
+};
+
+/**
  * Get program state for Peace. We will use this as a health check call
  * @returns { Promise<void> } exception if Peace is not okay.
  */

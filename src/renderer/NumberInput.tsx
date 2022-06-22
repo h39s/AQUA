@@ -1,4 +1,4 @@
-import { ChangeEvent, KeyboardEvent } from 'react';
+import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import './styles/NumberInput.scss';
 import { clamp } from './utils';
 
@@ -25,12 +25,22 @@ const NumberInput = ({
   handleChange,
   handleSubmit,
 }: INumberInputProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [width, setWidth] = useState<number>(24);
+
+  // TODO: Add styling for unsaved/unapplied changes
+
+  useEffect(() => {
+    // TODO: Figure out a way to shrink the text input
+    setWidth(Math.max(24, (inputRef.current?.scrollWidth || 0) - 8));
+  }, [value]);
+
   const onInput = (e: ChangeEvent<HTMLInputElement>) => {
     const { value: input } = e.target;
     const lastChar = input[input.length - 1];
 
     // Allow user to clear input and type an initial negative sign
-    if (input === '' || input === '-') {
+    if (input === '' || (input === '-' && min < 0)) {
       handleChange(input);
       return;
     }
@@ -58,6 +68,7 @@ const NumberInput = ({
   return (
     <label htmlFor={name} className="col center numberInput">
       <input
+        ref={inputRef}
         type="text"
         name={name}
         aria-label={name}
@@ -65,6 +76,7 @@ const NumberInput = ({
         onInput={onInput}
         onKeyDown={listenForEnter}
         disabled={isDisabled}
+        style={{ width }}
       />
       {showLabel && name}
     </label>
