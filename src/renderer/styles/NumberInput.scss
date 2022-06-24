@@ -14,6 +14,11 @@
     width: 24px;
     text-align: center;
 
+    &:focus:not(:focus-visible) {
+      // TODO: can't figure out how to differentiate between only focus and focus-visible for text inputs
+      outline: 1px solid $secondary-default;
+    }
+
     &:focus-visible {
       outline: 2px solid $white;
     }
@@ -21,6 +26,10 @@
     &:disabled {
       border: 2px solid $primary-lighter;
       color: $primary-lighter;
+    }
+
+    &.hasChanges {
+      color: $complementary;
     }
   }
 }

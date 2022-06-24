@@ -5,7 +5,7 @@ import {
   MIN_FREQUENCY,
   MIN_GAIN,
 } from 'common/peaceConversions';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { getFrequency, getGain, setFrequency, setGain } from './equalizerApi';
 import NumberInput, { TNumberInput } from './NumberInput';
 import { PeaceFoundContext } from './PeaceFoundContext';
@@ -26,9 +26,6 @@ const FrequencyBand = ({ sliderIndex }: IFrequncyBandProps) => {
     const fetchResults = async () => {
       try {
         const result = await getFrequency(sliderIndex);
-        if (sliderIndex === 10) {
-          console.log(result);
-        }
         setActualFrequency(result);
         setDisplayFrequncy(result);
       } catch (e) {
@@ -56,6 +53,8 @@ const FrequencyBand = ({ sliderIndex }: IFrequncyBandProps) => {
     }
   };
 
+  const getSliderGain = useCallback(() => getGain(sliderIndex), [sliderIndex]);
+
   return (
     <div className="col band">
       {`${actualFrequency} Hz`}
@@ -73,7 +72,7 @@ const FrequencyBand = ({ sliderIndex }: IFrequncyBandProps) => {
         name={`${actualFrequency}-gain`}
         min={MIN_GAIN}
         max={MAX_GAIN}
-        getValue={() => getGain(sliderIndex)}
+        getValue={getSliderGain}
         setValue={(newValue: number) => setGain(sliderIndex, newValue)}
       />
     </div>

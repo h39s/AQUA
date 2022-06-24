@@ -1,4 +1,10 @@
-import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import './styles/NumberInput.scss';
 import { clamp } from './utils';
 
@@ -26,13 +32,13 @@ const NumberInput = ({
   handleSubmit,
 }: INumberInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [width, setWidth] = useState<number>(24);
+  const [width, setWidth] = useState<number>(0);
+  const [hasChanges, setHasChanges] = useState<boolean>(false);
 
-  // TODO: Add styling for unsaved/unapplied changes
+  // TODO: Think about if more props need to be passed to determine if there's been a change
 
-  useEffect(() => {
-    // TODO: Figure out a way to shrink the text input
-    setWidth(Math.max(24, (inputRef.current?.scrollWidth || 0) - 8));
+  useLayoutEffect(() => {
+    setWidth(inputRef.current?.value.length || 0);
   }, [value]);
 
   const onInput = (e: ChangeEvent<HTMLInputElement>) => {
@@ -52,6 +58,7 @@ const NumberInput = ({
 
     const newValue: number = parseInt(input, 10);
     handleChange(newValue);
+    setHasChanges(true);
   };
 
   // Helper for detecting use of the ENTER key
@@ -62,6 +69,7 @@ const NumberInput = ({
       }
       const newValue: number = clamp(value, min, max);
       handleSubmit(newValue);
+      setHasChanges(false);
     }
   };
 
@@ -76,7 +84,9 @@ const NumberInput = ({
         onInput={onInput}
         onKeyDown={listenForEnter}
         disabled={isDisabled}
-        style={{ width }}
+        className={` ${hasChanges ? 'hasChanges' : ''}`}
+        // the ch unit supposedly uses the '0' as the per character width
+        style={{ width: `max(24px, ${width}ch)` }}
       />
       {showLabel && name}
     </label>
