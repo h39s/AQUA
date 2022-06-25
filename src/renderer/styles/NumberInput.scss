@@ -1,6 +1,8 @@
 @import 'color';
 @import 'spacing';
 
+$input-height: 24px;
+
 .numberInput {
   gap: $spacing-s;
 
@@ -10,8 +12,8 @@
     border-radius: 4px;
     color: $white;
     padding: $spacing-xs;
-    height: 24px;
-    width: 24px;
+    height: $input-height;
+    width: max($input-height, var(--input-width));
     text-align: center;
 
     &:focus:not(:focus-visible) {
@@ -27,9 +29,13 @@
       border: 2px solid $primary-lighter;
       color: $primary-lighter;
     }
+  }
 
-    &.hasChanges {
-      color: $complementary;
-    }
+  .asterisk {
+    position: absolute;
+    margin-left: calc(
+      $spacing-xl + max($input-height, var(--input-width)) / 2 + $spacing-s
+    );
+    margin-top: -$spacing-m;
   }
 }

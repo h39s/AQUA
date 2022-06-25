@@ -6,7 +6,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import Slider from '../renderer/Slider';
+import Slider from '../../renderer/Slider';
 
 describe('Slider', () => {
   const name = 'Slider';

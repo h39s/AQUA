@@ -1,14 +1,17 @@
 import {
   ChangeEvent,
+  CSSProperties,
   KeyboardEvent,
+  useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
 import './styles/NumberInput.scss';
 import { clamp } from './utils';
 
-export type TNumberInput = number | '' | '-';
+type TNumberInput = number | '' | '-';
 
 interface INumberInputProps {
   name: string;
@@ -17,7 +20,6 @@ interface INumberInputProps {
   max: number;
   isDisabled: boolean;
   showLabel: boolean;
-  handleChange: (newValue: TNumberInput) => void;
   handleSubmit: (newValue: number) => void;
 }
 
@@ -28,18 +30,26 @@ const NumberInput = ({
   max,
   isDisabled,
   showLabel,
-  handleChange,
   handleSubmit,
 }: INumberInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [width, setWidth] = useState<number>(0);
-  const [hasChanges, setHasChanges] = useState<boolean>(false);
+  const [internalValue, setInternalValue] = useState<TNumberInput>(value);
+  const [valueLength, setValueLength] = useState<number>(0);
 
-  // TODO: Think about if more props need to be passed to determine if there's been a change
-
+  // Update input valueLength
   useLayoutEffect(() => {
-    setWidth(inputRef.current?.value.length || 0);
+    setValueLength(inputRef.current?.value.length || 0);
+  }, [internalValue]);
+
+  // Synchronize local input value with prop value
+  useEffect(() => {
+    setInternalValue(value);
   }, [value]);
+
+  const hasChanges = useMemo(
+    () => value !== internalValue,
+    [internalValue, value]
+  );
 
   const onInput = (e: ChangeEvent<HTMLInputElement>) => {
     const { value: input } = e.target;
@@ -47,7 +57,7 @@ const NumberInput = ({
 
     // Allow user to clear input and type an initial negative sign
     if (input === '' || (input === '-' && min < 0)) {
-      handleChange(input);
+      setInternalValue(input);
       return;
     }
 
@@ -57,38 +67,49 @@ const NumberInput = ({
     }
 
     const newValue: number = parseInt(input, 10);
-    handleChange(newValue);
-    setHasChanges(true);
+    setInternalValue(newValue);
   };
 
-  // Helper for detecting use of the ENTER key
+  // Helper for discarding changes
+  const onBlur = () => {
+    setInternalValue(value);
+  };
+
+  // Helper for detecting use of the ENTER or TAB keys
   const listenForEnter = (e: KeyboardEvent) => {
-    if (e.code === 'Enter') {
-      if (value === '' || value === '-') {
+    if (e.code === 'Enter' || e.code === 'Tab') {
+      if (internalValue === '' || internalValue === '-') {
         return;
       }
-      const newValue: number = clamp(value, min, max);
+      const newValue: number = clamp(internalValue, min, max);
+
+      // Call handler on the parent
       handleSubmit(newValue);
-      setHasChanges(false);
+    } else if (e.code === 'Escape') {
+      onBlur();
     }
   };
 
   return (
-    <label htmlFor={name} className="col center numberInput">
+    <label
+      htmlFor={name}
+      className="col center numberInput"
+      // the ch unit supposedly uses the '0' as the per character valueLength
+      style={{ '--input-width': `${valueLength}ch` } as CSSProperties}
+    >
       <input
         ref={inputRef}
         type="text"
         name={name}
         aria-label={name}
-        value={value}
+        value={internalValue}
         onInput={onInput}
+        onBlur={onBlur}
         onKeyDown={listenForEnter}
         disabled={isDisabled}
-        className={` ${hasChanges ? 'hasChanges' : ''}`}
-        // the ch unit supposedly uses the '0' as the per character width
-        style={{ width: `max(24px, ${width}ch)` }}
       />
       {showLabel && name}
+      {hasChanges && <span className="asterisk">*</span>}
     </label>
   );
 };

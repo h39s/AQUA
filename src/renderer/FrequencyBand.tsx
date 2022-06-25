@@ -7,7 +7,7 @@ import {
 } from 'common/peaceConversions';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { getFrequency, getGain, setFrequency, setGain } from './equalizerApi';
-import NumberInput, { TNumberInput } from './NumberInput';
+import NumberInput from './NumberInput';
 import { PeaceFoundContext } from './PeaceFoundContext';
 import Slider from './Slider';
 import './styles/MainContent.scss';
@@ -17,7 +17,6 @@ interface IFrequncyBandProps {
 }
 
 const FrequencyBand = ({ sliderIndex }: IFrequncyBandProps) => {
-  const [displayFrequency, setDisplayFrequncy] = useState<TNumberInput>('');
   const [actualFrequency, setActualFrequency] = useState<number>(0);
 
   const { peaceError, setPeaceError } = useContext(PeaceFoundContext);
@@ -27,7 +26,6 @@ const FrequencyBand = ({ sliderIndex }: IFrequncyBandProps) => {
       try {
         const result = await getFrequency(sliderIndex);
         setActualFrequency(result);
-        setDisplayFrequncy(result);
       } catch (e) {
         setPeaceError(e as ErrorDescription);
       }
@@ -37,17 +35,10 @@ const FrequencyBand = ({ sliderIndex }: IFrequncyBandProps) => {
     }
   }, [peaceError, setPeaceError, sliderIndex]);
 
-  const handleChange = (newFrequency: TNumberInput) => {
-    setDisplayFrequncy(newFrequency);
-  };
-
-  const handleSubmit = async (index: number) => {
-    if (displayFrequency === '' || displayFrequency === '-') {
-      return;
-    }
+  const handleSubmit = async (newValue: number) => {
     try {
-      await setFrequency(index, displayFrequency as number);
-      setActualFrequency(displayFrequency as number);
+      await setFrequency(sliderIndex, newValue);
+      setActualFrequency(newValue);
     } catch (e) {
       setPeaceError(e as ErrorDescription);
     }
@@ -57,15 +48,13 @@ const FrequencyBand = ({ sliderIndex }: IFrequncyBandProps) => {
 
   return (
     <div className="col band">
-      {`${actualFrequency} Hz`}
       <NumberInput
-        value={displayFrequency}
+        value={actualFrequency}
         min={MIN_FREQUENCY}
         max={MAX_FREQUENCY}
-        name={`${displayFrequency}`}
+        name={`${actualFrequency}`}
         isDisabled={false}
         showLabel={false}
-        handleChange={handleChange}
         handleSubmit={handleSubmit}
       />
       <Slider
