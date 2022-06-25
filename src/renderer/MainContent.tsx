@@ -16,13 +16,13 @@ const MainContent = () => {
       ) : (
         <>
           <div className="col center bandLabel">
-            <span>Frequency (Hz)</span>
+            <span className="rowLabel">Frequency (Hz)</span>
             <div className="col">
               <span>30dB</span>
               <span>0dB</span>
               <span>-30dB</span>
             </div>
-            <span className="gainLabel">Gain (dB)</span>
+            <span className="rowLabel">Gain (dB)</span>
           </div>
           {sliderIndicies.map((sliderIndex) => (
             <FrequencyBand
