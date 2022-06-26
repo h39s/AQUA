@@ -24,3 +24,19 @@ export const useInterval = (callback: () => void, delay?: number) => {
     return () => {};
   }, [delay]);
 };
+
+// Based on https://codeforgeek.com/throttle-function-javascript/
+export const useThrottle = <Type>(
+  fn: (arg: Type) => unknown,
+  delay: number
+) => {
+  const lastCalled = useRef<number>(0);
+  return (arg: Type) => {
+    const now = new Date().getTime();
+    if (now - lastCalled.current < delay) {
+      return;
+    }
+    lastCalled.current = now;
+    fn(arg);
+  };
+};

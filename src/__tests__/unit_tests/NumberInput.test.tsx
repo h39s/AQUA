@@ -15,12 +15,13 @@ describe('NumberInput', () => {
     render(
       <NumberInput
         name={id}
-        showLabel
         min={1}
         max={5}
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
+        showArrows={false}
+        showLabel
       />
     );
     expect(screen.getByText(id)).toBeInTheDocument();
@@ -32,12 +33,13 @@ describe('NumberInput', () => {
     render(
       <NumberInput
         name={id}
-        showLabel={false}
         min={-5}
         max={5}
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
+        showArrows={false}
+        showLabel={false}
       />
     );
     const input = screen.getByLabelText(id);
@@ -54,12 +56,13 @@ describe('NumberInput', () => {
     render(
       <NumberInput
         name={id}
-        showLabel={false}
         min={-5}
         max={5}
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
+        showArrows={false}
+        showLabel={false}
       />
     );
     const input = screen.getByLabelText(id);
@@ -76,12 +79,13 @@ describe('NumberInput', () => {
     render(
       <NumberInput
         name={id}
-        showLabel={false}
         min={-5}
         max={5}
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
+        showArrows={false}
+        showLabel={false}
       />
     );
     const input = screen.getByLabelText(id);
@@ -96,12 +100,13 @@ describe('NumberInput', () => {
     render(
       <NumberInput
         name={id}
-        showLabel={false}
         min={-5}
         max={5}
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
+        showArrows={false}
+        showLabel={false}
       />
     );
     const input = screen.getByLabelText(id);
@@ -116,12 +121,13 @@ describe('NumberInput', () => {
     render(
       <NumberInput
         name={id}
-        showLabel={false}
         min={-5}
         max={5}
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled
+        showArrows={false}
+        showLabel={false}
       />
     );
     const input = screen.getByLabelText(id);

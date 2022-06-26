@@ -4,6 +4,7 @@ import NumberInput from './NumberInput';
 import RangeInput from './RangeInput';
 import { PeaceFoundContext } from './PeaceFoundContext';
 import './styles/Slider.scss';
+import { useThrottle } from './utils';
 
 interface ISliderProps {
   name: string;
@@ -14,9 +15,9 @@ interface ISliderProps {
 }
 
 const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
+  const INTERVAL = 200;
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
   const { peaceError, setPeaceError } = useContext(PeaceFoundContext);
 
   const isDisabled = useMemo(
@@ -40,11 +41,19 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
     }
   }, [getValue, peaceError, setPeaceError]);
 
+  const throttledSetValue = useThrottle(async (newValue: number) => {
+    try {
+      await setValue(newValue);
+    } catch (e) {
+      setPeaceError(e as ErrorDescription);
+    }
+  }, INTERVAL);
+
   // Helpers for adjusting the preamp gain value
   const handleChangeGain = async (newValue: number) => {
     setSliderValue(newValue);
     try {
-      await setValue(newValue);
+      throttledSetValue(newValue);
     } catch (e) {
       setPeaceError(e as ErrorDescription);
     }

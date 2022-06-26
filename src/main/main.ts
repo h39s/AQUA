@@ -63,7 +63,6 @@ ipcMain.on('peace', async (event, arg) => {
     return;
   }
   const reply: TSuccess = { result: res };
-  console.log(messageCode, wParam, lParam, res);
   event.reply(channel, reply);
 });
 

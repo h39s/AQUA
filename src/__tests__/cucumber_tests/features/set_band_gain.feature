@@ -6,5 +6,5 @@ Feature: Set gain of a frequency band
       And Peace is running
       And Aqua is not running
     When Aqua is launched
-      And I set gain of slider of frequency 100Hz to bottom
-    Then Peace should show gain of -30dB for frequency 100Hz
+      And I set gain of slider of frequency 125Hz to bottom
+    Then Peace should show gain of -30dB for frequency 125Hz
