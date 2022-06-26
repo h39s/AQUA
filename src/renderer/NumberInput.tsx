@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import ArrowButton from './ArrowButton';
 import './styles/NumberInput.scss';
 import { clamp } from './utils';
 
@@ -19,8 +20,9 @@ interface INumberInputProps {
   min: number;
   max: number;
   isDisabled: boolean;
+  showArrows: boolean;
   showLabel: boolean;
-  handleSubmit: (newValue: number) => void;
+  handleSubmit: (newValue: number) => Promise<void>;
 }
 
 const NumberInput = ({
@@ -29,12 +31,14 @@ const NumberInput = ({
   min,
   max,
   isDisabled,
+  showArrows,
   showLabel,
   handleSubmit,
 }: INumberInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [internalValue, setInternalValue] = useState<TNumberInput>(value);
   const [valueLength, setValueLength] = useState<number>(0);
+  const [hasChanges, setHasChanges] = useState<boolean>(false);
 
   // Update input valueLength
   useLayoutEffect(() => {
@@ -46,10 +50,12 @@ const NumberInput = ({
     setInternalValue(value);
   }, [value]);
 
-  const hasChanges = useMemo(
-    () => value !== internalValue,
-    [internalValue, value]
-  );
+  const numericalValue: number = useMemo(() => {
+    if (value === '' || value === '-') {
+      return 0;
+    }
+    return value;
+  }, [value]);
 
   const onInput = (e: ChangeEvent<HTMLInputElement>) => {
     const { value: input } = e.target;
@@ -58,6 +64,7 @@ const NumberInput = ({
     // Allow user to clear input and type an initial negative sign
     if (input === '' || (input === '-' && min < 0)) {
       setInternalValue(input);
+      setHasChanges(true);
       return;
     }
 
@@ -67,12 +74,24 @@ const NumberInput = ({
     }
 
     const newValue: number = parseInt(input, 10);
+    // Prevent user from typing numbers with more than 5 digits
+    if (newValue / 100000 > 1) {
+      return;
+    }
+    setHasChanges(input !== value);
     setInternalValue(newValue);
   };
 
   // Helper for discarding changes
   const onBlur = () => {
+    setHasChanges(false);
     setInternalValue(value);
+  };
+
+  const onArrow = async (newValue: number) => {
+    setInternalValue(newValue);
+    setHasChanges(false);
+    handleSubmit(newValue);
   };
 
   // Helper for detecting use of the ENTER or TAB keys
@@ -83,6 +102,7 @@ const NumberInput = ({
       }
       const newValue: number = clamp(internalValue, min, max);
 
+      setHasChanges(false);
       // Call handler on the parent
       handleSubmit(newValue);
     } else if (e.code === 'Escape') {
@@ -93,23 +113,47 @@ const NumberInput = ({
   return (
     <label
       htmlFor={name}
-      className="col center numberInput"
+      className="numberInput col center"
       // the ch unit supposedly uses the '0' as the per character valueLength
       style={{ '--input-width': `${valueLength}ch` } as CSSProperties}
     >
-      <input
-        ref={inputRef}
-        type="text"
-        name={name}
-        aria-label={name}
-        value={internalValue}
-        onInput={onInput}
-        onBlur={onBlur}
-        onKeyDown={listenForEnter}
-        disabled={isDisabled}
-      />
+      <div className="inputWrapper row center">
+        <input
+          ref={inputRef}
+          type="text"
+          name={name}
+          aria-label={name}
+          value={internalValue}
+          onInput={onInput}
+          onBlur={onBlur}
+          onKeyDown={listenForEnter}
+          disabled={isDisabled}
+        />
+        {hasChanges && <span className="asterisk">*</span>}
+        {showArrows && (
+          <div className="arrows">
+            <ArrowButton
+              name={name}
+              type="up"
+              value={numericalValue}
+              min={min}
+              max={max}
+              handleChange={onArrow}
+              isDisabled={isDisabled}
+            />
+            <ArrowButton
+              name={name}
+              type="down"
+              value={numericalValue}
+              min={min}
+              max={max}
+              handleChange={onArrow}
+              isDisabled={isDisabled}
+            />
+          </div>
+        )}
+      </div>
       {showLabel && name}
-      {hasChanges && <span className="asterisk">*</span>}
     </label>
   );
 };

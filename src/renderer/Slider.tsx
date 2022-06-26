@@ -68,6 +68,7 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
         handleSubmit={handleChangeGain}
         isDisabled={isDisabled}
         showLabel={false}
+        showArrows={false}
       />
     </div>
   );

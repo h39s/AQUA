@@ -53,8 +53,9 @@ const FrequencyBand = ({ sliderIndex }: IFrequncyBandProps) => {
         min={MIN_FREQUENCY}
         max={MAX_FREQUENCY}
         name={`${actualFrequency}`}
-        isDisabled={false}
+        isDisabled={!!peaceError}
         showLabel={false}
+        showArrows
         handleSubmit={handleSubmit}
       />
       <Slider

@@ -6,9 +6,10 @@ import {
   useRef,
   useState,
 } from 'react';
-import SliderArrowIcon from './icons/SliderArrowIcon';
+import ArrowIcon from './icons/ArrowIcon';
 import { clamp, useInterval } from './utils';
 import './styles/RangeInput.scss';
+import ArrowButton from './ArrowButton';
 
 interface IRangeInputProps {
   name: string;
@@ -112,19 +113,15 @@ const RangeInput = ({
 
   return (
     <div className="col center range">
-      <div
-        ref={increaseButtonRef}
-        role="button"
-        aria-label={`Increase ${name}`}
-        className="center range-top"
-        onMouseDown={() => handleArrowInput(true)}
-        onMouseUp={stopIncrement}
-        onKeyDown={(e) => listenForEnter(e, () => handleDeltaChangeGain(true))}
-        tabIndex={isDisabled ? -1 : 0}
-        aria-disabled={isDisabled}
-      >
-        <SliderArrowIcon type="up" />
-      </div>
+      <ArrowButton
+        name={name}
+        type="up"
+        value={value}
+        min={min}
+        max={max}
+        handleChange={handleChange}
+        isDisabled={isDisabled}
+      />
       <input
         type="range"
         min={min}
@@ -143,19 +140,15 @@ const RangeInput = ({
           } as CSSProperties
         }
       />
-      <div
-        ref={decreaseButtonRef}
-        role="button"
-        aria-label={`Decrease ${name}`}
-        className="center range-bottom"
-        onMouseDown={() => handleArrowInput(false)}
-        onMouseUp={stopDecrement}
-        onKeyDown={(e) => listenForEnter(e, () => handleDeltaChangeGain(false))}
-        tabIndex={isDisabled ? -1 : 0}
-        aria-disabled={isDisabled}
-      >
-        <SliderArrowIcon type="down" />
-      </div>
+      <ArrowButton
+        name={name}
+        type="down"
+        value={value}
+        min={min}
+        max={max}
+        handleChange={handleChange}
+        isDisabled={isDisabled}
+      />
     </div>
   );
 };

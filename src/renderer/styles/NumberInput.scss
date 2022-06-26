@@ -6,6 +6,10 @@ $input-height: 24px;
 .numberInput {
   gap: $spacing-s;
 
+  .inputWrapper {
+    align-self: flex-end;
+  }
+
   input[type='text'] {
     background: $primary-dark;
     border: 2px solid $secondary-default;
@@ -37,5 +41,17 @@ $input-height: 24px;
       $spacing-xl + max($input-height, var(--input-width)) / 2 + $spacing-s
     );
     margin-top: -$spacing-m;
+  }
+
+  .arrows {
+    display: flex;
+    flex-direction: column;
+    margin-left: 2px;
+    gap: 2px;
+
+    svg {
+      width: 16px;
+      height: auto;
+    }
   }
 }
