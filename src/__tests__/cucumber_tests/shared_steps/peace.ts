@@ -42,13 +42,13 @@ export const thenPeaceFrequencyGain = (
   then(
     /^Peace should show gain of (-?\d+)dB for frequency (\d+)Hz$/,
     async (gain: string, frequency: string) => {
-      const sliderElems = await webdriver.driver
-        .$('.mainContent')
-        .$$('div*=Hz');
+      const sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
       for (let i = 0; i < sliderElems.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop
-        const text = await sliderElems[i].getText();
-        if (text === `${frequency} Hz`) {
+        const element = await sliderElems[i].$('input');
+        // eslint-disable-next-line no-await-in-loop
+        const name = await element.getAttribute('name');
+        if (name === `${frequency}-gain-range`) {
           // eslint-disable-next-line no-await-in-loop
           const peaceHWnd = getPeaceWindowHandle();
           if (!isPeaceRunning(peaceHWnd)) {
