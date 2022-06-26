@@ -41,22 +41,25 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
     }
   }, [getValue, peaceError, setPeaceError]);
 
-  const throttledSetValue = useThrottle(async (newValue: number) => {
+  const handleChangeGain = async (newValue: number) => {
     try {
       await setValue(newValue);
     } catch (e) {
       setPeaceError(e as ErrorDescription);
     }
-  }, INTERVAL);
+  };
+
+  const throttledSetValue = useThrottle(handleChangeGain, INTERVAL);
 
   // Helpers for adjusting the preamp gain value
-  const handleChangeGain = async (newValue: number) => {
+  const handleChangeGainWithThrottle = async (newValue: number) => {
     setSliderValue(newValue);
-    try {
-      throttledSetValue(newValue);
-    } catch (e) {
-      setPeaceError(e as ErrorDescription);
-    }
+    throttledSetValue(newValue);
+  };
+
+  const handleChangeGainWithoutThrottle = async (newValue: number) => {
+    setSliderValue(newValue);
+    handleChangeGain(newValue);
   };
 
   return (
@@ -66,7 +69,8 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
         value={sliderValue}
         min={min}
         max={max}
-        handleChange={handleChangeGain}
+        handleChange={handleChangeGainWithThrottle}
+        handleMouseUp={handleChangeGainWithoutThrottle}
         isDisabled={isDisabled}
       />
       <NumberInput
@@ -74,7 +78,7 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
         value={sliderValue}
         min={min}
         max={max}
-        handleSubmit={handleChangeGain}
+        handleSubmit={handleChangeGainWithoutThrottle}
         isDisabled={isDisabled}
         showLabel={false}
         showArrows={false}

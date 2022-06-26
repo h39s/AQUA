@@ -5,9 +5,11 @@ import RangeInput from '../../renderer/RangeInput';
 describe('RangeInput', () => {
   const name = 'Range Input';
   const handleChange = jest.fn();
+  const handleMouseUp = jest.fn();
 
   beforeEach(() => {
     handleChange.mockClear();
+    handleMouseUp.mockClear();
   });
 
   it('should render with name', () => {
@@ -18,6 +20,7 @@ describe('RangeInput', () => {
         min={1}
         max={5}
         handleChange={handleChange}
+        handleMouseUp={handleMouseUp}
         value={testValue}
         isDisabled={false}
       />
@@ -33,6 +36,7 @@ describe('RangeInput', () => {
         min={-5}
         max={5}
         handleChange={handleChange}
+        handleMouseUp={handleMouseUp}
         value={testValue}
         isDisabled={false}
       />
@@ -55,6 +59,7 @@ describe('RangeInput', () => {
         min={-5}
         max={5}
         handleChange={handleChange}
+        handleMouseUp={handleMouseUp}
         value={testValue}
         isDisabled={false}
       />
@@ -77,6 +82,7 @@ describe('RangeInput', () => {
         min={-5}
         max={5}
         handleChange={handleChange}
+        handleMouseUp={handleMouseUp}
         value={testValue}
         isDisabled={false}
       />
@@ -95,6 +101,7 @@ describe('RangeInput', () => {
         min={-5}
         max={5}
         handleChange={handleChange}
+        handleMouseUp={handleMouseUp}
         value={testValue}
         isDisabled={false}
       />
@@ -113,6 +120,7 @@ describe('RangeInput', () => {
         min={-5}
         max={5}
         handleChange={handleChange}
+        handleMouseUp={handleMouseUp}
         value={testValue}
         isDisabled
       />

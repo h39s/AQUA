@@ -12,11 +12,11 @@ import { PeaceFoundContext } from './PeaceFoundContext';
 import Slider from './Slider';
 import './styles/MainContent.scss';
 
-interface IFrequncyBandProps {
+interface IFrequencyBandProps {
   sliderIndex: number;
 }
 
-const FrequencyBand = ({ sliderIndex }: IFrequncyBandProps) => {
+const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
   const [actualFrequency, setActualFrequency] = useState<number>(0);
 
   const { peaceError, setPeaceError } = useContext(PeaceFoundContext);

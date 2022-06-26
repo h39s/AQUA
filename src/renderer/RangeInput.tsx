@@ -10,6 +10,7 @@ interface IRangeInputProps {
   max: number;
   isDisabled: boolean;
   handleChange: (newValue: number) => Promise<void>;
+  handleMouseUp: (newValue: number) => Promise<void>;
 }
 
 const RangeInput = ({
@@ -19,6 +20,7 @@ const RangeInput = ({
   max,
   isDisabled,
   handleChange,
+  handleMouseUp,
 }: IRangeInputProps) => {
   // Store a copy of the last value so it isn't lost to the throttle
   const lastValue = useRef<number | undefined>(undefined);
@@ -29,10 +31,16 @@ const RangeInput = ({
     handleChange(newValue);
   };
 
+  const onArrowInput = (isIncrement: boolean) => {
+    const offset = isIncrement ? 1 : -1;
+    const newValue = clamp(offset + value, min, max);
+    handleChange(newValue);
+  };
+
   const onMouseUp = () => {
     // Apply the last value if it there is one associated to this input
-    if (lastValue.current) {
-      handleChange(lastValue.current);
+    if (lastValue.current !== undefined) {
+      handleMouseUp(lastValue.current);
       lastValue.current = undefined;
     }
   };
@@ -42,10 +50,7 @@ const RangeInput = ({
       <ArrowButton
         name={name}
         type="up"
-        value={value}
-        min={min}
-        max={max}
-        handleChange={handleChange}
+        handleChange={() => onArrowInput(true)}
         isDisabled={isDisabled}
       />
       <input
@@ -70,10 +75,7 @@ const RangeInput = ({
       <ArrowButton
         name={name}
         type="down"
-        value={value}
-        min={min}
-        max={max}
-        handleChange={handleChange}
+        handleChange={() => onArrowInput(false)}
         isDisabled={isDisabled}
       />
     </div>

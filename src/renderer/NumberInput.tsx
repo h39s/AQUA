@@ -75,7 +75,7 @@ const NumberInput = ({
 
     const newValue: number = parseInt(input, 10);
     // Prevent user from typing numbers with more than 5 digits
-    if (newValue / 100000 > 1) {
+    if (Math.abs(newValue) >= 100000) {
       return;
     }
     setHasChanges(input !== value);
@@ -88,7 +88,10 @@ const NumberInput = ({
     setInternalValue(value);
   };
 
-  const onArrow = async (newValue: number) => {
+  const onArrow = async (isIncrement: boolean) => {
+    const offset = isIncrement ? 1 : -1;
+    // Treat internalValue as a 0 if it is empty or only a negative sign
+    const newValue = clamp(offset + numericalValue, min, max);
     setInternalValue(newValue);
     setHasChanges(false);
     handleSubmit(newValue);
@@ -135,19 +138,13 @@ const NumberInput = ({
             <ArrowButton
               name={name}
               type="up"
-              value={numericalValue}
-              min={min}
-              max={max}
-              handleChange={onArrow}
+              handleChange={() => onArrow(true)}
               isDisabled={isDisabled}
             />
             <ArrowButton
               name={name}
               type="down"
-              value={numericalValue}
-              min={min}
-              max={max}
-              handleChange={onArrow}
+              handleChange={() => onArrow(false)}
               isDisabled={isDisabled}
             />
           </div>

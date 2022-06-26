@@ -2,7 +2,6 @@ import {
   KeyboardEvent,
   MouseEvent,
   useCallback,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -13,19 +12,13 @@ import './styles/ArrowButton.scss';
 interface IArrowButtonProps {
   name: string;
   type: 'up' | 'down';
-  value: number;
-  min: number;
-  max: number;
   isDisabled: boolean;
-  handleChange: (newValue: number) => Promise<void>;
+  handleChange: () => void;
 }
 
 const ArrowButton = ({
   name,
   type,
-  value,
-  min,
-  max,
   isDisabled,
   handleChange,
 }: IArrowButtonProps) => {
@@ -34,15 +27,9 @@ const ArrowButton = ({
   const buttonRef = useRef<HTMLDivElement | null>(null);
   const [isChanging, setIsChanging] = useState(false);
 
-  const isIncrement = useMemo(() => type === 'up', [type]);
-
   const handleDeltaChangeGain = useCallback(() => {
-    if (value < max && isIncrement) {
-      handleChange(value + 1);
-    } else if (value > min && !isIncrement) {
-      handleChange(value - 1);
-    }
-  }, [handleChange, isIncrement, max, min, value]);
+    handleChange();
+  }, [handleChange]);
 
   // Hooks for continuously increasing/decreasing gain
   useInterval(() => handleDeltaChangeGain(), isChanging ? INTERVAL : undefined);
