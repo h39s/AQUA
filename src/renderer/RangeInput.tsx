@@ -1,14 +1,7 @@
-import {
-  ChangeEvent,
-  CSSProperties,
-  KeyboardEvent,
-  useCallback,
-  useRef,
-  useState,
-} from 'react';
-import SliderArrowIcon from './icons/SliderArrowIcon';
-import { clamp, useInterval } from './utils';
+import { ChangeEvent, CSSProperties, useRef } from 'react';
+import { clamp } from './utils';
 import './styles/RangeInput.scss';
+import ArrowButton from './ArrowButton';
 
 interface IRangeInputProps {
   name: string;
@@ -17,6 +10,7 @@ interface IRangeInputProps {
   max: number;
   isDisabled: boolean;
   handleChange: (newValue: number) => Promise<void>;
+  handleMouseUp: (newValue: number) => Promise<void>;
 }
 
 const RangeInput = ({
@@ -26,105 +20,39 @@ const RangeInput = ({
   max,
   isDisabled,
   handleChange,
+  handleMouseUp,
 }: IRangeInputProps) => {
-  const INTERVAL = 200;
+  // Store a copy of the last value so it isn't lost to the throttle
+  const lastValue = useRef<number | undefined>(undefined);
 
-  const increaseButtonRef = useRef<HTMLDivElement | null>(null);
-  const decreaseButtonRef = useRef<HTMLDivElement | null>(null);
-  const [isIncreasing, setIsIncreasing] = useState(false);
-  const [isDecreasing, setIsDecreasing] = useState(false);
-
-  const handleDeltaChangeGain = useCallback(
-    (isIncrement: boolean) => {
-      if (value < max && isIncrement) {
-        handleChange(value + 1);
-      } else if (value > min && !isIncrement) {
-        handleChange(value - 1);
-      }
-    },
-    [handleChange, max, min, value]
-  );
-
-  // Hooks for continuously increasing/decreasing gain
-  useInterval(
-    () => handleDeltaChangeGain(true),
-    isIncreasing ? INTERVAL : undefined
-  );
-
-  useInterval(
-    () => handleDeltaChangeGain(false),
-    isDecreasing ? INTERVAL : undefined
-  );
-
-  // Handlers for pausing continous change of the gain
-  const stopIncrement = useCallback(() => {
-    setIsIncreasing(false);
-    increaseButtonRef.current?.removeEventListener('mouseleave', stopIncrement);
-  }, []);
-
-  const stopDecrement = useCallback(() => {
-    setIsDecreasing(false);
-    decreaseButtonRef.current?.removeEventListener('mouseleave', stopDecrement);
-  }, []);
-
-  // Handlers for various input types
-  const handleArrowInput = useCallback(
-    (isIncrement: boolean) => {
-      if (isDisabled) {
-        return;
-      }
-      if (isIncrement) {
-        // Manually alter gain once to simulate click
-        handleDeltaChangeGain(true);
-
-        // Begin timer for continous adjustment
-        setIsIncreasing(true);
-        increaseButtonRef.current?.addEventListener(
-          'mouseleave',
-          stopIncrement
-        );
-      } else {
-        // Manually alter gain once to simulate click
-        handleDeltaChangeGain(false);
-
-        // Begin timer for continous adjustment
-        setIsDecreasing(true);
-        decreaseButtonRef.current?.addEventListener(
-          'mouseleave',
-          stopDecrement
-        );
-      }
-    },
-    [handleDeltaChangeGain, isDisabled, stopDecrement, stopIncrement]
-  );
-
-  const handleRangeInput = (e: ChangeEvent<HTMLInputElement>) => {
+  const onRangeInput = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue: number = clamp(parseInt(e.target.value, 10), min, max);
+    lastValue.current = newValue;
     handleChange(newValue);
   };
 
-  // Helper for detecting use of the ENTER key
-  const listenForEnter = (e: KeyboardEvent, handler: () => void) => {
-    if (e.code === 'Enter') {
-      handler();
+  const onArrowInput = (isIncrement: boolean) => {
+    const offset = isIncrement ? 1 : -1;
+    const newValue = clamp(offset + value, min, max);
+    handleChange(newValue);
+  };
+
+  const onMouseUp = () => {
+    // Apply the last value if it there is one associated to this input
+    if (lastValue.current !== undefined) {
+      handleMouseUp(lastValue.current);
+      lastValue.current = undefined;
     }
   };
 
   return (
     <div className="col center range">
-      <div
-        ref={increaseButtonRef}
-        role="button"
-        aria-label={`Increase ${name}`}
-        className="center range-top"
-        onMouseDown={() => handleArrowInput(true)}
-        onMouseUp={stopIncrement}
-        onKeyDown={(e) => listenForEnter(e, () => handleDeltaChangeGain(true))}
-        tabIndex={isDisabled ? -1 : 0}
-        aria-disabled={isDisabled}
-      >
-        <SliderArrowIcon type="up" />
-      </div>
+      <ArrowButton
+        name={name}
+        type="up"
+        handleChange={() => onArrowInput(true)}
+        isDisabled={isDisabled}
+      />
       <input
         type="range"
         min={min}
@@ -132,7 +60,8 @@ const RangeInput = ({
         value={value}
         name={name}
         aria-label={name}
-        onChange={handleRangeInput}
+        onChange={onRangeInput}
+        onMouseUp={onMouseUp}
         disabled={isDisabled}
         style={
           // Set css variables for determining upper/lower track
@@ -143,19 +72,12 @@ const RangeInput = ({
           } as CSSProperties
         }
       />
-      <div
-        ref={decreaseButtonRef}
-        role="button"
-        aria-label={`Decrease ${name}`}
-        className="center range-bottom"
-        onMouseDown={() => handleArrowInput(false)}
-        onMouseUp={stopDecrement}
-        onKeyDown={(e) => listenForEnter(e, () => handleDeltaChangeGain(false))}
-        tabIndex={isDisabled ? -1 : 0}
-        aria-disabled={isDisabled}
-      >
-        <SliderArrowIcon type="down" />
-      </div>
+      <ArrowButton
+        name={name}
+        type="down"
+        handleChange={() => onArrowInput(false)}
+        isDisabled={isDisabled}
+      />
     </div>
   );
 };

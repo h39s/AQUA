@@ -1,8 +1,14 @@
 @import 'color';
 @import 'spacing';
 
+$input-height: 24px;
+
 .numberInput {
   gap: $spacing-s;
+
+  .inputWrapper {
+    align-self: flex-end;
+  }
 
   input[type='text'] {
     background: $primary-dark;
@@ -10,9 +16,14 @@
     border-radius: 4px;
     color: $white;
     padding: $spacing-xs;
-    height: 24px;
-    width: 24px;
+    height: $input-height;
+    width: max($input-height, var(--input-width));
     text-align: center;
+
+    &:focus:not(:focus-visible) {
+      // TODO: can't figure out how to differentiate between only focus and focus-visible for text inputs
+      outline: 1px solid $secondary-default;
+    }
 
     &:focus-visible {
       outline: 2px solid $white;
@@ -21,6 +32,26 @@
     &:disabled {
       border: 2px solid $primary-lighter;
       color: $primary-lighter;
+    }
+  }
+
+  .asterisk {
+    position: absolute;
+    margin-left: calc(
+      $spacing-xl + max($input-height, var(--input-width)) / 2 + $spacing-s
+    );
+    margin-top: -$spacing-m;
+  }
+
+  .arrows {
+    display: flex;
+    flex-direction: column;
+    margin-left: 2px;
+    gap: 2px;
+
+    svg {
+      width: 16px;
+      height: auto;
     }
   }
 }

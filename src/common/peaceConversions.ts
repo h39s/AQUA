@@ -1,11 +1,12 @@
 // Peace returns numerical values as unsigned integers
 // This is the offset for the value -1000, used when fetching gain values
 const OVERFLOW_OFFSET = 4294967296;
+export const MAX_GAIN = 30;
+export const MIN_GAIN = -30;
+export const MAX_FREQUENCY = 20000; // Peace's actual limit is 22050
+export const MIN_FREQUENCY = 0; // graph input's limit is 10 Hz
 
 export const peaceGainOutputToDb = (result: number) => {
-  const MAX_GAIN = 30;
-  const MIN_GAIN = -30;
-
   // If gain is larger than MAX_GAIN, assume that Peace returned an unsigned negative number
   // If after adjusting for the unsigned number gives a positive value, default to -30
   if (result / 1000 > MAX_GAIN && (result - OVERFLOW_OFFSET) / 1000 > 0) {
@@ -22,9 +23,6 @@ export const peaceGainOutputToDb = (result: number) => {
 };
 
 export const peaceFrequencyOutputToNormal = (result: number) => {
-  const MAX_FREQUENCY = 22050;
-  const MIN_FREQUENCY = 10;
-
   // If gain is larger than the MAX_FREQUENCY, assume that Peace returned an unsigned negative number
   // Since frequency shouldn't be negative, default to the MIN_FREQUENCY
   if (result > MAX_FREQUENCY) {

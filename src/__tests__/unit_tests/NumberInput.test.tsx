@@ -1,14 +1,12 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
-import NumberInput from '../renderer/NumberInput';
+import NumberInput from '../../renderer/NumberInput';
 
 describe('NumberInput', () => {
   const id = 'Number Input';
-  const handleChange = jest.fn();
   const handleSubmit = jest.fn();
 
   beforeEach(() => {
-    handleChange.mockClear();
     handleSubmit.mockClear();
   });
 
@@ -17,13 +15,13 @@ describe('NumberInput', () => {
     render(
       <NumberInput
         name={id}
-        showLabel
         min={1}
         max={5}
-        handleChange={handleChange}
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
+        showArrows={false}
+        showLabel
       />
     );
     expect(screen.getByText(id)).toBeInTheDocument();
@@ -35,13 +33,13 @@ describe('NumberInput', () => {
     render(
       <NumberInput
         name={id}
-        showLabel={false}
         min={-5}
         max={5}
-        handleChange={handleChange}
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
+        showArrows={false}
+        showLabel={false}
       />
     );
     const input = screen.getByLabelText(id);
@@ -50,8 +48,7 @@ describe('NumberInput', () => {
     fireEvent.input(input, {
       target: { value: '-' },
     });
-
-    expect(handleChange).toBeCalledWith('-');
+    expect(input).toHaveValue('-');
   });
 
   it('should allow input to be changed to a negative value', () => {
@@ -59,13 +56,13 @@ describe('NumberInput', () => {
     render(
       <NumberInput
         name={id}
-        showLabel={false}
         min={-5}
         max={5}
-        handleChange={handleChange}
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
+        showArrows={false}
+        showLabel={false}
       />
     );
     const input = screen.getByLabelText(id);
@@ -74,8 +71,7 @@ describe('NumberInput', () => {
     fireEvent.input(input, {
       target: { value: '-1' },
     });
-
-    expect(handleChange).toBeCalledWith(-1);
+    expect(input).toHaveValue('-1');
   });
 
   it('should clamp submitted values below the minimum to be within the threshold', () => {
@@ -83,13 +79,13 @@ describe('NumberInput', () => {
     render(
       <NumberInput
         name={id}
-        showLabel={false}
         min={-5}
         max={5}
-        handleChange={handleChange}
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
+        showArrows={false}
+        showLabel={false}
       />
     );
     const input = screen.getByLabelText(id);
@@ -104,13 +100,13 @@ describe('NumberInput', () => {
     render(
       <NumberInput
         name={id}
-        showLabel={false}
         min={-5}
         max={5}
-        handleChange={handleChange}
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
+        showArrows={false}
+        showLabel={false}
       />
     );
     const input = screen.getByLabelText(id);
@@ -125,13 +121,13 @@ describe('NumberInput', () => {
     render(
       <NumberInput
         name={id}
-        showLabel={false}
         min={-5}
         max={5}
-        handleChange={handleChange}
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled
+        showArrows={false}
+        showLabel={false}
       />
     );
     const input = screen.getByLabelText(id);

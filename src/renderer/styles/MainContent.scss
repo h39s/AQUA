@@ -1,12 +1,13 @@
 @import './constant';
 @import './spacing';
 
-$band-height: 280px;
+$band-height: 300px;
+$band-width: 64px;
 
 .mainContent {
   height: 100%;
   width: $content-width;
-  gap: $spacing-s;
+  justify-content: space-evenly;
 
   .bandLabel {
     height: $band-height;
@@ -17,14 +18,14 @@ $band-height: 280px;
       height: 100%;
     }
 
-    .gainLabel {
+    .rowLabel {
       margin: $spacing-s 0;
     }
   }
 
   .band {
     height: $band-height;
-    width: 72px;
+    width: $band-width;
     gap: $spacing-s;
   }
 }

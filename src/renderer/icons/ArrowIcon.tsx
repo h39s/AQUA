@@ -1,4 +1,4 @@
-const SliderArrowIcon = ({ type }: { type: 'up' | 'down' }) => {
+const ArrowIcon = ({ type }: { type: 'up' | 'down' }) => {
   switch (type) {
     case 'up':
       return (
@@ -113,4 +113,4 @@ const SliderArrowIcon = ({ type }: { type: 'up' | 'down' }) => {
   }
 };
 
-export default SliderArrowIcon;
+export default ArrowIcon;

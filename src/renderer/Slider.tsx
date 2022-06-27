@@ -1,9 +1,10 @@
 import { ErrorDescription } from 'common/errors';
 import { useEffect, useContext, useState, useMemo } from 'react';
-import NumberInput, { TNumberInput } from './NumberInput';
+import NumberInput from './NumberInput';
 import RangeInput from './RangeInput';
 import { PeaceFoundContext } from './PeaceFoundContext';
 import './styles/Slider.scss';
+import { useThrottle } from './utils';
 
 interface ISliderProps {
   name: string;
@@ -14,10 +15,9 @@ interface ISliderProps {
 }
 
 const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
-  const [rangeValue, setRangeValue] = useState<number>(0);
-  const [inputValue, setInputValue] = useState<TNumberInput>(0);
+  const INTERVAL = 200;
+  const [sliderValue, setSliderValue] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
   const { peaceError, setPeaceError } = useContext(PeaceFoundContext);
 
   const isDisabled = useMemo(
@@ -30,8 +30,7 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
       setIsLoading(true);
       try {
         const initValue = await getValue();
-        setRangeValue(initValue);
-        setInputValue(initValue);
+        setSliderValue(initValue);
       } catch (e) {
         setPeaceError(e as ErrorDescription);
       }
@@ -42,10 +41,7 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
     }
   }, [getValue, peaceError, setPeaceError]);
 
-  // Helpers for adjusting the preamp gain value
   const handleChangeGain = async (newValue: number) => {
-    setRangeValue(newValue);
-    setInputValue(newValue);
     try {
       await setValue(newValue);
     } catch (e) {
@@ -53,25 +49,39 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
     }
   };
 
+  const throttledSetValue = useThrottle(handleChangeGain, INTERVAL);
+
+  // Helpers for adjusting the preamp gain value
+  const handleChangeGainWithThrottle = async (newValue: number) => {
+    setSliderValue(newValue);
+    throttledSetValue(newValue);
+  };
+
+  const handleChangeGainWithoutThrottle = async (newValue: number) => {
+    setSliderValue(newValue);
+    handleChangeGain(newValue);
+  };
+
   return (
     <div className="col center slider">
       <RangeInput
         name={`${name}-range`}
-        value={rangeValue}
+        value={sliderValue}
         min={min}
         max={max}
-        handleChange={handleChangeGain}
+        handleChange={handleChangeGainWithThrottle}
+        handleMouseUp={handleChangeGainWithoutThrottle}
         isDisabled={isDisabled}
       />
       <NumberInput
         name={`${name}-number`}
-        value={inputValue}
+        value={sliderValue}
         min={min}
         max={max}
-        handleChange={setInputValue}
-        handleSubmit={handleChangeGain}
+        handleSubmit={handleChangeGainWithoutThrottle}
         isDisabled={isDisabled}
         showLabel={false}
+        showArrows={false}
       />
     </div>
   );
