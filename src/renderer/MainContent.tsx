@@ -52,12 +52,20 @@ const MainContent = () => {
         setSliderIndicies(newIndices);
         break;
       } catch (e) {
-        await new Promise((resolve) => {
-          setTimeout(resolve, 500);
-        });
+        if (i === 5) {
+          setPeaceError(e as ErrorDescription);
+        } else {
+          await new Promise((resolve) => {
+            setTimeout(resolve, 500);
+          });
+        }
       }
     }
-    await closePeaceWindow();
+    try {
+      await closePeaceWindow();
+      // Ignore if we can't close peace window
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
   };
 
   const onRemoveEqualizerSlider = async () => {
@@ -73,11 +81,15 @@ const MainContent = () => {
         const newIndices = [...sliderIndicies];
         newIndices.pop();
         setSliderIndicies(newIndices);
-        break;
+        return;
       } catch (e) {
-        await new Promise((resolve) => {
-          setTimeout(resolve, 500);
-        });
+        if (i === 5) {
+          setPeaceError(e as ErrorDescription);
+        } else {
+          await new Promise((resolve) => {
+            setTimeout(resolve, 500);
+          });
+        }
       }
     }
   };
