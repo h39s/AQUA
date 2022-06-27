@@ -4,6 +4,7 @@ export enum ErrorCode {
   PEACE_NOT_RUNNING = 2,
   PEACE_NOT_READY = 3,
   PEACE_TIMEOUT = 4,
+  NEGATIVE_FREQUENCY = 5,
 }
 
 export type ErrorDescription = {
@@ -39,6 +40,11 @@ export const errors: Record<ErrorCode, ErrorDescription> = {
     action:
       'Please restart the application. If the error persists, try reaching out to the developers to resolve the issue.',
     code: ErrorCode.PEACE_TIMEOUT,
+  },
+  [ErrorCode.NEGATIVE_FREQUENCY]: {
+    shortError: 'Invalid frequency - frequency is negative',
+    action: '',
+    code: ErrorCode.NEGATIVE_FREQUENCY,
   },
 };
 

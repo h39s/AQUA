@@ -160,9 +160,15 @@ export const getFrequency = (index: number): Promise<number> => {
     0,
   ]);
 
-  const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    resolve(peaceFrequencyOutputToNormal(result));
-  });
+  const responseHandler = buildResponseHandler<number>(
+    (result, resolve, reject) => {
+      if (result > 22050) {
+        reject(getErrorDescription(ErrorCode.NEGATIVE_FREQUENCY));
+        return;
+      }
+      resolve(peaceFrequencyOutputToNormal(result));
+    }
+  );
   return promisifyResult(responseHandler, channel);
 };
 
@@ -206,7 +212,7 @@ export const enableEqualizer = (): Promise<void> => {
   const responseHandler = buildResponseHandler<void>(
     (result, resolve, reject) => {
       if (result !== 1) {
-        reject(getErrorDescription(0));
+        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
       }
       resolve();
     }
@@ -224,7 +230,7 @@ export const disableEqualizer = (): Promise<void> => {
   const responseHandler = buildResponseHandler<void>(
     (result, resolve, reject) => {
       if (result !== 2) {
-        reject(getErrorDescription(0));
+        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
       }
       resolve();
     }
@@ -247,8 +253,77 @@ export const getEqualizerStatus = (): Promise<boolean> => {
       } else if (result === 2) {
         resolve(false);
       } else {
-        reject(getErrorDescription(0));
+        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
       }
+    }
+  );
+  return promisifyResult(responseHandler, channel);
+};
+
+/**
+ * Get number of equalizer bands
+ * @returns { Promise<number> } exception if failed
+ */
+export const getEqualizerSliderCount = (): Promise<number> => {
+  const channel = 'getEqualizerSliderCount';
+  window.electron.ipcRenderer.sendMessage('peace', [channel, 22, 13]);
+  const responseHandler = buildResponseHandler<number>((result, resolve) => {
+    resolve(result);
+  });
+  return promisifyResult(responseHandler, channel);
+};
+
+/**
+ * Add another slider
+ * @returns { Promise<void> } exception if failed
+ */
+export const addEqualizerSlider = (): Promise<void> => {
+  const channel = 'addEqualizerSlider';
+  window.electron.ipcRenderer.sendMessage('peace', [channel, 22, 14]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Remove rightmost slider
+ * @returns { Promise<void> } exception if failed
+ */
+export const removeEqualizerSlider = (): Promise<void> => {
+  const channel = 'removeEqualizerSlider';
+  window.electron.ipcRenderer.sendMessage('peace', [channel, 22, 15]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Show Peace window
+ * @returns { Promise<void> } exception if failed
+ */
+export const showPeaceWindow = (): Promise<void> => {
+  const channel = 'showPeaceWindow';
+  window.electron.ipcRenderer.sendMessage('peace', [channel, 1, 0]);
+  const responseHandler = buildResponseHandler<void>(
+    (result, resolve, reject) => {
+      if (result !== 2) {
+        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
+      }
+      resolve();
+    }
+  );
+  return promisifyResult(responseHandler, channel);
+};
+
+/**
+ * Close Peace window
+ * @returns { Promise<void> } exception if failed
+ */
+export const closePeaceWindow = (): Promise<void> => {
+  const channel = 'closePeaceWindow';
+  window.electron.ipcRenderer.sendMessage('peace', [channel, 1, 1]);
+  const responseHandler = buildResponseHandler<void>(
+    (result, resolve, reject) => {
+      if (result !== 1) {
+        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
+      }
+      resolve();
     }
   );
   return promisifyResult(responseHandler, channel);

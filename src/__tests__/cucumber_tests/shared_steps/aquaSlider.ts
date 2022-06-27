@@ -10,9 +10,7 @@ export const whenSetFrequencyGain = (
     async (frequency: number, position: string) => {
       const sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
       for (let i = 0; i < sliderElems.length; i += 1) {
-        // eslint-disable-next-line no-await-in-loop
         const element = await sliderElems[i].$('input');
-        // eslint-disable-next-line no-await-in-loop
         const name = await element.getAttribute('name');
         if (name === `${frequency}-gain-range`) {
           const coord = { x: 0, y: 0 };
@@ -23,7 +21,6 @@ export const whenSetFrequencyGain = (
           }
           element.dragAndDrop(coord);
           // wait 1000 ms for the action.
-          // eslint-disable-next-line no-await-in-loop
           await new Promise((resolve) => setTimeout(resolve, 1000));
           return;
         }
