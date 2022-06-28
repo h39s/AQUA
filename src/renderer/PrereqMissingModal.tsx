@@ -1,3 +1,4 @@
+import Button from './Button';
 import './styles/Modal.scss';
 
 interface IPrereqMissingModalProps {
@@ -27,12 +28,22 @@ export default function PrereqMissingModal({
           </p>
         </div>
         <div className="footer row">
-          <button type="button" disabled={isLoading} onClick={onRetry}>
-            Retry
-          </button>
-          <button type="button" disabled={isLoading} onClick={handleClose}>
-            Close
-          </button>
+          <Button
+            ariaLabel="Retry"
+            isDisabled={isLoading}
+            className="modalButton"
+            handleChange={onRetry}
+          >
+            <div>Retry</div>
+          </Button>
+          <Button
+            ariaLabel="Close"
+            isDisabled={isLoading}
+            className="modalButton"
+            handleChange={handleClose}
+          >
+            <div>Close</div>
+          </Button>
         </div>
       </div>
     </div>

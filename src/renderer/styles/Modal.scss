@@ -1,5 +1,6 @@
 @import 'color';
 @import 'spacing';
+@import 'button-state';
 
 .modal {
   position: fixed;
@@ -11,6 +12,20 @@
   overflow: auto;
   background-color: rgb(0, 0, 0); /* Fallback color */
   background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+
+  .modalButton {
+    @extend %button-state;
+    color: $black;
+    padding: $spacing-s $spacing-m;
+    margin: $spacing-xs;
+    border: none;
+    border-radius: 4px;
+
+    &.small {
+      padding: $spacing-xs $spacing-s;
+      height: fit-content;
+    }
+  }
 
   .footer {
     justify-content: flex-end;
