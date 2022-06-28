@@ -1,7 +1,7 @@
 import './styles/Button.scss';
 
 interface IButtonProps {
-  children: JSX.Element;
+  children: JSX.Element | string;
   ariaLabel: string;
   isDisabled: boolean;
   className?: string;
@@ -12,14 +12,14 @@ const Button = ({
   children,
   ariaLabel,
   isDisabled,
-  className = 'button',
+  className = '',
   handleChange,
 }: IButtonProps) => {
   return (
     <div
       role="button"
       aria-label={ariaLabel}
-      className={className}
+      className={`button ${className}`}
       onMouseUp={handleChange}
       tabIndex={isDisabled ? -1 : 0}
       aria-disabled={isDisabled}

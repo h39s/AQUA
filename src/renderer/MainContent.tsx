@@ -119,6 +119,7 @@ const MainContent = () => {
             <Button
               ariaLabel="Add Equalizer Slider"
               isDisabled={false}
+              className="sliderButton"
               handleChange={onAddEqualizerSlider}
             >
               <PlusIcon />
@@ -126,6 +127,7 @@ const MainContent = () => {
             <Button
               ariaLabel="Remove Equalizer Slider"
               isDisabled={false}
+              className="sliderButton"
               handleChange={onRemoveEqualizerSlider}
             >
               <MinusIcon />

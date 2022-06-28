@@ -2,6 +2,7 @@
 
 %button-state {
   background: $secondary-default;
+  color: $black;
 
   &:focus-visible {
     outline: 2px solid $white;
@@ -19,7 +20,6 @@
   }
 
   &:disabled {
-    color: $black;
     background: $primary-light;
     cursor: default;
   }

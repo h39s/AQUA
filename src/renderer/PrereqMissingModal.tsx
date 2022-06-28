@@ -31,18 +31,18 @@ export default function PrereqMissingModal({
           <Button
             ariaLabel="Retry"
             isDisabled={isLoading}
-            className="modalButton"
+            className="small"
             handleChange={onRetry}
           >
-            <div>Retry</div>
+            Retry
           </Button>
           <Button
             ariaLabel="Close"
             isDisabled={isLoading}
-            className="modalButton"
+            className="small"
             handleChange={handleClose}
           >
-            <div>Close</div>
+            Close
           </Button>
         </div>
       </div>

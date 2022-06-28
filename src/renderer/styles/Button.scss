@@ -1,14 +1,14 @@
 @import 'color';
+@import 'spacing';
 @import 'button-state';
 
 $button-width: 24px;
 $button-height: 100px;
 
 .button {
-  width: $button-width;
-  height: $button-height;
   border-radius: 4px;
   background-color: $secondary-default;
+  margin: $spacing-xs;
 
   display: flex;
   flex-direction: column;
@@ -16,6 +16,11 @@ $button-height: 100px;
   justify-content: center;
 
   @extend %button-state;
+
+  &.small {
+    padding: $spacing-xs $spacing-s;
+    height: fit-content;
+  }
 
   path {
     fill: $white;
