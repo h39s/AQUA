@@ -33,8 +33,8 @@ $band-width: 64px;
     height: $band-height;
     justify-content: center;
     div {
-      margin-top: 5px;
-      margin-bottom: 5px;
+      margin-top: $spacing-xs;
+      margin-bottom: $spacing-xs;
     }
   }
 }

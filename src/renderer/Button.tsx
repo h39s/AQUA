@@ -1,23 +1,25 @@
-import './styles/LargeButton.scss';
+import './styles/Button.scss';
 
-interface ILargeButtonProps {
+interface IButtonProps {
   children: JSX.Element;
   ariaLabel: string;
   isDisabled: boolean;
+  className?: string;
   handleChange: () => void;
 }
 
-const LargeButton = ({
+const Button = ({
   children,
   ariaLabel,
   isDisabled,
+  className = 'button',
   handleChange,
-}: ILargeButtonProps) => {
+}: IButtonProps) => {
   return (
     <div
       role="button"
       aria-label={ariaLabel}
-      className="button"
+      className={className}
       onMouseUp={handleChange}
       tabIndex={isDisabled ? -1 : 0}
       aria-disabled={isDisabled}
@@ -27,4 +29,4 @@ const LargeButton = ({
   );
 };
 
-export default LargeButton;
+export default Button;

@@ -11,7 +11,7 @@ import {
 import FrequencyBand from './FrequencyBand';
 import MinusIcon from './icons/MinusIcon';
 import PlusIcon from './icons/PlusIcon';
-import LargeButton from './LargeButton';
+import Button from './Button';
 import { PeaceFoundContext } from './PeaceFoundContext';
 import './styles/MainContent.scss';
 
@@ -36,6 +36,23 @@ const MainContent = () => {
     }
   }, [peaceError, setPeaceError]);
 
+  const retryHelper = async (attempts: number, f: () => any) => {
+    for (let i = 0; i < attempts; i += 1) {
+      try {
+        await f();
+        return;
+      } catch (e) {
+        if (i === attempts) {
+          setPeaceError(e as ErrorDescription);
+          return;
+        }
+        await new Promise((resolve) => {
+          setTimeout(resolve, 500);
+        });
+      }
+    }
+  };
+
   const onAddEqualizerSlider = async () => {
     try {
       await addEqualizerSlider();
@@ -43,24 +60,16 @@ const MainContent = () => {
       setPeaceError(e as ErrorDescription);
       return;
     }
-    for (let i = 0; i < 5; i += 1) {
-      try {
-        await getProgramState();
-        await showPeaceWindow();
-        const newIndices = [...sliderIndicies];
-        newIndices.push(sliderIndicies.length + 1);
-        setSliderIndicies(newIndices);
-        break;
-      } catch (e) {
-        if (i === 5) {
-          setPeaceError(e as ErrorDescription);
-        } else {
-          await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-          });
-        }
-      }
-    }
+    const addSlider = async () => {
+      await getProgramState();
+      await showPeaceWindow();
+      const newIndices = [...sliderIndicies];
+      newIndices.push(sliderIndicies.length + 1);
+      setSliderIndicies(newIndices);
+    };
+
+    retryHelper(5, addSlider);
+
     try {
       await closePeaceWindow();
       // Ignore if we can't close peace window
@@ -75,23 +84,14 @@ const MainContent = () => {
       setPeaceError(e as ErrorDescription);
       return;
     }
-    for (let i = 0; i < 5; i += 1) {
-      try {
-        await getProgramState();
-        const newIndices = [...sliderIndicies];
-        newIndices.pop();
-        setSliderIndicies(newIndices);
-        return;
-      } catch (e) {
-        if (i === 5) {
-          setPeaceError(e as ErrorDescription);
-        } else {
-          await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-          });
-        }
-      }
-    }
+
+    const removeSlider = async () => {
+      await getProgramState();
+      const newIndices = [...sliderIndicies];
+      newIndices.pop();
+      setSliderIndicies(newIndices);
+    };
+    retryHelper(5, removeSlider);
   };
 
   return (
@@ -116,20 +116,20 @@ const MainContent = () => {
             />
           ))}
           <div className="col sliderButtons">
-            <LargeButton
-              ariaLabel=""
+            <Button
+              ariaLabel="Add Equalizer Slider"
               isDisabled={false}
               handleChange={onAddEqualizerSlider}
             >
               <PlusIcon />
-            </LargeButton>
-            <LargeButton
-              ariaLabel=""
+            </Button>
+            <Button
+              ariaLabel="Remove Equalizer Slider"
               isDisabled={false}
               handleChange={onRemoveEqualizerSlider}
             >
               <MinusIcon />
-            </LargeButton>
+            </Button>
           </div>
         </>
       )}
