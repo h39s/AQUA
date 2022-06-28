@@ -27,7 +27,6 @@ export const givenPeaceIsRunning = (given: DefineStepFunction) => {
         return;
       }
       // Wait 1s before trying again
-      // eslint-disable-next-line no-await-in-loop
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
     throw new Error('Peace not running');
@@ -44,12 +43,9 @@ export const thenPeaceFrequencyGain = (
     async (gain: string, frequency: string) => {
       const sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
       for (let i = 0; i < sliderElems.length; i += 1) {
-        // eslint-disable-next-line no-await-in-loop
         const element = await sliderElems[i].$('input');
-        // eslint-disable-next-line no-await-in-loop
         const name = await element.getAttribute('name');
         if (name === `${frequency}-gain-range`) {
-          // eslint-disable-next-line no-await-in-loop
           const peaceHWnd = getPeaceWindowHandle();
           if (!isPeaceRunning(peaceHWnd)) {
             throw new Error('Peace is not running.');

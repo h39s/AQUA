@@ -28,4 +28,18 @@ $band-width: 64px;
     width: $band-width;
     gap: $spacing-s;
   }
+
+  .sliderButtons {
+    height: $band-height;
+    justify-content: center;
+    div {
+      margin-top: $spacing-xs;
+      margin-bottom: $spacing-xs;
+    }
+
+    .sliderButton {
+      height: 100px;
+      width: 24px;
+    }
+  }
 }
