@@ -12,11 +12,13 @@ import path from 'path';
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import ChannelEnum from '../common/channels';
 import {
   getPeaceWindowHandle,
   isPeaceRunning,
   sendPeaceCommand,
 } from '../common/peaceIPC';
+import { fetch, flush, IState, save } from './flush';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import registry from './registry';
@@ -32,6 +34,8 @@ export default class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+
+const state: IState = fetch();
 
 ipcMain.on('peace', async (event, arg) => {
   const channel: string = arg[0];
@@ -64,6 +68,62 @@ ipcMain.on('peace', async (event, arg) => {
   }
   const reply: TSuccess = { result: res };
   event.reply(channel, reply);
+});
+
+const handleUpdate = (event: Electron.IpcMainEvent, channel: ChannelEnum) => {
+  console.log(state);
+  flush(state);
+  const reply: TSuccess = { result: 1 };
+  event.reply(channel, reply);
+  save(state);
+};
+
+ipcMain.on(ChannelEnum.GET_ENABLE, async (event) => {
+  const reply: TSuccess = { result: state.isEnabled ? 1 : 0 };
+  event.reply(ChannelEnum.GET_ENABLE, reply);
+});
+
+ipcMain.on(ChannelEnum.SET_ENABLE, async (event, arg) => {
+  const value = parseInt(arg[0], 10) || 0;
+  state.isEnabled = value !== 0;
+  handleUpdate(event, ChannelEnum.SET_ENABLE);
+});
+
+ipcMain.on(ChannelEnum.GET_PREAMP, async (event) => {
+  const reply: TSuccess = { result: state.preAmp || 0 };
+  event.reply(ChannelEnum.GET_PREAMP, reply);
+});
+
+ipcMain.on(ChannelEnum.SET_PREAMP, async (event, arg) => {
+  const gain = parseInt(arg[0], 10) || 0;
+  state.preAmp = gain;
+  handleUpdate(event, ChannelEnum.SET_PREAMP);
+});
+
+ipcMain.on(ChannelEnum.GET_GAIN, async (event, arg) => {
+  const filterIndex = parseInt(arg[0], 10) || 0;
+
+  if (filterIndex >= state.filters.length) {
+    const reply: TError = { errorCode: ErrorCode.PEACE_UNKNOWN_ERROR };
+    event.reply(ChannelEnum.SET_GAIN, reply);
+    return;
+  }
+
+  const reply: TSuccess = { result: state.filters[filterIndex].gain || 0 };
+  event.reply(ChannelEnum.GET_GAIN, reply);
+});
+
+ipcMain.on(ChannelEnum.SET_GAIN, async (event, arg) => {
+  const filterIndex = parseInt(arg[0], 10) || 0;
+  const gain = parseInt(arg[1], 10) || 0;
+
+  if (filterIndex >= state.filters.length) {
+    const reply: TError = { errorCode: ErrorCode.PEACE_UNKNOWN_ERROR };
+    event.reply(ChannelEnum.SET_GAIN, reply);
+    return;
+  }
+  state.filters[filterIndex].gain = gain;
+  handleUpdate(event, ChannelEnum.SET_GAIN);
 });
 
 ipcMain.on('quit-app', () => {
