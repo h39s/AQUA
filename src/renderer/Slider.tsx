@@ -82,6 +82,9 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
         isDisabled={isDisabled}
         showLabel={false}
         showArrows={false}
+        type="float"
+        floatPrecision={0.1}
+        round
       />
     </div>
   );

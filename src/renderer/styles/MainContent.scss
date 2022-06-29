@@ -1,7 +1,7 @@
 @import './constant';
 @import './spacing';
 
-$band-height: 300px;
+$band-height: 344px;
 $band-width: 64px;
 
 .mainContent {
@@ -11,7 +11,8 @@ $band-width: 64px;
 
   .bandLabel {
     height: $band-height;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 8px;
 
     div {
       justify-content: space-around;
@@ -31,7 +32,7 @@ $band-width: 64px;
 
   .sliderButtons {
     height: $band-height;
-    justify-content: center;
+    padding-top: 90px;
     div {
       margin-top: $spacing-xs;
       margin-bottom: $spacing-xs;

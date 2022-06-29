@@ -22,6 +22,7 @@ describe('NumberInput', () => {
         isDisabled={false}
         showArrows={false}
         showLabel
+        type="int"
       />
     );
     expect(screen.getByText(id)).toBeInTheDocument();
@@ -29,7 +30,7 @@ describe('NumberInput', () => {
   });
 
   it('should allow input to be changed to a negative sign', () => {
-    const testValue = '';
+    const testValue = 0;
     render(
       <NumberInput
         name={id}
@@ -40,10 +41,11 @@ describe('NumberInput', () => {
         isDisabled={false}
         showArrows={false}
         showLabel={false}
+        type="float"
       />
     );
     const input = screen.getByLabelText(id);
-    expect(input).toHaveValue(testValue);
+    expect(input).toHaveValue(`${testValue}`);
 
     fireEvent.input(input, {
       target: { value: '-' },
@@ -52,7 +54,7 @@ describe('NumberInput', () => {
   });
 
   it('should allow input to be changed to a negative value', () => {
-    const testValue = '';
+    const testValue = 0;
     render(
       <NumberInput
         name={id}
@@ -63,10 +65,11 @@ describe('NumberInput', () => {
         isDisabled={false}
         showArrows={false}
         showLabel={false}
+        type="int"
       />
     );
     const input = screen.getByLabelText(id);
-    expect(input).toHaveValue(testValue);
+    expect(input).toHaveValue(`${testValue}`);
 
     fireEvent.input(input, {
       target: { value: '-1' },
@@ -86,6 +89,7 @@ describe('NumberInput', () => {
         isDisabled={false}
         showArrows={false}
         showLabel={false}
+        type="int"
       />
     );
     const input = screen.getByLabelText(id);
@@ -101,23 +105,24 @@ describe('NumberInput', () => {
       <NumberInput
         name={id}
         min={-5}
-        max={5}
+        max={4.3}
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
         showArrows={false}
         showLabel={false}
+        type="float"
       />
     );
     const input = screen.getByLabelText(id);
     expect(input).toHaveValue(`${testValue}`);
 
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
-    expect(handleSubmit).toBeCalledWith(5);
+    expect(handleSubmit).toBeCalledWith(4.3);
   });
 
   it('should be disabled', () => {
-    const testValue = '';
+    const testValue = 0;
     render(
       <NumberInput
         name={id}
@@ -128,10 +133,96 @@ describe('NumberInput', () => {
         isDisabled
         showArrows={false}
         showLabel={false}
+        type="int"
       />
     );
     const input = screen.getByLabelText(id);
-    expect(input).toHaveValue(testValue);
+    expect(input).toHaveValue(`${testValue}`);
     expect(input).toBeDisabled();
+  });
+
+  it('should be able to truncate to the correct float precision', () => {
+    const testValue = 1;
+    render(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        showArrows={false}
+        showLabel={false}
+        type="float"
+        floatPrecision={0.001}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    fireEvent.input(input, {
+      target: { value: '1.6912' },
+    });
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+    expect(handleSubmit).toBeCalledWith(1.691);
+
+    fireEvent.change(input, {
+      target: { value: '-2.60000' },
+    });
+    screen.logTestingPlaygroundURL();
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+    expect(handleSubmit).toBeCalledWith(-2.6);
+  });
+
+  it('should not accept bad inputs for float input', () => {
+    const testValue = 2;
+    render(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        showArrows={false}
+        showLabel={false}
+        type="float"
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    fireEvent.input(input, {
+      target: { value: '-2.6e10' },
+    });
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+    expect(handleSubmit).toBeCalledWith(2);
+  });
+
+  it('should be able to round to the correct float precision', () => {
+    const testValue = 0;
+    render(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        showArrows={false}
+        showLabel={false}
+        type="float"
+        floatPrecision={0.01}
+        round
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    fireEvent.input(input, {
+      target: { value: '-1.1621' },
+    });
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+    expect(handleSubmit).toBeCalledWith(-1.15);
   });
 });
