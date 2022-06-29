@@ -2,11 +2,8 @@ import { ErrorDescription } from 'common/errors';
 import { useContext, useEffect, useState } from 'react';
 import {
   addEqualizerSlider,
-  closePeaceWindow,
   getEqualizerSliderCount,
-  getProgramState,
   removeEqualizerSlider,
-  showPeaceWindow,
 } from './equalizerApi';
 import FrequencyBand from './FrequencyBand';
 import MinusIcon from './icons/MinusIcon';
@@ -25,7 +22,7 @@ const MainContent = () => {
         const sliderCount = await getEqualizerSliderCount();
         const newIndices = Array(sliderCount)
           .fill(0)
-          .map((_, i) => i + 1);
+          .map((_, i) => i);
         setSliderIndicies(newIndices);
       } catch (e) {
         setPeaceError(e as ErrorDescription);
@@ -36,62 +33,26 @@ const MainContent = () => {
     }
   }, [peaceError, setPeaceError]);
 
-  const retryHelper = async (attempts: number, f: () => any) => {
-    for (let i = 0; i < attempts; i += 1) {
-      try {
-        await f();
-        return;
-      } catch (e) {
-        if (i === attempts) {
-          setPeaceError(e as ErrorDescription);
-          return;
-        }
-        await new Promise((resolve) => {
-          setTimeout(resolve, 500);
-        });
-      }
-    }
-  };
-
   const onAddEqualizerSlider = async () => {
     try {
       await addEqualizerSlider();
+      const newIndices = [...sliderIndicies];
+      newIndices.push(sliderIndicies.length);
+      setSliderIndicies(newIndices);
     } catch (e) {
       setPeaceError(e as ErrorDescription);
-      return;
     }
-    const addSlider = async () => {
-      await getProgramState();
-      await showPeaceWindow();
-      const newIndices = [...sliderIndicies];
-      newIndices.push(sliderIndicies.length + 1);
-      setSliderIndicies(newIndices);
-    };
-
-    retryHelper(5, addSlider);
-
-    try {
-      await closePeaceWindow();
-      // Ignore if we can't close peace window
-      // eslint-disable-next-line no-empty
-    } catch (e) {}
   };
 
   const onRemoveEqualizerSlider = async () => {
     try {
-      await removeEqualizerSlider();
-    } catch (e) {
-      setPeaceError(e as ErrorDescription);
-      return;
-    }
-
-    const removeSlider = async () => {
-      await getProgramState();
+      await removeEqualizerSlider(sliderIndicies.length - 1);
       const newIndices = [...sliderIndicies];
       newIndices.pop();
       setSliderIndicies(newIndices);
-    };
-    retryHelper(5, removeSlider);
+    } catch (e) {
+      setPeaceError(e as ErrorDescription);
+    }
   };
 
   return (

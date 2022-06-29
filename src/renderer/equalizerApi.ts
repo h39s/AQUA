@@ -4,7 +4,12 @@ import {
   ErrorDescription,
   getErrorDescription,
 } from 'common/errors';
-import { peaceFrequencyOutputToNormal } from 'common/peaceConversions';
+import {
+  MAX_FREQUENCY,
+  MAX_GAIN,
+  MIN_FREQUENCY,
+  MIN_GAIN,
+} from 'common/constants';
 
 const TIMEOUT = 10000;
 
@@ -64,6 +69,12 @@ const buildResponseHandler = <Type>(
   };
 };
 
+const simpleResponseHandler = buildResponseHandler<number>(
+  (result, resolve) => {
+    resolve(result);
+  }
+);
+
 const setterResponseHandler = buildResponseHandler<void>(
   (result, resolve, reject) => {
     if (result !== 1) {
@@ -80,11 +91,7 @@ const setterResponseHandler = buildResponseHandler<void>(
 export const getMainPreAmp = (): Promise<number> => {
   const channel = ChannelEnum.GET_PREAMP;
   window.electron.ipcRenderer.sendMessage(channel, []);
-
-  const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    resolve(result);
-  });
-  return promisifyResult(responseHandler, channel);
+  return promisifyResult(simpleResponseHandler, channel);
 };
 
 /**
@@ -93,8 +100,10 @@ export const getMainPreAmp = (): Promise<number> => {
  */
 export const setMainPreAmp = (gain: number) => {
   const channel = ChannelEnum.SET_PREAMP;
-  if (gain > 30 || gain < -30) {
-    throw new Error('Invalid gain value - outside of range [-30, 30]');
+  if (gain > MAX_GAIN || gain < MIN_GAIN) {
+    throw new Error(
+      `Invalid gain value - outside of range [${MIN_GAIN}, ${MAX_GAIN}]`
+    );
   }
   window.electron.ipcRenderer.sendMessage(channel, [gain]);
   return promisifyResult(setterResponseHandler, channel);
@@ -106,13 +115,9 @@ export const setMainPreAmp = (gain: number) => {
  * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
  */
 export const getGain = (index: number): Promise<number> => {
-  const channel = ChannelEnum.GET_GAIN;
+  const channel = ChannelEnum.GET_FILTER_GAIN;
   window.electron.ipcRenderer.sendMessage(channel, [index]);
-
-  const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    resolve(result);
-  });
-  return promisifyResult(responseHandler, channel);
+  return promisifyResult(simpleResponseHandler, channel + index);
 };
 
 /**
@@ -121,12 +126,14 @@ export const getGain = (index: number): Promise<number> => {
  * @param {number} gain - new gain value in [-30, 30]
  */
 export const setGain = (index: number, gain: number) => {
-  const channel = ChannelEnum.SET_GAIN;
-  if (gain > 30 || gain < -30) {
-    throw new Error('Invalid gain value - outside of range [-30, 30]');
+  const channel = ChannelEnum.SET_FILTER_GAIN;
+  if (gain > MAX_GAIN || gain < MIN_GAIN) {
+    throw new Error(
+      `Invalid gain value - outside of range [${MIN_GAIN}, ${MAX_GAIN}]`
+    );
   }
   window.electron.ipcRenderer.sendMessage(channel, [index, gain]);
-  return promisifyResult(setterResponseHandler, channel);
+  return promisifyResult(setterResponseHandler, channel + index);
 };
 
 /**
@@ -135,24 +142,9 @@ export const setGain = (index: number, gain: number) => {
  * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
  */
 export const getFrequency = (index: number): Promise<number> => {
-  const channel = `getFrequency${index}`;
-  window.electron.ipcRenderer.sendMessage('peace', [
-    channel,
-    100 + index,
-    8,
-    0,
-  ]);
-
-  const responseHandler = buildResponseHandler<number>(
-    (result, resolve, reject) => {
-      if (result > 22050) {
-        reject(getErrorDescription(ErrorCode.NEGATIVE_FREQUENCY));
-        return;
-      }
-      resolve(peaceFrequencyOutputToNormal(result));
-    }
-  );
-  return promisifyResult(responseHandler, channel);
+  const channel = ChannelEnum.GET_FILTER_FREQUENCY;
+  window.electron.ipcRenderer.sendMessage(channel, [index]);
+  return promisifyResult(simpleResponseHandler, channel + index);
 };
 
 /**
@@ -161,18 +153,14 @@ export const getFrequency = (index: number): Promise<number> => {
  * @param {frequency} index - index of the slider being adjusted
  */
 export const setFrequency = (index: number, frequency: number) => {
-  const channel = `setFrequency${index}`;
-  window.electron.ipcRenderer.sendMessage('peace', [
-    channel,
-    100 + index,
-    6,
-    frequency,
-  ]);
-
-  const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    resolve(peaceFrequencyOutputToNormal(result));
-  });
-  return promisifyResult(responseHandler, channel);
+  const channel = ChannelEnum.SET_FILTER_FREQUENCY;
+  if (frequency <= MIN_FREQUENCY || frequency > MAX_FREQUENCY) {
+    throw new Error(
+      `Invalid gain value - outside of range (${MIN_FREQUENCY}, ${MAX_FREQUENCY}]`
+    );
+  }
+  window.electron.ipcRenderer.sendMessage(channel, [index, frequency]);
+  return promisifyResult(setterResponseHandler, channel + index);
 };
 
 /**
@@ -230,12 +218,9 @@ export const getEqualizerStatus = (): Promise<boolean> => {
  * @returns { Promise<number> } exception if failed
  */
 export const getEqualizerSliderCount = (): Promise<number> => {
-  const channel = 'getEqualizerSliderCount';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 22, 13]);
-  const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    resolve(result);
-  });
-  return promisifyResult(responseHandler, channel);
+  const channel = ChannelEnum.GET_FILTER_COUNT;
+  window.electron.ipcRenderer.sendMessage(channel, []);
+  return promisifyResult(simpleResponseHandler, channel);
 };
 
 /**
@@ -243,8 +228,8 @@ export const getEqualizerSliderCount = (): Promise<number> => {
  * @returns { Promise<void> } exception if failed
  */
 export const addEqualizerSlider = (): Promise<void> => {
-  const channel = 'addEqualizerSlider';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 22, 14]);
+  const channel = ChannelEnum.ADD_FILTER;
+  window.electron.ipcRenderer.sendMessage(channel, []);
   return promisifyResult(setterResponseHandler, channel);
 };
 
@@ -252,9 +237,9 @@ export const addEqualizerSlider = (): Promise<void> => {
  * Remove rightmost slider
  * @returns { Promise<void> } exception if failed
  */
-export const removeEqualizerSlider = (): Promise<void> => {
-  const channel = 'removeEqualizerSlider';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 22, 15]);
+export const removeEqualizerSlider = (index: number): Promise<void> => {
+  const channel = ChannelEnum.REMOVE_FILTER;
+  window.electron.ipcRenderer.sendMessage(channel, [index]);
   return promisifyResult(setterResponseHandler, channel);
 };
 

@@ -5,6 +5,7 @@ export enum ErrorCode {
   PEACE_NOT_READY = 3,
   PEACE_TIMEOUT = 4,
   NEGATIVE_FREQUENCY = 5,
+  INVALID_PARAMETER = 6,
 }
 
 export type ErrorDescription = {
@@ -43,6 +44,11 @@ export const errors: Record<ErrorCode, ErrorDescription> = {
   },
   [ErrorCode.NEGATIVE_FREQUENCY]: {
     shortError: 'Invalid frequency - frequency is negative',
+    action: '',
+    code: ErrorCode.NEGATIVE_FREQUENCY,
+  },
+  [ErrorCode.INVALID_PARAMETER]: {
+    shortError: 'Invalid parameter',
     action: '',
     code: ErrorCode.NEGATIVE_FREQUENCY,
   },

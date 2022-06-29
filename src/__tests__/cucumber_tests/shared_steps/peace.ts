@@ -1,4 +1,4 @@
-import { peaceGainOutputToDb } from 'common/peaceConversions';
+import { peaceGainOutputToDb } from 'common/constants';
 import {
   getPeaceWindowHandle,
   isPeaceRunning,

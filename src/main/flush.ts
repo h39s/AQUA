@@ -32,6 +32,32 @@ export interface IState {
   filters: IFilter[];
 }
 
+const FIXED_FREQUENCIES = [
+  32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000,
+];
+
+export const DEFAULT_FILTER: IFilter = {
+  frequency: 1000,
+  gain: 0,
+  quality: 1,
+  type: FilterTypeEnum.PEAK,
+};
+
+const DEFAULT_FILTERS: IFilter[] = FIXED_FREQUENCIES.map((f) => {
+  return {
+    frequency: f,
+    gain: 0,
+    quality: 1,
+    type: FilterTypeEnum.PEAK,
+  };
+});
+
+const DEFAULT_STATE: IState = {
+  isEnabled: true,
+  preAmp: 0,
+  filters: DEFAULT_FILTERS,
+};
+
 export const stateToString = (state: IState) => {
   if (!state.isEnabled) {
     return '';
@@ -69,12 +95,19 @@ export const serializeState = (state: IState) => {
 };
 
 export const fetch = () => {
-  const content = fs.readFileSync('./state.txt', { encoding: 'utf8' });
-  return JSON.parse(content) as IState;
+  try {
+    const content = fs.readFileSync('state.txt', { encoding: 'utf8' });
+    return JSON.parse(content) as IState;
+  } catch (ex) {
+    // if unable to fetch the state, use a default one
+    return DEFAULT_STATE;
+  }
 };
 
 export const save = (state: IState) => {
-  fs.writeFileSync('./state.txt', serializeState(state), { encoding: 'utf8' });
+  fs.writeFileSync('state.txt', serializeState(state), {
+    encoding: 'utf8',
+  });
 };
 
 export const flush = (state: IState) => {

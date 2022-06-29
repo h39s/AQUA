@@ -6,6 +6,9 @@ export const MIN_GAIN = -30;
 export const MAX_FREQUENCY = 20000; // Peace's actual limit is 22050
 export const MIN_FREQUENCY = 0; // graph input's limit is 10 Hz
 
+export const MAX_NUM_FILTERS = 20; // TODO: Investigate an appropriate value for this
+export const MIN_NUM_FILTERS = 1;
+
 export const peaceGainOutputToDb = (result: number) => {
   // If gain is larger than MAX_GAIN, assume that Peace returned an unsigned negative number
   // If after adjusting for the unsigned number gives a positive value, default to -30

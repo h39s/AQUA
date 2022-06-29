@@ -4,7 +4,7 @@ import {
   MAX_GAIN,
   MIN_FREQUENCY,
   MIN_GAIN,
-} from 'common/peaceConversions';
+} from 'common/constants';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { getFrequency, getGain, setFrequency, setGain } from './equalizerApi';
 import NumberInput from './NumberInput';

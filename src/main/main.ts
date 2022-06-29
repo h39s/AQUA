@@ -8,21 +8,22 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import path from 'path';
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
-import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
+import path from 'path';
+import { DEFAULT_FILTER, fetch, flush, IState, save } from './flush';
+import MenuBuilder from './menu';
+import { resolveHtmlPath } from './util';
+import registry from './registry';
 import ChannelEnum from '../common/channels';
+import { MAX_NUM_FILTERS, MIN_NUM_FILTERS } from '../common/constants';
+import { ErrorCode } from '../common/errors';
 import {
   getPeaceWindowHandle,
   isPeaceRunning,
   sendPeaceCommand,
 } from '../common/peaceIPC';
-import { fetch, flush, IState, save } from './flush';
-import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
-import registry from './registry';
-import { ErrorCode } from '../common/errors';
 import { TSuccess, TError } from '../renderer/equalizerApi';
 
 export default class AppUpdater {
@@ -70,8 +71,10 @@ ipcMain.on('peace', async (event, arg) => {
   event.reply(channel, reply);
 });
 
-const handleUpdate = (event: Electron.IpcMainEvent, channel: ChannelEnum) => {
-  console.log(state);
+const handleUpdate = (
+  event: Electron.IpcMainEvent,
+  channel: ChannelEnum | string
+) => {
   flush(state);
   const reply: TSuccess = { result: 1 };
   event.reply(channel, reply);
@@ -100,30 +103,101 @@ ipcMain.on(ChannelEnum.SET_PREAMP, async (event, arg) => {
   handleUpdate(event, ChannelEnum.SET_PREAMP);
 });
 
-ipcMain.on(ChannelEnum.GET_GAIN, async (event, arg) => {
+ipcMain.on(ChannelEnum.GET_FILTER_GAIN, async (event, arg) => {
+  const channel = ChannelEnum.GET_FILTER_GAIN;
   const filterIndex = parseInt(arg[0], 10) || 0;
 
   if (filterIndex >= state.filters.length) {
     const reply: TError = { errorCode: ErrorCode.PEACE_UNKNOWN_ERROR };
-    event.reply(ChannelEnum.SET_GAIN, reply);
+    event.reply(channel + filterIndex, reply);
     return;
   }
 
   const reply: TSuccess = { result: state.filters[filterIndex].gain || 0 };
-  event.reply(ChannelEnum.GET_GAIN, reply);
+  event.reply(channel + filterIndex, reply);
 });
 
-ipcMain.on(ChannelEnum.SET_GAIN, async (event, arg) => {
+ipcMain.on(ChannelEnum.SET_FILTER_GAIN, async (event, arg) => {
+  const channel = ChannelEnum.SET_FILTER_GAIN;
   const filterIndex = parseInt(arg[0], 10) || 0;
   const gain = parseInt(arg[1], 10) || 0;
 
   if (filterIndex >= state.filters.length) {
     const reply: TError = { errorCode: ErrorCode.PEACE_UNKNOWN_ERROR };
-    event.reply(ChannelEnum.SET_GAIN, reply);
+    event.reply(channel, reply);
     return;
   }
   state.filters[filterIndex].gain = gain;
-  handleUpdate(event, ChannelEnum.SET_GAIN);
+  handleUpdate(event, channel + filterIndex);
+});
+
+ipcMain.on(ChannelEnum.GET_FILTER_FREQUENCY, async (event, arg) => {
+  const channel = ChannelEnum.GET_FILTER_FREQUENCY;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+
+  if (filterIndex >= state.filters.length) {
+    const reply: TError = { errorCode: ErrorCode.INVALID_PARAMETER };
+    event.reply(channel + filterIndex, reply);
+    return;
+  }
+
+  const reply: TSuccess = {
+    result: state.filters[filterIndex].frequency || 10,
+  };
+  event.reply(channel + filterIndex, reply);
+});
+
+ipcMain.on(ChannelEnum.SET_FILTER_FREQUENCY, async (event, arg) => {
+  const channel = ChannelEnum.SET_FILTER_FREQUENCY;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+  const frequency = parseInt(arg[1], 10) || 0;
+
+  if (filterIndex >= state.filters.length) {
+    const reply: TError = { errorCode: ErrorCode.INVALID_PARAMETER };
+    event.reply(channel, reply);
+    return;
+  }
+  state.filters[filterIndex].frequency = frequency;
+  handleUpdate(event, channel + filterIndex);
+});
+
+ipcMain.on(ChannelEnum.GET_FILTER_COUNT, async (event) => {
+  const reply: TSuccess = {
+    result: state.filters.length,
+  };
+  event.reply(ChannelEnum.GET_FILTER_COUNT, reply);
+});
+
+ipcMain.on(ChannelEnum.ADD_FILTER, async (event) => {
+  const channel = ChannelEnum.ADD_FILTER;
+  if (state.filters.length === MAX_NUM_FILTERS) {
+    const reply: TError = { errorCode: ErrorCode.INVALID_PARAMETER };
+    event.reply(channel, reply);
+    return;
+  }
+
+  state.filters.push(DEFAULT_FILTER);
+  handleUpdate(event, channel);
+});
+
+ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
+  const channel = ChannelEnum.REMOVE_FILTER;
+  const filterIndex = parseInt(arg[0], 10);
+
+  if (filterIndex >= state.filters.length) {
+    const reply: TError = { errorCode: ErrorCode.INVALID_PARAMETER };
+    event.reply(channel, reply);
+    return;
+  }
+
+  if (state.filters.length === MIN_NUM_FILTERS) {
+    const reply: TError = { errorCode: ErrorCode.INVALID_PARAMETER };
+    event.reply(channel, reply);
+    return;
+  }
+
+  state.filters.splice(filterIndex, 1);
+  handleUpdate(event, channel);
 });
 
 ipcMain.on('quit-app', () => {
