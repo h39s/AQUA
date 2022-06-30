@@ -42,7 +42,7 @@ const promisifyResult = <Type>(
     window.electron.ipcRenderer.once(channel, handler);
 
     timer = setTimeout(() => {
-      reject(getErrorDescription(ErrorCode.PEACE_TIMEOUT));
+      reject(getErrorDescription(ErrorCode.TIMEOUT));
       window.electron.ipcRenderer.removeListener(channel, handler);
     }, TIMEOUT);
   });
@@ -78,7 +78,7 @@ const simpleResponseHandler = buildResponseHandler<number>(
 const setterResponseHandler = buildResponseHandler<void>(
   (result, resolve, reject) => {
     if (result !== 1) {
-      reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
+      reject(getErrorDescription(ErrorCode.FAILURE));
     }
     resolve();
   }
@@ -133,14 +133,8 @@ export const getEqualizerStatus = (): Promise<boolean> => {
   const channel = ChannelEnum.GET_ENABLE;
   window.electron.ipcRenderer.sendMessage(channel, []);
 
-  const responseHandler = buildResponseHandler<boolean>(
-    (result, resolve, reject) => {
-      if (result === 0 || result === 1) {
-        resolve(result === 1);
-      } else {
-        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
-      }
-    }
+  const responseHandler = buildResponseHandler<boolean>((result, resolve) =>
+    resolve(result === 1)
   );
   return promisifyResult(responseHandler, channel);
 };

@@ -52,7 +52,7 @@ const handleUpdate = async (
 ) => {
   const isInstalled = await isEqualizerAPOInstalled();
   if (!isInstalled) {
-    const reply: TError = { errorCode: ErrorCode.PEACE_NOT_INSTALLED };
+    const reply: TError = { errorCode: ErrorCode.EQUALIZER_APO_NOT_INSTALLED };
     event.reply(channel, reply);
     return;
   }
@@ -108,7 +108,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_GAIN, async (event, arg) => {
   const filterIndex = parseInt(arg[0], 10) || 0;
 
   if (filterIndex >= state.filters.length) {
-    const reply: TError = { errorCode: ErrorCode.PEACE_UNKNOWN_ERROR };
+    const reply: TError = { errorCode: ErrorCode.INVALID_PARAMETER };
     event.reply(channel + filterIndex, reply);
     return;
   }
@@ -123,7 +123,7 @@ ipcMain.on(ChannelEnum.SET_FILTER_GAIN, async (event, arg) => {
   const gain = parseInt(arg[1], 10) || 0;
 
   if (filterIndex >= state.filters.length) {
-    const reply: TError = { errorCode: ErrorCode.PEACE_UNKNOWN_ERROR };
+    const reply: TError = { errorCode: ErrorCode.INVALID_PARAMETER };
     event.reply(channel, reply);
     return;
   }

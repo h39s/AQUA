@@ -28,9 +28,7 @@ const MainContent = () => {
         setGlobalError(e as ErrorDescription);
       }
     };
-    if (!globalError) {
-      fetchResults();
-    }
+    fetchResults();
   }, [globalError, setGlobalError]);
 
   const onAddEqualizerSlider = async () => {

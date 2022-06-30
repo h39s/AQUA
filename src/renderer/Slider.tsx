@@ -36,10 +36,8 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
       }
       setIsLoading(false);
     };
-    if (!globalError) {
-      fetchResults();
-    }
-  }, [getValue, globalError, setGlobalError]);
+    fetchResults();
+  }, [getValue, setGlobalError]);
 
   const handleChangeGain = async (newValue: number) => {
     try {

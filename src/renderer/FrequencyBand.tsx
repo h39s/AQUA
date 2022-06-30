@@ -30,10 +30,8 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
         setGlobalError(e as ErrorDescription);
       }
     };
-    if (!globalError) {
-      fetchResults();
-    }
-  }, [globalError, setGlobalError, sliderIndex]);
+    fetchResults();
+  }, [setGlobalError, sliderIndex]);
 
   const handleSubmit = async (newValue: number) => {
     try {
