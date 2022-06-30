@@ -6,11 +6,11 @@ import {
 } from 'common/peaceIPC';
 import { DefineStepFunction } from 'jest-cucumber';
 import { Driver } from '__tests__/utils/webdriver';
-import registry from '../../../main/registry';
+import { isPeaceInstalled } from '../../../main/registry';
 
 export const givenPeaceIsInstalled = (given: DefineStepFunction) => {
   given('Peace is installed', async () => {
-    if (!(await registry.isPeaceInstalled())) {
+    if (!(await isPeaceInstalled())) {
       throw new Error('Peace not installed');
     }
     // TODO find a way to install peace

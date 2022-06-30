@@ -8,7 +8,7 @@ import {
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { getFrequency, getGain, setFrequency, setGain } from './equalizerApi';
 import NumberInput from './NumberInput';
-import { PeaceFoundContext } from './PeaceFoundContext';
+import { AquaContext } from './AquaContext';
 import Slider from './Slider';
 import './styles/MainContent.scss';
 
@@ -19,7 +19,7 @@ interface IFrequencyBandProps {
 const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
   const [actualFrequency, setActualFrequency] = useState<number>(0);
 
-  const { peaceError, setPeaceError } = useContext(PeaceFoundContext);
+  const { globalError, setGlobalError } = useContext(AquaContext);
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -27,20 +27,20 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
         const result = await getFrequency(sliderIndex);
         setActualFrequency(result);
       } catch (e) {
-        setPeaceError(e as ErrorDescription);
+        setGlobalError(e as ErrorDescription);
       }
     };
-    if (!peaceError) {
+    if (!globalError) {
       fetchResults();
     }
-  }, [peaceError, setPeaceError, sliderIndex]);
+  }, [globalError, setGlobalError, sliderIndex]);
 
   const handleSubmit = async (newValue: number) => {
     try {
       await setFrequency(sliderIndex, newValue);
       setActualFrequency(newValue);
     } catch (e) {
-      setPeaceError(e as ErrorDescription);
+      setGlobalError(e as ErrorDescription);
     }
   };
 
@@ -53,7 +53,7 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
         min={MIN_FREQUENCY}
         max={MAX_FREQUENCY}
         name={`${actualFrequency}`}
-        isDisabled={!!peaceError}
+        isDisabled={!!globalError}
         showLabel={false}
         showArrows
         handleSubmit={handleSubmit}

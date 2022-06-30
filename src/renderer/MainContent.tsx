@@ -9,11 +9,11 @@ import FrequencyBand from './FrequencyBand';
 import MinusIcon from './icons/MinusIcon';
 import PlusIcon from './icons/PlusIcon';
 import Button from './Button';
-import { PeaceFoundContext } from './PeaceFoundContext';
+import { AquaContext } from './AquaContext';
 import './styles/MainContent.scss';
 
 const MainContent = () => {
-  const { peaceError, setPeaceError } = useContext(PeaceFoundContext);
+  const { globalError, setGlobalError } = useContext(AquaContext);
   const [sliderIndicies, setSliderIndicies] = useState<number[]>([]);
 
   useEffect(() => {
@@ -25,13 +25,13 @@ const MainContent = () => {
           .map((_, i) => i);
         setSliderIndicies(newIndices);
       } catch (e) {
-        setPeaceError(e as ErrorDescription);
+        setGlobalError(e as ErrorDescription);
       }
     };
-    if (!peaceError) {
+    if (!globalError) {
       fetchResults();
     }
-  }, [peaceError, setPeaceError]);
+  }, [globalError, setGlobalError]);
 
   const onAddEqualizerSlider = async () => {
     try {
@@ -40,7 +40,7 @@ const MainContent = () => {
       newIndices.push(sliderIndicies.length);
       setSliderIndicies(newIndices);
     } catch (e) {
-      setPeaceError(e as ErrorDescription);
+      setGlobalError(e as ErrorDescription);
     }
   };
 
@@ -51,7 +51,7 @@ const MainContent = () => {
       newIndices.pop();
       setSliderIndicies(newIndices);
     } catch (e) {
-      setPeaceError(e as ErrorDescription);
+      setGlobalError(e as ErrorDescription);
     }
   };
 

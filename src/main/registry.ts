@@ -18,7 +18,7 @@ if (app) {
   setExternalVBSLocation(vbsDirectory);
 }
 
-const isPeaceInstalled = async () => {
+const isSoftwareInstalled = async (softwareKey: string) => {
   const registryKey =
     'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall';
   const listResult = await regedit.list([registryKey]);
@@ -26,7 +26,7 @@ const isPeaceInstalled = async () => {
   if (listResult[registryKey].exists) {
     // eslint-disable-next-line no-restricted-syntax
     for (const key of listResult[registryKey].keys) {
-      if (key === 'Peace') {
+      if (key === softwareKey) {
         return true;
       }
     }
@@ -34,6 +34,31 @@ const isPeaceInstalled = async () => {
   return false;
 };
 
-export default {
-  isPeaceInstalled,
+export const isPeaceInstalled = () => isSoftwareInstalled('Peace');
+export const isEqualizerAPOInstalled = () =>
+  isSoftwareInstalled('EqualizerAPO');
+
+export const getConfigPath = async () => {
+  const isInstalled = await isEqualizerAPOInstalled();
+  if (!isInstalled) {
+    throw new Error('Equalizer APO not installed');
+  }
+
+  try {
+    const registryKey64 = 'HKLM64\\SOFTWARE\\EqualizerAPO';
+    const listResult = await regedit.list([registryKey64]);
+    const configPath = listResult[registryKey64].values.ConfigPath.value;
+    return configPath as string;
+  } catch (e) {
+    console.log('Did not find file using 64 key');
+  }
+
+  try {
+    const registryKey = 'HKLM\\SOFTWARE\\EqualizerAPO';
+    const listResult = await regedit.list([registryKey]);
+    const configPath = listResult[registryKey].values.ConfigPath.value;
+    return configPath as string;
+  } catch (e) {
+    throw new Error('Config path not found');
+  }
 };

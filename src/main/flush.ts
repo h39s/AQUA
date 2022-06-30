@@ -94,9 +94,26 @@ export const serializeState = (state: IState) => {
   return JSON.stringify(state);
 };
 
+const CONFIG_CONTENT = 'Include: aqua.txt';
+const AQUA_LOCAL_CONFIG_FILENAME = 'state.txt';
+const AQUA_CONFIG_FILENAME = 'aqua.txt';
+const CONFIG_FILENAME = 'config.txt';
+
+const convertToForwardSlash = (path: string) => {
+  return path.replace('\\', '/');
+};
+
+const addFileToPath = (path: string, fileName: string) => {
+  return path.charAt(path.length - 1) === '/'
+    ? path + fileName
+    : `${path}/${fileName}`;
+};
+
 export const fetch = () => {
   try {
-    const content = fs.readFileSync('state.txt', { encoding: 'utf8' });
+    const content = fs.readFileSync(AQUA_LOCAL_CONFIG_FILENAME, {
+      encoding: 'utf8',
+    });
     return JSON.parse(content) as IState;
   } catch (ex) {
     // if unable to fetch the state, use a default one
@@ -105,15 +122,45 @@ export const fetch = () => {
 };
 
 export const save = (state: IState) => {
-  fs.writeFileSync('state.txt', serializeState(state), {
+  fs.writeFileSync(AQUA_LOCAL_CONFIG_FILENAME, serializeState(state), {
     encoding: 'utf8',
   });
 };
 
-export const flush = (state: IState) => {
+export const flush = (state: IState, path: string) => {
   fs.writeFileSync(
-    'C:/Program Files/EqualizerAPO/config/aqua.txt',
+    addFileToPath(convertToForwardSlash(path), AQUA_CONFIG_FILENAME),
     stateToString(state),
-    { encoding: 'utf8' }
+    {
+      encoding: 'utf8',
+    }
   );
+};
+
+export const checkConfigFile = (path: string) => {
+  try {
+    const content = fs.readFileSync(
+      addFileToPath(convertToForwardSlash(path), CONFIG_FILENAME),
+      {
+        encoding: 'utf8',
+      }
+    );
+    return content.search(CONFIG_CONTENT) !== -1;
+  } catch (ex) {
+    throw new Error(`Unable to locate config file at ${path}`);
+  }
+};
+
+export const updateConfig = (path: string) => {
+  try {
+    fs.writeFileSync(
+      addFileToPath(convertToForwardSlash(path), CONFIG_FILENAME),
+      CONFIG_CONTENT,
+      {
+        encoding: 'utf8',
+      }
+    );
+  } catch (ex) {
+    throw new Error(`Unable to locate config file at ${path}`);
+  }
 };

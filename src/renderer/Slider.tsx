@@ -2,7 +2,7 @@ import { ErrorDescription } from 'common/errors';
 import { useEffect, useContext, useState, useMemo } from 'react';
 import NumberInput from './NumberInput';
 import RangeInput from './RangeInput';
-import { PeaceFoundContext } from './PeaceFoundContext';
+import { AquaContext } from './AquaContext';
 import './styles/Slider.scss';
 import { useThrottle } from './utils';
 
@@ -18,11 +18,11 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
   const INTERVAL = 200;
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { peaceError, setPeaceError } = useContext(PeaceFoundContext);
+  const { globalError, setGlobalError } = useContext(AquaContext);
 
   const isDisabled = useMemo(
-    () => !!peaceError || isLoading,
-    [peaceError, isLoading]
+    () => !!globalError || isLoading,
+    [globalError, isLoading]
   );
 
   useEffect(() => {
@@ -32,20 +32,20 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
         const initValue = await getValue();
         setSliderValue(initValue);
       } catch (e) {
-        setPeaceError(e as ErrorDescription);
+        setGlobalError(e as ErrorDescription);
       }
       setIsLoading(false);
     };
-    if (!peaceError) {
+    if (!globalError) {
       fetchResults();
     }
-  }, [getValue, peaceError, setPeaceError]);
+  }, [getValue, globalError, setGlobalError]);
 
   const handleChangeGain = async (newValue: number) => {
     try {
       await setValue(newValue);
     } catch (e) {
-      setPeaceError(e as ErrorDescription);
+      setGlobalError(e as ErrorDescription);
     }
   };
 

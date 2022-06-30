@@ -6,6 +6,7 @@ export enum ErrorCode {
   PEACE_TIMEOUT = 4,
   NEGATIVE_FREQUENCY = 5,
   INVALID_PARAMETER = 6,
+  CONFIG_NOT_FOUND = 7,
 }
 
 export type ErrorDescription = {
@@ -48,9 +49,15 @@ export const errors: Record<ErrorCode, ErrorDescription> = {
     code: ErrorCode.NEGATIVE_FREQUENCY,
   },
   [ErrorCode.INVALID_PARAMETER]: {
-    shortError: 'Invalid parameter',
+    shortError: 'Invalid parameter.',
     action: '',
     code: ErrorCode.NEGATIVE_FREQUENCY,
+  },
+  [ErrorCode.CONFIG_NOT_FOUND]: {
+    shortError: 'Unable to locate the configuration file for EqualizerAPO.',
+    action:
+      'Please check whether the config.txt file exists in the config folder of EqualizerAPO.',
+    code: ErrorCode.CONFIG_NOT_FOUND,
   },
 };
 

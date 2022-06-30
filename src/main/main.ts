@@ -12,18 +12,21 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
-import { DEFAULT_FILTER, fetch, flush, IState, save } from './flush';
+import {
+  checkConfigFile,
+  DEFAULT_FILTER,
+  fetch,
+  flush,
+  IState,
+  save,
+  updateConfig,
+} from './flush';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import registry from './registry';
+import { getConfigPath, isEqualizerAPOInstalled } from './registry';
 import ChannelEnum from '../common/channels';
 import { MAX_NUM_FILTERS, MIN_NUM_FILTERS } from '../common/constants';
 import { ErrorCode } from '../common/errors';
-import {
-  getPeaceWindowHandle,
-  isPeaceRunning,
-  sendPeaceCommand,
-} from '../common/peaceIPC';
 import { TSuccess, TError } from '../renderer/equalizerApi';
 
 export default class AppUpdater {
@@ -36,50 +39,47 @@ export default class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-const state: IState = fetch();
+/** ----- Equalizer APO Implementation ----- */
 
-ipcMain.on('peace', async (event, arg) => {
-  const channel: string = arg[0];
-  const peaceInstalled = await registry.isPeaceInstalled();
-  if (!peaceInstalled) {
+// Load initial state from local state file
+const state: IState = fetch();
+let configPath = '';
+
+const handleUpdate = async (
+  event: Electron.IpcMainEvent,
+  channel: ChannelEnum | string,
+  checkConfig = false
+) => {
+  const isInstalled = await isEqualizerAPOInstalled();
+  if (!isInstalled) {
     const reply: TError = { errorCode: ErrorCode.PEACE_NOT_INSTALLED };
     event.reply(channel, reply);
     return;
   }
 
-  const peaceHWnd = getPeaceWindowHandle();
-  const foundPeace = isPeaceRunning(peaceHWnd);
-
-  if (!foundPeace) {
-    const reply: TError = { errorCode: ErrorCode.PEACE_NOT_RUNNING };
-    event.reply(channel, reply);
-    return;
+  if (checkConfig) {
+    try {
+      // Retrive configPath assuming EqualizerAPO is installed
+      configPath = await getConfigPath();
+      if (!checkConfigFile(configPath)) {
+        updateConfig(configPath);
+      }
+    } catch (e) {
+      const reply: TError = { errorCode: ErrorCode.CONFIG_NOT_FOUND };
+      event.reply(channel, reply);
+      return;
+    }
   }
 
-  const messageCode = parseInt(arg[1], 10) || 0;
-  const wParam = parseInt(arg[2], 10) || 0;
-  const lParam = parseInt(arg[3], 10) || 0;
-
-  // Send message to Peace
-  const res = sendPeaceCommand(peaceHWnd, messageCode, wParam, lParam);
-  if (res === 4294967295) {
-    const reply: TError = { errorCode: ErrorCode.PEACE_NOT_READY };
-    event.reply(channel, reply);
-    return;
-  }
-  const reply: TSuccess = { result: res };
-  event.reply(channel, reply);
-});
-
-const handleUpdate = (
-  event: Electron.IpcMainEvent,
-  channel: ChannelEnum | string
-) => {
-  flush(state);
+  flush(state, configPath);
   const reply: TSuccess = { result: 1 };
   event.reply(channel, reply);
   save(state);
 };
+
+ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
+  await handleUpdate(event, ChannelEnum.HEALTH_CHECK, true);
+});
 
 ipcMain.on(ChannelEnum.GET_ENABLE, async (event) => {
   const reply: TSuccess = { result: state.isEnabled ? 1 : 0 };
@@ -89,7 +89,7 @@ ipcMain.on(ChannelEnum.GET_ENABLE, async (event) => {
 ipcMain.on(ChannelEnum.SET_ENABLE, async (event, arg) => {
   const value = parseInt(arg[0], 10) || 0;
   state.isEnabled = value !== 0;
-  handleUpdate(event, ChannelEnum.SET_ENABLE);
+  await handleUpdate(event, ChannelEnum.SET_ENABLE);
 });
 
 ipcMain.on(ChannelEnum.GET_PREAMP, async (event) => {
@@ -100,7 +100,7 @@ ipcMain.on(ChannelEnum.GET_PREAMP, async (event) => {
 ipcMain.on(ChannelEnum.SET_PREAMP, async (event, arg) => {
   const gain = parseInt(arg[0], 10) || 0;
   state.preAmp = gain;
-  handleUpdate(event, ChannelEnum.SET_PREAMP);
+  await handleUpdate(event, ChannelEnum.SET_PREAMP);
 });
 
 ipcMain.on(ChannelEnum.GET_FILTER_GAIN, async (event, arg) => {
@@ -128,7 +128,7 @@ ipcMain.on(ChannelEnum.SET_FILTER_GAIN, async (event, arg) => {
     return;
   }
   state.filters[filterIndex].gain = gain;
-  handleUpdate(event, channel + filterIndex);
+  await handleUpdate(event, channel + filterIndex);
 });
 
 ipcMain.on(ChannelEnum.GET_FILTER_FREQUENCY, async (event, arg) => {
@@ -158,7 +158,7 @@ ipcMain.on(ChannelEnum.SET_FILTER_FREQUENCY, async (event, arg) => {
     return;
   }
   state.filters[filterIndex].frequency = frequency;
-  handleUpdate(event, channel + filterIndex);
+  await handleUpdate(event, channel + filterIndex);
 });
 
 ipcMain.on(ChannelEnum.GET_FILTER_COUNT, async (event) => {
@@ -177,7 +177,7 @@ ipcMain.on(ChannelEnum.ADD_FILTER, async (event) => {
   }
 
   state.filters.push(DEFAULT_FILTER);
-  handleUpdate(event, channel);
+  await handleUpdate(event, channel);
 });
 
 ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
@@ -197,7 +197,7 @@ ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
   }
 
   state.filters.splice(filterIndex, 1);
-  handleUpdate(event, channel);
+  await handleUpdate(event, channel);
 });
 
 ipcMain.on('quit-app', () => {

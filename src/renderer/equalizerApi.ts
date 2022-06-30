@@ -85,6 +85,67 @@ const setterResponseHandler = buildResponseHandler<void>(
 );
 
 /**
+ * Get program state for Peace. We will use this as a health check call
+ * @deprecated To be replaced with healthCheck below
+ * @returns { Promise<void> } exception if Peace is not okay.
+ */
+export const getProgramState = (): Promise<void> => {
+  const channel = 'getProgramState';
+  window.electron.ipcRenderer.sendMessage('peace', [channel, 0, 0]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Perform a health check to verify whether EqualizerAPO is installed
+ * @returns { Promise<void> } exception if Peace is not okay.
+ */
+export const healthCheck = (): Promise<void> => {
+  const channel = ChannelEnum.HEALTH_CHECK;
+  window.electron.ipcRenderer.sendMessage(channel, []);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Enable Equalizer
+ * @returns { Promise<void> } exception if failed.
+ */
+export const enableEqualizer = (): Promise<void> => {
+  const channel = ChannelEnum.SET_ENABLE;
+  window.electron.ipcRenderer.sendMessage(channel, [1]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Disable Equalizer
+ * @returns { Promise<void> } exception if failed.
+ */
+export const disableEqualizer = (): Promise<void> => {
+  const channel = ChannelEnum.SET_ENABLE;
+  window.electron.ipcRenderer.sendMessage(channel, [0]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Get the current equalizer status
+ * @returns { Promise<boolean> } true for on, false for off, exception otherwise
+ */
+export const getEqualizerStatus = (): Promise<boolean> => {
+  const channel = ChannelEnum.GET_ENABLE;
+  window.electron.ipcRenderer.sendMessage(channel, []);
+
+  const responseHandler = buildResponseHandler<boolean>(
+    (result, resolve, reject) => {
+      if (result === 0 || result === 1) {
+        resolve(result === 1);
+      } else {
+        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
+      }
+    }
+  );
+  return promisifyResult(responseHandler, channel);
+};
+
+/**
  * Get the current main preamplification gain value
  * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
  */
@@ -164,56 +225,6 @@ export const setFrequency = (index: number, frequency: number) => {
 };
 
 /**
- * Get program state for Peace. We will use this as a health check call
- * @returns { Promise<void> } exception if Peace is not okay.
- */
-export const getProgramState = (): Promise<void> => {
-  const channel = 'getProgramState';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 0, 0]);
-  return promisifyResult(setterResponseHandler, channel);
-};
-
-/**
- * Enable Equalizer
- * @returns { Promise<void> } exception if failed.
- */
-export const enableEqualizer = (): Promise<void> => {
-  const channel = ChannelEnum.SET_ENABLE;
-  window.electron.ipcRenderer.sendMessage(channel, [1]);
-  return promisifyResult(setterResponseHandler, channel);
-};
-
-/**
- * Disable Equalizer
- * @returns { Promise<void> } exception if failed.
- */
-export const disableEqualizer = (): Promise<void> => {
-  const channel = ChannelEnum.SET_ENABLE;
-  window.electron.ipcRenderer.sendMessage(channel, [0]);
-  return promisifyResult(setterResponseHandler, channel);
-};
-
-/**
- * Get the current equalizer status
- * @returns { Promise<boolean> } true for on, false for off, exception otherwise
- */
-export const getEqualizerStatus = (): Promise<boolean> => {
-  const channel = ChannelEnum.GET_ENABLE;
-  window.electron.ipcRenderer.sendMessage(channel, []);
-
-  const responseHandler = buildResponseHandler<boolean>(
-    (result, resolve, reject) => {
-      if (result === 0 || result === 1) {
-        resolve(result === 1);
-      } else {
-        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
-      }
-    }
-  );
-  return promisifyResult(responseHandler, channel);
-};
-
-/**
  * Get number of equalizer bands
  * @returns { Promise<number> } exception if failed
  */
@@ -241,40 +252,4 @@ export const removeEqualizerSlider = (index: number): Promise<void> => {
   const channel = ChannelEnum.REMOVE_FILTER;
   window.electron.ipcRenderer.sendMessage(channel, [index]);
   return promisifyResult(setterResponseHandler, channel);
-};
-
-/**
- * Show Peace window
- * @returns { Promise<void> } exception if failed
- */
-export const showPeaceWindow = (): Promise<void> => {
-  const channel = 'showPeaceWindow';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 1, 0]);
-  const responseHandler = buildResponseHandler<void>(
-    (result, resolve, reject) => {
-      if (result !== 1 && result !== 2) {
-        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
-      }
-      resolve();
-    }
-  );
-  return promisifyResult(responseHandler, channel);
-};
-
-/**
- * Close Peace window
- * @returns { Promise<void> } exception if failed
- */
-export const closePeaceWindow = (): Promise<void> => {
-  const channel = 'closePeaceWindow';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 1, 1]);
-  const responseHandler = buildResponseHandler<void>(
-    (result, resolve, reject) => {
-      if (result !== 1 && result !== 2) {
-        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
-      }
-      resolve();
-    }
-  );
-  return promisifyResult(responseHandler, channel);
 };

@@ -2,9 +2,9 @@ import { ErrorDescription } from 'common/errors';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './styles/App.scss';
-import { getProgramState } from './equalizerApi';
+import { healthCheck } from './equalizerApi';
 import MainContent from './MainContent';
-import { PeaceFoundContext } from './PeaceFoundContext';
+import { AquaContext } from './AquaContext';
 import PrereqMissingModal from './PrereqMissingModal';
 import SideBar from './SideBar';
 
@@ -18,29 +18,31 @@ const AppContent = () => {
 };
 
 export default function App() {
-  const [peaceError, setPeaceError] = useState<ErrorDescription | undefined>();
+  const [globalError, setGlobalError] = useState<
+    ErrorDescription | undefined
+  >();
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const isMounted = useRef<boolean>(false);
 
-  const healthCheck = useCallback(async () => {
+  const retry = useCallback(async () => {
     setIsLoading(true);
     try {
-      await getProgramState();
-      setPeaceError(undefined);
+      await healthCheck();
+      setGlobalError(undefined);
       isMounted.current = true;
     } catch (e) {
-      setPeaceError(e as ErrorDescription);
+      setGlobalError(e as ErrorDescription);
     }
     setIsLoading(false);
   }, []);
 
   useEffect(() => {
-    healthCheck();
-  }, [healthCheck]);
+    retry();
+  }, [retry]);
 
   return (
-    <PeaceFoundContext.Provider value={{ peaceError, setPeaceError }}>
+    <AquaContext.Provider value={{ globalError, setGlobalError }}>
       <Router>
         <Routes>
           <Route
@@ -48,12 +50,12 @@ export default function App() {
             element={
               <>
                 {isMounted.current && <AppContent />}
-                {peaceError && (
+                {globalError && (
                   <PrereqMissingModal
                     isLoading={isLoading}
-                    onRetry={healthCheck}
-                    errorMsg={peaceError.shortError}
-                    actionMsg={peaceError.action}
+                    onRetry={retry}
+                    errorMsg={globalError.shortError}
+                    actionMsg={globalError.action}
                   />
                 )}
               </>
@@ -61,6 +63,6 @@ export default function App() {
           />
         </Routes>
       </Router>
-    </PeaceFoundContext.Provider>
+    </AquaContext.Provider>
   );
 }
