@@ -85,19 +85,8 @@ const setterResponseHandler = buildResponseHandler<void>(
 );
 
 /**
- * Get program state for Peace. We will use this as a health check call
- * @deprecated To be replaced with healthCheck below
- * @returns { Promise<void> } exception if Peace is not okay.
- */
-export const getProgramState = (): Promise<void> => {
-  const channel = 'getProgramState';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 0, 0]);
-  return promisifyResult(setterResponseHandler, channel);
-};
-
-/**
  * Perform a health check to verify whether EqualizerAPO is installed
- * @returns { Promise<void> } exception if Peace is not okay.
+ * @returns { Promise<void> } exception if EqualizerAPO is not okay.
  */
 export const healthCheck = (): Promise<void> => {
   const channel = ChannelEnum.HEALTH_CHECK;
