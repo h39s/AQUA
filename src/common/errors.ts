@@ -32,7 +32,7 @@ export const errors: Record<ErrorCode, ErrorDescription> = {
   },
   [ErrorCode.INVALID_PARAMETER]: {
     shortError: 'Internal Error: Invalid parameter.',
-    action: 'Please reach out to the developres to resolve the issue.',
+    action: 'Please reach out to the developers to resolve the issue.',
     code: ErrorCode.INVALID_PARAMETER,
   },
   [ErrorCode.FAILURE]: {

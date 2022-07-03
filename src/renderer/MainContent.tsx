@@ -14,7 +14,7 @@ import './styles/MainContent.scss';
 
 const MainContent = () => {
   const { globalError, setGlobalError } = useContext(AquaContext);
-  const [sliderIndicies, setSliderIndicies] = useState<number[]>([]);
+  const [sliderIndices, setSliderIndices] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -23,7 +23,7 @@ const MainContent = () => {
         const newIndices = Array(sliderCount)
           .fill(0)
           .map((_, i) => i);
-        setSliderIndicies(newIndices);
+        setSliderIndices(newIndices);
       } catch (e) {
         setGlobalError(e as ErrorDescription);
       }
@@ -34,9 +34,9 @@ const MainContent = () => {
   const onAddEqualizerSlider = async () => {
     try {
       await addEqualizerSlider();
-      const newIndices = [...sliderIndicies];
-      newIndices.push(sliderIndicies.length);
-      setSliderIndicies(newIndices);
+      const newIndices = [...sliderIndices];
+      newIndices.push(sliderIndices.length);
+      setSliderIndices(newIndices);
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
@@ -44,10 +44,10 @@ const MainContent = () => {
 
   const onRemoveEqualizerSlider = async () => {
     try {
-      await removeEqualizerSlider(sliderIndicies.length - 1);
-      const newIndices = [...sliderIndicies];
+      await removeEqualizerSlider(sliderIndices.length - 1);
+      const newIndices = [...sliderIndices];
       newIndices.pop();
-      setSliderIndicies(newIndices);
+      setSliderIndices(newIndices);
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
@@ -55,7 +55,7 @@ const MainContent = () => {
 
   return (
     <div className="row center mainContent">
-      {sliderIndicies.length === 0 ? (
+      {sliderIndices.length === 0 ? (
         <h1>Loading...</h1>
       ) : (
         <>
@@ -68,7 +68,7 @@ const MainContent = () => {
             </div>
             <span className="rowLabel">Gain (dB)</span>
           </div>
-          {sliderIndicies.map((sliderIndex) => (
+          {sliderIndices.map((sliderIndex) => (
             <FrequencyBand
               sliderIndex={sliderIndex}
               key={`slider-${sliderIndex}`}

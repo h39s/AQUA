@@ -75,13 +75,11 @@ export const stateToString = (state: IState) => {
   // Using individual filter bands
   output = output.concat(
     state.filters
-      .flatMap(({ frequency, gain, type, quality }, index) => {
-        if (!gain) {
-          return '';
-        }
-        return `Filter${index}: ON ${type} Fc ${frequency} Hz Gain ${gain} dB Q ${quality}`;
-      })
-      .filter((str) => str.length > 0)
+      .filter(({ gain }) => gain !== 0)
+      .flatMap(
+        ({ frequency, gain, type, quality }, index) =>
+          `Filter${index}: ON ${type} Fc ${frequency} Hz Gain ${gain} dB Q ${quality}`
+      )
   );
 
   // TODO: Figure out when to use GraphicEQ
