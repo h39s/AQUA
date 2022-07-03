@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { setup } from '../utils/userEventUtils';
 import Switch from '../../renderer/Switch';
 
 describe('Switch', () => {
@@ -13,7 +14,7 @@ describe('Switch', () => {
   });
 
   it('should render the on state', () => {
-    render(
+    setup(
       <Switch
         id={id}
         isOn={false}
@@ -28,19 +29,21 @@ describe('Switch', () => {
   });
 
   it('should render the off state', () => {
-    render(<Switch id={id} isOn onLoad={onLoad} handleToggle={handleToggle} />);
+    setup(<Switch id={id} isOn onLoad={onLoad} handleToggle={handleToggle} />);
     expect(onLoad).toHaveBeenCalledTimes(1);
 
     const input = screen.getByRole('checkbox');
     expect(input).toBeChecked();
   });
 
-  it('should be able to trigger the toggle handler', () => {
-    render(<Switch id={id} isOn onLoad={onLoad} handleToggle={handleToggle} />);
+  it('should be able to trigger the toggle handler', async () => {
+    const { user } = setup(
+      <Switch id={id} isOn onLoad={onLoad} handleToggle={handleToggle} />
+    );
     expect(onLoad).toHaveBeenCalledTimes(1);
-    fireEvent.click(screen.getByRole('checkbox'));
+    await user.click(screen.getByRole('checkbox'));
     expect(handleToggle).toHaveBeenCalledTimes(1);
-    fireEvent.click(screen.getByRole('button', { name: id }));
+    await user.click(screen.getByRole('button', { name: id }));
     expect(handleToggle).toHaveBeenCalledTimes(2);
   });
 });

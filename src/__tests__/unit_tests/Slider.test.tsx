@@ -1,11 +1,7 @@
 import '@testing-library/jest-dom';
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { clearAndType, setup } from '../utils/userEventUtils';
 import Slider from '../../renderer/Slider';
 
 describe('Slider', () => {
@@ -22,7 +18,7 @@ describe('Slider', () => {
     const testValue = 1;
     getValue.mockReturnValue(testValue);
     await act(async () => {
-      render(
+      setup(
         <Slider
           name={name}
           min={-5}
@@ -39,10 +35,11 @@ describe('Slider', () => {
   });
 
   it('should update range to match number', async () => {
+    const user = userEvent.setup();
     const testValue = 1;
     getValue.mockReturnValue(testValue);
     await act(async () => {
-      render(
+      setup(
         <Slider
           name={name}
           min={-5}
@@ -57,11 +54,11 @@ describe('Slider', () => {
     expect(rangeInput).toHaveValue(`${testValue}`);
     expect(numberInput).toHaveValue(`${testValue}`);
 
-    numberInput.focus();
-    fireEvent.input(numberInput, { target: { value: -6 } });
+    await clearAndType(user, numberInput, '-6');
     expect(numberInput).toHaveValue('-6');
     expect(rangeInput).toHaveValue(`${testValue}`);
-    fireEvent.keyDown(numberInput, { key: 'Enter', code: 'Enter' });
+
+    await user.keyboard('{Enter}');
     expect(numberInput).toHaveValue('-5');
     expect(rangeInput).toHaveValue('-5');
   });
@@ -70,7 +67,7 @@ describe('Slider', () => {
     const testValue = 1;
     getValue.mockReturnValue(testValue);
     await act(async () => {
-      render(
+      setup(
         <Slider
           name={name}
           min={-5}

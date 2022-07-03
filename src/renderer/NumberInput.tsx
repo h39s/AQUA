@@ -97,7 +97,7 @@ const NumberInput = ({
       // numbers to integer values. Leading and trailing spaces are allowed.
       num = parseInt(input, 10);
       if (num.toString() !== input) {
-        // illegal character in the input or number to large
+        // illegal character in the input or number too large
         return;
       }
     } else if (type === 'float') {
@@ -167,7 +167,7 @@ const NumberInput = ({
         // => 20605
         // finally divide precisionFactor
         num = parseFloat(internalValue);
-        num = Math.floor(num * precisionFactor);
+        num = Math.round(num * precisionFactor);
         if (round) {
           num = Math.round(num / 5) * 5;
         }

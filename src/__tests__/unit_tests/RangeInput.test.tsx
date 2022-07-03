@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
+import { setup } from '__tests__/utils/userEventUtils';
 import RangeInput from '../../renderer/RangeInput';
 
 describe('RangeInput', () => {
@@ -14,7 +15,7 @@ describe('RangeInput', () => {
 
   it('should render with name', () => {
     const testValue = 1;
-    render(
+    setup(
       <RangeInput
         name={name}
         min={1}
@@ -30,7 +31,7 @@ describe('RangeInput', () => {
 
   it('should allow input to be changed to a negative value', () => {
     const testValue = 0;
-    render(
+    setup(
       <RangeInput
         name={name}
         min={-5}
@@ -53,7 +54,7 @@ describe('RangeInput', () => {
 
   it('should allow input to be changed to a positive value', () => {
     const testValue = 0;
-    render(
+    setup(
       <RangeInput
         name={name}
         min={-5}
@@ -74,9 +75,9 @@ describe('RangeInput', () => {
     expect(handleChange).toBeCalledWith(5);
   });
 
-  it('should increase value using up arrow', () => {
+  it('should increase value using up arrow', async () => {
     const testValue = 0;
-    render(
+    const { user } = setup(
       <RangeInput
         name={name}
         min={-5}
@@ -88,14 +89,13 @@ describe('RangeInput', () => {
       />
     );
     const arrow = screen.getByLabelText(`Increase ${name}`);
-    fireEvent.mouseDown(arrow);
-    fireEvent.mouseUp(arrow);
+    await user.click(arrow);
     expect(handleChange).toBeCalledWith(1);
   });
 
-  it('should decrease value using down arrow', () => {
+  it('should decrease value using down arrow', async () => {
     const testValue = 0;
-    render(
+    const { user } = setup(
       <RangeInput
         name={name}
         min={-5}
@@ -107,14 +107,13 @@ describe('RangeInput', () => {
       />
     );
     const arrow = screen.getByLabelText(`Decrease ${name}`);
-    fireEvent.mouseDown(arrow);
-    fireEvent.mouseUp(arrow);
+    await user.click(arrow);
     expect(handleChange).toBeCalledWith(-1);
   });
 
-  it('should be disabled', () => {
+  it('should be disabled', async () => {
     const testValue = 0;
-    render(
+    const { user } = setup(
       <RangeInput
         name={name}
         min={-5}
@@ -131,14 +130,12 @@ describe('RangeInput', () => {
 
     const downArrow = screen.getByLabelText(`Decrease ${name}`);
     expect(downArrow).toHaveAttribute('aria-disabled', 'true');
-    fireEvent.mouseDown(downArrow);
-    fireEvent.mouseUp(downArrow);
+    await user.click(downArrow);
     expect(handleChange).not.toHaveBeenCalled();
 
     const upArrow = screen.getByLabelText(`Increase ${name}`);
     expect(upArrow).toHaveAttribute('aria-disabled', 'true');
-    fireEvent.mouseDown(upArrow);
-    fireEvent.mouseUp(upArrow);
+    await user.click(upArrow);
     expect(handleChange).not.toHaveBeenCalled();
   });
 });
