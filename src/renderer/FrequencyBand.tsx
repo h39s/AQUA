@@ -75,9 +75,7 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
         max={MAX_FREQUENCY}
         name={`${actualFrequency}`}
         isDisabled={!!peaceError}
-        showLabel={false}
         showArrows
-        type="int"
         handleSubmit={handleFrequencySubmit}
       />
       <div className="col center slider">
@@ -94,10 +92,7 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
           max={MAX_QUALITY}
           name={`${actualQuality}`}
           isDisabled={!!peaceError}
-          showLabel={false}
-          showArrows={false}
-          type="float"
-          floatPrecision={0.001}
+          floatPrecision={3}
           handleSubmit={handleQualitySubmit}
         />
       </div>

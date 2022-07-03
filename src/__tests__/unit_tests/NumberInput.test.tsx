@@ -21,9 +21,7 @@ describe('NumberInput', () => {
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
-        showArrows={false}
         showLabel
-        type="int"
       />
     );
     expect(screen.getByText(id)).toBeInTheDocument();
@@ -40,9 +38,6 @@ describe('NumberInput', () => {
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
-        showArrows={false}
-        showLabel={false}
-        type="float"
       />
     );
     const input = screen.getByLabelText(id);
@@ -62,9 +57,6 @@ describe('NumberInput', () => {
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
-        showArrows={false}
-        showLabel={false}
-        type="int"
       />
     );
     const input = screen.getByLabelText(id);
@@ -84,9 +76,6 @@ describe('NumberInput', () => {
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
-        showArrows={false}
-        showLabel={false}
-        type="int"
       />
     );
     const input = screen.getByLabelText(id);
@@ -107,9 +96,7 @@ describe('NumberInput', () => {
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
-        showArrows={false}
-        showLabel={false}
-        type="float"
+        floatPrecision={1}
       />
     );
     const input = screen.getByLabelText(id);
@@ -130,9 +117,6 @@ describe('NumberInput', () => {
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled
-        showArrows={false}
-        showLabel={false}
-        type="int"
       />
     );
     const input = screen.getByLabelText(id);
@@ -150,10 +134,7 @@ describe('NumberInput', () => {
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
-        showArrows={false}
-        showLabel={false}
-        type="float"
-        floatPrecision={0.001}
+        floatPrecision={3}
       />
     );
     const input = screen.getByLabelText(id);
@@ -178,16 +159,13 @@ describe('NumberInput', () => {
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
-        showArrows={false}
-        showLabel={false}
-        type="float"
+        floatPrecision={1}
       />
     );
     const input = screen.getByLabelText(id);
     expect(input).toHaveValue(`${testValue}`);
 
     await clearAndType(user, input, '-2.6e10');
-    screen.logTestingPlaygroundURL();
     await user.keyboard('{Enter}');
     expect(handleSubmit).toBeCalledWith(-2.6);
   });
@@ -202,11 +180,8 @@ describe('NumberInput', () => {
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
-        showArrows={false}
-        showLabel={false}
-        type="float"
-        floatPrecision={0.01}
-        round
+        floatPrecision={2}
+        shouldRoundToHalf
       />
     );
     const input = screen.getByLabelText(id);
