@@ -67,19 +67,14 @@ export const stateToString = (state: IState) => {
 
   output.push('Device: all');
   output.push('Channel: all');
-
-  if (state.preAmp) {
-    output.push(`Preamp: ${state.preAmp}dB`);
-  }
+  output.push(`Preamp: ${state.preAmp}dB`);
 
   // Using individual filter bands
   output = output.concat(
-    state.filters
-      .filter(({ gain }) => gain !== 0)
-      .flatMap(
-        ({ frequency, gain, type, quality }, index) =>
-          `Filter${index}: ON ${type} Fc ${frequency} Hz Gain ${gain} dB Q ${quality}`
-      )
+    state.filters.flatMap(
+      ({ frequency, gain, type, quality }, index) =>
+        `Filter${index}: ON ${type} Fc ${frequency} Hz Gain ${gain} dB Q ${quality}`
+    )
   );
 
   // TODO: Figure out when to use GraphicEQ

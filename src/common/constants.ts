@@ -1,4 +1,4 @@
-import { clamp } from 'renderer/utils';
+import { clamp } from '../renderer/utils';
 
 /** ----- Application Constants ----- */
 

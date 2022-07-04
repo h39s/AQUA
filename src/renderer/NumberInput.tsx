@@ -99,12 +99,32 @@ const NumberInput = ({
       if (input.match(/e|E/)) {
         return;
       }
+
+      // Disallow the negative sign if the minimum is non-negative
+      if (input === '-' && min >= 0) {
+        return;
+      }
+
       // parseFloat("10.00") => 10. Since a user might input 10.001, we must
       // allow typing in "10.00". We'll append a 1 to avoid the truncation
-      // of 0s done by parseFloat and see if the input is valid.
-      const testInput = `${input}1`;
+      // of 0s done by parseFloat and see if the input is valid. We'll also
+      // prefix decimal inputs that dropped the initial 0 with one to ensure
+      // that the subsequent equality check works correctly
+      const testInput = `${input.charAt(0) === '.' ? '0' : ''}${input}1`;
       num = parseFloat(testInput);
-      if (num.toString() !== testInput) {
+
+      if (num < 1 && num > -1) {
+        if (testInput.charAt(0) === '.' && num.toString() !== `0${testInput}`) {
+          return;
+        }
+        if (
+          testInput.charAt(0) === '-' &&
+          testInput.charAt(1) === '.' &&
+          num.toString() !== `-0${testInput.substring(1)}`
+        ) {
+          return;
+        }
+      } else if (num.toString() !== testInput) {
         // illegal character in the input
         return;
       }

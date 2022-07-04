@@ -29,9 +29,11 @@ import {
   MAX_FREQUENCY,
   MAX_GAIN,
   MAX_NUM_FILTERS,
+  MAX_QUALITY,
   MIN_FREQUENCY,
   MIN_GAIN,
   MIN_NUM_FILTERS,
+  MIN_QUALITY,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
 import { TSuccess, TError } from '../renderer/equalizerApi';
@@ -170,7 +172,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_GAIN, async (event, arg) => {
 ipcMain.on(ChannelEnum.SET_FILTER_GAIN, async (event, arg) => {
   const channel = ChannelEnum.SET_FILTER_GAIN;
   const filterIndex = parseInt(arg[0], 10) || 0;
-  const gain = parseInt(arg[1], 10) || 0;
+  const gain = parseFloat(arg[1]) || 0;
 
   // Filter index must be within the lenght of the filters array
   if (filterIndex < 0 || filterIndex >= state.filters.length) {
@@ -220,6 +222,42 @@ ipcMain.on(ChannelEnum.SET_FILTER_FREQUENCY, async (event, arg) => {
   }
 
   state.filters[filterIndex].frequency = frequency;
+  await handleUpdate(event, channel + filterIndex);
+});
+
+ipcMain.on(ChannelEnum.GET_FILTER_QUALITY, async (event, arg) => {
+  const channel = ChannelEnum.GET_FILTER_QUALITY;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+
+  // Filter index must be within the lenght of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  const reply: TSuccess = {
+    result: state.filters[filterIndex].quality || 10,
+  };
+  event.reply(channel + filterIndex, reply);
+});
+
+ipcMain.on(ChannelEnum.SET_FILTER_QUALITY, async (event, arg) => {
+  const channel = ChannelEnum.SET_FILTER_QUALITY;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+  const quality = parseFloat(arg[1]) || 0;
+
+  // Filter index must be within the lenght of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  if (quality < MIN_QUALITY || quality > MAX_QUALITY) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  state.filters[filterIndex].quality = quality;
   await handleUpdate(event, channel + filterIndex);
 });
 
