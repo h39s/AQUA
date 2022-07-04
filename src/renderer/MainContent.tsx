@@ -36,7 +36,7 @@ const MainContent = () => {
     }
   }, [peaceError, setPeaceError]);
 
-  const retryHelper = async (attempts: number, f: () => any) => {
+  const retryHelper = async (attempts: number, f: () => unknown) => {
     for (let i = 0; i < attempts; i += 1) {
       try {
         await f();
@@ -108,6 +108,7 @@ const MainContent = () => {
               <span>-30dB</span>
             </div>
             <span className="rowLabel">Gain (dB)</span>
+            <span className="rowLabel">Quality</span>
           </div>
           {sliderIndicies.map((sliderIndex) => (
             <FrequencyBand

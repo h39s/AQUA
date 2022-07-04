@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { clearAndType, setup } from '../utils/userEventUtils';
 import NumberInput from '../../renderer/NumberInput';
 
 describe('NumberInput', () => {
@@ -12,7 +13,7 @@ describe('NumberInput', () => {
 
   it('should render with name', () => {
     const testValue = 1;
-    render(
+    setup(
       <NumberInput
         name={id}
         min={1}
@@ -20,7 +21,6 @@ describe('NumberInput', () => {
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
-        showArrows={false}
         showLabel
       />
     );
@@ -28,9 +28,9 @@ describe('NumberInput', () => {
     expect(screen.getByLabelText(id)).toHaveValue(`${testValue}`);
   });
 
-  it('should allow input to be changed to a negative sign', () => {
-    const testValue = '';
-    render(
+  it('should allow input to be changed to a negative sign', async () => {
+    const testValue = 0;
+    const { user } = setup(
       <NumberInput
         name={id}
         min={-5}
@@ -38,22 +38,18 @@ describe('NumberInput', () => {
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
-        showArrows={false}
-        showLabel={false}
       />
     );
     const input = screen.getByLabelText(id);
-    expect(input).toHaveValue(testValue);
+    expect(input).toHaveValue(`${testValue}`);
 
-    fireEvent.input(input, {
-      target: { value: '-' },
-    });
+    await clearAndType(user, input, '-');
     expect(input).toHaveValue('-');
   });
 
-  it('should allow input to be changed to a negative value', () => {
-    const testValue = '';
-    render(
+  it('should allow input to be changed to a negative value', async () => {
+    const testValue = 0;
+    const { user } = setup(
       <NumberInput
         name={id}
         min={-5}
@@ -61,22 +57,18 @@ describe('NumberInput', () => {
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
-        showArrows={false}
-        showLabel={false}
       />
     );
     const input = screen.getByLabelText(id);
-    expect(input).toHaveValue(testValue);
+    expect(input).toHaveValue(`${testValue}`);
 
-    fireEvent.input(input, {
-      target: { value: '-1' },
-    });
+    await clearAndType(user, input, '-1');
     expect(input).toHaveValue('-1');
   });
 
-  it('should clamp submitted values below the minimum to be within the threshold', () => {
+  it('should clamp submitted values below the minimum to be within the threshold', async () => {
     const testValue = -6;
-    render(
+    const { user } = setup(
       <NumberInput
         name={id}
         min={-5}
@@ -84,41 +76,40 @@ describe('NumberInput', () => {
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
-        showArrows={false}
-        showLabel={false}
       />
     );
     const input = screen.getByLabelText(id);
     expect(input).toHaveValue(`${testValue}`);
 
-    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+    await user.click(input);
+    await user.keyboard('{Enter}');
     expect(handleSubmit).toBeCalledWith(-5);
   });
 
-  it('should clamp submitted values above the maximum to be within the threshold', () => {
+  it('should clamp submitted values above the maximum to be within the threshold', async () => {
     const testValue = 6;
-    render(
+    const { user } = setup(
       <NumberInput
         name={id}
         min={-5}
-        max={5}
+        max={4.3}
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled={false}
-        showArrows={false}
-        showLabel={false}
+        floatPrecision={1}
       />
     );
     const input = screen.getByLabelText(id);
     expect(input).toHaveValue(`${testValue}`);
 
-    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
-    expect(handleSubmit).toBeCalledWith(5);
+    await user.click(input);
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(4.3);
   });
 
   it('should be disabled', () => {
-    const testValue = '';
-    render(
+    const testValue = 0;
+    setup(
       <NumberInput
         name={id}
         min={-5}
@@ -126,12 +117,103 @@ describe('NumberInput', () => {
         handleSubmit={handleSubmit}
         value={testValue}
         isDisabled
-        showArrows={false}
-        showLabel={false}
       />
     );
     const input = screen.getByLabelText(id);
-    expect(input).toHaveValue(testValue);
+    expect(input).toHaveValue(`${testValue}`);
     expect(input).toBeDisabled();
+  });
+
+  it('should be able to truncate to the correct float precision', async () => {
+    const testValue = 1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={3}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await clearAndType(user, input, '1.6912');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(1.691);
+
+    await clearAndType(user, input, '-2.60000');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(-2.6);
+  });
+
+  it('should not accept bad inputs for float input', async () => {
+    const testValue = 2;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={1}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await clearAndType(user, input, '-2.6e10');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(-2.6);
+  });
+
+  it('should be able to round to the correct float precision', async () => {
+    const testValue = 0;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={2}
+        shouldRoundToHalf
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await clearAndType(user, input, '-1.1621');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(-1.15);
+  });
+
+  it('should be able to enter 0', async () => {
+    const testValue = 1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={2}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await clearAndType(user, input, '01234');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(0);
+
+    await user.type(input, '.134');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(0.13);
   });
 });

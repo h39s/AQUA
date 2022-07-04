@@ -4,8 +4,11 @@ import {
   getErrorDescription,
 } from 'common/errors';
 import {
+  MAX_QUALITY,
+  MIN_QUALITY,
   peaceFrequencyOutputToNormal,
   peaceGainOutputToDb,
+  peaceQualityOutputToNormal,
 } from 'common/peaceConversions';
 
 const TIMEOUT = 10000;
@@ -108,7 +111,7 @@ export const setMainPreAmp = (gain: number) => {
 };
 
 /**
- * Get the current main preamplification gain value
+ * Get the a slider's gain value
  * @param {number} index - index of the slider being adjusted
  * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
  */
@@ -128,7 +131,7 @@ export const getGain = (index: number): Promise<number> => {
 };
 
 /**
- * Adjusts the main preamplification gain value
+ * Adjusts a slider's gain value
  * @param {number} index - index of the slider being adjusted
  * @param {number} gain - new gain value in [-30, 30]
  */
@@ -147,9 +150,9 @@ export const setGain = (index: number, gain: number) => {
 };
 
 /**
- * Get the current main preamplification gain value
+ * Get a slider's frequency
  * @param {number} index - index of the slider being adjusted
- * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
+ * @returns { Promise<number> } frequency - frequency value in the range [0, 20000]
  */
 export const getFrequency = (index: number): Promise<number> => {
   const channel = `getFrequency${index}`;
@@ -173,9 +176,9 @@ export const getFrequency = (index: number): Promise<number> => {
 };
 
 /**
- * Get the current main preamplification gain value
+ * Adjusts a slider's frequency
  * @param {number} index - index of the slider being adjusted
- * @param {frequency} index - index of the slider being adjusted
+ * @param {frequency} frequency - new frequency value in [0, 20000]
  */
 export const setFrequency = (index: number, frequency: number) => {
   const channel = `setFrequency${index}`;
@@ -190,6 +193,47 @@ export const setFrequency = (index: number, frequency: number) => {
     resolve(peaceFrequencyOutputToNormal(result));
   });
   return promisifyResult(responseHandler, channel);
+};
+
+/**
+ * Get a slider's quality
+ * @param {number} index - index of the slider being adjusted
+ * @returns { Promise<number> } quality - value in the range [0.001, 999.999]
+ */
+export const getQuality = (index: number): Promise<number> => {
+  const channel = `getQuality${index}`;
+  window.electron.ipcRenderer.sendMessage('peace', [
+    channel,
+    100 + index,
+    11,
+    0,
+  ]);
+
+  const responseHandler = buildResponseHandler<number>((result, resolve) => {
+    resolve(peaceQualityOutputToNormal(result));
+  });
+  return promisifyResult(responseHandler, channel);
+};
+
+/**
+ * Adjusts a slider's quality
+ * @param {number} index - index of the slider being adjusted
+ * @param {number} quality - new quality value in [0.001, 999.999]
+ */
+export const setQuality = (index: number, quality: number) => {
+  const channel = `setQuality${index}`;
+  if (quality < MIN_QUALITY || quality > MAX_QUALITY) {
+    throw new Error(
+      'Invalid quality value - outside of range [0.001, 999.999]'
+    );
+  }
+  window.electron.ipcRenderer.sendMessage('peace', [
+    channel,
+    100 + index,
+    9,
+    quality * 1000,
+  ]);
+  return promisifyResult(setterResponseHandler, channel);
 };
 
 /**
