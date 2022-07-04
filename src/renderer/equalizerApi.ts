@@ -7,8 +7,10 @@ import {
 import {
   MAX_FREQUENCY,
   MAX_GAIN,
+  MAX_QUALITY,
   MIN_FREQUENCY,
   MIN_GAIN,
+  MIN_QUALITY,
 } from 'common/constants';
 
 const TIMEOUT = 10000;
@@ -154,7 +156,7 @@ export const setMainPreAmp = (gain: number) => {
 };
 
 /**
- * Get the current main preamplification gain value
+ * Get the a slider's gain value
  * @param {number} index - index of the slider being adjusted
  * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
  */
@@ -165,7 +167,7 @@ export const getGain = (index: number): Promise<number> => {
 };
 
 /**
- * Adjusts the main preamplification gain value
+ * Adjusts a slider's gain value
  * @param {number} index - index of the slider being adjusted
  * @param {number} gain - new gain value in [-30, 30]
  */
@@ -181,9 +183,9 @@ export const setGain = (index: number, gain: number) => {
 };
 
 /**
- * Get the current main preamplification gain value
+ * Get a slider's frequency
  * @param {number} index - index of the slider being adjusted
- * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
+ * @returns { Promise<number> } frequency - frequency value in the range [0, 20000]
  */
 export const getFrequency = (index: number): Promise<number> => {
   const channel = ChannelEnum.GET_FILTER_FREQUENCY;
@@ -192,9 +194,9 @@ export const getFrequency = (index: number): Promise<number> => {
 };
 
 /**
- * Get the current main preamplification gain value
+ * Adjusts a slider's frequency
  * @param {number} index - index of the slider being adjusted
- * @param {frequency} index - index of the slider being adjusted
+ * @param {frequency} frequency - new frequency value in [0, 20000]
  */
 export const setFrequency = (index: number, frequency: number) => {
   const channel = ChannelEnum.SET_FILTER_FREQUENCY;
@@ -204,6 +206,33 @@ export const setFrequency = (index: number, frequency: number) => {
     );
   }
   window.electron.ipcRenderer.sendMessage(channel, [index, frequency]);
+  return promisifyResult(setterResponseHandler, channel + index);
+};
+
+/**
+ * Get a slider's quality
+ * @param {number} index - index of the slider being adjusted
+ * @returns { Promise<number> } quality - value in the range [0.001, 999.999]
+ */
+export const getQuality = (index: number): Promise<number> => {
+  const channel = ChannelEnum.GET_FILTER_QUALITY;
+  window.electron.ipcRenderer.sendMessage(channel, [index]);
+  return promisifyResult(simpleResponseHandler, channel + index);
+};
+
+/**
+ * Adjusts a slider's quality
+ * @param {number} index - index of the slider being adjusted
+ * @param {number} quality - new quality value in [0.001, 999.999]
+ */
+export const setQuality = (index: number, quality: number) => {
+  const channel = ChannelEnum.SET_FILTER_QUALITY;
+  if (quality < MIN_QUALITY || quality > MAX_QUALITY) {
+    throw new Error(
+      `Invalid quality value - outside of range [${MIN_QUALITY}, ${MAX_QUALITY}]`
+    );
+  }
+  window.electron.ipcRenderer.sendMessage(channel, [index, quality]);
   return promisifyResult(setterResponseHandler, channel + index);
 };
 

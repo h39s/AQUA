@@ -78,8 +78,8 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
         max={max}
         handleSubmit={handleChangeGainWithoutThrottle}
         isDisabled={isDisabled}
-        showLabel={false}
-        showArrows={false}
+        floatPrecision={1}
+        shouldRoundToHalf
       />
     </div>
   );

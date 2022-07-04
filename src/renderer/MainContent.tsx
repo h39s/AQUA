@@ -67,6 +67,7 @@ const MainContent = () => {
               <span>-30dB</span>
             </div>
             <span className="rowLabel">Gain (dB)</span>
+            <span className="rowLabel">Quality</span>
           </div>
           {sliderIndices.map((sliderIndex) => (
             <FrequencyBand

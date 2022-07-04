@@ -1,9 +1,14 @@
+import { clamp } from 'renderer/utils';
+
 /** ----- Application Constants ----- */
+
 export const MAX_GAIN = 30;
 export const MIN_GAIN = -30;
 
 export const MAX_FREQUENCY = 20000; // Peace's actual limit is 22050
 export const MIN_FREQUENCY = 0; // graph input's limit is 10 Hz
+export const MAX_QUALITY = 999.999;
+export const MIN_QUALITY = 0.001;
 
 export const MAX_NUM_FILTERS = 20; // TODO: Investigate an appropriate value for this
 export const MIN_NUM_FILTERS = 1;
@@ -31,12 +36,9 @@ export const peaceGainOutputToDb = (result: number) => {
 };
 
 export const peaceFrequencyOutputToNormal = (result: number) => {
-  // If gain is larger than the MAX_FREQUENCY, assume that Peace returned an unsigned negative number
-  // Since frequency shouldn't be negative, default to the MIN_FREQUENCY
-  if (result > MAX_FREQUENCY) {
-    return MIN_FREQUENCY;
-  }
+  return clamp(result, MIN_FREQUENCY, MAX_FREQUENCY);
+};
 
-  // Round up any lower frequency values up to MIN_FREQUENCY
-  return Math.max(result, MIN_FREQUENCY);
+export const peaceQualityOutputToNormal = (result: number) => {
+  return clamp(result, MIN_FREQUENCY, MAX_FREQUENCY) / 1000;
 };
