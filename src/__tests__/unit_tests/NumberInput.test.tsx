@@ -284,4 +284,29 @@ describe('NumberInput', () => {
     await user.keyboard('{Enter}');
     expect(handleSubmit).toBeCalledWith(1.12);
   });
+
+  it('should be able to enter a decimal numbers with the leading 0 between -1 and 1', async () => {
+    const testValue = 1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={2}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await clearAndType(user, input, '-0.12');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(-0.12);
+
+    await clearAndType(user, input, '0.6');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(0.6);
+  });
 });

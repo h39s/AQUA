@@ -60,22 +60,16 @@ const NumberInput = ({
   const onInput = (e: ChangeEvent<HTMLInputElement>) => {
     const { value: input } = e.target;
 
-    // Allow user to clear input and type an initial negative sign
+    // Allow user to clear input and type an initial negative sign or period or 0.
+    // In the case of integers, no subsequent characters are allowed after a 0
     if (
       input === '' ||
-      (input === '-' && min < 0) ||
-      (input === '.' && floatPrecision > 0)
+      input === '0' ||
+      (input === '.' && floatPrecision > 0) ||
+      (min < 0 && (input === '-' || input === '-0'))
     ) {
       setInternalValue(input);
-      setHasChanges(true);
-      return;
-    }
-
-    // Allow user to start with a 0. In the case of integers,
-    // no subsequent characters are allowed.
-    if (input === '0') {
-      setInternalValue(input);
-      setHasChanges(input === value.toString());
+      setHasChanges(input !== value.toString());
       return;
     }
 
@@ -100,31 +94,25 @@ const NumberInput = ({
         return;
       }
 
+      const isNegative = input.charAt(0) === '-';
       // Disallow the negative sign if the minimum is non-negative
-      if (input === '-' && min >= 0) {
+      if (isNegative && min >= 0) {
         return;
       }
 
       // parseFloat("10.00") => 10. Since a user might input 10.001, we must
       // allow typing in "10.00". We'll append a 1 to avoid the truncation
-      // of 0s done by parseFloat and see if the input is valid. We'll also
-      // prefix decimal inputs that dropped the initial 0 with one to ensure
-      // that the subsequent equality check works correctly
-      const testInput = `${input.charAt(0) === '.' ? '0' : ''}${input}1`;
+      // of 0s done by parseFloat and see if the input is valid.
+      // We support .123, 0.123, -0.123, -.123. To support this,
+      // we'll prefix the decimal to ensure that the subsequent equality
+      // check works correctly
+      const positiveInput = isNegative ? input.substring(1) : input;
+      const testInput = `${
+        positiveInput.charAt(0) === '.' ? '0' : ''
+      }${positiveInput}1`;
       num = parseFloat(testInput);
 
-      if (num < 1 && num > -1) {
-        if (testInput.charAt(0) === '.' && num.toString() !== `0${testInput}`) {
-          return;
-        }
-        if (
-          testInput.charAt(0) === '-' &&
-          testInput.charAt(1) === '.' &&
-          num.toString() !== `-0${testInput.substring(1)}`
-        ) {
-          return;
-        }
-      } else if (num.toString() !== testInput) {
+      if (num.toString() !== testInput) {
         // illegal character in the input
         return;
       }
@@ -157,13 +145,6 @@ const NumberInput = ({
   // Helper for detecting use of the ENTER or TAB keys
   const listenForEnter = (e: KeyboardEvent) => {
     if (e.code === 'Enter' || e.code === 'Tab') {
-      if (
-        internalValue === '' ||
-        internalValue === '-' ||
-        internalValue === '.'
-      ) {
-        return;
-      }
       let num = NaN;
       if (floatPrecision === 0) {
         num = parseInt(internalValue, 10);
@@ -182,6 +163,9 @@ const NumberInput = ({
           num = Math.round(num / 5) * 5;
         }
         num /= precisionFactor;
+      }
+      if (Number.isNaN(num)) {
+        return;
       }
       const newValue: number = clamp(num, min, max);
 
