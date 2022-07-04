@@ -191,4 +191,29 @@ describe('NumberInput', () => {
     await user.keyboard('{Enter}');
     expect(handleSubmit).toBeCalledWith(-1.15);
   });
+
+  it('should be able to enter 0', async () => {
+    const testValue = 1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={2}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await clearAndType(user, input, '01234');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(0);
+
+    await user.type(input, '.134');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(0.13);
+  });
 });
