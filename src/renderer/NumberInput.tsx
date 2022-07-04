@@ -71,6 +71,14 @@ const NumberInput = ({
       return;
     }
 
+    // Allow user to start with a 0. In the case of integers,
+    // no subsequent characters are allowed.
+    if (input === '0') {
+      setInternalValue(input);
+      setHasChanges(input === value.toString());
+      return;
+    }
+
     let num = NaN;
     if (precisionFactor === 1) {
       // If parseInt encounters a character that is not a numeral in the

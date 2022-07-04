@@ -4,6 +4,8 @@ import {
   getErrorDescription,
 } from 'common/errors';
 import {
+  MAX_QUALITY,
+  MIN_QUALITY,
   peaceFrequencyOutputToNormal,
   peaceGainOutputToDb,
   peaceQualityOutputToNormal,
@@ -220,7 +222,7 @@ export const getQuality = (index: number): Promise<number> => {
  */
 export const setQuality = (index: number, quality: number) => {
   const channel = `setQuality${index}`;
-  if (quality < 0.001 || quality > 999.999) {
+  if (quality < MIN_QUALITY || quality > MAX_QUALITY) {
     throw new Error(
       'Invalid quality value - outside of range [0.001, 999.999]'
     );
