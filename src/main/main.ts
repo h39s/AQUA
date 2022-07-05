@@ -15,7 +15,7 @@ import path from 'path';
 import {
   checkConfigFile,
   DEFAULT_FILTER,
-  fetch,
+  fetchSettings,
   flush,
   IState,
   save,
@@ -51,7 +51,7 @@ let mainWindow: BrowserWindow | null = null;
 /** ----- Equalizer APO Implementation ----- */
 
 // Load initial state from local state file
-const state: IState = fetch();
+const state: IState = fetchSettings();
 let configPath = '';
 
 const retryHelper = async (attempts: number, f: () => unknown) => {
@@ -77,33 +77,37 @@ const handleError = (
   errorCode: ErrorCode
 ) => {
   const reply: TError = { errorCode };
+  console.log(channel);
   event.reply(channel, reply);
+};
+
+const updateConfigPath = async (
+  event: Electron.IpcMainEvent,
+  channel: ChannelEnum | string
+) => {
+  try {
+    // Retrive configPath assuming EqualizerAPO is installed
+    configPath = await getConfigPath();
+    // Overwrite the config file if necessary
+    if (!checkConfigFile(configPath)) {
+      updateConfig(configPath);
+    }
+  } catch (e) {
+    handleError(event, channel, ErrorCode.CONFIG_NOT_FOUND);
+    return false;
+  }
+  return true;
 };
 
 const handleUpdate = async (
   event: Electron.IpcMainEvent,
-  channel: ChannelEnum | string,
-  checkConfig = false
+  channel: ChannelEnum | string
 ) => {
   // Check whether EqualizerAPO is installed every time a change is made
   const isInstalled = await isEqualizerAPOInstalled();
   if (!isInstalled) {
     handleError(event, channel, ErrorCode.EQUALIZER_APO_NOT_INSTALLED);
     return;
-  }
-
-  if (checkConfig) {
-    try {
-      // Retrive configPath assuming EqualizerAPO is installed
-      configPath = await getConfigPath();
-      // Overwrite the config file if necessary
-      if (!checkConfigFile(configPath)) {
-        updateConfig(configPath);
-      }
-    } catch (e) {
-      handleError(event, channel, ErrorCode.CONFIG_NOT_FOUND);
-      return;
-    }
   }
 
   try {
@@ -123,7 +127,10 @@ const handleUpdate = async (
 };
 
 ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
-  await handleUpdate(event, ChannelEnum.HEALTH_CHECK, true);
+  const res = await updateConfigPath(event, ChannelEnum.HEALTH_CHECK);
+  if (res) {
+    await handleUpdate(event, ChannelEnum.HEALTH_CHECK);
+  }
 });
 
 ipcMain.on(ChannelEnum.GET_ENABLE, async (event) => {
@@ -159,7 +166,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_GAIN, async (event, arg) => {
   const channel = ChannelEnum.GET_FILTER_GAIN;
   const filterIndex = parseInt(arg[0], 10) || 0;
 
-  // Filter index must be within the lenght of the filters array
+  // Filter index must be within the length of the filters array
   if (filterIndex < 0 || filterIndex >= state.filters.length) {
     handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
     return;
@@ -174,7 +181,7 @@ ipcMain.on(ChannelEnum.SET_FILTER_GAIN, async (event, arg) => {
   const filterIndex = parseInt(arg[0], 10) || 0;
   const gain = parseFloat(arg[1]) || 0;
 
-  // Filter index must be within the lenght of the filters array
+  // Filter index must be within the length of the filters array
   if (filterIndex < 0 || filterIndex >= state.filters.length) {
     handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
     return;
@@ -193,7 +200,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_FREQUENCY, async (event, arg) => {
   const channel = ChannelEnum.GET_FILTER_FREQUENCY;
   const filterIndex = parseInt(arg[0], 10) || 0;
 
-  // Filter index must be within the lenght of the filters array
+  // Filter index must be within the length of the filters array
   if (filterIndex < 0 || filterIndex >= state.filters.length) {
     handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
     return;
@@ -210,13 +217,13 @@ ipcMain.on(ChannelEnum.SET_FILTER_FREQUENCY, async (event, arg) => {
   const filterIndex = parseInt(arg[0], 10) || 0;
   const frequency = parseInt(arg[1], 10) || 0;
 
-  // Filter index must be within the lenght of the filters array
+  // Filter index must be within the length of the filters array
   if (filterIndex < 0 || filterIndex >= state.filters.length) {
     handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
     return;
   }
 
-  if (frequency <= MIN_FREQUENCY || frequency > MAX_FREQUENCY) {
+  if (frequency < MIN_FREQUENCY || frequency > MAX_FREQUENCY) {
     handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
     return;
   }
@@ -229,7 +236,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_QUALITY, async (event, arg) => {
   const channel = ChannelEnum.GET_FILTER_QUALITY;
   const filterIndex = parseInt(arg[0], 10) || 0;
 
-  // Filter index must be within the lenght of the filters array
+  // Filter index must be within the length of the filters array
   if (filterIndex < 0 || filterIndex >= state.filters.length) {
     handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
     return;
@@ -246,7 +253,7 @@ ipcMain.on(ChannelEnum.SET_FILTER_QUALITY, async (event, arg) => {
   const filterIndex = parseInt(arg[0], 10) || 0;
   const quality = parseFloat(arg[1]) || 0;
 
-  // Filter index must be within the lenght of the filters array
+  // Filter index must be within the length of the filters array
   if (filterIndex < 0 || filterIndex >= state.filters.length) {
     handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
     return;
@@ -285,7 +292,7 @@ ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
   const channel = ChannelEnum.REMOVE_FILTER;
   const filterIndex = parseInt(arg[0], 10);
 
-  // Filter index must be within the lenght of the filters array
+  // Filter index must be within the length of the filters array
   if (filterIndex < 0 || filterIndex >= state.filters.length) {
     handleError(event, channel, ErrorCode.INVALID_PARAMETER);
     return;

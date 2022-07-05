@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 
 export enum FilterTypeEnum {
   PEAK = 'PK', // ["PK",True,True]
@@ -67,7 +68,12 @@ export const stateToString = (state: IState) => {
 
   output.push('Device: all');
   output.push('Channel: all');
-  output.push(`Preamp: ${state.preAmp}dB`);
+
+  // We assume when that equalizerAPO will interpret the lack of an explicit
+  // preamp to mean 0dB for the preamp.
+  if (state.preAmp) {
+    output.push(`Preamp: ${state.preAmp}dB`);
+  }
 
   // Using individual filter bands
   output = output.concat(
@@ -92,17 +98,11 @@ const AQUA_LOCAL_CONFIG_FILENAME = 'state.txt';
 const AQUA_CONFIG_FILENAME = 'aqua.txt';
 const CONFIG_FILENAME = 'config.txt';
 
-const convertToForwardSlash = (path: string) => {
-  return path.replace('\\', '/');
+const addFileToPath = (pathPrefix: string, fileName: string) => {
+  return path.join(pathPrefix, fileName);
 };
 
-const addFileToPath = (path: string, fileName: string) => {
-  return path.charAt(path.length - 1) === '/'
-    ? path + fileName
-    : `${path}/${fileName}`;
-};
-
-export const fetch = () => {
+export const fetchSettings = () => {
   try {
     const content = fs.readFileSync(AQUA_LOCAL_CONFIG_FILENAME, {
       encoding: 'utf8',
@@ -115,45 +115,54 @@ export const fetch = () => {
 };
 
 export const save = (state: IState) => {
-  fs.writeFileSync(AQUA_LOCAL_CONFIG_FILENAME, serializeState(state), {
-    encoding: 'utf8',
-  });
-};
-
-export const flush = (state: IState, path: string) => {
-  fs.writeFileSync(
-    addFileToPath(convertToForwardSlash(path), AQUA_CONFIG_FILENAME),
-    stateToString(state),
-    {
+  try {
+    fs.writeFileSync(AQUA_LOCAL_CONFIG_FILENAME, serializeState(state), {
       encoding: 'utf8',
-    }
-  );
+    });
+  } catch (ex) {
+    console.log('Failed to save to %d', AQUA_LOCAL_CONFIG_FILENAME);
+    throw ex;
+  }
 };
 
-export const checkConfigFile = (path: string) => {
+export const flush = (state: IState, configPath: string) => {
+  try {
+    fs.writeFileSync(
+      addFileToPath(configPath, AQUA_CONFIG_FILENAME),
+      stateToString(state),
+      {
+        encoding: 'utf8',
+      }
+    );
+  } catch (ex) {
+    console.log('Failed to write to');
+  }
+};
+
+export const checkConfigFile = (configPath: string) => {
   try {
     const content = fs.readFileSync(
-      addFileToPath(convertToForwardSlash(path), CONFIG_FILENAME),
+      addFileToPath(configPath, CONFIG_FILENAME),
       {
         encoding: 'utf8',
       }
     );
     return content.search(CONFIG_CONTENT) !== -1;
   } catch (ex) {
-    throw new Error(`Unable to locate config file at ${path}`);
+    throw new Error(`Unable to locate config file at ${configPath}`);
   }
 };
 
-export const updateConfig = (path: string) => {
+export const updateConfig = (configPath: string) => {
   try {
     fs.writeFileSync(
-      addFileToPath(convertToForwardSlash(path), CONFIG_FILENAME),
+      addFileToPath(configPath, CONFIG_FILENAME),
       CONFIG_CONTENT,
       {
         encoding: 'utf8',
       }
     );
   } catch (ex) {
-    throw new Error(`Unable to locate config file at ${path}`);
+    throw new Error(`Unable to locate config file at ${configPath}`);
   }
 };

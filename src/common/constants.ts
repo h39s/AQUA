@@ -6,7 +6,7 @@ export const MAX_GAIN = 30;
 export const MIN_GAIN = -30;
 
 export const MAX_FREQUENCY = 20000; // Peace's actual limit is 22050
-export const MIN_FREQUENCY = 0; // graph input's limit is 10 Hz
+export const MIN_FREQUENCY = 10; // graph input's limit is 10 Hz
 export const MAX_QUALITY = 999.999;
 export const MIN_QUALITY = 0.001;
 

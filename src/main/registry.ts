@@ -44,6 +44,11 @@ export const getConfigPath = async () => {
     throw new Error('Equalizer APO not installed');
   }
 
+  // Peace checks for Equalizer APO using this registry key first, and then
+  // tries the second one if this one fails. From my local testing, this
+  // first key tends to always fail but I think it's best to keep both
+  // checks regardless, in case someone else installed Equalizer APO at
+  // a different location.
   try {
     const registryKey64 = 'HKLM64\\SOFTWARE\\EqualizerAPO';
     const listResult = await regedit.list([registryKey64]);

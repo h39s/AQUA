@@ -25,7 +25,7 @@ export default function App() {
 
   const isMounted = useRef<boolean>(false);
 
-  const retry = useCallback(async () => {
+  const performHealthCheck = useCallback(async () => {
     setIsLoading(true);
     try {
       await healthCheck();
@@ -38,8 +38,8 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    retry();
-  }, [retry]);
+    performHealthCheck();
+  }, [performHealthCheck]);
 
   return (
     <AquaContext.Provider value={{ globalError, setGlobalError }}>
@@ -53,7 +53,7 @@ export default function App() {
                 {globalError && (
                   <PrereqMissingModal
                     isLoading={isLoading}
-                    onRetry={retry}
+                    onRetry={performHealthCheck}
                     errorMsg={globalError.shortError}
                     actionMsg={globalError.action}
                   />
