@@ -1,5 +1,5 @@
 import { KeyboardEvent, useEffect, useContext } from 'react';
-import { PeaceFoundContext } from './PeaceFoundContext';
+import { AquaContext } from './AquaContext';
 import './styles/Switch.scss';
 
 interface ISwitchProps {
@@ -16,12 +16,12 @@ export default function Switch({
   handleToggle,
   onLoad,
 }: ISwitchProps) {
-  const { peaceError } = useContext(PeaceFoundContext);
+  const { globalError } = useContext(AquaContext);
   useEffect(() => {
-    if (!peaceError) {
+    if (!globalError) {
       onLoad();
     }
-  }, [onLoad, peaceError]);
+  }, [onLoad, globalError]);
 
   const handleKeyUp = (e: KeyboardEvent) => {
     if (e.code === 'Enter') {
@@ -39,7 +39,7 @@ export default function Switch({
         className="switch-checkbox"
         onChange={handleToggle}
         onKeyUp={handleKeyUp}
-        disabled={!!peaceError}
+        disabled={!!globalError}
       />
       <div role="button" className="switch-label" aria-label={id}>
         <span className="switch-button" />

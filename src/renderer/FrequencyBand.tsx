@@ -6,7 +6,7 @@ import {
   MIN_FREQUENCY,
   MIN_GAIN,
   MIN_QUALITY,
-} from 'common/peaceConversions';
+} from 'common/constants';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import {
   getFrequency,
@@ -17,7 +17,7 @@ import {
   setQuality,
 } from './equalizerApi';
 import NumberInput from './NumberInput';
-import { PeaceFoundContext } from './PeaceFoundContext';
+import { AquaContext } from './AquaContext';
 import Slider from './Slider';
 import './styles/MainContent.scss';
 
@@ -29,7 +29,7 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
   const [actualFrequency, setActualFrequency] = useState<number>(0);
   const [actualQuality, setActualQuality] = useState<number>(0);
 
-  const { peaceError, setPeaceError } = useContext(PeaceFoundContext);
+  const { globalError, setGlobalError } = useContext(AquaContext);
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -39,20 +39,18 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
         result = await getQuality(sliderIndex);
         setActualQuality(result);
       } catch (e) {
-        setPeaceError(e as ErrorDescription);
+        setGlobalError(e as ErrorDescription);
       }
     };
-    if (!peaceError) {
-      fetchResults();
-    }
-  }, [peaceError, setPeaceError, sliderIndex]);
+    fetchResults();
+  }, [setGlobalError, sliderIndex]);
 
   const handleFrequencySubmit = async (newValue: number) => {
     try {
       await setFrequency(sliderIndex, newValue);
       setActualFrequency(newValue);
     } catch (e) {
-      setPeaceError(e as ErrorDescription);
+      setGlobalError(e as ErrorDescription);
     }
   };
 
@@ -61,7 +59,7 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
       await setQuality(sliderIndex, newValue);
       setActualQuality(newValue);
     } catch (e) {
-      setPeaceError(e as ErrorDescription);
+      setGlobalError(e as ErrorDescription);
     }
   };
 
@@ -74,7 +72,7 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
         min={MIN_FREQUENCY}
         max={MAX_FREQUENCY}
         name={`${actualFrequency}`}
-        isDisabled={!!peaceError}
+        isDisabled={!!globalError}
         showArrows
         handleSubmit={handleFrequencySubmit}
       />
@@ -91,7 +89,7 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
           min={MIN_QUALITY}
           max={MAX_QUALITY}
           name={`${actualQuality}`}
-          isDisabled={!!peaceError}
+          isDisabled={!!globalError}
           floatPrecision={3}
           handleSubmit={handleQualitySubmit}
         />

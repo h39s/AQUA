@@ -1,10 +1,9 @@
 export enum ErrorCode {
-  PEACE_UNKNOWN_ERROR = 0,
-  PEACE_NOT_INSTALLED = 1,
-  PEACE_NOT_RUNNING = 2,
-  PEACE_NOT_READY = 3,
-  PEACE_TIMEOUT = 4,
-  NEGATIVE_FREQUENCY = 5,
+  EQUALIZER_APO_NOT_INSTALLED,
+  CONFIG_NOT_FOUND,
+  TIMEOUT,
+  INVALID_PARAMETER,
+  FAILURE,
 }
 
 export type ErrorDescription = {
@@ -14,37 +13,33 @@ export type ErrorDescription = {
 };
 
 export const errors: Record<ErrorCode, ErrorDescription> = {
-  [ErrorCode.PEACE_UNKNOWN_ERROR]: {
-    shortError: 'Unknown error occured with Peace.',
-    action: 'Please restart PeaceGUI and try again.',
-    code: ErrorCode.PEACE_UNKNOWN_ERROR,
+  [ErrorCode.EQUALIZER_APO_NOT_INSTALLED]: {
+    shortError: 'Equalizer APO is not installed.',
+    action: 'Please install Equalizer APO before retrying.',
+    code: ErrorCode.EQUALIZER_APO_NOT_INSTALLED,
   },
-  [ErrorCode.PEACE_NOT_INSTALLED]: {
-    shortError: 'Peace not installed.',
+  [ErrorCode.CONFIG_NOT_FOUND]: {
+    shortError: 'Unable to locate the configuration file for EqualizerAPO.',
     action:
-      'Please install PeaceGUI and launch Peace outside of the Peace Installation GUI before retrying.',
-    code: ErrorCode.PEACE_NOT_INSTALLED,
+      'Please check whether the config.txt file exists in the config folder of EqualizerAPO.',
+    code: ErrorCode.CONFIG_NOT_FOUND,
   },
-  [ErrorCode.PEACE_NOT_RUNNING]: {
-    shortError: 'Peace not running.',
-    action: 'Please launch PeaceGUI before retrying.',
-    code: ErrorCode.PEACE_NOT_RUNNING,
-  },
-  [ErrorCode.PEACE_NOT_READY]: {
-    shortError: 'Peace not ready yet.',
-    action: 'Please launch PeaceGUI before retrying.',
-    code: ErrorCode.PEACE_NOT_READY,
-  },
-  [ErrorCode.PEACE_TIMEOUT]: {
+  [ErrorCode.TIMEOUT]: {
     shortError: 'Timeout waiting for a response.',
     action:
       'Please restart the application. If the error persists, try reaching out to the developers to resolve the issue.',
-    code: ErrorCode.PEACE_TIMEOUT,
+    code: ErrorCode.TIMEOUT,
   },
-  [ErrorCode.NEGATIVE_FREQUENCY]: {
-    shortError: 'Invalid frequency - frequency is negative',
-    action: '',
-    code: ErrorCode.NEGATIVE_FREQUENCY,
+  [ErrorCode.INVALID_PARAMETER]: {
+    shortError: 'Internal Error: Invalid parameter.',
+    action: 'Please reach out to the developers to resolve the issue.',
+    code: ErrorCode.INVALID_PARAMETER,
+  },
+  [ErrorCode.FAILURE]: {
+    shortError: 'Internal Error: Failed to apply equalizer settings.',
+    action:
+      'Please restart the application. If the error persists, try reaching out to the developers to resolve the issue.',
+    code: ErrorCode.FAILURE,
   },
 };
 

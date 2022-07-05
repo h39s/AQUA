@@ -23,4 +23,10 @@
     background: $primary-light;
     cursor: default;
   }
+
+  &[aria-disabled='true'] {
+    pointer-events: none;
+    background: $primary-light;
+    cursor: default;
+  }
 }

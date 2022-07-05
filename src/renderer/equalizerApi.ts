@@ -1,15 +1,17 @@
+import ChannelEnum from 'common/channels';
 import {
   ErrorCode,
   ErrorDescription,
   getErrorDescription,
 } from 'common/errors';
 import {
+  MAX_FREQUENCY,
+  MAX_GAIN,
   MAX_QUALITY,
+  MIN_FREQUENCY,
+  MIN_GAIN,
   MIN_QUALITY,
-  peaceFrequencyOutputToNormal,
-  peaceGainOutputToDb,
-  peaceQualityOutputToNormal,
-} from 'common/peaceConversions';
+} from 'common/constants';
 
 const TIMEOUT = 10000;
 
@@ -42,7 +44,7 @@ const promisifyResult = <Type>(
     window.electron.ipcRenderer.once(channel, handler);
 
     timer = setTimeout(() => {
-      reject(getErrorDescription(ErrorCode.PEACE_TIMEOUT));
+      reject(getErrorDescription(ErrorCode.TIMEOUT));
       window.electron.ipcRenderer.removeListener(channel, handler);
     }, TIMEOUT);
   });
@@ -69,27 +71,73 @@ const buildResponseHandler = <Type>(
   };
 };
 
+const simpleResponseHandler = buildResponseHandler<number>(
+  (result, resolve) => {
+    resolve(result);
+  }
+);
+
 const setterResponseHandler = buildResponseHandler<void>(
   (result, resolve, reject) => {
     if (result !== 1) {
-      reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
+      reject(getErrorDescription(ErrorCode.FAILURE));
     }
     resolve();
   }
 );
 
 /**
+ * Perform a health check to verify whether EqualizerAPO is installed
+ * @returns { Promise<void> } exception if EqualizerAPO is not okay.
+ */
+export const healthCheck = (): Promise<void> => {
+  const channel = ChannelEnum.HEALTH_CHECK;
+  window.electron.ipcRenderer.sendMessage(channel, []);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Enable Equalizer
+ * @returns { Promise<void> } exception if failed.
+ */
+export const enableEqualizer = (): Promise<void> => {
+  const channel = ChannelEnum.SET_ENABLE;
+  window.electron.ipcRenderer.sendMessage(channel, [1]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Disable Equalizer
+ * @returns { Promise<void> } exception if failed.
+ */
+export const disableEqualizer = (): Promise<void> => {
+  const channel = ChannelEnum.SET_ENABLE;
+  window.electron.ipcRenderer.sendMessage(channel, [0]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Get the current equalizer status
+ * @returns { Promise<boolean> } true for on, false for off, exception otherwise
+ */
+export const getEqualizerStatus = (): Promise<boolean> => {
+  const channel = ChannelEnum.GET_ENABLE;
+  window.electron.ipcRenderer.sendMessage(channel, []);
+
+  const responseHandler = buildResponseHandler<boolean>((result, resolve) =>
+    resolve(result === 1)
+  );
+  return promisifyResult(responseHandler, channel);
+};
+
+/**
  * Get the current main preamplification gain value
  * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
  */
 export const getMainPreAmp = (): Promise<number> => {
-  const channel = 'getMainPreAmp';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 5, 5, 0]);
-
-  const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    resolve(peaceGainOutputToDb(result));
-  });
-  return promisifyResult(responseHandler, channel);
+  const channel = ChannelEnum.GET_PREAMP;
+  window.electron.ipcRenderer.sendMessage(channel, []);
+  return promisifyResult(simpleResponseHandler, channel);
 };
 
 /**
@@ -97,16 +145,13 @@ export const getMainPreAmp = (): Promise<number> => {
  * @param {number} gain - new gain value in [-30, 30]
  */
 export const setMainPreAmp = (gain: number) => {
-  const channel = 'setMainPreAmp';
-  if (gain > 30 || gain < -30) {
-    throw new Error('Invalid gain value - outside of range [-30, 30]');
+  const channel = ChannelEnum.SET_PREAMP;
+  if (gain > MAX_GAIN || gain < MIN_GAIN) {
+    throw new Error(
+      `Invalid gain value - outside of range [${MIN_GAIN}, ${MAX_GAIN}]`
+    );
   }
-  window.electron.ipcRenderer.sendMessage('peace', [
-    channel,
-    5,
-    1,
-    gain * 1000,
-  ]);
+  window.electron.ipcRenderer.sendMessage(channel, [gain]);
   return promisifyResult(setterResponseHandler, channel);
 };
 
@@ -116,18 +161,9 @@ export const setMainPreAmp = (gain: number) => {
  * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
  */
 export const getGain = (index: number): Promise<number> => {
-  const channel = `getGain${index}`;
-  window.electron.ipcRenderer.sendMessage('peace', [
-    channel,
-    100 + index,
-    5,
-    0,
-  ]);
-
-  const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    resolve(peaceGainOutputToDb(result));
-  });
-  return promisifyResult(responseHandler, channel);
+  const channel = ChannelEnum.GET_FILTER_GAIN;
+  window.electron.ipcRenderer.sendMessage(channel, [index]);
+  return promisifyResult(simpleResponseHandler, channel + index);
 };
 
 /**
@@ -136,17 +172,14 @@ export const getGain = (index: number): Promise<number> => {
  * @param {number} gain - new gain value in [-30, 30]
  */
 export const setGain = (index: number, gain: number) => {
-  const channel = `setGain${index}`;
-  if (gain > 30 || gain < -30) {
-    throw new Error('Invalid gain value - outside of range [-30, 30]');
+  const channel = ChannelEnum.SET_FILTER_GAIN;
+  if (gain > MAX_GAIN || gain < MIN_GAIN) {
+    throw new Error(
+      `Invalid gain value - outside of range [${MIN_GAIN}, ${MAX_GAIN}]`
+    );
   }
-  window.electron.ipcRenderer.sendMessage('peace', [
-    channel,
-    100 + index,
-    1,
-    gain * 1000,
-  ]);
-  return promisifyResult(setterResponseHandler, channel);
+  window.electron.ipcRenderer.sendMessage(channel, [index, gain]);
+  return promisifyResult(setterResponseHandler, channel + index);
 };
 
 /**
@@ -155,24 +188,9 @@ export const setGain = (index: number, gain: number) => {
  * @returns { Promise<number> } frequency - frequency value in the range [0, 20000]
  */
 export const getFrequency = (index: number): Promise<number> => {
-  const channel = `getFrequency${index}`;
-  window.electron.ipcRenderer.sendMessage('peace', [
-    channel,
-    100 + index,
-    8,
-    0,
-  ]);
-
-  const responseHandler = buildResponseHandler<number>(
-    (result, resolve, reject) => {
-      if (result > 22050) {
-        reject(getErrorDescription(ErrorCode.NEGATIVE_FREQUENCY));
-        return;
-      }
-      resolve(peaceFrequencyOutputToNormal(result));
-    }
-  );
-  return promisifyResult(responseHandler, channel);
+  const channel = ChannelEnum.GET_FILTER_FREQUENCY;
+  window.electron.ipcRenderer.sendMessage(channel, [index]);
+  return promisifyResult(simpleResponseHandler, channel + index);
 };
 
 /**
@@ -181,18 +199,14 @@ export const getFrequency = (index: number): Promise<number> => {
  * @param {frequency} frequency - new frequency value in [0, 20000]
  */
 export const setFrequency = (index: number, frequency: number) => {
-  const channel = `setFrequency${index}`;
-  window.electron.ipcRenderer.sendMessage('peace', [
-    channel,
-    100 + index,
-    6,
-    frequency,
-  ]);
-
-  const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    resolve(peaceFrequencyOutputToNormal(result));
-  });
-  return promisifyResult(responseHandler, channel);
+  const channel = ChannelEnum.SET_FILTER_FREQUENCY;
+  if (frequency <= MIN_FREQUENCY || frequency > MAX_FREQUENCY) {
+    throw new Error(
+      `Invalid gain value - outside of range (${MIN_FREQUENCY}, ${MAX_FREQUENCY}]`
+    );
+  }
+  window.electron.ipcRenderer.sendMessage(channel, [index, frequency]);
+  return promisifyResult(setterResponseHandler, channel + index);
 };
 
 /**
@@ -201,18 +215,9 @@ export const setFrequency = (index: number, frequency: number) => {
  * @returns { Promise<number> } quality - value in the range [0.001, 999.999]
  */
 export const getQuality = (index: number): Promise<number> => {
-  const channel = `getQuality${index}`;
-  window.electron.ipcRenderer.sendMessage('peace', [
-    channel,
-    100 + index,
-    11,
-    0,
-  ]);
-
-  const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    resolve(peaceQualityOutputToNormal(result));
-  });
-  return promisifyResult(responseHandler, channel);
+  const channel = ChannelEnum.GET_FILTER_QUALITY;
+  window.electron.ipcRenderer.sendMessage(channel, [index]);
+  return promisifyResult(simpleResponseHandler, channel + index);
 };
 
 /**
@@ -221,87 +226,14 @@ export const getQuality = (index: number): Promise<number> => {
  * @param {number} quality - new quality value in [0.001, 999.999]
  */
 export const setQuality = (index: number, quality: number) => {
-  const channel = `setQuality${index}`;
+  const channel = ChannelEnum.SET_FILTER_QUALITY;
   if (quality < MIN_QUALITY || quality > MAX_QUALITY) {
     throw new Error(
-      'Invalid quality value - outside of range [0.001, 999.999]'
+      `Invalid quality value - outside of range [${MIN_QUALITY}, ${MAX_QUALITY}]`
     );
   }
-  window.electron.ipcRenderer.sendMessage('peace', [
-    channel,
-    100 + index,
-    9,
-    quality * 1000,
-  ]);
-  return promisifyResult(setterResponseHandler, channel);
-};
-
-/**
- * Get program state for Peace. We will use this as a health check call
- * @returns { Promise<void> } exception if Peace is not okay.
- */
-export const getProgramState = (): Promise<void> => {
-  const channel = 'getProgramState';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 0, 0]);
-  return promisifyResult(setterResponseHandler, channel);
-};
-
-/**
- * Enable Equalizer
- * @returns { Promise<void> } exception if failed.
- */
-export const enableEqualizer = (): Promise<void> => {
-  const channel = 'enableEqualizer';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 3, 0]);
-  const responseHandler = buildResponseHandler<void>(
-    (result, resolve, reject) => {
-      if (result !== 1) {
-        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
-      }
-      resolve();
-    }
-  );
-  return promisifyResult(responseHandler, channel);
-};
-
-/**
- * Disable Equalizer
- * @returns { Promise<void> } exception if failed.
- */
-export const disableEqualizer = (): Promise<void> => {
-  const channel = 'disableEqualizer';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 3, 1]);
-  const responseHandler = buildResponseHandler<void>(
-    (result, resolve, reject) => {
-      if (result !== 2) {
-        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
-      }
-      resolve();
-    }
-  );
-  return promisifyResult(responseHandler, channel);
-};
-
-/**
- * Get the current equalizer status
- * @returns { Promise<boolean> } true for on, false for off, exception otherwise
- */
-export const getEqualizerStatus = (): Promise<boolean> => {
-  const channel = 'getEqualizerStatus';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 3, 3, 0]);
-
-  const responseHandler = buildResponseHandler<boolean>(
-    (result, resolve, reject) => {
-      if (result === 1) {
-        resolve(true);
-      } else if (result === 2) {
-        resolve(false);
-      } else {
-        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
-      }
-    }
-  );
-  return promisifyResult(responseHandler, channel);
+  window.electron.ipcRenderer.sendMessage(channel, [index, quality]);
+  return promisifyResult(setterResponseHandler, channel + index);
 };
 
 /**
@@ -309,12 +241,9 @@ export const getEqualizerStatus = (): Promise<boolean> => {
  * @returns { Promise<number> } exception if failed
  */
 export const getEqualizerSliderCount = (): Promise<number> => {
-  const channel = 'getEqualizerSliderCount';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 22, 13]);
-  const responseHandler = buildResponseHandler<number>((result, resolve) => {
-    resolve(result);
-  });
-  return promisifyResult(responseHandler, channel);
+  const channel = ChannelEnum.GET_FILTER_COUNT;
+  window.electron.ipcRenderer.sendMessage(channel, []);
+  return promisifyResult(simpleResponseHandler, channel);
 };
 
 /**
@@ -322,8 +251,8 @@ export const getEqualizerSliderCount = (): Promise<number> => {
  * @returns { Promise<void> } exception if failed
  */
 export const addEqualizerSlider = (): Promise<void> => {
-  const channel = 'addEqualizerSlider';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 22, 14]);
+  const channel = ChannelEnum.ADD_FILTER;
+  window.electron.ipcRenderer.sendMessage(channel, []);
   return promisifyResult(setterResponseHandler, channel);
 };
 
@@ -331,44 +260,8 @@ export const addEqualizerSlider = (): Promise<void> => {
  * Remove rightmost slider
  * @returns { Promise<void> } exception if failed
  */
-export const removeEqualizerSlider = (): Promise<void> => {
-  const channel = 'removeEqualizerSlider';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 22, 15]);
+export const removeEqualizerSlider = (index: number): Promise<void> => {
+  const channel = ChannelEnum.REMOVE_FILTER;
+  window.electron.ipcRenderer.sendMessage(channel, [index]);
   return promisifyResult(setterResponseHandler, channel);
-};
-
-/**
- * Show Peace window
- * @returns { Promise<void> } exception if failed
- */
-export const showPeaceWindow = (): Promise<void> => {
-  const channel = 'showPeaceWindow';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 1, 0]);
-  const responseHandler = buildResponseHandler<void>(
-    (result, resolve, reject) => {
-      if (result !== 2) {
-        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
-      }
-      resolve();
-    }
-  );
-  return promisifyResult(responseHandler, channel);
-};
-
-/**
- * Close Peace window
- * @returns { Promise<void> } exception if failed
- */
-export const closePeaceWindow = (): Promise<void> => {
-  const channel = 'closePeaceWindow';
-  window.electron.ipcRenderer.sendMessage('peace', [channel, 1, 1]);
-  const responseHandler = buildResponseHandler<void>(
-    (result, resolve, reject) => {
-      if (result !== 1) {
-        reject(getErrorDescription(ErrorCode.PEACE_UNKNOWN_ERROR));
-      }
-      resolve();
-    }
-  );
-  return promisifyResult(responseHandler, channel);
 };

@@ -216,4 +216,97 @@ describe('NumberInput', () => {
     await user.keyboard('{Enter}');
     expect(handleSubmit).toBeCalledWith(0.13);
   });
+
+  it('should be able to enter a number in the range without a 0 prior to the decimal point', async () => {
+    const testValue = 1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={2}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await clearAndType(user, input, '-.12');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(-0.12);
+
+    await clearAndType(user, input, '.56');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(0.56);
+  });
+
+  it('should not be able to enter a negative sign for integers when min is non-negative', async () => {
+    const testValue = 1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={0}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await clearAndType(user, input, '-1');
+    expect(input).toHaveValue('1');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(1);
+  });
+
+  it('should not be able to enter a negative sign for floats when min is non-negative', async () => {
+    const testValue = 1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={0}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={2}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await clearAndType(user, input, '-1.12');
+    expect(input).toHaveValue('1.12');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(1.12);
+  });
+
+  it('should be able to enter a decimal number with the leading 0 between -1 and 1', async () => {
+    const testValue = 1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={2}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await clearAndType(user, input, '-0.12');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(-0.12);
+
+    await clearAndType(user, input, '0.6');
+    await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(0.6);
+  });
 });

@@ -1,23 +1,21 @@
 import { ErrorDescription } from 'common/errors';
+import { MAX_NUM_FILTERS, MIN_NUM_FILTERS } from 'common/constants';
 import { useContext, useEffect, useState } from 'react';
 import {
   addEqualizerSlider,
-  closePeaceWindow,
   getEqualizerSliderCount,
-  getProgramState,
   removeEqualizerSlider,
-  showPeaceWindow,
 } from './equalizerApi';
 import FrequencyBand from './FrequencyBand';
 import MinusIcon from './icons/MinusIcon';
 import PlusIcon from './icons/PlusIcon';
 import Button from './Button';
-import { PeaceFoundContext } from './PeaceFoundContext';
+import { AquaContext } from './AquaContext';
 import './styles/MainContent.scss';
 
 const MainContent = () => {
-  const { peaceError, setPeaceError } = useContext(PeaceFoundContext);
-  const [sliderIndicies, setSliderIndicies] = useState<number[]>([]);
+  const { globalError, setGlobalError } = useContext(AquaContext);
+  const [sliderIndices, setSliderIndices] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -25,78 +23,40 @@ const MainContent = () => {
         const sliderCount = await getEqualizerSliderCount();
         const newIndices = Array(sliderCount)
           .fill(0)
-          .map((_, i) => i + 1);
-        setSliderIndicies(newIndices);
+          .map((_, i) => i);
+        setSliderIndices(newIndices);
       } catch (e) {
-        setPeaceError(e as ErrorDescription);
+        setGlobalError(e as ErrorDescription);
       }
     };
-    if (!peaceError) {
-      fetchResults();
-    }
-  }, [peaceError, setPeaceError]);
-
-  const retryHelper = async (attempts: number, f: () => unknown) => {
-    for (let i = 0; i < attempts; i += 1) {
-      try {
-        await f();
-        return;
-      } catch (e) {
-        if (i === attempts) {
-          setPeaceError(e as ErrorDescription);
-          return;
-        }
-        await new Promise((resolve) => {
-          setTimeout(resolve, 500);
-        });
-      }
-    }
-  };
+    fetchResults();
+  }, [globalError, setGlobalError]);
 
   const onAddEqualizerSlider = async () => {
     try {
       await addEqualizerSlider();
+      const newIndices = [...sliderIndices];
+      newIndices.push(sliderIndices.length);
+      setSliderIndices(newIndices);
     } catch (e) {
-      setPeaceError(e as ErrorDescription);
-      return;
+      setGlobalError(e as ErrorDescription);
     }
-    const addSlider = async () => {
-      await getProgramState();
-      await showPeaceWindow();
-      const newIndices = [...sliderIndicies];
-      newIndices.push(sliderIndicies.length + 1);
-      setSliderIndicies(newIndices);
-    };
-
-    retryHelper(5, addSlider);
-
-    try {
-      await closePeaceWindow();
-      // Ignore if we can't close peace window
-      // eslint-disable-next-line no-empty
-    } catch (e) {}
   };
 
   const onRemoveEqualizerSlider = async () => {
     try {
-      await removeEqualizerSlider();
-    } catch (e) {
-      setPeaceError(e as ErrorDescription);
-      return;
-    }
-
-    const removeSlider = async () => {
-      await getProgramState();
-      const newIndices = [...sliderIndicies];
+      await removeEqualizerSlider(sliderIndices.length - 1);
+      const newIndices = [...sliderIndices];
       newIndices.pop();
-      setSliderIndicies(newIndices);
-    };
-    retryHelper(5, removeSlider);
+      setSliderIndices(newIndices);
+    } catch (e) {
+      setGlobalError(e as ErrorDescription);
+    }
   };
 
   return (
     <div className="row center mainContent">
-      {sliderIndicies.length === 0 ? (
+      {sliderIndices.length === 0 ? (
         <h1>Loading...</h1>
       ) : (
         <>
@@ -110,7 +70,7 @@ const MainContent = () => {
             <span className="rowLabel">Gain (dB)</span>
             <span className="rowLabel">Quality</span>
           </div>
-          {sliderIndicies.map((sliderIndex) => (
+          {sliderIndices.map((sliderIndex) => (
             <FrequencyBand
               sliderIndex={sliderIndex}
               key={`slider-${sliderIndex}`}
@@ -119,7 +79,7 @@ const MainContent = () => {
           <div className="col sliderButtons">
             <Button
               ariaLabel="Add Equalizer Slider"
-              isDisabled={false}
+              isDisabled={sliderIndices.length >= MAX_NUM_FILTERS}
               className="sliderButton"
               handleChange={onAddEqualizerSlider}
             >
@@ -127,7 +87,7 @@ const MainContent = () => {
             </Button>
             <Button
               ariaLabel="Remove Equalizer Slider"
-              isDisabled={false}
+              isDisabled={sliderIndices.length <= MIN_NUM_FILTERS}
               className="sliderButton"
               handleChange={onRemoveEqualizerSlider}
             >

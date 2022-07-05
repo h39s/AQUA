@@ -8,18 +8,33 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import path from 'path';
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
-import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
+import path from 'path';
 import {
-  getPeaceWindowHandle,
-  isPeaceRunning,
-  sendPeaceCommand,
-} from '../common/peaceIPC';
+  checkConfigFile,
+  DEFAULT_FILTER,
+  fetchSettings,
+  flush,
+  IState,
+  save,
+  updateConfig,
+} from './flush';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import registry from './registry';
+import { getConfigPath, isEqualizerAPOInstalled } from './registry';
+import ChannelEnum from '../common/channels';
+import {
+  MAX_FREQUENCY,
+  MAX_GAIN,
+  MAX_NUM_FILTERS,
+  MAX_QUALITY,
+  MIN_FREQUENCY,
+  MIN_GAIN,
+  MIN_NUM_FILTERS,
+  MIN_QUALITY,
+} from '../common/constants';
 import { ErrorCode } from '../common/errors';
 import { TSuccess, TError } from '../renderer/equalizerApi';
 
@@ -33,37 +48,264 @@ export default class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('peace', async (event, arg) => {
-  const channel: string = arg[0];
-  const peaceInstalled = await registry.isPeaceInstalled();
-  if (!peaceInstalled) {
-    const reply: TError = { errorCode: ErrorCode.PEACE_NOT_INSTALLED };
-    event.reply(channel, reply);
-    return;
+/** ----- Equalizer APO Implementation ----- */
+
+// Load initial state from local state file
+const state: IState = fetchSettings();
+let configPath = '';
+
+const retryHelper = async (attempts: number, f: () => unknown) => {
+  for (let i = 0; i < attempts; i += 1) {
+    try {
+      await f();
+      return;
+    } catch (e) {
+      if (i === attempts) {
+        throw new Error(`Failed to perform action after ${attempts} retrires`);
+      }
+      // TODO: maybe add a backoff here?
+      await new Promise((resolve) => {
+        setTimeout(resolve, 500);
+      });
+    }
   }
+};
 
-  const peaceHWnd = getPeaceWindowHandle();
-  const foundPeace = isPeaceRunning(peaceHWnd);
-
-  if (!foundPeace) {
-    const reply: TError = { errorCode: ErrorCode.PEACE_NOT_RUNNING };
-    event.reply(channel, reply);
-    return;
-  }
-
-  const messageCode = parseInt(arg[1], 10) || 0;
-  const wParam = parseInt(arg[2], 10) || 0;
-  const lParam = parseInt(arg[3], 10) || 0;
-
-  // Send message to Peace
-  const res = sendPeaceCommand(peaceHWnd, messageCode, wParam, lParam);
-  if (res === 4294967295) {
-    const reply: TError = { errorCode: ErrorCode.PEACE_NOT_READY };
-    event.reply(channel, reply);
-    return;
-  }
-  const reply: TSuccess = { result: res };
+const handleError = (
+  event: Electron.IpcMainEvent,
+  channel: ChannelEnum | string,
+  errorCode: ErrorCode
+) => {
+  const reply: TError = { errorCode };
+  console.log(channel);
   event.reply(channel, reply);
+};
+
+const updateConfigPath = async (
+  event: Electron.IpcMainEvent,
+  channel: ChannelEnum | string
+) => {
+  try {
+    // Retrive configPath assuming EqualizerAPO is installed
+    configPath = await getConfigPath();
+    // Overwrite the config file if necessary
+    if (!checkConfigFile(configPath)) {
+      updateConfig(configPath);
+    }
+  } catch (e) {
+    handleError(event, channel, ErrorCode.CONFIG_NOT_FOUND);
+    return false;
+  }
+  return true;
+};
+
+const handleUpdate = async (
+  event: Electron.IpcMainEvent,
+  channel: ChannelEnum | string
+) => {
+  // Check whether EqualizerAPO is installed every time a change is made
+  const isInstalled = await isEqualizerAPOInstalled();
+  if (!isInstalled) {
+    handleError(event, channel, ErrorCode.EQUALIZER_APO_NOT_INSTALLED);
+    return;
+  }
+
+  try {
+    // Flush changes to EqualizerAPO with a retry in case several requests to write are occuring at the same time
+    retryHelper(5, () => flush(state, configPath));
+  } catch (e) {
+    handleError(event, channel, ErrorCode.FAILURE);
+    return;
+  }
+
+  // Return a success message of 1
+  const reply: TSuccess = { result: 1 };
+  event.reply(channel, reply);
+
+  // Flush changes to our local state file after informing UI that the changes have been applied
+  save(state);
+};
+
+ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
+  const res = await updateConfigPath(event, ChannelEnum.HEALTH_CHECK);
+  if (res) {
+    await handleUpdate(event, ChannelEnum.HEALTH_CHECK);
+  }
+});
+
+ipcMain.on(ChannelEnum.GET_ENABLE, async (event) => {
+  const reply: TSuccess = { result: state.isEnabled ? 1 : 0 };
+  event.reply(ChannelEnum.GET_ENABLE, reply);
+});
+
+ipcMain.on(ChannelEnum.SET_ENABLE, async (event, arg) => {
+  const value = parseInt(arg[0], 10) || 0;
+  state.isEnabled = value !== 0;
+  await handleUpdate(event, ChannelEnum.SET_ENABLE);
+});
+
+ipcMain.on(ChannelEnum.GET_PREAMP, async (event) => {
+  const reply: TSuccess = { result: state.preAmp || 0 };
+  event.reply(ChannelEnum.GET_PREAMP, reply);
+});
+
+ipcMain.on(ChannelEnum.SET_PREAMP, async (event, arg) => {
+  const channel = ChannelEnum.SET_PREAMP;
+  const gain = parseInt(arg[0], 10) || 0;
+
+  if (gain < MIN_GAIN || gain > MAX_GAIN) {
+    handleError(event, channel, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  state.preAmp = gain;
+  await handleUpdate(event, channel);
+});
+
+ipcMain.on(ChannelEnum.GET_FILTER_GAIN, async (event, arg) => {
+  const channel = ChannelEnum.GET_FILTER_GAIN;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+
+  // Filter index must be within the length of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  const reply: TSuccess = { result: state.filters[filterIndex].gain || 0 };
+  event.reply(channel + filterIndex, reply);
+});
+
+ipcMain.on(ChannelEnum.SET_FILTER_GAIN, async (event, arg) => {
+  const channel = ChannelEnum.SET_FILTER_GAIN;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+  const gain = parseFloat(arg[1]) || 0;
+
+  // Filter index must be within the length of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  if (gain < MIN_GAIN || gain > MAX_GAIN) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  state.filters[filterIndex].gain = gain;
+  await handleUpdate(event, channel + filterIndex);
+});
+
+ipcMain.on(ChannelEnum.GET_FILTER_FREQUENCY, async (event, arg) => {
+  const channel = ChannelEnum.GET_FILTER_FREQUENCY;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+
+  // Filter index must be within the length of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  const reply: TSuccess = {
+    result: state.filters[filterIndex].frequency || 10,
+  };
+  event.reply(channel + filterIndex, reply);
+});
+
+ipcMain.on(ChannelEnum.SET_FILTER_FREQUENCY, async (event, arg) => {
+  const channel = ChannelEnum.SET_FILTER_FREQUENCY;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+  const frequency = parseInt(arg[1], 10) || 0;
+
+  // Filter index must be within the length of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  if (frequency < MIN_FREQUENCY || frequency > MAX_FREQUENCY) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  state.filters[filterIndex].frequency = frequency;
+  await handleUpdate(event, channel + filterIndex);
+});
+
+ipcMain.on(ChannelEnum.GET_FILTER_QUALITY, async (event, arg) => {
+  const channel = ChannelEnum.GET_FILTER_QUALITY;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+
+  // Filter index must be within the length of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  const reply: TSuccess = {
+    result: state.filters[filterIndex].quality || 10,
+  };
+  event.reply(channel + filterIndex, reply);
+});
+
+ipcMain.on(ChannelEnum.SET_FILTER_QUALITY, async (event, arg) => {
+  const channel = ChannelEnum.SET_FILTER_QUALITY;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+  const quality = parseFloat(arg[1]) || 0;
+
+  // Filter index must be within the length of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  if (quality < MIN_QUALITY || quality > MAX_QUALITY) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  state.filters[filterIndex].quality = quality;
+  await handleUpdate(event, channel + filterIndex);
+});
+
+ipcMain.on(ChannelEnum.GET_FILTER_COUNT, async (event) => {
+  const reply: TSuccess = {
+    result: state.filters.length,
+  };
+  event.reply(ChannelEnum.GET_FILTER_COUNT, reply);
+});
+
+ipcMain.on(ChannelEnum.ADD_FILTER, async (event) => {
+  const channel = ChannelEnum.ADD_FILTER;
+
+  // Cannot exceed the maximum number of filters
+  if (state.filters.length === MAX_NUM_FILTERS) {
+    handleError(event, channel, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  state.filters.push(DEFAULT_FILTER);
+  await handleUpdate(event, channel);
+});
+
+ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
+  const channel = ChannelEnum.REMOVE_FILTER;
+  const filterIndex = parseInt(arg[0], 10);
+
+  // Filter index must be within the length of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  // Cannot fall below the minimum number of filters
+  if (state.filters.length === MIN_NUM_FILTERS) {
+    handleError(event, channel, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  state.filters.splice(filterIndex, 1);
+  await handleUpdate(event, channel);
 });
 
 ipcMain.on('quit-app', () => {

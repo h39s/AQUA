@@ -5,7 +5,7 @@ import {
   enableEqualizer,
   getEqualizerStatus,
 } from './equalizerApi';
-import { PeaceFoundContext } from './PeaceFoundContext';
+import { AquaContext } from './AquaContext';
 import Switch from './Switch';
 
 interface IEqualizerEnablerSwitchProps {
@@ -15,16 +15,16 @@ interface IEqualizerEnablerSwitchProps {
 export default function EqualizerEnablerSwitch({
   id,
 }: IEqualizerEnablerSwitchProps) {
-  const { setPeaceError } = useContext(PeaceFoundContext);
+  const { setGlobalError } = useContext(AquaContext);
   const [equalizerEnabled, setEqualizerEnabled] = useState<boolean>(false);
 
   const equalizerEnablerOnLoad = useCallback(async () => {
     try {
       setEqualizerEnabled(await getEqualizerStatus());
     } catch (e) {
-      setPeaceError(e as ErrorDescription);
+      setGlobalError(e as ErrorDescription);
     }
-  }, [setPeaceError]);
+  }, [setGlobalError]);
 
   const handleToggleEqualizer = useCallback(async () => {
     try {
@@ -35,9 +35,9 @@ export default function EqualizerEnablerSwitch({
       }
       setEqualizerEnabled(!equalizerEnabled);
     } catch (e) {
-      setPeaceError(e as ErrorDescription);
+      setGlobalError(e as ErrorDescription);
     }
-  }, [equalizerEnabled, setPeaceError]);
+  }, [equalizerEnabled, setGlobalError]);
 
   return (
     <Switch
