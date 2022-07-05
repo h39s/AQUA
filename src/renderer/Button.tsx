@@ -19,7 +19,7 @@ const Button = ({
     <div
       role="button"
       aria-label={ariaLabel}
-      className={`button ${className} ${isDisabled ? 'disabled' : ''}`}
+      className={`button ${className}`}
       onMouseUp={handleChange}
       tabIndex={isDisabled ? -1 : 0}
       aria-disabled={isDisabled}

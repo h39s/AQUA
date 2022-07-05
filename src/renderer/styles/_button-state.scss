@@ -24,7 +24,7 @@
     cursor: default;
   }
 
-  &.disabled {
+  &[aria-disabled='true'] {
     pointer-events: none;
     background: $primary-light;
     cursor: default;

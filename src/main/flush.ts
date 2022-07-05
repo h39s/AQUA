@@ -68,12 +68,7 @@ export const stateToString = (state: IState) => {
 
   output.push('Device: all');
   output.push('Channel: all');
-
-  // We assume when that equalizerAPO will interpret the lack of an explicit
-  // preamp to mean 0dB for the preamp.
-  if (state.preAmp) {
-    output.push(`Preamp: ${state.preAmp}dB`);
-  }
+  output.push(`Preamp: ${state.preAmp}dB`);
 
   // Using individual filter bands
   output = output.concat(
@@ -125,17 +120,14 @@ export const save = (state: IState) => {
   }
 };
 
-export const flush = (state: IState, configPath: string) => {
+export const flush = (state: IState, configDirPath: string) => {
+  const configPath = addFileToPath(configDirPath, AQUA_CONFIG_FILENAME);
   try {
-    fs.writeFileSync(
-      addFileToPath(configPath, AQUA_CONFIG_FILENAME),
-      stateToString(state),
-      {
-        encoding: 'utf8',
-      }
-    );
+    fs.writeFileSync(configPath, stateToString(state), {
+      encoding: 'utf8',
+    });
   } catch (ex) {
-    console.log('Failed to write to');
+    console.log(`Failed to flush to ${configPath}`);
   }
 };
 

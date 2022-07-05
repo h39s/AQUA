@@ -285,7 +285,7 @@ describe('NumberInput', () => {
     expect(handleSubmit).toBeCalledWith(1.12);
   });
 
-  it('should be able to enter a decimal numbers with the leading 0 between -1 and 1', async () => {
+  it('should be able to enter a decimal number with the leading 0 between -1 and 1', async () => {
     const testValue = 1;
     const { user } = setup(
       <NumberInput
