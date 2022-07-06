@@ -10,6 +10,8 @@ enum ChannelEnum {
   SET_FILTER_FREQUENCY = 'setFilterFrequency',
   GET_FILTER_QUALITY = 'getFilterQuality',
   SET_FILTER_QUALITY = 'setFilterQuality',
+  GET_FILTER_TYPE = 'getFilterType',
+  SET_FILTER_TYPE = 'setFilterType',
   GET_FILTER_COUNT = 'getFilterCount',
   ADD_FILTER = 'addFilter',
   REMOVE_FILTER = 'removeFilter',

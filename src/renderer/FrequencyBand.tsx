@@ -14,9 +14,11 @@ import {
   getFrequency,
   getGain,
   getQuality,
+  getType,
   setFrequency,
   setGain,
   setQuality,
+  setType,
 } from './equalizerApi';
 import NumberInput from './NumberInput';
 import { AquaContext } from './AquaContext';
@@ -57,6 +59,7 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
         setActualFrequency(result);
         result = await getQuality(sliderIndex);
         setActualQuality(result);
+        setFilterType(await getType(sliderIndex));
       } catch (e) {
         setGlobalError(e as ErrorDescription);
       }
@@ -82,6 +85,15 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
     }
   };
 
+  const handleFilterTypeSubmit = async (newValue: string) => {
+    try {
+      await setType(sliderIndex, newValue);
+      setFilterType(newValue);
+    } catch (e) {
+      setGlobalError(e as ErrorDescription);
+    }
+  };
+
   const getSliderGain = useCallback(() => getGain(sliderIndex), [sliderIndex]);
 
   return (
@@ -90,7 +102,7 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
         name={`${actualFrequency}-filter-type`}
         value={filterType}
         options={options}
-        handleChange={(newValue) => setFilterType(newValue)}
+        handleChange={handleFilterTypeSubmit}
       />
       <NumberInput
         value={actualFrequency}
