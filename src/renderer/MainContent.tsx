@@ -1,9 +1,5 @@
 import { ErrorDescription } from 'common/errors';
-import {
-  FilterTypeEnum,
-  MAX_NUM_FILTERS,
-  MIN_NUM_FILTERS,
-} from 'common/constants';
+import { MAX_NUM_FILTERS, MIN_NUM_FILTERS } from 'common/constants';
 import { useContext, useEffect, useState } from 'react';
 import {
   addEqualizerSlider,

@@ -14,22 +14,24 @@ export const MAX_NUM_FILTERS = 20; // TODO: Investigate an appropriate value for
 export const MIN_NUM_FILTERS = 1;
 
 export enum FilterTypeEnum {
-  PEAK = 'PK', // ["PK",True,True]
-  LPQ = 'LPQ', // ["LPQ",False,True]
-  HPQ = 'HPQ', // ["HPQ",False,True]
-  BP = 'BP', // ["BP",False,True]
-  LS = 'LS', // ["LS",True,False]
-  HS = 'HS', // ["HS",True,False]
-  NO = 'NO', // ["NO",False,True]
-  AP = 'AP', // ["AP",False,True]
-  LSC = 'LSC', // ["LSC",True,True]
-  HSC = 'HSC', // ["HSC",True,True]
-  BWLP = 'BWLP', // ["BWLP",False,True]
-  BWHP = 'BWHP', // ["BWHP",False,True]
-  LRLP = 'LRLP', // ["LRLP",False,True]
-  LRHP = 'LRHP', // ["LRHP",False,True]
-  LSCQ = 'LSCQ', // ["LSCQ",True,True]
-  HSCQ = 'HSCQ', // ["HSCQ",True,True]
+  PEAK = 'PK', // Peak ["PK",True,True]
+  LP = 'LP', // Low Pass
+  HP = 'HP', // High Pass
+  LPQ = 'LPQ', // ?? ["LPQ",False,True]
+  HPQ = 'HPQ', // ?? ["HPQ",False,True]
+  BP = 'BP', // Band Pass ["BP",False,True]
+  LS = 'LS', // Low Shelf ["LS",True,False]
+  HS = 'HS', // High Shelf ["HS",True,False]
+  NO = 'NO', // Notch ["NO",False,True]
+  AP = 'AP', // All Pass ["AP",False,True]
+  LSC = 'LSC', // Low Shelf DB?? ["LSC",True,True]
+  HSC = 'HSC', // High Shelf DB?? ["HSC",True,True]
+  BWLP = 'BWLP', // Butterworth Low Pass ["BWLP",False,True]
+  BWHP = 'BWHP', // Butterworth High Pass ["BWHP",False,True]
+  LRLP = 'LRLP', // Linkwitz Riley Low Pass ["LRLP",False,True]
+  LRHP = 'LRHP', // Linkwitz Riley High Pass["LRHP",False,True]
+  LSCQ = 'LSCQ', // Low Shelf Q?? ["LSCQ",True,True]
+  HSCQ = 'HSCQ', // High Shelf Q?? ["HSCQ",True,True]
 }
 
 /** ----- Peace specific ----- */

@@ -119,7 +119,7 @@ const NumberInput = ({
     }
 
     // Prevent user from typing numbers that are too large or use more than 7 characters
-    if (Math.abs(num) > 10000 || input.length > 7) {
+    if (Math.abs(num) >= 100000 || input.length > 7) {
       return;
     }
 

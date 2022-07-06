@@ -32,12 +32,24 @@ const options = [
     display: <FilterTypeIcon type={FilterTypeEnum.PEAK} />,
   },
   {
-    value: FilterTypeEnum.NO,
-    display: <FilterTypeIcon type={FilterTypeEnum.NO} />,
+    value: FilterTypeEnum.LP,
+    display: <FilterTypeIcon type={FilterTypeEnum.LP} />,
   },
   {
-    value: 'test',
-    display: 'Test',
+    value: FilterTypeEnum.HP,
+    display: <FilterTypeIcon type={FilterTypeEnum.HP} />,
+  },
+  {
+    value: FilterTypeEnum.LS,
+    display: <FilterTypeIcon type={FilterTypeEnum.LS} />,
+  },
+  {
+    value: FilterTypeEnum.HS,
+    display: <FilterTypeIcon type={FilterTypeEnum.HS} />,
+  },
+  {
+    value: FilterTypeEnum.NO,
+    display: <FilterTypeIcon type={FilterTypeEnum.NO} />,
   },
 ];
 
