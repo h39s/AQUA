@@ -1,8 +1,8 @@
 const ArrowIcon = ({
-  className,
+  className = '',
   type,
 }: {
-  className: string;
+  className?: string;
   type: 'up' | 'down';
 }) => {
   switch (type) {
