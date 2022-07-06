@@ -1,4 +1,10 @@
-const ArrowIcon = ({ type }: { type: 'up' | 'down' }) => {
+const ArrowIcon = ({
+  className,
+  type,
+}: {
+  className: string;
+  type: 'up' | 'down';
+}) => {
   switch (type) {
     case 'up':
       return (
@@ -8,6 +14,7 @@ const ArrowIcon = ({ type }: { type: 'up' | 'down' }) => {
           viewBox="0 0 28 23"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
+          className={className}
         >
           <g filter="url(#filter0_d_413_31)">
             <path
@@ -62,6 +69,7 @@ const ArrowIcon = ({ type }: { type: 'up' | 'down' }) => {
           viewBox="0 0 28 23"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
+          className={className}
         >
           <g filter="url(#filter0_d_413_49)">
             <path

@@ -13,6 +13,25 @@ export const MIN_QUALITY = 0.001;
 export const MAX_NUM_FILTERS = 20; // TODO: Investigate an appropriate value for this
 export const MIN_NUM_FILTERS = 1;
 
+export enum FilterTypeEnum {
+  PEAK = 'PK', // ["PK",True,True]
+  LPQ = 'LPQ', // ["LPQ",False,True]
+  HPQ = 'HPQ', // ["HPQ",False,True]
+  BP = 'BP', // ["BP",False,True]
+  LS = 'LS', // ["LS",True,False]
+  HS = 'HS', // ["HS",True,False]
+  NO = 'NO', // ["NO",False,True]
+  AP = 'AP', // ["AP",False,True]
+  LSC = 'LSC', // ["LSC",True,True]
+  HSC = 'HSC', // ["HSC",True,True]
+  BWLP = 'BWLP', // ["BWLP",False,True]
+  BWHP = 'BWHP', // ["BWHP",False,True]
+  LRLP = 'LRLP', // ["LRLP",False,True]
+  LRHP = 'LRHP', // ["LRHP",False,True]
+  LSCQ = 'LSCQ', // ["LSCQ",True,True]
+  HSCQ = 'HSCQ', // ["HSCQ",True,True]
+}
+
 /** ----- Peace specific ----- */
 
 // Peace returns numerical values as unsigned integers

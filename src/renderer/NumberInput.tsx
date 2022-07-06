@@ -185,7 +185,7 @@ const NumberInput = ({
   return (
     <label
       htmlFor={name}
-      className="numberInput col center"
+      className="numberInput"
       // the ch unit supposedly uses the '0' as the per character valueLength
       style={{ '--input-width': `${valueLength}ch` } as CSSProperties}
     >

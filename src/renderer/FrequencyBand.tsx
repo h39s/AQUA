@@ -1,5 +1,6 @@
 import { ErrorDescription } from 'common/errors';
 import {
+  FilterTypeEnum,
   MAX_FREQUENCY,
   MAX_GAIN,
   MAX_QUALITY,
@@ -8,6 +9,7 @@ import {
   MIN_QUALITY,
 } from 'common/constants';
 import { useCallback, useContext, useEffect, useState } from 'react';
+import Dropdown from './Dropdown';
 import {
   getFrequency,
   getGain,
@@ -20,6 +22,22 @@ import NumberInput from './NumberInput';
 import { AquaContext } from './AquaContext';
 import Slider from './Slider';
 import './styles/MainContent.scss';
+import FilterTypeIcon from './icons/FilterTypeIcon';
+
+const options = [
+  {
+    value: FilterTypeEnum.PEAK,
+    display: <FilterTypeIcon type={FilterTypeEnum.PEAK} />,
+  },
+  {
+    value: FilterTypeEnum.NO,
+    display: <FilterTypeIcon type={FilterTypeEnum.NO} />,
+  },
+  {
+    value: 'test',
+    display: 'Test',
+  },
+];
 
 interface IFrequencyBandProps {
   sliderIndex: number;
@@ -28,6 +46,7 @@ interface IFrequencyBandProps {
 const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
   const [actualFrequency, setActualFrequency] = useState<number>(0);
   const [actualQuality, setActualQuality] = useState<number>(0);
+  const [filterType, setFilterType] = useState<string>(FilterTypeEnum.PEAK);
 
   const { globalError, setGlobalError } = useContext(AquaContext);
 
@@ -67,6 +86,12 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
 
   return (
     <div className="col band">
+      <Dropdown
+        name={`${actualFrequency}-filter-type`}
+        value={filterType}
+        options={options}
+        handleChange={(newValue) => setFilterType(newValue)}
+      />
       <NumberInput
         value={actualFrequency}
         min={MIN_FREQUENCY}
@@ -84,16 +109,16 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
           getValue={getSliderGain}
           setValue={(newValue: number) => setGain(sliderIndex, newValue)}
         />
-        <NumberInput
-          value={actualQuality}
-          min={MIN_QUALITY}
-          max={MAX_QUALITY}
-          name={`${actualQuality}`}
-          isDisabled={!!globalError}
-          floatPrecision={3}
-          handleSubmit={handleQualitySubmit}
-        />
       </div>
+      <NumberInput
+        value={actualQuality}
+        min={MIN_QUALITY}
+        max={MAX_QUALITY}
+        name={`${actualQuality}`}
+        isDisabled={!!globalError}
+        floatPrecision={3}
+        handleSubmit={handleQualitySubmit}
+      />
     </div>
   );
 };

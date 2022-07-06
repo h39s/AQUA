@@ -1,0 +1,103 @@
+@import 'color';
+@import 'spacing';
+
+.dropdown {
+  select {
+    background: $primary-dark;
+    color: $white;
+    border: solid 2px $secondary-default;
+    border-radius: 4px;
+    padding: $spacing-xs;
+
+    option {
+      padding: 2px;
+
+      &:selected {
+        background: $secondary-dark;
+        color: $white;
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid $white;
+    }
+
+    &:disabled {
+      background: $primary-light;
+      cursor: default;
+    }
+  }
+
+  [role='menu'] {
+    background: $primary-dark;
+    color: $white;
+    border: solid 2px $secondary-default;
+    border-radius: 4px;
+    padding: $spacing-xs;
+    font-size: small;
+    width: 52px;
+    height: 18px;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+
+    &:focus-visible {
+      outline: 2px solid $white;
+    }
+
+    &:disabled {
+      background: $primary-light;
+      cursor: default;
+    }
+
+    svg {
+      width: 36px;
+      height: auto;
+    }
+
+    svg.arrow {
+      width: 12px;
+      height: auto;
+      margin-left: 4px;
+      path {
+        fill: $white;
+      }
+    }
+  }
+
+  ul {
+    // Position the drop down menu
+    position: absolute;
+    margin-block-start: -4px;
+
+    // Remove default styles
+    list-style-type: none;
+    padding-inline-start: 0px;
+
+    // Apply custom styles
+    background: $primary-dark;
+    color: $white;
+    border: solid 2px $secondary-default;
+    border-radius: 4px;
+    width: 60px;
+    text-align: start;
+    z-index: 1;
+
+    li {
+      padding: $spacing-xs;
+      align-content: center;
+      font-size: small;
+
+      &:hover,
+      &:focus-visible {
+        background: $secondary-darker;
+        outline: none;
+      }
+
+      svg {
+        width: 36px;
+        height: auto;
+      }
+    }
+  }
+}
