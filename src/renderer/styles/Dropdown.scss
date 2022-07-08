@@ -88,7 +88,7 @@
       align-content: center;
       font-size: small;
 
-      &:hover,
+      &:focus,
       &:focus-visible {
         background: $secondary-darker;
         outline: none;

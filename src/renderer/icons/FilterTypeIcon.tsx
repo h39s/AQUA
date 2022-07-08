@@ -112,26 +112,32 @@ const FilterTypeIcon = ({ type }: { type: FilterTypeEnum }) => {
 export const FILTER_OPTIONS = [
   {
     value: FilterTypeEnum.PEAK,
+    label: 'Peak Filter',
     display: <FilterTypeIcon type={FilterTypeEnum.PEAK} />,
   },
   {
     value: FilterTypeEnum.LP,
+    label: 'Low Pass Filter',
     display: <FilterTypeIcon type={FilterTypeEnum.LP} />,
   },
   {
     value: FilterTypeEnum.HP,
+    label: 'High Pass Filter',
     display: <FilterTypeIcon type={FilterTypeEnum.HP} />,
   },
   {
     value: FilterTypeEnum.LS,
+    label: 'Low Shelf Filter',
     display: <FilterTypeIcon type={FilterTypeEnum.LS} />,
   },
   {
     value: FilterTypeEnum.HS,
+    label: 'High Shelf Filter',
     display: <FilterTypeIcon type={FilterTypeEnum.HS} />,
   },
   {
     value: FilterTypeEnum.NO,
+    label: 'Notch Filter',
     display: <FilterTypeIcon type={FilterTypeEnum.NO} />,
   },
 ];

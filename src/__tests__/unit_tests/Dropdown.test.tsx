@@ -13,7 +13,7 @@ describe('Dropdown', () => {
     handleChange.mockClear();
   });
 
-  it('should render the dropdown', async () => {
+  it('should render the dropdown and click on an item', async () => {
     const { user } = setup(
       <Dropdown
         name={name}
@@ -29,9 +29,28 @@ describe('Dropdown', () => {
     await user.click(dropdown);
     expect(screen.getByLabelText(`${name}-items`)).toBeInTheDocument();
 
-    const newValue = screen.getByTitle('Notch Filter');
+    const newValue = screen.getByLabelText('Notch Filter');
     expect(newValue).toBeInTheDocument();
     await user.click(newValue);
     expect(handleChange).toHaveBeenCalledWith(FilterTypeEnum.NO);
+  });
+
+  it('should render the dropdown and select an item using keys', async () => {
+    const { user } = setup(
+      <Dropdown
+        name={name}
+        value={FilterTypeEnum.LP}
+        options={FILTER_OPTIONS}
+        handleChange={handleChange}
+      />
+    );
+
+    const dropdown = screen.getByLabelText(name);
+    await user.click(dropdown);
+    const item = screen.getByLabelText('Low Pass Filter');
+    expect(item).toHaveFocus();
+
+    await user.keyboard('{ArrowDown}{Enter}');
+    expect(handleChange).toHaveBeenCalledWith(FilterTypeEnum.HP);
   });
 });
