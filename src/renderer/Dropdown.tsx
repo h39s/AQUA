@@ -1,7 +1,7 @@
-import { ChangeEvent, KeyboardEvent, useMemo, useRef, useState } from 'react';
+import { KeyboardEvent, useMemo, useRef, useState } from 'react';
 import ArrowIcon from './icons/ArrowIcon';
 import './styles/Dropdown.scss';
-import { useClickOutside } from './utils';
+import { useClickOutside, useFocusOutside } from './utils';
 
 interface IOptionEntry {
   value: string;
@@ -15,33 +15,15 @@ interface IDropdownProps {
   handleChange: (newValue: string) => void;
 }
 
-export const SimpleDropdown = ({
-  name,
-  options,
-  value,
-  handleChange,
-}: IDropdownProps) => {
-  const onChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const { value: newValue } = e.target;
-    handleChange(newValue);
-  };
-
-  return (
-    <label htmlFor={name} className="dropdown">
-      <select name={name} aria-label={name} value={value} onChange={onChange}>
-        {options.map((entry: IOptionEntry) => {
-          return <option value={entry.value}>{entry.display}</option>;
-        })}
-      </select>
-    </label>
-  );
-};
-
 const Dropdown = ({ name, options, value, handleChange }: IDropdownProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const labelRef = useRef<HTMLLabelElement>(null);
 
   useClickOutside<HTMLLabelElement>(labelRef, () => {
+    setIsOpen(false);
+  });
+
+  useFocusOutside<HTMLLabelElement>(labelRef, () => {
     setIsOpen(false);
   });
 
@@ -77,6 +59,7 @@ const Dropdown = ({ name, options, value, handleChange }: IDropdownProps) => {
     <label htmlFor={name} ref={labelRef} className="dropdown">
       <div
         role="menu"
+        aria-label={name}
         className="row"
         onClick={toggleIsOpen}
         onKeyDown={listenForEnter}
@@ -86,7 +69,7 @@ const Dropdown = ({ name, options, value, handleChange }: IDropdownProps) => {
         <ArrowIcon type="down" className="arrow" />
       </div>
       {isOpen && (
-        <ul aria-label={name}>
+        <ul aria-label={`${name}-items`}>
           {options.map((entry: IOptionEntry) => {
             return (
               <li

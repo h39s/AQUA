@@ -24,34 +24,7 @@ import NumberInput from './NumberInput';
 import { AquaContext } from './AquaContext';
 import Slider from './Slider';
 import './styles/MainContent.scss';
-import FilterTypeIcon from './icons/FilterTypeIcon';
-
-const options = [
-  {
-    value: FilterTypeEnum.PEAK,
-    display: <FilterTypeIcon type={FilterTypeEnum.PEAK} />,
-  },
-  {
-    value: FilterTypeEnum.LP,
-    display: <FilterTypeIcon type={FilterTypeEnum.LP} />,
-  },
-  {
-    value: FilterTypeEnum.HP,
-    display: <FilterTypeIcon type={FilterTypeEnum.HP} />,
-  },
-  {
-    value: FilterTypeEnum.LS,
-    display: <FilterTypeIcon type={FilterTypeEnum.LS} />,
-  },
-  {
-    value: FilterTypeEnum.HS,
-    display: <FilterTypeIcon type={FilterTypeEnum.HS} />,
-  },
-  {
-    value: FilterTypeEnum.NO,
-    display: <FilterTypeIcon type={FilterTypeEnum.NO} />,
-  },
-];
+import { FILTER_OPTIONS } from './icons/FilterTypeIcon';
 
 interface IFrequencyBandProps {
   sliderIndex: number;
@@ -113,7 +86,7 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
       <Dropdown
         name={`${actualFrequency}-filter-type`}
         value={filterType}
-        options={options}
+        options={FILTER_OPTIONS}
         handleChange={handleFilterTypeSubmit}
       />
       <NumberInput
