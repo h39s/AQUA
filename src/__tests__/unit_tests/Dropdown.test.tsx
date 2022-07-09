@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { act, screen } from '@testing-library/react';
 import { setup } from '../utils/userEventUtils';
-import Dropdown from '../../renderer/Dropdown';
+import Dropdown from '../../renderer/widgets/Dropdown';
 import { FILTER_OPTIONS } from '../../renderer/icons/FilterTypeIcon';
 import { FilterTypeEnum } from '../../common/constants';
 

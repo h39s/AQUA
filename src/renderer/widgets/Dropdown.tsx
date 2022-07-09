@@ -7,9 +7,9 @@ import {
   useState,
   createElement,
 } from 'react';
-import ArrowIcon from './icons/ArrowIcon';
-import './styles/Dropdown.scss';
-import { useClickOutside, useFocusOutside } from './utils';
+import ArrowIcon from '../icons/ArrowIcon';
+import '../styles/Dropdown.scss';
+import { useClickOutside, useFocusOutside } from '../utils/utils';
 
 interface IOptionEntry {
   value: string;

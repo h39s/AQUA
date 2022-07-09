@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { fireEvent, screen } from '@testing-library/react';
 import { setup } from '__tests__/utils/userEventUtils';
-import RangeInput from '../../renderer/RangeInput';
+import RangeInput from '../../renderer/widgets/RangeInput';
 
 describe('RangeInput', () => {
   const name = 'Range Input';

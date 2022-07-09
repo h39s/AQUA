@@ -1,4 +1,4 @@
-import Button from './Button';
+import Button from './widgets/Button';
 import './styles/Modal.scss';
 
 interface IPrereqMissingModalProps {

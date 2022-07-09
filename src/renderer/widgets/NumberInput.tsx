@@ -9,8 +9,8 @@ import {
   useState,
 } from 'react';
 import ArrowButton from './ArrowButton';
-import './styles/NumberInput.scss';
-import { clamp } from './utils';
+import '../styles/NumberInput.scss';
+import { clamp } from '../utils/utils';
 
 interface INumberInputProps {
   name: string;

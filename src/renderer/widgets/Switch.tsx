@@ -1,6 +1,6 @@
 import { KeyboardEvent, useEffect, useContext } from 'react';
-import { AquaContext } from './AquaContext';
-import './styles/Switch.scss';
+import { AquaContext } from '../utils/AquaContext';
+import '../styles/Switch.scss';
 
 interface ISwitchProps {
   id: string;

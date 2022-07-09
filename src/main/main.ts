@@ -37,7 +37,7 @@ import {
   MIN_QUALITY,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
-import { TSuccess, TError } from '../renderer/equalizerApi';
+import { TSuccess, TError } from '../renderer/utils/equalizerApi';
 
 export default class AppUpdater {
   constructor() {
