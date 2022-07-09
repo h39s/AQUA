@@ -26,6 +26,7 @@ import { resolveHtmlPath } from './util';
 import { getConfigPath, isEqualizerAPOInstalled } from './registry';
 import ChannelEnum from '../common/channels';
 import {
+  FilterTypeEnum,
   MAX_FREQUENCY,
   MAX_GAIN,
   MAX_NUM_FILTERS,
@@ -265,6 +266,42 @@ ipcMain.on(ChannelEnum.SET_FILTER_QUALITY, async (event, arg) => {
   }
 
   state.filters[filterIndex].quality = quality;
+  await handleUpdate(event, channel + filterIndex);
+});
+
+ipcMain.on(ChannelEnum.GET_FILTER_TYPE, async (event, arg) => {
+  const channel = ChannelEnum.GET_FILTER_TYPE;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+
+  // Filter index must be within the length of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  const reply: TSuccess = {
+    result: state.filters[filterIndex].type,
+  };
+  event.reply(channel + filterIndex, reply);
+});
+
+ipcMain.on(ChannelEnum.SET_FILTER_TYPE, async (event, arg) => {
+  const channel = ChannelEnum.SET_FILTER_TYPE;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+  const filterType = arg[1];
+
+  // Filter index must be within the length of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  if (!Object.values(FilterTypeEnum).includes(filterType)) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  state.filters[filterIndex].type = filterType as FilterTypeEnum;
   await handleUpdate(event, channel + filterIndex);
 });
 

@@ -1,0 +1,90 @@
+@import 'color';
+@import 'spacing';
+
+.dropdown {
+  [role='menu'] {
+    background: $primary-dark;
+    color: $white;
+    border: solid 2px $secondary-default;
+    border-radius: 4px;
+    padding: $spacing-xs;
+    font-size: small;
+    width: 52px;
+    height: 18px;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+
+    &:focus-visible {
+      outline: 2px solid $white;
+    }
+
+    &[aria-disabled='true'] {
+      border: 2px solid $primary-lighter;
+      color: $primary-lighter;
+      cursor: default;
+
+      svg {
+        path {
+          stroke: $primary-lighter;
+        }
+
+        &.arrow {
+          path {
+            fill: $primary-lighter;
+          }
+        }
+      }
+    }
+
+    svg {
+      width: 36px;
+      height: auto;
+
+      &.arrow {
+        width: 12px;
+        height: auto;
+        margin-left: 4px;
+        path {
+          fill: $white;
+        }
+      }
+    }
+  }
+
+  ul {
+    // Position the drop down menu
+    position: absolute;
+    margin-block-start: -4px;
+
+    // Remove default styles
+    list-style-type: none;
+    padding-inline-start: 0px;
+
+    // Apply custom styles
+    background: $primary-dark;
+    color: $white;
+    border: solid 2px $secondary-default;
+    border-radius: 4px;
+    width: 60px;
+    text-align: start;
+    z-index: 1;
+
+    li {
+      padding: $spacing-xs;
+      align-content: center;
+      font-size: small;
+
+      &:focus,
+      &:focus-visible {
+        background: $secondary-darker;
+        outline: none;
+      }
+
+      svg {
+        width: 36px;
+        height: auto;
+      }
+    }
+  }
+}

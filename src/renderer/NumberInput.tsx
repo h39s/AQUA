@@ -119,7 +119,7 @@ const NumberInput = ({
     }
 
     // Prevent user from typing numbers that are too large or use more than 7 characters
-    if (Math.abs(num) > 10000 || input.length > 7) {
+    if (Math.abs(num) >= 100000 || input.length > 7) {
       return;
     }
 
@@ -185,7 +185,7 @@ const NumberInput = ({
   return (
     <label
       htmlFor={name}
-      className="numberInput col center"
+      className="numberInput"
       // the ch unit supposedly uses the '0' as the per character valueLength
       style={{ '--input-width': `${valueLength}ch` } as CSSProperties}
     >

@@ -1,18 +1,22 @@
 @import './constant';
 @import './spacing';
 
-$band-height: 344px;
+$band-height: 382px;
 $band-width: 64px;
 
 .mainContent {
   height: 100%;
   width: $content-width;
-  justify-content: space-evenly;
+  display: grid;
+  grid-template-columns: 128px 1fr 48px;
+  grid-template-rows: 100%;
+  gap: $spacing-s;
+  justify-items: center;
 
   .bandLabel {
     height: $band-height;
     justify-content: flex-start;
-    gap: 8px;
+    gap: $spacing-s;
 
     div {
       justify-content: space-around;
@@ -24,6 +28,20 @@ $band-width: 64px;
     }
   }
 
+  .bands {
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    gap: $spacing-s;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    &::before,
+    &::after {
+      content: ' '; /* Insert space before the first item and after the last one */
+    }
+  }
+
   .band {
     height: $band-height;
     width: $band-width;
@@ -32,11 +50,7 @@ $band-width: 64px;
 
   .sliderButtons {
     height: $band-height;
-    padding-top: 90px;
-    div {
-      margin-top: $spacing-xs;
-      margin-bottom: $spacing-xs;
-    }
+    gap: $spacing-xs;
 
     .sliderButton {
       height: 100px;

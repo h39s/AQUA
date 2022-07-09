@@ -55,12 +55,15 @@ const MainContent = () => {
   };
 
   return (
-    <div className="row center mainContent">
+    <>
       {sliderIndices.length === 0 ? (
-        <h1>Loading...</h1>
+        <div className="center full row">
+          <h1>Loading...</h1>
+        </div>
       ) : (
-        <>
+        <div className="center mainContent">
           <div className="col center bandLabel">
+            <span className="rowLabel">Filter Type</span>
             <span className="rowLabel">Frequency (Hz)</span>
             <div className="col">
               <span>30dB</span>
@@ -70,13 +73,15 @@ const MainContent = () => {
             <span className="rowLabel">Gain (dB)</span>
             <span className="rowLabel">Quality</span>
           </div>
-          {sliderIndices.map((sliderIndex) => (
-            <FrequencyBand
-              sliderIndex={sliderIndex}
-              key={`slider-${sliderIndex}`}
-            />
-          ))}
-          <div className="col sliderButtons">
+          <div className="bands row center">
+            {sliderIndices.map((sliderIndex) => (
+              <FrequencyBand
+                sliderIndex={sliderIndex}
+                key={`slider-${sliderIndex}`}
+              />
+            ))}
+          </div>
+          <div className="col center sliderButtons">
             <Button
               ariaLabel="Add Equalizer Slider"
               isDisabled={sliderIndices.length >= MAX_NUM_FILTERS}
@@ -94,9 +99,9 @@ const MainContent = () => {
               <MinusIcon />
             </Button>
           </div>
-        </>
+        </div>
       )}
-    </div>
+    </>
   );
 };
 

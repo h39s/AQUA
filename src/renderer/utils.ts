@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { RefObject, useEffect, useMemo, useRef } from 'react';
 
 export const clamp = (num: number, min: number, max: number) => {
   return Math.min(Math.max(num, min), max);
@@ -39,4 +39,47 @@ export const useThrottle = <Type>(
     lastCalled.current = now;
     fn(arg);
   };
+};
+
+// https://github.com/teetotum/react-attached-properties/blob/master/examples/useClickOutside.js
+export const useClickOutside = <T extends HTMLElement = HTMLElement>(
+  ref: RefObject<T>,
+  callback: () => void
+) => {
+  const handleClick = useMemo(() => {
+    return (e: globalThis.MouseEvent) => {
+      if (!ref.current || ref.current.contains(e.target as Node)) {
+        return;
+      }
+
+      callback();
+    };
+  }, [callback, ref]);
+
+  useEffect(() => {
+    document.addEventListener('click', handleClick, true);
+
+    return () => document.removeEventListener('click', handleClick, true);
+  }, [handleClick]);
+};
+
+export const useFocusOutside = <T extends HTMLElement = HTMLElement>(
+  ref: RefObject<T>,
+  callback: () => void
+) => {
+  const handleFocus = useMemo(() => {
+    return (e: globalThis.FocusEvent) => {
+      if (!ref.current || ref.current.contains(e.target as Node)) {
+        return;
+      }
+
+      callback();
+    };
+  }, [callback, ref]);
+
+  useEffect(() => {
+    document.addEventListener('focusin', handleFocus, true);
+
+    return () => document.removeEventListener('focusin', handleFocus, true);
+  }, [handleFocus]);
 };

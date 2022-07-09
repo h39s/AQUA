@@ -13,6 +13,25 @@ export const MIN_QUALITY = 0.001;
 export const MAX_NUM_FILTERS = 20; // TODO: Investigate an appropriate value for this
 export const MIN_NUM_FILTERS = 1;
 
+// Need to use LPQ and HPQ to allow users to adjust quality for low/high pass filters
+// Need to use LSC and HSC to allow users to adjust quality for low/high shelf filters
+export enum FilterTypeEnum {
+  PEAK = 'PK', // Peak ["PK",True,True] - Implemented
+  LPQ = 'LPQ', // Low Pass ["LPQ",False,True] - Implemented
+  HPQ = 'HPQ', // High Pass ["HPQ",False,True] - Implemented
+  BP = 'BP', // Band Pass ["BP",False,True]
+  NO = 'NO', // Notch ["NO",False,True] - Implemented
+  AP = 'AP', // All Pass ["AP",False,True]
+  LSC = 'LSC', // Low Shelf ["LSC",True,True] - Implemented
+  HSC = 'HSC', // High Shelf ["HSC",True,True] - Implemented
+  BWLP = 'BWLP', // Butterworth Low Pass ["BWLP",False,True]
+  BWHP = 'BWHP', // Butterworth High Pass ["BWHP",False,True]
+  LRLP = 'LRLP', // Linkwitz Riley Low Pass ["LRLP",False,True]
+  LRHP = 'LRHP', // Linkwitz Riley High Pass["LRHP",False,True]
+  LSCQ = 'LSCQ', // Low Shelf Q?? ["LSCQ",True,True]
+  HSCQ = 'HSCQ', // High Shelf Q?? ["HSCQ",True,True]
+}
+
 /** ----- Peace specific ----- */
 
 // Peace returns numerical values as unsigned integers
