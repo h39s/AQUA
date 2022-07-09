@@ -5,6 +5,7 @@ import {
   useMemo,
   useRef,
   useState,
+  createElement,
 } from 'react';
 import ArrowIcon from './icons/ArrowIcon';
 import './styles/Dropdown.scss';
@@ -31,6 +32,7 @@ const Dropdown = ({
   isDisabled,
   handleChange,
 }: IDropdownProps) => {
+  const nullElement = createElement('div');
   const inputRefs = useMemo(
     () =>
       Array(options.length)
@@ -71,7 +73,7 @@ const Dropdown = ({
 
   const selectedEntry = useMemo(
     // Default to the first option if the value isn't valid
-    () => (options.find((e) => e.value === value) || options[0]).display,
+    () => options.find((e) => e.value === value)?.display,
     [options, value]
   );
 
@@ -130,7 +132,7 @@ const Dropdown = ({
         onKeyDown={listenForEnter}
         tabIndex={isDisabled ? -1 : 0}
       >
-        {selectedEntry}
+        {selectedEntry || nullElement}
         <ArrowIcon type="down" className="arrow" />
       </div>
       {isOpen && (
