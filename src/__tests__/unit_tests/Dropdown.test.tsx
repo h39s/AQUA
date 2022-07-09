@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { setup } from '../utils/userEventUtils';
 import Dropdown from '../../renderer/Dropdown';
 import { FILTER_OPTIONS } from '../../renderer/icons/FilterTypeIcon';
@@ -39,7 +39,7 @@ describe('Dropdown', () => {
     const { user } = setup(
       <Dropdown
         name={name}
-        value={FilterTypeEnum.LP}
+        value={FilterTypeEnum.LPQ}
         options={FILTER_OPTIONS}
         handleChange={handleChange}
       />
@@ -51,6 +51,53 @@ describe('Dropdown', () => {
     expect(item).toHaveFocus();
 
     await user.keyboard('{ArrowDown}{Enter}');
-    expect(handleChange).toHaveBeenCalledWith(FilterTypeEnum.HP);
+    expect(handleChange).toHaveBeenCalledWith(FilterTypeEnum.HPQ);
+  });
+
+  it('should close the dropdown when clicking outside', async () => {
+    const { user } = setup(
+      <div>
+        <Dropdown
+          name={name}
+          value={FilterTypeEnum.PEAK}
+          options={FILTER_OPTIONS}
+          handleChange={handleChange}
+        />
+        <div>Outside</div>
+      </div>
+    );
+
+    const dropdown = screen.getByLabelText(name);
+    await user.click(dropdown);
+    const item = screen.getByLabelText('Peak Filter');
+    expect(item).toHaveFocus();
+
+    await user.click(screen.getByText('Outside'));
+    expect(item).not.toBeInTheDocument();
+  });
+
+  it('should close the dropdown when focus moves outside', async () => {
+    const { user } = setup(
+      <div>
+        <Dropdown
+          name={name}
+          value={FilterTypeEnum.PEAK}
+          options={FILTER_OPTIONS}
+          handleChange={handleChange}
+        />
+        <button type="button">Outside</button>
+      </div>
+    );
+
+    const dropdown = screen.getByLabelText(name);
+    await user.click(dropdown);
+    const item = screen.getByLabelText('Peak Filter');
+    expect(item).toHaveFocus();
+
+    // Need this because the focus triggers a state update and so we need to wait
+    act(() => {
+      screen.getByText('Outside').focus();
+    });
+    expect(item).not.toBeInTheDocument();
   });
 });

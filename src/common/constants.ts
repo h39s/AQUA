@@ -13,19 +13,17 @@ export const MIN_QUALITY = 0.001;
 export const MAX_NUM_FILTERS = 20; // TODO: Investigate an appropriate value for this
 export const MIN_NUM_FILTERS = 1;
 
+// Need to use LPQ and HPQ to allow users to adjust quality for low/high pass filters
+// Need to use LSC and HSC to allow users to adjust quality for low/high shelf filters
 export enum FilterTypeEnum {
-  PEAK = 'PK', // Peak ["PK",True,True]
-  LP = 'LP', // Low Pass
-  HP = 'HP', // High Pass
-  LPQ = 'LPQ', // ?? ["LPQ",False,True]
-  HPQ = 'HPQ', // ?? ["HPQ",False,True]
+  PEAK = 'PK', // Peak ["PK",True,True] - Implemented
+  LPQ = 'LPQ', // Low Pass ["LPQ",False,True] - Implemented
+  HPQ = 'HPQ', // High Pass ["HPQ",False,True] - Implemented
   BP = 'BP', // Band Pass ["BP",False,True]
-  LS = 'LS', // Low Shelf ["LS",True,False]
-  HS = 'HS', // High Shelf ["HS",True,False]
-  NO = 'NO', // Notch ["NO",False,True]
+  NO = 'NO', // Notch ["NO",False,True] - Implemented
   AP = 'AP', // All Pass ["AP",False,True]
-  LSC = 'LSC', // Low Shelf DB?? ["LSC",True,True]
-  HSC = 'HSC', // High Shelf DB?? ["HSC",True,True]
+  LSC = 'LSC', // Low Shelf ["LSC",True,True] - Implemented
+  HSC = 'HSC', // High Shelf ["HSC",True,True] - Implemented
   BWLP = 'BWLP', // Butterworth Low Pass ["BWLP",False,True]
   BWHP = 'BWHP', // Butterworth High Pass ["BWHP",False,True]
   LRLP = 'LRLP', // Linkwitz Riley Low Pass ["LRLP",False,True]

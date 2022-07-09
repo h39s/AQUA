@@ -19,7 +19,7 @@ const FilterTypeIcon = ({ type }: { type: FilterTypeEnum }) => {
           />
         </svg>
       );
-    case FilterTypeEnum.LP:
+    case FilterTypeEnum.LPQ:
       return (
         <svg
           width="32"
@@ -36,7 +36,7 @@ const FilterTypeIcon = ({ type }: { type: FilterTypeEnum }) => {
           />
         </svg>
       );
-    case FilterTypeEnum.HP:
+    case FilterTypeEnum.HPQ:
       return (
         <svg
           width="32"
@@ -53,7 +53,7 @@ const FilterTypeIcon = ({ type }: { type: FilterTypeEnum }) => {
           />
         </svg>
       );
-    case FilterTypeEnum.LS:
+    case FilterTypeEnum.LSC:
       return (
         <svg
           width="32"
@@ -70,7 +70,7 @@ const FilterTypeIcon = ({ type }: { type: FilterTypeEnum }) => {
           />
         </svg>
       );
-    case FilterTypeEnum.HS:
+    case FilterTypeEnum.HSC:
       return (
         <svg
           width="32"
@@ -116,24 +116,24 @@ export const FILTER_OPTIONS = [
     display: <FilterTypeIcon type={FilterTypeEnum.PEAK} />,
   },
   {
-    value: FilterTypeEnum.LP,
+    value: FilterTypeEnum.LPQ,
     label: 'Low Pass Filter',
-    display: <FilterTypeIcon type={FilterTypeEnum.LP} />,
+    display: <FilterTypeIcon type={FilterTypeEnum.LPQ} />,
   },
   {
-    value: FilterTypeEnum.HP,
+    value: FilterTypeEnum.HPQ,
     label: 'High Pass Filter',
-    display: <FilterTypeIcon type={FilterTypeEnum.HP} />,
+    display: <FilterTypeIcon type={FilterTypeEnum.HPQ} />,
   },
   {
-    value: FilterTypeEnum.LS,
+    value: FilterTypeEnum.LSC,
     label: 'Low Shelf Filter',
-    display: <FilterTypeIcon type={FilterTypeEnum.LS} />,
+    display: <FilterTypeIcon type={FilterTypeEnum.LSC} />,
   },
   {
-    value: FilterTypeEnum.HS,
+    value: FilterTypeEnum.HSC,
     label: 'High Shelf Filter',
-    display: <FilterTypeIcon type={FilterTypeEnum.HS} />,
+    display: <FilterTypeIcon type={FilterTypeEnum.HSC} />,
   },
   {
     value: FilterTypeEnum.NO,

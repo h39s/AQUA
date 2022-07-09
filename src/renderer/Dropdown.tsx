@@ -32,25 +32,33 @@ const Dropdown = ({ name, options, value, handleChange }: IDropdownProps) => {
     [options]
   );
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const labelRef = useRef<HTMLLabelElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen) {
-      const index = options.findIndex((entry) => entry.value === value);
+      // Focus on the selected dropdown item when opened
+      const index = Math.max(
+        options.findIndex((entry) => entry.value === value),
+        // Default to the first option if the value isn't valid
+        0
+      );
       inputRefs[index].current?.focus();
     }
   }, [inputRefs, isOpen, options, value]);
 
-  useClickOutside<HTMLLabelElement>(labelRef, () => {
+  // Close the dropdown if the user clicks outside of the dropdown
+  useClickOutside<HTMLDivElement>(dropdownRef, () => {
     setIsOpen(false);
   });
 
-  useFocusOutside<HTMLLabelElement>(labelRef, () => {
+  // Close the dropdown if the user tabs outside of the dropdown
+  useFocusOutside<HTMLDivElement>(dropdownRef, () => {
     setIsOpen(false);
   });
 
   const selectedEntry = useMemo(
-    () => options.find((e) => e.value === value)?.display,
+    // Default to the first option if the value isn't valid
+    () => (options.find((e) => e.value === value) || options[0]).display,
     [options, value]
   );
 
@@ -86,7 +94,7 @@ const Dropdown = ({ name, options, value, handleChange }: IDropdownProps) => {
   };
 
   return (
-    <label htmlFor={name} ref={labelRef} className="dropdown">
+    <div ref={dropdownRef} className="dropdown">
       <div
         role="menu"
         aria-label={name}
@@ -120,7 +128,7 @@ const Dropdown = ({ name, options, value, handleChange }: IDropdownProps) => {
           })}
         </ul>
       )}
-    </label>
+    </div>
   );
 };
 

@@ -57,7 +57,9 @@ const MainContent = () => {
   return (
     <>
       {sliderIndices.length === 0 ? (
-        <h1>Loading...</h1>
+        <div className="center row">
+          <h1>Loading...</h1>
+        </div>
       ) : (
         <div className="center mainContent">
           <div className="col center bandLabel">

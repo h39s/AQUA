@@ -72,11 +72,12 @@ const buildResponseHandler = <Type extends string | number | boolean | void>(
   };
 };
 
-const simpleResponseHandler = buildResponseHandler<number>(
-  (result, resolve) => {
+const simpleResponseHandler = <
+  Type extends string | number | boolean | void
+>() =>
+  buildResponseHandler<Type>((result, resolve) => {
     resolve(result);
-  }
-);
+  });
 
 const setterResponseHandler = buildResponseHandler<void>((_result, resolve) =>
   resolve()
@@ -120,10 +121,7 @@ export const getEqualizerStatus = (): Promise<boolean> => {
   const channel = ChannelEnum.GET_ENABLE;
   window.electron.ipcRenderer.sendMessage(channel, []);
 
-  const responseHandler = buildResponseHandler<boolean>((result, resolve) =>
-    resolve(result)
-  );
-  return promisifyResult(responseHandler, channel);
+  return promisifyResult(simpleResponseHandler<boolean>(), channel);
 };
 
 /**
@@ -133,7 +131,7 @@ export const getEqualizerStatus = (): Promise<boolean> => {
 export const getMainPreAmp = (): Promise<number> => {
   const channel = ChannelEnum.GET_PREAMP;
   window.electron.ipcRenderer.sendMessage(channel, []);
-  return promisifyResult(simpleResponseHandler, channel);
+  return promisifyResult(simpleResponseHandler<number>(), channel);
 };
 
 /**
@@ -159,7 +157,7 @@ export const setMainPreAmp = (gain: number) => {
 export const getGain = (index: number): Promise<number> => {
   const channel = ChannelEnum.GET_FILTER_GAIN;
   window.electron.ipcRenderer.sendMessage(channel, [index]);
-  return promisifyResult(simpleResponseHandler, channel + index);
+  return promisifyResult(simpleResponseHandler<number>(), channel + index);
 };
 
 /**
@@ -186,7 +184,7 @@ export const setGain = (index: number, gain: number) => {
 export const getFrequency = (index: number): Promise<number> => {
   const channel = ChannelEnum.GET_FILTER_FREQUENCY;
   window.electron.ipcRenderer.sendMessage(channel, [index]);
-  return promisifyResult(simpleResponseHandler, channel + index);
+  return promisifyResult(simpleResponseHandler<number>(), channel + index);
 };
 
 /**
@@ -213,7 +211,7 @@ export const setFrequency = (index: number, frequency: number) => {
 export const getQuality = (index: number): Promise<number> => {
   const channel = ChannelEnum.GET_FILTER_QUALITY;
   window.electron.ipcRenderer.sendMessage(channel, [index]);
-  return promisifyResult(simpleResponseHandler, channel + index);
+  return promisifyResult(simpleResponseHandler<number>(), channel + index);
 };
 
 /**
@@ -241,9 +239,7 @@ export const getType = (index: number): Promise<FilterTypeEnum> => {
   const channel = ChannelEnum.GET_FILTER_TYPE;
   window.electron.ipcRenderer.sendMessage(channel, [index]);
   return promisifyResult<FilterTypeEnum>(
-    buildResponseHandler<FilterTypeEnum>((result, resolve) => {
-      resolve(result);
-    }),
+    simpleResponseHandler<FilterTypeEnum>(),
     channel + index
   );
 };
@@ -266,7 +262,7 @@ export const setType = (index: number, filterType: string) => {
 export const getEqualizerSliderCount = (): Promise<number> => {
   const channel = ChannelEnum.GET_FILTER_COUNT;
   window.electron.ipcRenderer.sendMessage(channel, []);
-  return promisifyResult(simpleResponseHandler, channel);
+  return promisifyResult(simpleResponseHandler<number>(), channel);
 };
 
 /**
