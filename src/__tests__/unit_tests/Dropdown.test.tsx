@@ -19,6 +19,7 @@ describe('Dropdown', () => {
         name={name}
         value={FilterTypeEnum.PEAK}
         options={FILTER_OPTIONS}
+        isDisabled={false}
         handleChange={handleChange}
       />
     );
@@ -41,6 +42,7 @@ describe('Dropdown', () => {
         name={name}
         value={FilterTypeEnum.LPQ}
         options={FILTER_OPTIONS}
+        isDisabled={false}
         handleChange={handleChange}
       />
     );
@@ -54,6 +56,24 @@ describe('Dropdown', () => {
     expect(handleChange).toHaveBeenCalledWith(FilterTypeEnum.HPQ);
   });
 
+  it('should disable the dropdown', async () => {
+    const { user } = setup(
+      <Dropdown
+        name={name}
+        value={FilterTypeEnum.LPQ}
+        options={FILTER_OPTIONS}
+        isDisabled
+        handleChange={handleChange}
+      />
+    );
+
+    const value = screen.getByTitle('Low Pass Filter');
+    expect(value).toBeInTheDocument();
+    const dropdown = screen.getByLabelText(name);
+    await user.click(dropdown);
+    expect(screen.queryByLabelText('Low Pass Filter')).not.toBeInTheDocument();
+  });
+
   it('should close the dropdown when clicking outside', async () => {
     const { user } = setup(
       <div>
@@ -61,6 +81,7 @@ describe('Dropdown', () => {
           name={name}
           value={FilterTypeEnum.PEAK}
           options={FILTER_OPTIONS}
+          isDisabled={false}
           handleChange={handleChange}
         />
         <div>Outside</div>
@@ -83,6 +104,7 @@ describe('Dropdown', () => {
           name={name}
           value={FilterTypeEnum.PEAK}
           options={FILTER_OPTIONS}
+          isDisabled={false}
           handleChange={handleChange}
         />
         <button type="button">Outside</button>

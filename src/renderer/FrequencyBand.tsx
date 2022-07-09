@@ -87,6 +87,7 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
         name={`${actualFrequency}-filter-type`}
         value={filterType}
         options={FILTER_OPTIONS}
+        isDisabled={!!globalError}
         handleChange={handleFilterTypeSubmit}
       />
       <NumberInput

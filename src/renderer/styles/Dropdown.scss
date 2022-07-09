@@ -2,32 +2,6 @@
 @import 'spacing';
 
 .dropdown {
-  select {
-    background: $primary-dark;
-    color: $white;
-    border: solid 2px $secondary-default;
-    border-radius: 4px;
-    padding: $spacing-xs;
-
-    option {
-      padding: 2px;
-
-      &:selected {
-        background: $secondary-dark;
-        color: $white;
-      }
-    }
-
-    &:focus-visible {
-      outline: 2px solid $white;
-    }
-
-    &:disabled {
-      background: $primary-light;
-      cursor: default;
-    }
-  }
-
   [role='menu'] {
     background: $primary-dark;
     color: $white;
@@ -45,22 +19,35 @@
       outline: 2px solid $white;
     }
 
-    &:disabled {
-      background: $primary-light;
+    &[aria-disabled='true'] {
+      border: 2px solid $primary-lighter;
+      color: $primary-lighter;
       cursor: default;
+
+      svg {
+        path {
+          stroke: $primary-lighter;
+        }
+
+        &.arrow {
+          path {
+            fill: $primary-lighter;
+          }
+        }
+      }
     }
 
     svg {
       width: 36px;
       height: auto;
-    }
 
-    svg.arrow {
-      width: 12px;
-      height: auto;
-      margin-left: 4px;
-      path {
-        fill: $white;
+      &.arrow {
+        width: 12px;
+        height: auto;
+        margin-left: 4px;
+        path {
+          fill: $white;
+        }
       }
     }
   }

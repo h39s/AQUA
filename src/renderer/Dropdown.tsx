@@ -20,10 +20,17 @@ interface IDropdownProps {
   name: string;
   options: IOptionEntry[];
   value: string;
+  isDisabled: boolean;
   handleChange: (newValue: string) => void;
 }
 
-const Dropdown = ({ name, options, value, handleChange }: IDropdownProps) => {
+const Dropdown = ({
+  name,
+  options,
+  value,
+  isDisabled,
+  handleChange,
+}: IDropdownProps) => {
   const inputRefs = useMemo(
     () =>
       Array(options.length)
@@ -33,6 +40,12 @@ const Dropdown = ({ name, options, value, handleChange }: IDropdownProps) => {
   );
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isDisabled) {
+      setIsOpen(false);
+    }
+  }, [isDisabled]);
 
   useEffect(() => {
     if (isOpen) {
@@ -66,7 +79,17 @@ const Dropdown = ({ name, options, value, handleChange }: IDropdownProps) => {
     setIsOpen(!isOpen);
   };
 
+  const handleClick = () => {
+    if (isDisabled) {
+      return;
+    }
+    toggleIsOpen();
+  };
+
   const listenForEnter = (e: KeyboardEvent) => {
+    if (isDisabled) {
+      return;
+    }
     if (e.code === 'Enter') {
       toggleIsOpen();
     }
@@ -82,6 +105,9 @@ const Dropdown = ({ name, options, value, handleChange }: IDropdownProps) => {
     entry: IOptionEntry,
     index: number
   ) => {
+    if (isDisabled) {
+      return;
+    }
     if (e.code === 'Enter') {
       onChange(entry.value);
     } else if (e.code === 'ArrowDown') {
@@ -98,10 +124,11 @@ const Dropdown = ({ name, options, value, handleChange }: IDropdownProps) => {
       <div
         role="menu"
         aria-label={name}
+        aria-disabled={isDisabled}
         className="row"
-        onClick={toggleIsOpen}
+        onClick={handleClick}
         onKeyDown={listenForEnter}
-        tabIndex={0}
+        tabIndex={isDisabled ? -1 : 0}
       >
         {selectedEntry}
         <ArrowIcon type="down" className="arrow" />
