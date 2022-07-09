@@ -57,7 +57,7 @@ const MainContent = () => {
   return (
     <>
       {sliderIndices.length === 0 ? (
-        <div className="center row">
+        <div className="center full row">
           <h1>Loading...</h1>
         </div>
       ) : (

@@ -12,6 +12,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 0px;
 
   #root {
     height: 100%;
@@ -41,24 +42,23 @@ body {
   text-align: center;
 }
 
-/* width */
+/** Scrollbar styles */
 ::-webkit-scrollbar {
-  width: 4px;
+  height: 8px;
 }
 
-/* Track */
+// Scrollbar track
 ::-webkit-scrollbar-track {
   border-radius: 8px;
   background: $primary-lighter;
 }
 
-/* Handle */
+// Scrollbar handle
 ::-webkit-scrollbar-thumb {
   border-radius: 8px;
   background: $primary-light;
-}
 
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: $primary-default;
+  &:hover {
+    background: $primary-default;
+  }
 }
