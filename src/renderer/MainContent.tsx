@@ -1,5 +1,6 @@
 import { ErrorDescription } from 'common/errors';
 import { MAX_NUM_FILTERS, MIN_NUM_FILTERS } from 'common/constants';
+import portfolio from './graph/portfolio.json';
 import {
   addEqualizerSlider,
   removeEqualizerSlider,
@@ -10,6 +11,7 @@ import PlusIcon from './icons/PlusIcon';
 import Button from './widgets/Button';
 import { FilterActionEnum, useAquaContext } from './utils/AquaContext';
 import './styles/MainContent.scss';
+import MultilineChart from './graph/MultilineChart';
 
 const MainContent = () => {
   const { filters, dispatchFilter, setGlobalError } = useAquaContext();
@@ -31,6 +33,24 @@ const MainContent = () => {
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
+  };
+
+  const portfolioData = {
+    name: 'Portfolio',
+    color: '#ffffff',
+    items: portfolio.map((d) => ({ ...d, date: new Date(d.date) })),
+  };
+  const chartData = [portfolioData];
+
+  const dimensions = {
+    width: 630,
+    height: 300,
+    margin: {
+      top: 30,
+      right: 30,
+      bottom: 30,
+      left: 30,
+    },
   };
 
   return (
