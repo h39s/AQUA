@@ -1,11 +1,10 @@
 /*
  * @jest-environment node
  */
-// This is necessary so that calling regedit works correctly in the test environment
-// Specifically, setImmediate function becomes defined.
+// This is necessary so that jest and regedit works correctly in the test environment
+// Specifically, functions getRandomValues and setImmediate become well defined.
 
 import { loadFeature, defineFeature } from 'jest-cucumber';
-import getRandomValuesPolyPony from 'get-random-values-polypony'; // Need this to fix jest-cucumber's reliance on uuid's getRandomValues
 import {
   Driver,
   startChromeDriver,
@@ -15,9 +14,6 @@ import { givenAquaIsRunning } from './shared_steps/aqua';
 import { whenSetFrequencyGain } from './shared_steps/aquaSlider';
 import { thenFrequencyGain } from './shared_steps/config';
 
-// shim the getRandomValues function used in uuid which is used by jest-cucumber
-// so that it works in electron environment.
-getRandomValuesPolyPony.polyfill();
 const chromeDriver = startChromeDriver();
 
 const feature = loadFeature(
