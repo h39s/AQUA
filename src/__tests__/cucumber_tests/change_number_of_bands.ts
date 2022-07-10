@@ -17,7 +17,7 @@ import { thenFrequencyGain } from './shared_steps/config';
 const chromeDriver = startChromeDriver();
 
 const feature = loadFeature(
-  './src/__tests__/cucumber_tests/features/set_band_gain.feature'
+  './src/__tests__/cucumber_tests/features/change_number_of_bands.feature'
 );
 const webdriver: { driver: Driver } = { driver: undefined };
 

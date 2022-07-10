@@ -113,29 +113,24 @@ export const flush = (state: IState, configDirPath: string) => {
   }
 };
 
-export const checkConfigFile = (configPath: string) => {
+export const checkConfigFile = (configDirPath: string) => {
+  const configPath = addFileToPath(configDirPath, CONFIG_FILENAME);
   try {
-    const content = fs.readFileSync(
-      addFileToPath(configPath, CONFIG_FILENAME),
-      {
-        encoding: 'utf8',
-      }
-    );
+    const content = fs.readFileSync(configPath, {
+      encoding: 'utf8',
+    });
     return content.search(CONFIG_CONTENT) !== -1;
   } catch (ex) {
     throw new Error(`Unable to locate config file at ${configPath}`);
   }
 };
 
-export const updateConfig = (configPath: string) => {
+export const updateConfig = (configDirPath: string) => {
+  const configPath = addFileToPath(configDirPath, CONFIG_FILENAME);
   try {
-    fs.writeFileSync(
-      addFileToPath(configPath, CONFIG_FILENAME),
-      CONFIG_CONTENT,
-      {
-        encoding: 'utf8',
-      }
-    );
+    fs.writeFileSync(configPath, CONFIG_CONTENT, {
+      encoding: 'utf8',
+    });
   } catch (ex) {
     throw new Error(`Unable to locate config file at ${configPath}`);
   }

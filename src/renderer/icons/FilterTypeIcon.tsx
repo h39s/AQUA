@@ -1,4 +1,4 @@
-import { FilterTypeEnum } from 'common/constants';
+import { FilterTypeEnum, FilterTypeToLabelMap } from 'common/constants';
 
 const FilterTypeIcon = ({ type }: { type: FilterTypeEnum }) => {
   switch (type) {
@@ -109,37 +109,14 @@ const FilterTypeIcon = ({ type }: { type: FilterTypeEnum }) => {
   }
 };
 
-export const FILTER_OPTIONS = [
-  {
-    value: FilterTypeEnum.PEAK,
-    label: 'Peak Filter',
-    display: <FilterTypeIcon type={FilterTypeEnum.PEAK} />,
-  },
-  {
-    value: FilterTypeEnum.LPQ,
-    label: 'Low Pass Filter',
-    display: <FilterTypeIcon type={FilterTypeEnum.LPQ} />,
-  },
-  {
-    value: FilterTypeEnum.HPQ,
-    label: 'High Pass Filter',
-    display: <FilterTypeIcon type={FilterTypeEnum.HPQ} />,
-  },
-  {
-    value: FilterTypeEnum.LSC,
-    label: 'Low Shelf Filter',
-    display: <FilterTypeIcon type={FilterTypeEnum.LSC} />,
-  },
-  {
-    value: FilterTypeEnum.HSC,
-    label: 'High Shelf Filter',
-    display: <FilterTypeIcon type={FilterTypeEnum.HSC} />,
-  },
-  {
-    value: FilterTypeEnum.NO,
-    label: 'Notch Filter',
-    display: <FilterTypeIcon type={FilterTypeEnum.NO} />,
-  },
-];
+export const FILTER_OPTIONS = Object.values(FilterTypeEnum).map(
+  (filterType: FilterTypeEnum) => {
+    return {
+      value: filterType,
+      label: FilterTypeToLabelMap[filterType],
+      display: <FilterTypeIcon type={filterType} />,
+    };
+  }
+);
 
 export default FilterTypeIcon;

@@ -126,18 +126,42 @@ export const thenFrequencyGain = (
 
 export const thenFrequencyQuality = (
   then: DefineStepFunction,
-  webdriver: { driver: Driver | undefined },
-  config: AquaConfig
+  webdriver: { driver: Driver | undefined }
 ) => {
   then(
-    /^Aqua config file show quality of (\d+.?\d+) for frequency (\d+)Hz$/,
-    async (gain: string, frequency: string) => {
+    /^Aqua config file should show a quality of (\d+.?\d+) for the band with frequency (\d+)Hz$/,
+    async (quality: string, frequency: string) => {
       const sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
       for (let i = 0; i < sliderElems.length; i += 1) {
         const element = await sliderElems[i].$('input');
         const name = await element.getAttribute('name');
         if (name === `${frequency}-gain-range`) {
-          expect(config.filters[i].quality).toBe(parseFloat(gain));
+          const configPath = await getConfigPath();
+          const config = readAquaConfig(configPath);
+          expect(config.filters[i].quality).toBe(parseFloat(quality));
+          return;
+        }
+      }
+      throw new Error(`${frequency} Hz gain band not found.`);
+    }
+  );
+};
+
+export const thenFrequencyFilterType = (
+  then: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
+  then(
+    /^Aqua config file should show the (\w+) filter type for the band with frequency (\d+)Hz$/,
+    async (filterType: string, frequency: string) => {
+      const sliderElems = await webdriver.driver.$$('.range');
+      for (let i = 0; i < sliderElems.length; i += 1) {
+        const element = await sliderElems[i].$('input');
+        const name = await element.getAttribute('name');
+        if (name === `${frequency}-gain-range`) {
+          const configPath = await getConfigPath();
+          const config = readAquaConfig(configPath);
+          expect(config.filters[i].type).toBe(filterType);
           return;
         }
       }
