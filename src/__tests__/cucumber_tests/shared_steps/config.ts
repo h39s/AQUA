@@ -126,6 +126,17 @@ export const thenConfigFile = (then: DefineStepFunction) => {
   );
 };
 
+export const thenBandCount = (then: DefineStepFunction) => {
+  then(
+    /^Aqua config file should show (\d+) frequency bands$/,
+    async (count: string) => {
+      const configPath = await getConfigPath();
+      const config = readAquaConfig(configPath);
+      expect(Object.keys(config.filters).length).toBe(parseInt(count, 10));
+    }
+  );
+};
+
 export const thenFrequencyGain = (
   then: DefineStepFunction,
   webdriver: { driver: Driver | undefined }

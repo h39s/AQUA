@@ -1,18 +1,20 @@
 Feature: Change number of frequency bands
   Users want to increase or decrease the number of frequency bands
 
-  Scenario: Add a new frequency band
+  Scenario: Add a frequency band
     Given EqualizerAPO is installed
-      And Aqua can write to aqua.txt
+      And Aqua can write to Aqua config
       And Aqua is running
+      And Aqua equalizer state is enabled
       And there are 10 frequency bands
-    When I click to add a new frequency band
-    Then aqua.txt should show an 11th band with frequency 1000Hz
+    When I click to add a frequency band
+    Then Aqua config file should show 11 frequency bands
 
-  Scenario: Select a new quality using the arrow buttons
+  Scenario: Remove a frequency band
     Given EqualizerAPO is installed
-      And Aqua can write to aqua.txt
+      And Aqua can write to Aqua config
       And Aqua is running
+      And Aqua equalizer state is enabled
       And there are 10 frequency bands
-    When I click to remove the last frequency band
-    Then aqua.txt should show 9 frequency bands
+    When I click to remove a frequency band
+    Then Aqua config file should show 9 frequency bands

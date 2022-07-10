@@ -10,11 +10,11 @@ import {
   startChromeDriver,
   stopChromeDriver,
 } from '__tests__/utils/webdriver';
-import { givenAquaIsRunning } from './shared_steps/aqua';
 import {
+  givenAquaIsRunning,
   givenEnabledState,
   whenSetEnabledState,
-} from './shared_steps/aquaSlider';
+} from './shared_steps/aqua';
 import { thenConfigFile } from './shared_steps/config';
 import {
   givenCanWriteToAquaConfig,

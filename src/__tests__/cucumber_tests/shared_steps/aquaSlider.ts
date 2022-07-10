@@ -2,36 +2,61 @@ import { DefineStepFunction } from 'jest-cucumber';
 import { Driver } from '__tests__/utils/webdriver';
 import { FilterTypeEnum, FilterTypeToLabelMap } from 'common/constants';
 
-export const givenEnabledState = (
-  when: DefineStepFunction,
+export const givenBandCount = (
+  given: DefineStepFunction,
   webdriver: { driver: Driver | undefined }
 ) => {
-  when(
-    /^Aqua equalizer state is (enabled|disabled)$/,
-    async (state: string) => {
-      const desiredState = state === 'enabled';
-      const equalizerSwitch = await webdriver.driver.$('.sideBar .switch');
+  given(/^there are (\d+) frequency bands$/, async (count: number) => {
+    let sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
+    let sliderLength = sliderElems.length;
+    const addButton = await webdriver.driver.$(
+      '.mainContent [aria-label="Add Equalizer Slider"]'
+    );
+    const removeButton = await webdriver.driver.$(
+      '.mainContent [aria-label="Remove Equalizer Slider"]'
+    );
 
-      const enabledInput = await equalizerSwitch.$('[aria-checked="1"]');
-      if (
-        (desiredState && enabledInput === null) ||
-        (!desiredState && enabledInput !== null)
-      ) {
-        equalizerSwitch.click();
-        // wait 1000 ms for the action.
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      }
+    while (sliderLength > count) {
+      removeButton.click();
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      do {
+        sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
+      } while (sliderElems.length === sliderLength);
+      sliderLength = sliderElems.length;
     }
-  );
+
+    while (sliderLength < count) {
+      addButton.click();
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      do {
+        sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
+      } while (sliderElems.length === sliderLength);
+      sliderLength = sliderElems.length;
+    }
+  });
 };
 
-export const whenSetEnabledState = (
+export const whenChangeBandCount = (
   when: DefineStepFunction,
   webdriver: { driver: Driver | undefined }
 ) => {
-  when(/^I toggle the equalizer state$/, async () => {
-    const equalizerSwitch = await webdriver.driver.$('.sideBar .switch');
-    equalizerSwitch.click();
+  when(/^I click to (add|remove) a frequency band$/, async (action: string) => {
+    const isAdd = action === 'add';
+
+    if (isAdd) {
+      const addButton = await webdriver.driver.$(
+        '.mainContent [aria-label="Add Equalizer Slider"]'
+      );
+      addButton.click();
+    } else {
+      const removeButton = await webdriver.driver.$(
+        '.mainContent [aria-label="Remove Equalizer Slider"]'
+      );
+      removeButton.click();
+    }
+
     // wait 1000 ms for the action.
     await new Promise((resolve) => setTimeout(resolve, 1000));
   });
@@ -67,10 +92,10 @@ export const whenSetFrequencyGain = (
 };
 
 export const givenFrequencyQuality = (
-  when: DefineStepFunction,
+  given: DefineStepFunction,
   webdriver: { driver: Driver | undefined }
 ) => {
-  when(
+  given(
     /^the quality for the band with frequency (\d+)Hz is (\d+(.\d+)?)$/,
     async (frequency: number, position: string) => {
       const sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
@@ -156,10 +181,10 @@ export const whenSetFrequencyQualityUsingArrows = (
 };
 
 export const givenFrequencyFilterType = (
-  when: DefineStepFunction,
+  given: DefineStepFunction,
   webdriver: { driver: Driver | undefined }
 ) => {
-  when(
+  given(
     /^the filter type is (\w+) filter for the band with frequency (\d+)Hz$/,
     async (filterType: string, frequency: number) => {
       if (

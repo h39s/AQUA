@@ -31,3 +31,38 @@ export const whenAquaIsLaunched = (
     await new Promise((resolve) => setTimeout(resolve, 10000));
   });
 };
+
+export const givenEnabledState = (
+  when: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
+  when(
+    /^Aqua equalizer state is (enabled|disabled)$/,
+    async (state: string) => {
+      const desiredState = state === 'enabled';
+      const equalizerSwitch = await webdriver.driver.$('.sideBar .switch');
+
+      const enabledInput = await equalizerSwitch.$('[aria-checked="1"]');
+      if (
+        (desiredState && enabledInput === null) ||
+        (!desiredState && enabledInput !== null)
+      ) {
+        equalizerSwitch.click();
+        // wait 1000 ms for the action.
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    }
+  );
+};
+
+export const whenSetEnabledState = (
+  when: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
+  when(/^I toggle the equalizer state$/, async () => {
+    const equalizerSwitch = await webdriver.driver.$('.sideBar .switch');
+    equalizerSwitch.click();
+    // wait 1000 ms for the action.
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  });
+};
