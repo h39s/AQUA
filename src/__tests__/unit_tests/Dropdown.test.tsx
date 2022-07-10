@@ -56,6 +56,96 @@ describe('Dropdown', () => {
     expect(handleChange).toHaveBeenCalledWith(FilterTypeEnum.HPQ);
   });
 
+  it('should render the dropdown and select an item using tab', async () => {
+    const { user } = setup(
+      <Dropdown
+        name={name}
+        value={FilterTypeEnum.LPQ}
+        options={FILTER_OPTIONS}
+        isDisabled={false}
+        handleChange={handleChange}
+      />
+    );
+
+    const dropdown = screen.getByLabelText(name);
+    await user.click(dropdown);
+    const item = screen.getByLabelText('Low Pass Filter');
+    expect(item).toHaveFocus();
+
+    await user.keyboard('{Tab}{Enter}');
+    expect(handleChange).toHaveBeenCalledWith(FilterTypeEnum.HPQ);
+  });
+
+  it('should prevent using arrow keys to leave the dropdown menu', async () => {
+    const { user } = setup(
+      <div>
+        <button type="button">Above</button>
+        <Dropdown
+          name={name}
+          value={FILTER_OPTIONS[0].value}
+          options={FILTER_OPTIONS}
+          isDisabled={false}
+          handleChange={handleChange}
+        />
+        <button type="button">Below</button>
+      </div>
+    );
+    // Open the dropdown menu
+    const dropdown = screen.getByLabelText(name);
+    await user.click(dropdown);
+    const firstItem = screen.getByLabelText(FILTER_OPTIONS[0].label);
+    expect(firstItem).toHaveFocus();
+
+    // Use tab to navigate above the dropdown menu
+    await user.keyboard('{Shift>}{ArrowUp}{ArrowUp}{/Shift}'); // Hold Shift down when pressing Tab
+    expect(firstItem).toHaveFocus();
+
+    // Use tab to navigate below the dropdown menu
+    const tabInstructions = Array(FILTER_OPTIONS.length)
+      .fill('{ArrowDown}')
+      .join('');
+    await user.keyboard(tabInstructions);
+    const lastItem = screen.getByLabelText(
+      FILTER_OPTIONS[FILTER_OPTIONS.length - 1].label
+    );
+    expect(lastItem).toHaveFocus();
+  });
+
+  it('should allow using tab to leave the dropdown menu', async () => {
+    const { user } = setup(
+      <div>
+        <button type="button">Above</button>
+        <Dropdown
+          name={name}
+          value={FILTER_OPTIONS[0].value}
+          options={FILTER_OPTIONS}
+          isDisabled={false}
+          handleChange={handleChange}
+        />
+        <button type="button">Below</button>
+      </div>
+    );
+    // Open the dropdown menu
+    const dropdown = screen.getByLabelText(name);
+    await user.click(dropdown);
+    let menuItem = screen.getByLabelText(FILTER_OPTIONS[0].label);
+    expect(menuItem).toHaveFocus();
+    // Use tab to navigate above the dropdown menu
+    await user.keyboard('{Shift>}{Tab}{Tab}{/Shift}'); // Hold Shift down when pressing Tab
+    expect(screen.getByText('Above')).toHaveFocus();
+    expect(menuItem).not.toBeInTheDocument();
+
+    // Open the dropdown menu
+    await user.click(dropdown);
+    menuItem = screen.getByLabelText(FILTER_OPTIONS[0].label);
+    expect(menuItem).toHaveFocus();
+    // Use tab to navigate below the dropdown menu
+    const tabInstructions = Array(FILTER_OPTIONS.length).fill('{Tab}').join('');
+    await user.keyboard(tabInstructions);
+    expect(screen.getByText('Below')).toHaveFocus();
+    expect(menuItem).not.toBeInTheDocument();
+  });
+
   it('should disable the dropdown', async () => {
     const { user } = setup(
       <Dropdown
