@@ -1,3 +1,9 @@
+/*
+ * @jest-environment node
+ */
+// This is necessary so that calling regedit works correctly in the test environment
+// Specifically, setImmediate function becomes defined.
+
 import { loadFeature, defineFeature } from 'jest-cucumber';
 import getRandomValuesPolyPony from 'get-random-values-polypony'; // Need this to fix jest-cucumber's reliance on uuid's getRandomValues
 import {
@@ -5,7 +11,6 @@ import {
   startChromeDriver,
   stopChromeDriver,
 } from '__tests__/utils/webdriver';
-import { getConfigPath } from 'main/registry';
 import { givenAquaIsRunning } from './shared_steps/aqua';
 import { whenSetFrequencyGain } from './shared_steps/aquaSlider';
 import { thenFrequencyGain } from './shared_steps/config';
@@ -19,18 +24,19 @@ const feature = loadFeature(
   './src/__tests__/cucumber_tests/features/set_band_gain.feature'
 );
 const webdriver: { driver: Driver } = { driver: undefined };
-let configPath: string;
+// let configPath: string;
 
-beforeAll(async () => {
-  configPath = await getConfigPath();
-});
+// beforeAll(async () => {
+//   configPath = await getConfigPath();
+//   console.log(configPath);
+// });
 
 defineFeature(feature, (test) => {
   test('Move slider to bottom', async ({ given, when, then }) => {
     givenAquaIsRunning(given, webdriver, chromeDriver);
 
     whenSetFrequencyGain(when, webdriver);
-    thenFrequencyGain(then, webdriver, configPath);
+    thenFrequencyGain(then, webdriver);
   }, 30000);
 });
 

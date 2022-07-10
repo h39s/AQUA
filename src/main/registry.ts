@@ -40,8 +40,7 @@ export const isEqualizerAPOInstalled = () =>
   isSoftwareInstalled('EqualizerAPO');
 
 export const getConfigPath = async () => {
-  let isInstalled = await isEqualizerAPOInstalled();
-  isInstalled = await isEqualizerAPOInstalled();
+  const isInstalled = await isEqualizerAPOInstalled();
   if (!isInstalled) {
     throw new Error('Equalizer APO not installed');
   }
