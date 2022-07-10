@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { clearAndType, setup } from '../utils/userEventUtils';
-import Slider from '../../renderer/Slider';
+import Slider from '../../renderer/components/Slider';
 
 describe('Slider', () => {
   const name = 'Slider';

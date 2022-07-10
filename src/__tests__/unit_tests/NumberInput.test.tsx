@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { screen } from '@testing-library/react';
 import { clearAndType, setup } from '../utils/userEventUtils';
-import NumberInput from '../../renderer/NumberInput';
+import NumberInput from '../../renderer/widgets/NumberInput';
 
 describe('NumberInput', () => {
   const id = 'Number Input';

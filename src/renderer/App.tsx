@@ -2,9 +2,9 @@ import { ErrorDescription } from 'common/errors';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './styles/App.scss';
-import { healthCheck } from './equalizerApi';
+import { healthCheck } from './utils/equalizerApi';
 import MainContent from './MainContent';
-import { AquaContext } from './AquaContext';
+import { AquaContext } from './utils/AquaContext';
 import PrereqMissingModal from './PrereqMissingModal';
 import SideBar from './SideBar';
 

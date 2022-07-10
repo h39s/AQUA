@@ -1,10 +1,10 @@
 import { ErrorDescription } from 'common/errors';
 import { useEffect, useContext, useState, useMemo } from 'react';
-import NumberInput from './NumberInput';
-import RangeInput from './RangeInput';
-import { AquaContext } from './AquaContext';
-import './styles/Slider.scss';
-import { useThrottle } from './utils';
+import NumberInput from '../widgets/NumberInput';
+import RangeInput from '../widgets/RangeInput';
+import { AquaContext } from '../utils/AquaContext';
+import '../styles/Slider.scss';
+import { useThrottle } from '../utils/utils';
 
 interface ISliderProps {
   name: string;

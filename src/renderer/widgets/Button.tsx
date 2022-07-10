@@ -1,4 +1,4 @@
-import './styles/Button.scss';
+import '../styles/Button.scss';
 
 interface IButtonProps {
   children: JSX.Element | string;

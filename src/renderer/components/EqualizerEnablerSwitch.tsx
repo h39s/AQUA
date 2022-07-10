@@ -4,9 +4,9 @@ import {
   disableEqualizer,
   enableEqualizer,
   getEqualizerStatus,
-} from './equalizerApi';
-import { AquaContext } from './AquaContext';
-import Switch from './Switch';
+} from '../utils/equalizerApi';
+import { AquaContext } from '../utils/AquaContext';
+import Switch from '../widgets/Switch';
 
 interface IEqualizerEnablerSwitchProps {
   id: string;

@@ -5,9 +5,9 @@ import {
   useRef,
   useState,
 } from 'react';
-import ArrowIcon from './icons/ArrowIcon';
-import { useInterval } from './utils';
-import './styles/ArrowButton.scss';
+import ArrowIcon from '../icons/ArrowIcon';
+import { useInterval } from '../utils/utils';
+import '../styles/ArrowButton.scss';
 
 interface IArrowButtonProps {
   name: string;

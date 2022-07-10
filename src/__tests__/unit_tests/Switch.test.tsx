@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { screen } from '@testing-library/react';
 import { setup } from '../utils/userEventUtils';
-import Switch from '../../renderer/Switch';
+import Switch from '../../renderer/widgets/Switch';
 
 describe('Switch', () => {
   const id = 'switch';

@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { ErrorDescription } from '../common/errors';
+import { ErrorDescription } from '../../common/errors';
 
 export interface IAquaContext {
   globalError: ErrorDescription | undefined;

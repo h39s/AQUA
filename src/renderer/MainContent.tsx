@@ -5,12 +5,12 @@ import {
   addEqualizerSlider,
   getEqualizerSliderCount,
   removeEqualizerSlider,
-} from './equalizerApi';
-import FrequencyBand from './FrequencyBand';
+} from './utils/equalizerApi';
+import FrequencyBand from './components/FrequencyBand';
 import MinusIcon from './icons/MinusIcon';
 import PlusIcon from './icons/PlusIcon';
-import Button from './Button';
-import { AquaContext } from './AquaContext';
+import Button from './widgets/Button';
+import { AquaContext } from './utils/AquaContext';
 import './styles/MainContent.scss';
 
 const MainContent = () => {

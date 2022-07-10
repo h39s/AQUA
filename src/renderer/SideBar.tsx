@@ -1,6 +1,6 @@
-import { getMainPreAmp, setMainPreAmp } from './equalizerApi';
-import EqualizerEnablerSwitch from './EqualizerEnablerSwitch';
-import Slider from './Slider';
+import { getMainPreAmp, setMainPreAmp } from './utils/equalizerApi';
+import EqualizerEnablerSwitch from './components/EqualizerEnablerSwitch';
+import Slider from './components/Slider';
 import './styles/SideBar.scss';
 
 const SideBar = () => {

@@ -9,7 +9,7 @@ import {
   MIN_QUALITY,
 } from 'common/constants';
 import { useCallback, useContext, useEffect, useState } from 'react';
-import Dropdown from './Dropdown';
+import Dropdown from '../widgets/Dropdown';
 import {
   getFrequency,
   getGain,
@@ -19,12 +19,12 @@ import {
   setGain,
   setQuality,
   setType,
-} from './equalizerApi';
-import NumberInput from './NumberInput';
-import { AquaContext } from './AquaContext';
+} from '../utils/equalizerApi';
+import NumberInput from '../widgets/NumberInput';
+import { AquaContext } from '../utils/AquaContext';
 import Slider from './Slider';
-import './styles/MainContent.scss';
-import { FILTER_OPTIONS } from './icons/FilterTypeIcon';
+import '../styles/MainContent.scss';
+import { FILTER_OPTIONS } from '../icons/FilterTypeIcon';
 
 interface IFrequencyBandProps {
   sliderIndex: number;

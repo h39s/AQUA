@@ -1,7 +1,7 @@
 import { ChangeEvent, CSSProperties, useRef } from 'react';
 import ArrowButton from './ArrowButton';
-import './styles/RangeInput.scss';
-import { clamp } from './utils';
+import '../styles/RangeInput.scss';
+import { clamp } from '../utils/utils';
 
 interface IRangeInputProps {
   name: string;
