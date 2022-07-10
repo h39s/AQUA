@@ -5,13 +5,10 @@ import {
   startChromeDriver,
   stopChromeDriver,
 } from '__tests__/utils/webdriver';
-import { givenAquaIsNotRunning, whenAquaIsLaunched } from './shared_steps/aqua';
+import { getConfigPath } from 'main/registry';
+import { givenAquaIsRunning } from './shared_steps/aqua';
 import { whenSetFrequencyGain } from './shared_steps/aquaSlider';
-import {
-  givenPeaceIsRunning,
-  givenPeaceIsInstalled,
-  thenPeaceFrequencyGain,
-} from './shared_steps/peace';
+import { thenFrequencyGain } from './shared_steps/config';
 
 // shim the getRandomValues function used in uuid which is used by jest-cucumber
 // so that it works in electron environment.
@@ -22,17 +19,18 @@ const feature = loadFeature(
   './src/__tests__/cucumber_tests/features/set_band_gain.feature'
 );
 const webdriver: { driver: Driver } = { driver: undefined };
+let configPath: string;
+
+beforeAll(async () => {
+  configPath = await getConfigPath();
+});
 
 defineFeature(feature, (test) => {
   test('Move slider to bottom', async ({ given, when, then }) => {
-    givenPeaceIsInstalled(given);
-    givenPeaceIsRunning(given);
-    givenAquaIsNotRunning(given);
+    givenAquaIsRunning(given, webdriver, chromeDriver);
 
-    whenAquaIsLaunched(when, webdriver, chromeDriver);
     whenSetFrequencyGain(when, webdriver);
-
-    thenPeaceFrequencyGain(then, webdriver);
+    thenFrequencyGain(then, webdriver, configPath);
   }, 30000);
 });
 

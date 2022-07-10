@@ -22,6 +22,7 @@ const isSoftwareInstalled = async (softwareKey: string) => {
   const registryKey =
     'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall';
   const listResult = await regedit.list([registryKey]);
+  console.log(listResult);
 
   if (listResult[registryKey].exists) {
     // eslint-disable-next-line no-restricted-syntax
@@ -39,7 +40,8 @@ export const isEqualizerAPOInstalled = () =>
   isSoftwareInstalled('EqualizerAPO');
 
 export const getConfigPath = async () => {
-  const isInstalled = await isEqualizerAPOInstalled();
+  let isInstalled = await isEqualizerAPOInstalled();
+  isInstalled = await isEqualizerAPOInstalled();
   if (!isInstalled) {
     throw new Error('Equalizer APO not installed');
   }
@@ -64,6 +66,7 @@ export const getConfigPath = async () => {
     const configPath = listResult[registryKey].values.ConfigPath.value;
     return configPath as string;
   } catch (e) {
+    console.log(e);
     throw new Error('Config path not found');
   }
 };

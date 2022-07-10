@@ -8,6 +8,18 @@ export const givenAquaIsNotRunning = (given: DefineStepFunction) => {
   });
 };
 
+export const givenAquaIsRunning = (
+  given: DefineStepFunction,
+  webdriver: { driver: Driver | undefined },
+  chromeDriverProcess: ChildProcessWithoutNullStreams
+) => {
+  given('Aqua is running', async () => {
+    webdriver.driver = await getWebDriver(chromeDriverProcess);
+    // Wait 10 seconds for the app to launch and load screen
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+  });
+};
+
 export const whenAquaIsLaunched = (
   when: DefineStepFunction,
   webdriver: { driver: Driver | undefined },

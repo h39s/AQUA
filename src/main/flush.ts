@@ -71,8 +71,8 @@ export const serializeState = (state: IState) => {
 };
 
 const CONFIG_CONTENT = 'Include: aqua.txt';
-const AQUA_LOCAL_CONFIG_FILENAME = 'state.txt';
-const AQUA_CONFIG_FILENAME = 'aqua.txt';
+export const AQUA_LOCAL_CONFIG_FILENAME = 'state.txt';
+export const AQUA_CONFIG_FILENAME = 'aqua.txt';
 const CONFIG_FILENAME = 'config.txt';
 
 const addFileToPath = (pathPrefix: string, fileName: string) => {
