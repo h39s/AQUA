@@ -11,7 +11,10 @@ import {
   stopChromeDriver,
 } from '__tests__/utils/webdriver';
 import { givenAquaIsRunning } from './shared_steps/aqua';
-import { whenSetFrequencyFilterType } from './shared_steps/aquaSlider';
+import {
+  givenFrequencyFilterType,
+  whenSetFrequencyFilterType,
+} from './shared_steps/aquaSlider';
 import { thenFrequencyFilterType } from './shared_steps/config';
 import {
   givenCanWriteToAquaConfig,
@@ -21,7 +24,7 @@ import {
 const chromeDriver = startChromeDriver();
 
 const feature = loadFeature(
-  './src/__tests__/cucumber_tests/features/set_band_gain.feature'
+  './src/__tests__/cucumber_tests/features/set_filter_type.feature'
 );
 const webdriver: { driver: Driver } = { driver: undefined };
 // let configPath: string;
@@ -43,7 +46,7 @@ defineFeature(feature, (test) => {
     givenFrequencyFilterType(given, webdriver);
 
     whenSetFrequencyFilterType(when, webdriver);
-    thenFrequencyFilterType(then, webdriver, config);
+    thenFrequencyFilterType(then, webdriver);
   }, 30000);
 });
 

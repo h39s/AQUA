@@ -33,7 +33,7 @@ interface IFrequencyBandProps {
 const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
   const [actualFrequency, setActualFrequency] = useState<number>(0);
   const [actualQuality, setActualQuality] = useState<number>(0);
-  const [filterType, setFilterType] = useState<string>(FilterTypeEnum.PEAK);
+  const [filterType, setFilterType] = useState<string>(FilterTypeEnum.PK);
 
   const { globalError, setGlobalError } = useContext(AquaContext);
 

@@ -16,7 +16,7 @@ export const MIN_NUM_FILTERS = 1;
 // Need to use LPQ and HPQ to allow users to adjust quality for low/high pass filters
 // Need to use LSC and HSC to allow users to adjust quality for low/high shelf filters
 export enum FilterTypeEnum {
-  PEAK = 'PK', // Peak ["PK",True,True]
+  PK = 'PK', // Peak ["PK",True,True]
   LPQ = 'LPQ', // Low Pass ["LPQ",False,True]
   HPQ = 'HPQ', // High Pass ["HPQ",False,True]
   // BP = 'BP', // Band Pass ["BP",False,True]
@@ -33,7 +33,7 @@ export enum FilterTypeEnum {
 }
 
 export const FilterTypeToLabelMap: Record<FilterTypeEnum, string> = {
-  [FilterTypeEnum.PEAK]: 'Peak Filter',
+  [FilterTypeEnum.PK]: 'Peak Filter',
   [FilterTypeEnum.LPQ]: 'Low Pass Filter',
   [FilterTypeEnum.HPQ]: 'High Pass Filter',
   [FilterTypeEnum.LSC]: 'Low Shelf Filter',

@@ -2,7 +2,7 @@ import { FilterTypeEnum, FilterTypeToLabelMap } from 'common/constants';
 
 const FilterTypeIcon = ({ type }: { type: FilterTypeEnum }) => {
   switch (type) {
-    case FilterTypeEnum.PEAK:
+    case FilterTypeEnum.PK:
       return (
         <svg
           width="32"

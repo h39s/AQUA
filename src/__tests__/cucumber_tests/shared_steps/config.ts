@@ -154,7 +154,7 @@ export const thenFrequencyFilterType = (
   then(
     /^Aqua config file should show the (\w+) filter type for the band with frequency (\d+)Hz$/,
     async (filterType: string, frequency: string) => {
-      const sliderElems = await webdriver.driver.$$('.range');
+      const sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
       for (let i = 0; i < sliderElems.length; i += 1) {
         const element = await sliderElems[i].$('input');
         const name = await element.getAttribute('name');

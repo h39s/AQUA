@@ -132,27 +132,23 @@ export const givenFrequencyFilterType = (
         throw new Error(`Invalid filter type ${filterType}.`);
       }
       const filterTypeAsEnum = filterType as FilterTypeEnum;
-      const dropdownElems = await webdriver.driver
+      const dropdownElem = await webdriver.driver
         .$('.mainContent')
-        .$$('.dropdown');
-      for (let i = 0; i < dropdownElems.length; i += 1) {
-        const element = await dropdownElems[i].$('[role="menu"]');
-        const name = await element.getAttribute('aria-label');
-        if (name === `${frequency}-filter-type`) {
-          element.click();
-          // wait 1000 ms for the action.
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+        .$(`.dropdown [aria-label="${frequency}-filter-type"]`);
 
-          const filterElement = await element.$(
-            `title:contains(${FilterTypeToLabelMap[filterTypeAsEnum]}`
-          );
-          filterElement.click();
-          // wait 1000 ms for the action.
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          return;
-        }
-      }
-      throw new Error(`${frequency} Hz gain band not found.`);
+      expect(dropdownElem).not.toBeNull();
+      dropdownElem.click();
+      // wait 1000 ms for the action.
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Need to reselect from driver since these elements didn't exist before clicking on the dropdown
+      const filterElement = await webdriver.driver.$(
+        `.dropdown li[aria-label="${FilterTypeToLabelMap[filterTypeAsEnum]}"]`
+      );
+      expect(filterElement).not.toBeNull();
+      filterElement.click();
+      // wait 1000 ms for the action.
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   );
 };
@@ -162,7 +158,6 @@ export const whenSetFrequencyFilterType = (
   webdriver: { driver: Driver | undefined }
 ) => {
   when(
-    // I set the filter type to LPQ filter for the band with frequency 125Hz
     /^I set the filter type to (\w+) filter for the band with frequency (\d+)Hz$/,
     async (filterType: string, frequency: number) => {
       if (
@@ -171,27 +166,23 @@ export const whenSetFrequencyFilterType = (
         throw new Error(`Invalid filter type ${filterType}.`);
       }
       const filterTypeAsEnum = filterType as FilterTypeEnum;
-      const dropdownElems = await webdriver.driver
+      const dropdownElem = await webdriver.driver
         .$('.mainContent')
-        .$$('.dropdown');
-      for (let i = 0; i < dropdownElems.length; i += 1) {
-        const element = await dropdownElems[i].$('[role="menu"]');
-        const name = await element.getAttribute('aria-label');
-        if (name === `${frequency}-filter-type`) {
-          element.click();
-          // wait 1000 ms for the action.
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+        .$(`.dropdown [aria-label="${frequency}-filter-type"]`);
 
-          const filterElement = await element.$(
-            `title:contains(${FilterTypeToLabelMap[filterTypeAsEnum]}`
-          );
-          filterElement.click();
-          // wait 1000 ms for the action.
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          return;
-        }
-      }
-      throw new Error(`${frequency} Hz gain band not found.`);
+      expect(dropdownElem).not.toBeNull();
+      dropdownElem.click();
+      // wait 1000 ms for the action.
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Need to reselect from driver since these elements didn't exist before clicking on the dropdown
+      const filterElement = await webdriver.driver.$(
+        `.dropdown li[aria-label="${FilterTypeToLabelMap[filterTypeAsEnum]}"]`
+      );
+      expect(filterElement).not.toBeNull();
+      filterElement.click();
+      // wait 1000 ms for the action.
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   );
 };

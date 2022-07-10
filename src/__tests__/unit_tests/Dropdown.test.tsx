@@ -17,7 +17,7 @@ describe('Dropdown', () => {
     const { user } = setup(
       <Dropdown
         name={name}
-        value={FilterTypeEnum.PEAK}
+        value={FilterTypeEnum.PK}
         options={FILTER_OPTIONS}
         isDisabled={false}
         handleChange={handleChange}
@@ -169,7 +169,7 @@ describe('Dropdown', () => {
       <div>
         <Dropdown
           name={name}
-          value={FilterTypeEnum.PEAK}
+          value={FilterTypeEnum.PK}
           options={FILTER_OPTIONS}
           isDisabled={false}
           handleChange={handleChange}
@@ -192,7 +192,7 @@ describe('Dropdown', () => {
       <div>
         <Dropdown
           name={name}
-          value={FilterTypeEnum.PEAK}
+          value={FilterTypeEnum.PK}
           options={FILTER_OPTIONS}
           isDisabled={false}
           handleChange={handleChange}

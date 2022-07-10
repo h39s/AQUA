@@ -23,7 +23,7 @@ export const DEFAULT_FILTER: IFilter = {
   frequency: 1000,
   gain: 0,
   quality: 1,
-  type: FilterTypeEnum.PEAK,
+  type: FilterTypeEnum.PK,
 };
 
 const DEFAULT_FILTERS: IFilter[] = FIXED_FREQUENCIES.map((f) => {
@@ -31,7 +31,7 @@ const DEFAULT_FILTERS: IFilter[] = FIXED_FREQUENCIES.map((f) => {
     frequency: f,
     gain: 0,
     quality: 1,
-    type: FilterTypeEnum.PEAK,
+    type: FilterTypeEnum.PK,
   };
 });
 
