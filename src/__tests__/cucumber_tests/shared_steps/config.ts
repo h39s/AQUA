@@ -101,6 +101,31 @@ export const readAquaConfig = (configPath: string) => {
   return state;
 };
 
+export const thenConfigFile = (then: DefineStepFunction) => {
+  then(
+    /^Aqua config file should be (empty|non-empty)$/,
+    async (state: string) => {
+      const isEmpty = state === 'empty';
+      const configPath = await getConfigPath();
+      const config = readAquaConfig(configPath);
+      const matchObject = isEmpty
+        ? {
+            device: null,
+            channel: null,
+            preamp: NaN,
+            filters: {},
+          }
+        : {
+            device: expect.any(String),
+            channel: expect.any(String),
+            preamp: expect.any(Number),
+            filters: expect.any(Object),
+          };
+      expect(config).toMatchObject(matchObject);
+    }
+  );
+};
+
 export const thenFrequencyGain = (
   then: DefineStepFunction,
   webdriver: { driver: Driver | undefined }

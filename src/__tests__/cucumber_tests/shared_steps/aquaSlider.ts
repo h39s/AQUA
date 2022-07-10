@@ -2,6 +2,41 @@ import { DefineStepFunction } from 'jest-cucumber';
 import { Driver } from '__tests__/utils/webdriver';
 import { FilterTypeEnum, FilterTypeToLabelMap } from 'common/constants';
 
+export const givenEnabledState = (
+  when: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
+  when(
+    /^Aqua equalizer state is (enabled|disabled)$/,
+    async (state: string) => {
+      const desiredState = state === 'enabled';
+      const equalizerSwitch = await webdriver.driver.$('.sideBar .switch');
+
+      const enabledInput = await equalizerSwitch.$('[aria-checked="1"]');
+      if (
+        (desiredState && enabledInput === null) ||
+        (!desiredState && enabledInput !== null)
+      ) {
+        equalizerSwitch.click();
+        // wait 1000 ms for the action.
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    }
+  );
+};
+
+export const whenSetEnabledState = (
+  when: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
+  when(/^I toggle the equalizer state$/, async () => {
+    const equalizerSwitch = await webdriver.driver.$('.sideBar .switch');
+    equalizerSwitch.click();
+    // wait 1000 ms for the action.
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  });
+};
+
 export const whenSetFrequencyGain = (
   when: DefineStepFunction,
   webdriver: { driver: Driver | undefined }
@@ -30,6 +65,7 @@ export const whenSetFrequencyGain = (
     }
   );
 };
+
 export const givenFrequencyQuality = (
   when: DefineStepFunction,
   webdriver: { driver: Driver | undefined }

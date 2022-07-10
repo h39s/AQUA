@@ -5,14 +5,14 @@ Feature: Set whether the equalizer is enabled or disabled
     Given EqualizerAPO is installed
       And Aqua can write to Aqua config
       And Aqua is running
-      And Aqua is disabled
-    When I enable the equalizer
-    Then Aqua config should be non-empty
+      And Aqua equalizer state is disabled
+    When I toggle the equalizer state
+    Then Aqua config file should be non-empty
   
   Scenario: Disable the equalizer
     Given EqualizerAPO is installed
       And Aqua can write to Aqua config
       And Aqua is running
-      And Aqua is enabled
-    When I disable the equalizer
-    Then Aqua config should be empty
+      And Aqua equalizer state is enabled
+    When I toggle the equalizer state
+    Then Aqua config file should be empty
