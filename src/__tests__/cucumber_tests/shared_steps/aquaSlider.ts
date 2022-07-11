@@ -102,10 +102,9 @@ const setFrequencyQuality = async (
   frequency: number,
   quality: string
 ) => {
-  const element = await webdriver.driver.$(
-    `.mainContent label[for="${frequency}-quality"]`
+  const inputElement = await webdriver.driver.$(
+    `.mainContent label[for="${frequency}-quality"] input`
   );
-  const inputElement = await element.$('input');
   await inputElement.setValue(parseFloat(quality));
   await inputElement.keys('Tab');
   // wait 1000 ms for the action.
@@ -158,6 +157,34 @@ export const whenSetFrequencyQualityUsingArrows = (
 
 // ====================================
 
+const setFrequencyFilterType = async (
+  webdriver: { driver: Driver | undefined },
+  frequency: number,
+  filterType: string
+) => {
+  if (Object.values(FilterTypeEnum).findIndex((f) => f === filterType) === -1) {
+    throw new Error(`Invalid filter type ${filterType}.`);
+  }
+  const filterTypeAsEnum = filterType as FilterTypeEnum;
+  const dropdownElem = await webdriver.driver
+    .$('.mainContent')
+    .$(`.dropdown [aria-label="${frequency}-filter-type"]`);
+
+  expect(dropdownElem).not.toBeNull();
+  dropdownElem.click();
+  // wait 1000 ms for the action.
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  // Need to reselect from driver since these elements didn't exist before clicking on the dropdown
+  const filterElement = await webdriver.driver.$(
+    `.dropdown li[aria-label="${FilterTypeToLabelMap[filterTypeAsEnum]}"]`
+  );
+  expect(filterElement).not.toBeNull();
+  filterElement.click();
+  // wait 1000 ms for the action.
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+};
+
 export const givenFrequencyFilterType = (
   given: DefineStepFunction,
   webdriver: { driver: Driver | undefined }
@@ -165,29 +192,7 @@ export const givenFrequencyFilterType = (
   given(
     /^the filter type is (\w+) filter for the band with frequency (\d+)Hz$/,
     async (filterType: string, frequency: number) => {
-      if (
-        Object.values(FilterTypeEnum).findIndex((f) => f === filterType) === -1
-      ) {
-        throw new Error(`Invalid filter type ${filterType}.`);
-      }
-      const filterTypeAsEnum = filterType as FilterTypeEnum;
-      const dropdownElem = await webdriver.driver
-        .$('.mainContent')
-        .$(`.dropdown [aria-label="${frequency}-filter-type"]`);
-
-      expect(dropdownElem).not.toBeNull();
-      dropdownElem.click();
-      // wait 1000 ms for the action.
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Need to reselect from driver since these elements didn't exist before clicking on the dropdown
-      const filterElement = await webdriver.driver.$(
-        `.dropdown li[aria-label="${FilterTypeToLabelMap[filterTypeAsEnum]}"]`
-      );
-      expect(filterElement).not.toBeNull();
-      filterElement.click();
-      // wait 1000 ms for the action.
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await setFrequencyFilterType(webdriver, frequency, filterType);
     }
   );
 };
@@ -199,29 +204,7 @@ export const whenSetFrequencyFilterType = (
   when(
     /^I set the filter type to (\w+) filter for the band with frequency (\d+)Hz$/,
     async (filterType: string, frequency: number) => {
-      if (
-        Object.values(FilterTypeEnum).findIndex((f) => f === filterType) === -1
-      ) {
-        throw new Error(`Invalid filter type ${filterType}.`);
-      }
-      const filterTypeAsEnum = filterType as FilterTypeEnum;
-      const dropdownElem = await webdriver.driver
-        .$('.mainContent')
-        .$(`.dropdown [aria-label="${frequency}-filter-type"]`);
-
-      expect(dropdownElem).not.toBeNull();
-      dropdownElem.click();
-      // wait 1000 ms for the action.
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Need to reselect from driver since these elements didn't exist before clicking on the dropdown
-      const filterElement = await webdriver.driver.$(
-        `.dropdown li[aria-label="${FilterTypeToLabelMap[filterTypeAsEnum]}"]`
-      );
-      expect(filterElement).not.toBeNull();
-      filterElement.click();
-      // wait 1000 ms for the action.
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await setFrequencyFilterType(webdriver, frequency, filterType);
     }
   );
 };

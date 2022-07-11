@@ -44,7 +44,7 @@ defineFeature(feature, (test) => {
     givenEqualizerApoIsInstalled(given);
     givenCanWriteToAquaConfig(given);
     givenAquaIsRunning(given, webdriver, chromeDriver);
-    givenPreampGain(when, webdriver);
+    givenPreampGain(given, webdriver);
     givenEnabledState(given, webdriver);
 
     whenSetPreampGainUsingArrows(when, webdriver);
