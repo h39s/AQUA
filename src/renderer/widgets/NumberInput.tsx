@@ -134,9 +134,12 @@ const NumberInput = ({
   };
 
   const onArrow = async (isIncrement: boolean) => {
-    const offset = isIncrement ? precisionFactor : precisionFactor * -1;
-    // Treat internalValue as a 0 if it is empty or only a negative sign
-    const newValue = clamp(offset + value, min, max);
+    const offset = isIncrement
+      ? 1 / precisionFactor
+      : (1 / precisionFactor) * -1;
+    // Need to round the value because of floating addition imprecision
+    let newValue = clamp(offset + value, min, max);
+    newValue = Math.round(newValue * precisionFactor) / precisionFactor;
     setInternalValue(newValue.toString());
     setHasChanges(false);
     handleSubmit(newValue);

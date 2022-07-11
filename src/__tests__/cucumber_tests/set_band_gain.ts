@@ -13,6 +13,10 @@ import {
 import { givenAquaIsRunning } from './shared_steps/aqua';
 import { whenSetFrequencyGain } from './shared_steps/aquaSlider';
 import { thenFrequencyGain } from './shared_steps/config';
+import {
+  givenCanWriteToAquaConfig,
+  givenEqualizerApoIsInstalled,
+} from './shared_steps/equalizerApo';
 
 const chromeDriver = startChromeDriver();
 
@@ -23,6 +27,8 @@ const webdriver: { driver: Driver } = { driver: undefined };
 
 defineFeature(feature, (test) => {
   test('Move slider to bottom', async ({ given, when, then }) => {
+    givenEqualizerApoIsInstalled(given);
+    givenCanWriteToAquaConfig(given);
     givenAquaIsRunning(given, webdriver, chromeDriver);
 
     whenSetFrequencyGain(when, webdriver);

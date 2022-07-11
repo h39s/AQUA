@@ -62,6 +62,25 @@ export const whenChangeBandCount = (
   });
 };
 
+const setFrequencyGain = async (
+  webdriver: { driver: Driver | undefined },
+  frequency: number,
+  position: string
+) => {
+  const element = await webdriver.driver.$(
+    `.mainContent input[name="${frequency}-gain-range"]`
+  );
+  const coord = { x: 0, y: 0 };
+  if (position === 'top') {
+    coord.y = -100;
+  } else if (position === 'bottom') {
+    coord.y = 100;
+  }
+  element.dragAndDrop(coord);
+  // wait 1000 ms for the action.
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+};
+
 export const whenSetFrequencyGain = (
   when: DefineStepFunction,
   webdriver: { driver: Driver | undefined }
@@ -69,26 +88,26 @@ export const whenSetFrequencyGain = (
   when(
     /^I set gain of slider of frequency (\d+)Hz to (top|bottom)$/,
     async (frequency: number, position: string) => {
-      const sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
-      for (let i = 0; i < sliderElems.length; i += 1) {
-        const element = await sliderElems[i].$('input');
-        const name = await element.getAttribute('name');
-        if (name === `${frequency}-gain-range`) {
-          const coord = { x: 0, y: 0 };
-          if (position === 'top') {
-            coord.y = -100;
-          } else if (position === 'bottom') {
-            coord.y = 100;
-          }
-          element.dragAndDrop(coord);
-          // wait 1000 ms for the action.
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          return;
-        }
-      }
-      throw new Error(`${frequency} Hz gain band not found.`);
+      await setFrequencyGain(webdriver, frequency, position);
     }
   );
+};
+
+// ====================================
+
+const setFrequencyQuality = async (
+  webdriver: { driver: Driver | undefined },
+  frequency: number,
+  quality: string
+) => {
+  const element = await webdriver.driver.$(
+    `.mainContent label[for="${frequency}-quality"]`
+  );
+  const inputElement = await element.$('input');
+  await inputElement.setValue(parseFloat(quality));
+  await inputElement.keys('Tab');
+  // wait 1000 ms for the action.
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 };
 
 export const givenFrequencyQuality = (
@@ -96,26 +115,9 @@ export const givenFrequencyQuality = (
   webdriver: { driver: Driver | undefined }
 ) => {
   given(
-    /^the quality for the band with frequency (\d+)Hz is (\d+(.\d+)?)$/,
-    async (frequency: number, position: string) => {
-      const sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
-      for (let i = 0; i < sliderElems.length; i += 1) {
-        const element = await sliderElems[i].$('input');
-        const name = await element.getAttribute('name');
-        if (name === `${frequency}-gain-range`) {
-          const coord = { x: 0, y: 0 };
-          if (position === 'top') {
-            coord.y = -100;
-          } else if (position === 'bottom') {
-            coord.y = 100;
-          }
-          element.dragAndDrop(coord);
-          // wait 1000 ms for the action.
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          return;
-        }
-      }
-      throw new Error(`${frequency} Hz gain band not found.`);
+    /^the quality for the band with frequency (\d+)Hz is (\d+(?:.\d+)?)$/,
+    async (frequency: number, quality: string) => {
+      await setFrequencyQuality(webdriver, frequency, quality);
     }
   );
 };
@@ -125,26 +127,10 @@ export const whenSetFrequencyQuality = (
   webdriver: { driver: Driver | undefined }
 ) => {
   when(
-    /^I set the quality to (\d+(.\d+)?) for the band with frequency (\d+)Hz$/,
-    async (frequency: number, position: string) => {
-      const sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
-      for (let i = 0; i < sliderElems.length; i += 1) {
-        const element = await sliderElems[i].$('input');
-        const name = await element.getAttribute('name');
-        if (name === `${frequency}-gain-range`) {
-          const coord = { x: 0, y: 0 };
-          if (position === 'top') {
-            coord.y = -100;
-          } else if (position === 'bottom') {
-            coord.y = 100;
-          }
-          element.dragAndDrop(coord);
-          // wait 1000 ms for the action.
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          return;
-        }
-      }
-      throw new Error(`${frequency} Hz gain band not found.`);
+    /^I set the quality to (\d+(?:.\d+)?) for the band with frequency (\d+)Hz$/,
+    async (quality: string, frequency: number) => {
+      console.log(`${quality} ${frequency}`);
+      await setFrequencyQuality(webdriver, frequency, quality);
     }
   );
 };
@@ -155,30 +141,21 @@ export const whenSetFrequencyQualityUsingArrows = (
 ) => {
   when(
     /^I click on the (up|down) arrow for the quality for frequency (\d+)Hz (\d+) times$/,
-    async (direction: string, frequency: number, times: string) => {
-      const sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
-      for (let i = 0; i < sliderElems.length; i += 1) {
-        const element = await sliderElems[i].$('input');
-        const name = await element.getAttribute('name');
-        if (name === `${frequency}-gain-range`) {
-          console.log(direction);
-          console.log(times);
-          // const coord = { x: 0, y: 0 };
-          // if (position === 'top') {
-          //   coord.y = -100;
-          // } else if (position === 'bottom') {
-          //   coord.y = 100;
-          // }
-          // element.dragAndDrop(coord);
-          // // wait 1000 ms for the action.
-          // await new Promise((resolve) => setTimeout(resolve, 1000));
-          // return;
-        }
+    async (direction: string, frequency: number, times: number) => {
+      const element = await webdriver.driver.$(
+        `.mainContent label[for="${frequency}-quality"]`
+      );
+      const button = await element.$(`.arrow-${direction}`);
+      for (let i = 0; i < times; i += 1) {
+        await button.click();
+        // wait 500 ms for the action. necessary
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
-      throw new Error(`${frequency} Hz gain band not found.`);
     }
   );
 };
+
+// ====================================
 
 export const givenFrequencyFilterType = (
   given: DefineStepFunction,

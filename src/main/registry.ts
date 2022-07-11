@@ -22,7 +22,6 @@ const isSoftwareInstalled = async (softwareKey: string) => {
   const registryKey =
     'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall';
   const listResult = await regedit.list([registryKey]);
-  console.log(listResult);
 
   if (listResult[registryKey].exists) {
     // eslint-disable-next-line no-restricted-syntax
