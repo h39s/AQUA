@@ -27,12 +27,6 @@ const feature = loadFeature(
   './src/__tests__/cucumber_tests/features/set_filter_type.feature'
 );
 const webdriver: { driver: Driver } = { driver: undefined };
-// let configPath: string;
-
-// beforeAll(async () => {
-//   configPath = await getConfigPath();
-//   console.log(configPath);
-// });
 
 defineFeature(feature, (test) => {
   test('Select a new filter type using a mouse', async ({
