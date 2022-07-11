@@ -8,7 +8,7 @@ import { loadFeature, defineFeature } from 'jest-cucumber';
 import {
   Driver,
   startChromeDriver,
-  // stopChromeDriver,
+  stopChromeDriver,
 } from '__tests__/utils/webdriver';
 import { givenAquaIsRunning, givenEnabledState } from './shared_steps/aqua';
 import { givenBandCount, whenChangeBandCount } from './shared_steps/aquaSlider';
@@ -49,9 +49,9 @@ defineFeature(feature, (test) => {
   }, 30000);
 });
 
-// afterAll(() => {
-//   if (webdriver.driver) {
-//     webdriver.driver.deleteSession();
-//   }
-//   stopChromeDriver(chromeDriver);
-// });
+afterAll(() => {
+  if (webdriver.driver) {
+    webdriver.driver.deleteSession();
+  }
+  stopChromeDriver(chromeDriver);
+});
