@@ -12,10 +12,11 @@ import {
 } from '__tests__/utils/webdriver';
 import { givenAquaIsRunning, givenEnabledState } from './shared_steps/aqua';
 import {
-  givenFrequencyFilterType,
-  whenSetFrequencyFilterType,
+  givenPreampGain,
+  whenSetPreampGain,
+  whenSetPreampGainUsingArrows,
 } from './shared_steps/aquaSlider';
-import { thenFrequencyFilterType } from './shared_steps/config';
+import { thenPreampGain } from './shared_steps/config';
 import {
   givenCanWriteToAquaConfig,
   givenEqualizerApoIsInstalled,
@@ -24,30 +25,30 @@ import {
 const chromeDriver = startChromeDriver();
 
 const feature = loadFeature(
-  './src/__tests__/cucumber_tests/features/set_filter_type.feature'
+  './src/__tests__/cucumber_tests/features/set_preamp_gain.feature'
 );
 const webdriver: { driver: Driver } = { driver: undefined };
-// let configPath: string;
-
-// beforeAll(async () => {
-//   configPath = await getConfigPath();
-//   console.log(configPath);
-// });
 
 defineFeature(feature, (test) => {
-  test('Select a new filter type using a mouse', async ({
-    given,
-    when,
-    then,
-  }) => {
+  test('Set preamp gain using the slider', async ({ given, when, then }) => {
     givenEqualizerApoIsInstalled(given);
     givenCanWriteToAquaConfig(given);
     givenAquaIsRunning(given, webdriver, chromeDriver);
-    givenFrequencyFilterType(given, webdriver);
     givenEnabledState(given, webdriver);
 
-    whenSetFrequencyFilterType(when, webdriver);
-    thenFrequencyFilterType(then, webdriver);
+    whenSetPreampGain(when, webdriver);
+    thenPreampGain(then);
+  }, 30000);
+
+  test('Set preamp gain using the arrows', async ({ given, when, then }) => {
+    givenEqualizerApoIsInstalled(given);
+    givenCanWriteToAquaConfig(given);
+    givenAquaIsRunning(given, webdriver, chromeDriver);
+    givenPreampGain(when, webdriver);
+    givenEnabledState(given, webdriver);
+
+    whenSetPreampGainUsingArrows(when, webdriver);
+    thenPreampGain(then);
   }, 30000);
 });
 

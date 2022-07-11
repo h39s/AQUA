@@ -205,3 +205,25 @@ export const thenFrequencyFilterType = (
     }
   );
 };
+
+export const thenBandFrequency = (then: DefineStepFunction) => {
+  then(
+    /^Aqua config file should show a frequency of (\d+)Hz for band (\d+)$/,
+    async (frequency: string, bandIndex: number) => {
+      const configPath = await getConfigPath();
+      const config = readAquaConfig(configPath);
+      expect(config.filters[bandIndex - 1].freq).toBe(parseInt(frequency, 10));
+    }
+  );
+};
+
+export const thenPreampGain = (then: DefineStepFunction) => {
+  then(
+    /^Aqua config should show a preamp gain of (-?\d+)dB$/,
+    async (gain: string) => {
+      const configPath = await getConfigPath();
+      const config = readAquaConfig(configPath);
+      expect(config.preamp).toBe(parseInt(gain, 10));
+    }
+  );
+};

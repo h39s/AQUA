@@ -62,6 +62,8 @@ export const whenChangeBandCount = (
   });
 };
 
+// ====================================
+
 const setFrequencyGain = async (
   webdriver: { driver: Driver | undefined },
   frequency: number,
@@ -129,7 +131,6 @@ export const whenSetFrequencyQuality = (
   when(
     /^I set the quality to (\d+(?:.\d+)?) for the band with frequency (\d+)Hz$/,
     async (quality: string, frequency: number) => {
-      console.log(`${quality} ${frequency}`);
       await setFrequencyQuality(webdriver, frequency, quality);
     }
   );
@@ -221,6 +222,141 @@ export const whenSetFrequencyFilterType = (
       filterElement.click();
       // wait 1000 ms for the action.
       await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  );
+};
+
+// ====================================
+
+const setBandFrequency = async (
+  webdriver: { driver: Driver | undefined },
+  bandIndex: number,
+  frequency: number
+) => {
+  const inputElement = await webdriver.driver
+    .$$('.band')
+    [bandIndex - 1].$$('label')[0]
+    .$('input');
+  await inputElement.setValue(frequency);
+  await inputElement.keys('Tab');
+  // wait 1000 ms for the action.
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+};
+
+export const givenBandFrequency = (
+  given: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
+  given(
+    /^the frequency of band (\d+) is (\d+)Hz$/,
+    async (bandIndex: number, frequency: number) => {
+      await setBandFrequency(webdriver, bandIndex, frequency);
+    }
+  );
+};
+
+export const whenSetBandFrequency = (
+  when: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
+  when(
+    /^I set the frequency of band (\d+) to (\d+)Hz$/,
+    async (bandIndex: number, frequency: number) => {
+      await setBandFrequency(webdriver, bandIndex, frequency);
+    }
+  );
+};
+
+export const whenSetBandFrequencyUsingArrows = (
+  when: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
+  when(
+    /^I click on the (up|down) arrow of band (\d+) (\d+) times$/,
+    async (direction: string, bandIndex: number, times: number) => {
+      const button = await webdriver.driver
+        .$$('.band')
+        [bandIndex - 1].$(`.arrow-${direction}`);
+
+      for (let i = 0; i < times; i += 1) {
+        await button.click();
+        // wait 500 ms for the action. necessary
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+    }
+  );
+};
+
+// ====================================
+
+const setPreampGain = async (
+  webdriver: { driver: Driver | undefined },
+  position: string
+) => {
+  const element = await webdriver.driver.$(
+    '.sideBar input[name="Pre-Amplification Gain (dB)-range"]'
+  );
+  const coord = { x: 0, y: 0 };
+  if (position === 'top') {
+    coord.y = -100;
+  } else if (position === 'bottom') {
+    coord.y = 100;
+  }
+  element.dragAndDrop(coord);
+  // wait 1000 ms for the action.
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+};
+
+const setPreampGainNumber = async (
+  webdriver: { driver: Driver | undefined },
+  gain: number
+) => {
+  const inputElement = await webdriver.driver.$(
+    '.sideBar input[name="Pre-Amplification Gain (dB)-number"]'
+  );
+  await inputElement.setValue(gain);
+  await inputElement.keys('Tab');
+  // wait 1000 ms for the action.
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+};
+
+export const givenPreampGain = (
+  given: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
+  given(/^the preamp gain is (-?\d+)dB$/, async (gain: number) => {
+    await setPreampGainNumber(webdriver, gain);
+  });
+};
+
+export const whenSetPreampGain = (
+  when: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
+  when(
+    /^I set gain of the preamp slider to the (top|bottom)$/,
+    async (position: string) => {
+      await setPreampGain(webdriver, position);
+    }
+  );
+};
+
+export const whenSetPreampGainUsingArrows = (
+  when: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
+  when(
+    /^I click on the (up|down) arrow for the preamp gain (\d+) times$/,
+    async (direction: string, times: number) => {
+      const button = await webdriver.driver
+        .$('.sideBar')
+        .$(`.arrow-${direction}`);
+
+      for (let i = 0; i < times; i += 1) {
+        await button.click();
+        // wait 500 ms for the action. necessary
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
     }
   );
 };
