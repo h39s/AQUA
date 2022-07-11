@@ -44,11 +44,10 @@ export const givenEnabledState = (
       const desiredState = state === 'enabled';
       const equalizerSwitch = await webdriver.driver.$('.sideBar .switch');
 
-      const enabledInput = await equalizerSwitch.$('[aria-checked="1"]');
-      if (
-        (desiredState && enabledInput === null) ||
-        (!desiredState && enabledInput !== null)
-      ) {
+      const switchOn = await equalizerSwitch
+        .$('[aria-checked="1"]')
+        .isExisting();
+      if ((desiredState && !switchOn) || (!desiredState && switchOn)) {
         equalizerSwitch.click();
         // wait 1000 ms for the action.
         await new Promise((resolve) => setTimeout(resolve, 1000));
