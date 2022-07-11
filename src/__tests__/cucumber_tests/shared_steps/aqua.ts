@@ -45,7 +45,7 @@ export const givenEnabledState = (
       const equalizerSwitch = await webdriver.driver.$('.sideBar .switch');
 
       const switchOn = await equalizerSwitch
-        .$('[aria-checked="1"]')
+        .$('[aria-checked="true"]')
         .isExisting();
       if ((desiredState && !switchOn) || (!desiredState && switchOn)) {
         equalizerSwitch.click();
