@@ -64,6 +64,7 @@ export const getConfigPath = async () => {
     const configPath = listResult[registryKey].values.ConfigPath.value;
     return configPath as string;
   } catch (e) {
+    console.log(e);
     throw new Error('Config path not found');
   }
 };

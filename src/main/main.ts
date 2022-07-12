@@ -119,8 +119,8 @@ const handleUpdate = async (
     return;
   }
 
-  // Return a success message of 1
-  const reply: TSuccess = { result: 1 };
+  // Return a success message of undefined
+  const reply: TSuccess<void> = { result: undefined };
   event.reply(channel, reply);
 
   // Flush changes to our local state file after informing UI that the changes have been applied
@@ -135,7 +135,7 @@ ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
 });
 
 ipcMain.on(ChannelEnum.GET_ENABLE, async (event) => {
-  const reply: TSuccess = { result: state.isEnabled ? 1 : 0 };
+  const reply: TSuccess<boolean> = { result: !!state.isEnabled };
   event.reply(ChannelEnum.GET_ENABLE, reply);
 });
 
@@ -146,7 +146,7 @@ ipcMain.on(ChannelEnum.SET_ENABLE, async (event, arg) => {
 });
 
 ipcMain.on(ChannelEnum.GET_PREAMP, async (event) => {
-  const reply: TSuccess = { result: state.preAmp || 0 };
+  const reply: TSuccess<number> = { result: state.preAmp || 0 };
   event.reply(ChannelEnum.GET_PREAMP, reply);
 });
 
@@ -173,7 +173,9 @@ ipcMain.on(ChannelEnum.GET_FILTER_GAIN, async (event, arg) => {
     return;
   }
 
-  const reply: TSuccess = { result: state.filters[filterIndex].gain || 0 };
+  const reply: TSuccess<number> = {
+    result: state.filters[filterIndex].gain || 0,
+  };
   event.reply(channel + filterIndex, reply);
 });
 
@@ -207,7 +209,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_FREQUENCY, async (event, arg) => {
     return;
   }
 
-  const reply: TSuccess = {
+  const reply: TSuccess<number> = {
     result: state.filters[filterIndex].frequency || 10,
   };
   event.reply(channel + filterIndex, reply);
@@ -243,7 +245,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_QUALITY, async (event, arg) => {
     return;
   }
 
-  const reply: TSuccess = {
+  const reply: TSuccess<number> = {
     result: state.filters[filterIndex].quality || 10,
   };
   event.reply(channel + filterIndex, reply);
@@ -279,7 +281,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_TYPE, async (event, arg) => {
     return;
   }
 
-  const reply: TSuccess = {
+  const reply: TSuccess<string> = {
     result: state.filters[filterIndex].type,
   };
   event.reply(channel + filterIndex, reply);
@@ -306,7 +308,7 @@ ipcMain.on(ChannelEnum.SET_FILTER_TYPE, async (event, arg) => {
 });
 
 ipcMain.on(ChannelEnum.GET_FILTER_COUNT, async (event) => {
-  const reply: TSuccess = {
+  const reply: TSuccess<number> = {
     result: state.filters.length,
   };
   event.reply(ChannelEnum.GET_FILTER_COUNT, reply);

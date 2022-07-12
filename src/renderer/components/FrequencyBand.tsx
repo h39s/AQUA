@@ -33,7 +33,7 @@ interface IFrequencyBandProps {
 const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
   const [actualFrequency, setActualFrequency] = useState<number>(0);
   const [actualQuality, setActualQuality] = useState<number>(0);
-  const [filterType, setFilterType] = useState<string>(FilterTypeEnum.PEAK);
+  const [filterType, setFilterType] = useState<string>(FilterTypeEnum.PK);
 
   const { globalError, setGlobalError } = useContext(AquaContext);
 
@@ -94,7 +94,7 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
         value={actualFrequency}
         min={MIN_FREQUENCY}
         max={MAX_FREQUENCY}
-        name={`${actualFrequency}`}
+        name={`${actualFrequency}-frequency`}
         isDisabled={!!globalError}
         showArrows
         handleSubmit={handleFrequencySubmit}
@@ -112,9 +112,10 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
         value={actualQuality}
         min={MIN_QUALITY}
         max={MAX_QUALITY}
-        name={`${actualQuality}`}
+        name={`${actualFrequency}-quality`}
         isDisabled={!!globalError}
         floatPrecision={3}
+        showArrows
         handleSubmit={handleQualitySubmit}
       />
     </div>

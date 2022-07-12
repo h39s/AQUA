@@ -36,7 +36,7 @@
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
     "test": "jest",
     "test:unit": "jest --testMatch **/__tests__/unit_tests/*.ts?(x)",
-    "test:cucumber": "jest --testMatch **/__tests__/cucumber_tests/*.ts?(x)"
+    "test:cucumber": "jest --testMatch **/__tests__/cucumber_tests/*.ts?(x) --runInBand"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -157,7 +157,6 @@
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.5.0",
     "file-loader": "^6.2.0",
-    "get-random-values-polypony": "^1.0.0",
     "html-webpack-plugin": "^5.5.0",
     "husky": "^8.0.1",
     "identity-obj-proxy": "^3.0.0",

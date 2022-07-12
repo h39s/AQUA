@@ -11,8 +11,8 @@ import {
   stopChromeDriver,
 } from '__tests__/utils/webdriver';
 import { givenAquaIsRunning, givenEnabledState } from './shared_steps/aqua';
-import { whenSetFrequencyGain } from './shared_steps/aquaSlider';
-import { thenFrequencyGain } from './shared_steps/config';
+import { givenBandCount, whenChangeBandCount } from './shared_steps/aquaSlider';
+import { thenBandCount } from './shared_steps/config';
 import {
   givenCanWriteToAquaConfig,
   givenEqualizerApoIsInstalled,
@@ -21,19 +21,31 @@ import {
 const chromeDriver = startChromeDriver();
 
 const feature = loadFeature(
-  './src/__tests__/cucumber_tests/features/set_band_gain.feature'
+  './src/__tests__/cucumber_tests/features/change_number_of_bands.feature'
 );
 const webdriver: { driver: Driver } = { driver: undefined };
 
 defineFeature(feature, (test) => {
-  test('Move slider to bottom', async ({ given, when, then }) => {
+  test('Add a frequency band', async ({ given, when, then }) => {
     givenEqualizerApoIsInstalled(given);
     givenCanWriteToAquaConfig(given);
     givenAquaIsRunning(given, webdriver, chromeDriver);
     givenEnabledState(given, webdriver);
+    givenBandCount(given, webdriver);
 
-    whenSetFrequencyGain(when, webdriver);
-    thenFrequencyGain(then, webdriver);
+    whenChangeBandCount(when, webdriver);
+    thenBandCount(then);
+  }, 30000);
+
+  test('Remove a frequency band', async ({ given, when, then }) => {
+    givenEqualizerApoIsInstalled(given);
+    givenCanWriteToAquaConfig(given);
+    givenAquaIsRunning(given, webdriver, chromeDriver);
+    givenEnabledState(given, webdriver);
+    givenBandCount(given, webdriver);
+
+    whenChangeBandCount(when, webdriver);
+    thenBandCount(then);
   }, 30000);
 });
 

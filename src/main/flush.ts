@@ -23,7 +23,7 @@ export const DEFAULT_FILTER: IFilter = {
   frequency: 1000,
   gain: 0,
   quality: 1,
-  type: FilterTypeEnum.PEAK,
+  type: FilterTypeEnum.PK,
 };
 
 const DEFAULT_FILTERS: IFilter[] = FIXED_FREQUENCIES.map((f) => {
@@ -31,7 +31,7 @@ const DEFAULT_FILTERS: IFilter[] = FIXED_FREQUENCIES.map((f) => {
     frequency: f,
     gain: 0,
     quality: 1,
-    type: FilterTypeEnum.PEAK,
+    type: FilterTypeEnum.PK,
   };
 });
 
@@ -71,8 +71,8 @@ export const serializeState = (state: IState) => {
 };
 
 const CONFIG_CONTENT = 'Include: aqua.txt';
-const AQUA_LOCAL_CONFIG_FILENAME = 'state.txt';
-const AQUA_CONFIG_FILENAME = 'aqua.txt';
+export const AQUA_LOCAL_CONFIG_FILENAME = 'state.txt';
+export const AQUA_CONFIG_FILENAME = 'aqua.txt';
 const CONFIG_FILENAME = 'config.txt';
 
 const addFileToPath = (pathPrefix: string, fileName: string) => {
@@ -113,29 +113,24 @@ export const flush = (state: IState, configDirPath: string) => {
   }
 };
 
-export const checkConfigFile = (configPath: string) => {
+export const checkConfigFile = (configDirPath: string) => {
+  const configPath = addFileToPath(configDirPath, CONFIG_FILENAME);
   try {
-    const content = fs.readFileSync(
-      addFileToPath(configPath, CONFIG_FILENAME),
-      {
-        encoding: 'utf8',
-      }
-    );
+    const content = fs.readFileSync(configPath, {
+      encoding: 'utf8',
+    });
     return content.search(CONFIG_CONTENT) !== -1;
   } catch (ex) {
     throw new Error(`Unable to locate config file at ${configPath}`);
   }
 };
 
-export const updateConfig = (configPath: string) => {
+export const updateConfig = (configDirPath: string) => {
+  const configPath = addFileToPath(configDirPath, CONFIG_FILENAME);
   try {
-    fs.writeFileSync(
-      addFileToPath(configPath, CONFIG_FILENAME),
-      CONFIG_CONTENT,
-      {
-        encoding: 'utf8',
-      }
-    );
+    fs.writeFileSync(configPath, CONFIG_CONTENT, {
+      encoding: 'utf8',
+    });
   } catch (ex) {
     throw new Error(`Unable to locate config file at ${configPath}`);
   }

@@ -11,8 +11,11 @@ import {
   stopChromeDriver,
 } from '__tests__/utils/webdriver';
 import { givenAquaIsRunning, givenEnabledState } from './shared_steps/aqua';
-import { whenSetFrequencyGain } from './shared_steps/aquaSlider';
-import { thenFrequencyGain } from './shared_steps/config';
+import {
+  givenFrequencyFilterType,
+  whenSetFrequencyFilterType,
+} from './shared_steps/aquaSlider';
+import { thenFrequencyFilterType } from './shared_steps/config';
 import {
   givenCanWriteToAquaConfig,
   givenEqualizerApoIsInstalled,
@@ -21,19 +24,24 @@ import {
 const chromeDriver = startChromeDriver();
 
 const feature = loadFeature(
-  './src/__tests__/cucumber_tests/features/set_band_gain.feature'
+  './src/__tests__/cucumber_tests/features/set_filter_type.feature'
 );
 const webdriver: { driver: Driver } = { driver: undefined };
 
 defineFeature(feature, (test) => {
-  test('Move slider to bottom', async ({ given, when, then }) => {
+  test('Select a new filter type using a mouse', async ({
+    given,
+    when,
+    then,
+  }) => {
     givenEqualizerApoIsInstalled(given);
     givenCanWriteToAquaConfig(given);
     givenAquaIsRunning(given, webdriver, chromeDriver);
+    givenFrequencyFilterType(given, webdriver);
     givenEnabledState(given, webdriver);
 
-    whenSetFrequencyGain(when, webdriver);
-    thenFrequencyGain(then, webdriver);
+    whenSetFrequencyFilterType(when, webdriver);
+    thenFrequencyFilterType(then, webdriver);
   }, 30000);
 });
 

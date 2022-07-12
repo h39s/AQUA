@@ -19,12 +19,14 @@ const options: RemoteOptions = {
 };
 
 export const startChromeDriver = () => {
-  return spawn('chromedriver.exe', ['--port=9515'], {
+  const cwd = path.join(__dirname, '../../../');
+  const chromedriverPath = path.join(
+    'node_modules/electron-chromedriver/bin',
+    'chromedriver.exe'
+  );
+  return spawn(chromedriverPath, ['--port=9515'], {
     shell: true,
-    cwd: path.join(
-      __dirname,
-      '../../../node_modules/electron-chromedriver/bin'
-    ),
+    cwd,
   });
 };
 

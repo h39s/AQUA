@@ -16,19 +16,19 @@ import {
 
 const TIMEOUT = 10000;
 
-export interface TSuccess {
-  result: number | string;
+export interface TSuccess<Type> {
+  result: Type;
 }
 
 export interface TError {
   errorCode: ErrorCode;
 }
 
-type TResult = TSuccess | TError;
+type TResult<Type> = TSuccess<Type> | TError;
 
 const promisifyResult = <Type>(
   responseHandler: (
-    arg: TResult,
+    arg: TResult<Type>,
     resolve: (value: Type | PromiseLike<Type>) => void,
     reject: (reason?: ErrorDescription) => void
   ) => void,
@@ -38,7 +38,7 @@ const promisifyResult = <Type>(
     let timer: NodeJS.Timeout;
 
     const handler = (arg: unknown) => {
-      responseHandler(arg as TResult, resolve, reject);
+      responseHandler(arg as TResult<Type>, resolve, reject);
       clearTimeout(timer);
     };
 
@@ -59,7 +59,7 @@ const buildResponseHandler = <Type extends string | number | boolean | void>(
   ) => void
 ) => {
   return (
-    arg: TResult,
+    arg: TResult<Type>,
     resolve: (value: Type | PromiseLike<Type>) => void,
     reject: (reason?: ErrorDescription) => void
   ) => {
@@ -67,7 +67,7 @@ const buildResponseHandler = <Type extends string | number | boolean | void>(
       reject(getErrorDescription(arg.errorCode));
       return;
     }
-    const { result } = arg as TSuccess;
+    const { result } = arg as TSuccess<Type>;
     resultEvaluator(result as Type, resolve, reject);
   };
 };

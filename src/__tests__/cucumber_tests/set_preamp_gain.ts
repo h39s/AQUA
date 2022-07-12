@@ -11,8 +11,12 @@ import {
   stopChromeDriver,
 } from '__tests__/utils/webdriver';
 import { givenAquaIsRunning, givenEnabledState } from './shared_steps/aqua';
-import { whenSetFrequencyGain } from './shared_steps/aquaSlider';
-import { thenFrequencyGain } from './shared_steps/config';
+import {
+  givenPreampGain,
+  whenSetPreampGain,
+  whenSetPreampGainUsingArrows,
+} from './shared_steps/aquaSlider';
+import { thenPreampGain } from './shared_steps/config';
 import {
   givenCanWriteToAquaConfig,
   givenEqualizerApoIsInstalled,
@@ -21,19 +25,30 @@ import {
 const chromeDriver = startChromeDriver();
 
 const feature = loadFeature(
-  './src/__tests__/cucumber_tests/features/set_band_gain.feature'
+  './src/__tests__/cucumber_tests/features/set_preamp_gain.feature'
 );
 const webdriver: { driver: Driver } = { driver: undefined };
 
 defineFeature(feature, (test) => {
-  test('Move slider to bottom', async ({ given, when, then }) => {
+  test('Set preamp gain using the slider', async ({ given, when, then }) => {
     givenEqualizerApoIsInstalled(given);
     givenCanWriteToAquaConfig(given);
     givenAquaIsRunning(given, webdriver, chromeDriver);
     givenEnabledState(given, webdriver);
 
-    whenSetFrequencyGain(when, webdriver);
-    thenFrequencyGain(then, webdriver);
+    whenSetPreampGain(when, webdriver);
+    thenPreampGain(then);
+  }, 30000);
+
+  test('Set preamp gain using the arrows', async ({ given, when, then }) => {
+    givenEqualizerApoIsInstalled(given);
+    givenCanWriteToAquaConfig(given);
+    givenAquaIsRunning(given, webdriver, chromeDriver);
+    givenPreampGain(given, webdriver);
+    givenEnabledState(given, webdriver);
+
+    whenSetPreampGainUsingArrows(when, webdriver);
+    thenPreampGain(then);
   }, 30000);
 });
 
