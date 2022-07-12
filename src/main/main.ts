@@ -395,7 +395,7 @@ const createMainWindow = async () => {
     minWidth: 1024,
     height: 728,
     minHeight: 728,
-    icon: getAssetPath('aquasimple.png'),
+    icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
