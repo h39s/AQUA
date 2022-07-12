@@ -225,10 +225,8 @@
         }
       ]
     },
-    "win": {
-      "target": [
-        "nsis"
-      ]
+    "nsis": {
+      "runAfterFinish": false
     },
     "linux": {
       "target": [
