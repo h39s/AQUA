@@ -3,7 +3,7 @@ import { act, screen } from '@testing-library/react';
 import { setup } from '../utils/userEventUtils';
 import Dropdown from '../../renderer/widgets/Dropdown';
 import { FILTER_OPTIONS } from '../../renderer/icons/FilterTypeIcon';
-import { FilterTypeEnum } from '../../common/constants';
+import { FilterTypeEnum, FilterTypeToLabelMap } from '../../common/constants';
 
 describe('Dropdown', () => {
   const name = 'dropdown';
@@ -14,33 +14,36 @@ describe('Dropdown', () => {
   });
 
   it('should render the dropdown and click on an item', async () => {
+    const filterType = FilterTypeEnum.PK;
     const { user } = setup(
       <Dropdown
         name={name}
-        value={FilterTypeEnum.PK}
+        value={filterType}
         options={FILTER_OPTIONS}
         isDisabled={false}
         handleChange={handleChange}
       />
     );
 
-    const value = screen.getByTitle('Peak Filter');
+    const value = screen.getByTitle(FilterTypeToLabelMap[filterType]);
     expect(value).toBeInTheDocument();
     const dropdown = screen.getByLabelText(name);
     await user.click(dropdown);
     expect(screen.getByLabelText(`${name}-items`)).toBeInTheDocument();
 
-    const newValue = screen.getByLabelText('Notch Filter');
+    const newFilterType = FilterTypeEnum.NO;
+    const newValue = screen.getByLabelText(FilterTypeToLabelMap[newFilterType]);
     expect(newValue).toBeInTheDocument();
     await user.click(newValue);
-    expect(handleChange).toHaveBeenCalledWith(FilterTypeEnum.NO);
+    expect(handleChange).toHaveBeenCalledWith(newFilterType);
   });
 
   it('should render the dropdown and select an item using keys', async () => {
+    const filterType = FilterTypeEnum.LSC;
     const { user } = setup(
       <Dropdown
         name={name}
-        value={FilterTypeEnum.LPQ}
+        value={filterType}
         options={FILTER_OPTIONS}
         isDisabled={false}
         handleChange={handleChange}
@@ -49,18 +52,19 @@ describe('Dropdown', () => {
 
     const dropdown = screen.getByLabelText(name);
     await user.click(dropdown);
-    const item = screen.getByLabelText('Low Pass Filter');
+    const item = screen.getByLabelText(FilterTypeToLabelMap[filterType]);
     expect(item).toHaveFocus();
 
     await user.keyboard('{ArrowDown}{Enter}');
-    expect(handleChange).toHaveBeenCalledWith(FilterTypeEnum.HPQ);
+    expect(handleChange).toHaveBeenCalledWith(FilterTypeEnum.HSC);
   });
 
   it('should render the dropdown and select an item using tab', async () => {
+    const filterType = FilterTypeEnum.LSC;
     const { user } = setup(
       <Dropdown
         name={name}
-        value={FilterTypeEnum.LPQ}
+        value={filterType}
         options={FILTER_OPTIONS}
         isDisabled={false}
         handleChange={handleChange}
@@ -69,11 +73,11 @@ describe('Dropdown', () => {
 
     const dropdown = screen.getByLabelText(name);
     await user.click(dropdown);
-    const item = screen.getByLabelText('Low Pass Filter');
+    const item = screen.getByLabelText(FilterTypeToLabelMap[filterType]);
     expect(item).toHaveFocus();
 
     await user.keyboard('{Tab}{Enter}');
-    expect(handleChange).toHaveBeenCalledWith(FilterTypeEnum.HPQ);
+    expect(handleChange).toHaveBeenCalledWith(FilterTypeEnum.HSC);
   });
 
   it('should prevent using arrow keys to leave the dropdown menu', async () => {
@@ -147,29 +151,33 @@ describe('Dropdown', () => {
   });
 
   it('should disable the dropdown', async () => {
+    const filterType = FilterTypeEnum.LSC;
     const { user } = setup(
       <Dropdown
         name={name}
-        value={FilterTypeEnum.LPQ}
+        value={filterType}
         options={FILTER_OPTIONS}
         isDisabled
         handleChange={handleChange}
       />
     );
 
-    const value = screen.getByTitle('Low Pass Filter');
+    const value = screen.getByTitle(FilterTypeToLabelMap[filterType]);
     expect(value).toBeInTheDocument();
     const dropdown = screen.getByLabelText(name);
     await user.click(dropdown);
-    expect(screen.queryByLabelText('Low Pass Filter')).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText(FilterTypeToLabelMap[filterType])
+    ).not.toBeInTheDocument();
   });
 
   it('should close the dropdown when clicking outside', async () => {
+    const filterType = FilterTypeEnum.PK;
     const { user } = setup(
       <div>
         <Dropdown
           name={name}
-          value={FilterTypeEnum.PK}
+          value={filterType}
           options={FILTER_OPTIONS}
           isDisabled={false}
           handleChange={handleChange}
@@ -180,7 +188,7 @@ describe('Dropdown', () => {
 
     const dropdown = screen.getByLabelText(name);
     await user.click(dropdown);
-    const item = screen.getByLabelText('Peak Filter');
+    const item = screen.getByLabelText(FilterTypeToLabelMap[filterType]);
     expect(item).toHaveFocus();
 
     await user.click(screen.getByText('Outside'));
@@ -188,11 +196,12 @@ describe('Dropdown', () => {
   });
 
   it('should close the dropdown when focus moves outside', async () => {
+    const filterType = FilterTypeEnum.PK;
     const { user } = setup(
       <div>
         <Dropdown
           name={name}
-          value={FilterTypeEnum.PK}
+          value={filterType}
           options={FILTER_OPTIONS}
           isDisabled={false}
           handleChange={handleChange}
@@ -203,7 +212,7 @@ describe('Dropdown', () => {
 
     const dropdown = screen.getByLabelText(name);
     await user.click(dropdown);
-    const item = screen.getByLabelText('Peak Filter');
+    const item = screen.getByLabelText(FilterTypeToLabelMap[filterType]);
     expect(item).toHaveFocus();
 
     // Need this because the focus triggers a state update and so we need to wait
