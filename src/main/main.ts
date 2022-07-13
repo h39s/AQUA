@@ -393,13 +393,19 @@ const createMainWindow = async () => {
     show: false,
     width: 1024,
     minWidth: 1024,
-    height: 728,
-    minHeight: 728,
+    height: 512,
+    minHeight: 512,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
+    },
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#1c313a',
+      symbolColor: '#ffffff',
+      height: 28,
     },
   });
 

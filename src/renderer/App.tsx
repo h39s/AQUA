@@ -10,7 +10,7 @@ import SideBar from './SideBar';
 
 const AppContent = () => {
   return (
-    <div className="full row">
+    <div className="parameteric-wrapper row">
       <SideBar />
       <MainContent />
     </div>
