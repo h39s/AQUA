@@ -20,7 +20,7 @@ export enum FilterTypeEnum {
   // LPQ = 'LPQ', // Low Pass ["LPQ",False,True]
   // HPQ = 'HPQ', // High Pass ["HPQ",False,True]
   // BP = 'BP', // Band Pass ["BP",False,True]
-  NO = 'NO', // Notch ["NO",False,True]
+  // NO = 'NO', // Notch ["NO",False,True]
   // AP = 'AP', // All Pass ["AP",False,True]
   LSC = 'LSC', // Low Shelf ["LSC",True,True]
   HSC = 'HSC', // High Shelf ["HSC",True,True]
@@ -38,7 +38,7 @@ export const FilterTypeToLabelMap: Record<FilterTypeEnum, string> = {
   // [FilterTypeEnum.HPQ]: 'High Pass Filter',
   [FilterTypeEnum.LSC]: 'Low Shelf Filter',
   [FilterTypeEnum.HSC]: 'High Shelf Filter',
-  [FilterTypeEnum.NO]: 'Notch Filter',
+  // [FilterTypeEnum.NO]: 'Notch Filter',
 };
 
 /** ----- Peace specific ----- */

@@ -87,23 +87,23 @@ const FilterTypeIcon = ({ type }: { type: FilterTypeEnum }) => {
           />
         </svg>
       );
-    case FilterTypeEnum.NO:
-      return (
-        <svg
-          width="32"
-          height="16"
-          viewBox="0 0 32 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <title>Notch Filter</title>
-          <path
-            d="M32 2C32 2 26.2271 2 23.3503 2C20.4735 2 18.5556 14 16.0623 14C13.5691 14 11.6512 2 8.39077 2C5.13036 2 0 2 0 2"
-            stroke="#F74F6E"
-            strokeWidth="2"
-          />
-        </svg>
-      );
+    // case FilterTypeEnum.NO:
+    //   return (
+    //     <svg
+    //       width="32"
+    //       height="16"
+    //       viewBox="0 0 32 16"
+    //       fill="none"
+    //       xmlns="http://www.w3.org/2000/svg"
+    //     >
+    //       <title>Notch Filter</title>
+    //       <path
+    //         d="M32 2C32 2 26.2271 2 23.3503 2C20.4735 2 18.5556 14 16.0623 14C13.5691 14 11.6512 2 8.39077 2C5.13036 2 0 2 0 2"
+    //         stroke="#F74F6E"
+    //         strokeWidth="2"
+    //       />
+    //     </svg>
+    //   );
     default:
       return <></>;
   }

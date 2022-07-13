@@ -31,7 +31,7 @@ describe('Dropdown', () => {
     await user.click(dropdown);
     expect(screen.getByLabelText(`${name}-items`)).toBeInTheDocument();
 
-    const newFilterType = FilterTypeEnum.NO;
+    const newFilterType = FilterTypeEnum.LSC;
     const newValue = screen.getByLabelText(FilterTypeToLabelMap[newFilterType]);
     expect(newValue).toBeInTheDocument();
     await user.click(newValue);
