@@ -10,10 +10,13 @@ import SideBar from './SideBar';
 
 const AppContent = () => {
   return (
-    <div className="parameteric-wrapper row">
-      <SideBar />
-      <MainContent />
-    </div>
+    <>
+      <div className="parameteric-wrapper row">
+        <SideBar />
+        <MainContent />
+      </div>
+      {/* <div className="graph-wrapper" /> */}
+    </>
   );
 };
 

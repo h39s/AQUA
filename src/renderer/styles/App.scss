@@ -21,6 +21,11 @@ body {
     padding-top: $spacing-s;
     height: calc(100vh - $titlebar-height - $spacing-m - $spacing-s);
     width: calc(100vw - 2 * $spacing-m);
+
+    // Add flex so we can split space bweteen parametric and graph views
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-s;
   }
 }
 
@@ -42,8 +47,14 @@ body {
 }
 
 .parameteric-wrapper {
-  height: 100%;
+  flex: 1;
   gap: $spacing-s;
+}
+
+.graph-wrapper {
+  flex: 1;
+  border-radius: $spacing-m;
+  border: 2px solid $secondary-default;
 }
 
 .row {

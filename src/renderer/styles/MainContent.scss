@@ -14,7 +14,7 @@ $band-width: 64px;
   padding: $spacing-s;
   justify-items: center;
 
-  border-radius: 16px;
+  border-radius: $spacing-m;
   border: 2px solid $secondary-default;
 
   .bandLabel {

@@ -4,9 +4,8 @@
 
 .sideBar {
   width: calc(100% - $content-width);
-  gap: $spacing-m;
   padding: $spacing-s;
 
-  border-radius: 16px;
+  border-radius: $spacing-m;
   background: $primary-default;
 }
