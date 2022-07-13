@@ -2,6 +2,9 @@
 @import 'spacing';
 
 .dropdown {
+  // Necessary so that the absolutely positioned children will scroll with the parent
+  position: relative;
+
   [role='menu'] {
     background: $primary-dark;
     color: $white;

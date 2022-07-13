@@ -402,7 +402,6 @@ const createMainWindow = async () => {
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
-  mainWindow.webContents.openDevTools();
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
@@ -414,6 +413,11 @@ const createMainWindow = async () => {
       mainWindow.minimize();
     } else {
       mainWindow.show();
+    }
+
+    if (isDebug) {
+      // When in debug mode, show dev tools after the app loads
+      mainWindow.webContents.openDevTools();
     }
   });
 

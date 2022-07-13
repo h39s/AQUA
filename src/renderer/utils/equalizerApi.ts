@@ -194,7 +194,7 @@ export const getFrequency = (index: number): Promise<number> => {
  */
 export const setFrequency = (index: number, frequency: number) => {
   const channel = ChannelEnum.SET_FILTER_FREQUENCY;
-  if (frequency <= MIN_FREQUENCY || frequency > MAX_FREQUENCY) {
+  if (frequency < MIN_FREQUENCY || frequency > MAX_FREQUENCY) {
     throw new Error(
       `Invalid gain value - outside of range (${MIN_FREQUENCY}, ${MAX_FREQUENCY}]`
     );

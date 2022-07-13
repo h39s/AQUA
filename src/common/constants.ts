@@ -5,9 +5,9 @@ import { clamp } from '../renderer/utils/utils';
 export const MAX_GAIN = 30;
 export const MIN_GAIN = -30;
 
-export const MAX_FREQUENCY = 20000; // Peace's actual limit is 22050
-export const MIN_FREQUENCY = 10; // graph input's limit is 10 Hz
-export const MAX_QUALITY = 999.999;
+export const MAX_FREQUENCY = 20000;
+export const MIN_FREQUENCY = 1;
+export const MAX_QUALITY = 100;
 export const MIN_QUALITY = 0.001;
 
 export const MAX_NUM_FILTERS = 20; // TODO: Investigate an appropriate value for this
@@ -17,10 +17,10 @@ export const MIN_NUM_FILTERS = 1;
 // Need to use LSC and HSC to allow users to adjust quality for low/high shelf filters
 export enum FilterTypeEnum {
   PK = 'PK', // Peak ["PK",True,True]
-  LPQ = 'LPQ', // Low Pass ["LPQ",False,True]
-  HPQ = 'HPQ', // High Pass ["HPQ",False,True]
+  // LPQ = 'LPQ', // Low Pass ["LPQ",False,True]
+  // HPQ = 'HPQ', // High Pass ["HPQ",False,True]
   // BP = 'BP', // Band Pass ["BP",False,True]
-  NO = 'NO', // Notch ["NO",False,True]
+  // NO = 'NO', // Notch ["NO",False,True]
   // AP = 'AP', // All Pass ["AP",False,True]
   LSC = 'LSC', // Low Shelf ["LSC",True,True]
   HSC = 'HSC', // High Shelf ["HSC",True,True]
@@ -34,11 +34,11 @@ export enum FilterTypeEnum {
 
 export const FilterTypeToLabelMap: Record<FilterTypeEnum, string> = {
   [FilterTypeEnum.PK]: 'Peak Filter',
-  [FilterTypeEnum.LPQ]: 'Low Pass Filter',
-  [FilterTypeEnum.HPQ]: 'High Pass Filter',
+  // [FilterTypeEnum.LPQ]: 'Low Pass Filter',
+  // [FilterTypeEnum.HPQ]: 'High Pass Filter',
   [FilterTypeEnum.LSC]: 'Low Shelf Filter',
   [FilterTypeEnum.HSC]: 'High Shelf Filter',
-  [FilterTypeEnum.NO]: 'Notch Filter',
+  // [FilterTypeEnum.NO]: 'Notch Filter',
 };
 
 /** ----- Peace specific ----- */

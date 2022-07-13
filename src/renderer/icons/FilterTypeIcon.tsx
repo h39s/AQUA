@@ -19,40 +19,40 @@ const FilterTypeIcon = ({ type }: { type: FilterTypeEnum }) => {
           />
         </svg>
       );
-    case FilterTypeEnum.LPQ:
-      return (
-        <svg
-          width="32"
-          height="17"
-          viewBox="0 0 32 17"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <title>Low Pass Filter</title>
-          <path
-            d="M1 2C1 2 10.5 2 13.5 2C16.5 2 20.5 7.50024 22 10.0002C23.5 12.5002 24.5 15.5002 24.5 16.0002"
-            stroke="#F7844F"
-            strokeWidth="2"
-          />
-        </svg>
-      );
-    case FilterTypeEnum.HPQ:
-      return (
-        <svg
-          width="32"
-          height="17"
-          viewBox="0 0 32 17"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <title>High Pass Filter</title>
-          <path
-            d="M32 2C32 2 22.5 2 19.5 2C16.5 2 12.5 7.50024 11 10.0002C9.5 12.5002 8.5 15.5002 8.5 16.0002"
-            stroke="#4FF7D8"
-            strokeWidth="2"
-          />
-        </svg>
-      );
+    // case FilterTypeEnum.LPQ:
+    //   return (
+    //     <svg
+    //       width="32"
+    //       height="17"
+    //       viewBox="0 0 32 17"
+    //       fill="none"
+    //       xmlns="http://www.w3.org/2000/svg"
+    //     >
+    //       <title>Low Pass Filter</title>
+    //       <path
+    //         d="M1 2C1 2 10.5 2 13.5 2C16.5 2 20.5 7.50024 22 10.0002C23.5 12.5002 24.5 15.5002 24.5 16.0002"
+    //         stroke="#F7844F"
+    //         strokeWidth="2"
+    //       />
+    //     </svg>
+    //   );
+    // case FilterTypeEnum.HPQ:
+    //   return (
+    //     <svg
+    //       width="32"
+    //       height="17"
+    //       viewBox="0 0 32 17"
+    //       fill="none"
+    //       xmlns="http://www.w3.org/2000/svg"
+    //     >
+    //       <title>High Pass Filter</title>
+    //       <path
+    //         d="M32 2C32 2 22.5 2 19.5 2C16.5 2 12.5 7.50024 11 10.0002C9.5 12.5002 8.5 15.5002 8.5 16.0002"
+    //         stroke="#4FF7D8"
+    //         strokeWidth="2"
+    //       />
+    //     </svg>
+    //   );
     case FilterTypeEnum.LSC:
       return (
         <svg
@@ -87,23 +87,23 @@ const FilterTypeIcon = ({ type }: { type: FilterTypeEnum }) => {
           />
         </svg>
       );
-    case FilterTypeEnum.NO:
-      return (
-        <svg
-          width="32"
-          height="16"
-          viewBox="0 0 32 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <title>Notch Filter</title>
-          <path
-            d="M32 2C32 2 26.2271 2 23.3503 2C20.4735 2 18.5556 14 16.0623 14C13.5691 14 11.6512 2 8.39077 2C5.13036 2 0 2 0 2"
-            stroke="#F74F6E"
-            strokeWidth="2"
-          />
-        </svg>
-      );
+    // case FilterTypeEnum.NO:
+    //   return (
+    //     <svg
+    //       width="32"
+    //       height="16"
+    //       viewBox="0 0 32 16"
+    //       fill="none"
+    //       xmlns="http://www.w3.org/2000/svg"
+    //     >
+    //       <title>Notch Filter</title>
+    //       <path
+    //         d="M32 2C32 2 26.2271 2 23.3503 2C20.4735 2 18.5556 14 16.0623 14C13.5691 14 11.6512 2 8.39077 2C5.13036 2 0 2 0 2"
+    //         stroke="#F74F6E"
+    //         strokeWidth="2"
+    //       />
+    //     </svg>
+    //   );
     default:
       return <></>;
   }
