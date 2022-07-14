@@ -1,6 +1,6 @@
 import { ErrorDescription } from 'common/errors';
 import { MAX_NUM_FILTERS, MIN_NUM_FILTERS } from 'common/constants';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   addEqualizerSlider,
   getEqualizerSliderCount,
@@ -10,11 +10,11 @@ import FrequencyBand from './components/FrequencyBand';
 import MinusIcon from './icons/MinusIcon';
 import PlusIcon from './icons/PlusIcon';
 import Button from './widgets/Button';
-import { AquaContext } from './utils/AquaContext';
+import { useAquaContext } from './utils/AquaContext';
 import './styles/MainContent.scss';
 
 const MainContent = () => {
-  const { globalError, setGlobalError } = useContext(AquaContext);
+  const { globalError, setGlobalError, filters } = useAquaContext();
   const [sliderIndices, setSliderIndices] = useState<number[]>([]);
 
   useEffect(() => {
@@ -56,7 +56,7 @@ const MainContent = () => {
 
   return (
     <>
-      {sliderIndices.length === 0 ? (
+      {filters.length === 0 ? (
         <div className="center full row">
           <h1>Loading...</h1>
         </div>
@@ -74,9 +74,11 @@ const MainContent = () => {
             <span className="rowLabel">Quality</span>
           </div>
           <div className="bands row center">
-            {sliderIndices.map((sliderIndex) => (
+            {filters.map((filter, sliderIndex) => (
               <FrequencyBand
                 sliderIndex={sliderIndex}
+                filter={filter}
+                // eslint-disable-next-line react/no-array-index-key
                 key={`slider-${sliderIndex}`}
               />
             ))}

@@ -1,45 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { FilterTypeEnum } from '../common/constants';
-
-interface IFilter {
-  frequency: number;
-  gain: number;
-  type: FilterTypeEnum;
-  quality: number;
-}
-
-export interface IState {
-  isEnabled: boolean;
-  preAmp: number;
-  filters: IFilter[];
-}
-
-const FIXED_FREQUENCIES = [
-  32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000,
-];
-
-export const DEFAULT_FILTER: IFilter = {
-  frequency: 1000,
-  gain: 0,
-  quality: 1,
-  type: FilterTypeEnum.PK,
-};
-
-const DEFAULT_FILTERS: IFilter[] = FIXED_FREQUENCIES.map((f) => {
-  return {
-    frequency: f,
-    gain: 0,
-    quality: 1,
-    type: FilterTypeEnum.PK,
-  };
-});
-
-const DEFAULT_STATE: IState = {
-  isEnabled: true,
-  preAmp: 0,
-  filters: DEFAULT_FILTERS,
-};
+import { DEFAULT_STATE, IState } from '../common/constants';
 
 export const stateToString = (state: IState) => {
   if (!state.isEnabled) {

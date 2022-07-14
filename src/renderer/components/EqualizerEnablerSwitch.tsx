@@ -1,11 +1,11 @@
 import { ErrorDescription } from 'common/errors';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   disableEqualizer,
   enableEqualizer,
   getEqualizerStatus,
 } from '../utils/equalizerApi';
-import { AquaContext } from '../utils/AquaContext';
+import { useAquaContext } from '../utils/AquaContext';
 import Switch from '../widgets/Switch';
 
 interface IEqualizerEnablerSwitchProps {
@@ -15,7 +15,7 @@ interface IEqualizerEnablerSwitchProps {
 export default function EqualizerEnablerSwitch({
   id,
 }: IEqualizerEnablerSwitchProps) {
-  const { setGlobalError } = useContext(AquaContext);
+  const { globalError, setGlobalError } = useAquaContext();
   const [equalizerEnabled, setEqualizerEnabled] = useState<boolean>(false);
 
   const equalizerEnablerOnLoad = useCallback(async () => {
@@ -45,6 +45,7 @@ export default function EqualizerEnablerSwitch({
       isOn={equalizerEnabled}
       handleToggle={handleToggleEqualizer}
       onLoad={equalizerEnablerOnLoad}
+      isDisabled={!!globalError}
     />
   );
 }

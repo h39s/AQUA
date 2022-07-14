@@ -1,8 +1,8 @@
 import { ErrorDescription } from 'common/errors';
-import { useEffect, useContext, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import NumberInput from '../widgets/NumberInput';
 import RangeInput from '../widgets/RangeInput';
-import { AquaContext } from '../utils/AquaContext';
+import { useAquaContext } from '../utils/AquaContext';
 import '../styles/Slider.scss';
 import { useThrottle } from '../utils/utils';
 
@@ -18,7 +18,7 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
   const INTERVAL = 200;
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { globalError, setGlobalError } = useContext(AquaContext);
+  const { globalError, setGlobalError } = useAquaContext();
 
   const isDisabled = useMemo(
     () => !!globalError || isLoading,

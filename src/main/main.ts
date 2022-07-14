@@ -14,10 +14,8 @@ import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import {
   checkConfigFile,
-  DEFAULT_FILTER,
   fetchSettings,
   flush,
-  IState,
   save,
   updateConfig,
 } from './flush';
@@ -26,7 +24,9 @@ import { resolveHtmlPath } from './util';
 import { getConfigPath, isEqualizerAPOInstalled } from './registry';
 import ChannelEnum from '../common/channels';
 import {
+  DEFAULT_FILTER,
   FilterTypeEnum,
+  IState,
   MAX_FREQUENCY,
   MAX_GAIN,
   MAX_NUM_FILTERS,

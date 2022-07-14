@@ -1,6 +1,7 @@
 import { ErrorDescription } from 'common/errors';
 import {
   FilterTypeEnum,
+  IFilter,
   MAX_FREQUENCY,
   MAX_GAIN,
   MAX_QUALITY,
@@ -8,7 +9,7 @@ import {
   MIN_GAIN,
   MIN_QUALITY,
 } from 'common/constants';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Dropdown from '../widgets/Dropdown';
 import {
   getFrequency,
@@ -21,27 +22,28 @@ import {
   setType,
 } from '../utils/equalizerApi';
 import NumberInput from '../widgets/NumberInput';
-import { AquaContext } from '../utils/AquaContext';
+import { FilterActionEnum, useAquaContext } from '../utils/AquaContext';
 import Slider from './Slider';
 import '../styles/MainContent.scss';
 import { FILTER_OPTIONS } from '../icons/FilterTypeIcon';
 
 interface IFrequencyBandProps {
   sliderIndex: number;
+  filter: IFilter;
 }
 
-const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
-  const [actualFrequency, setActualFrequency] = useState<number>(0);
+const FrequencyBand = ({ sliderIndex, filter }: IFrequencyBandProps) => {
+  // const [actualFrequency, setActualFrequency] = useState<number>(0);
   const [actualQuality, setActualQuality] = useState<number>(0);
   const [filterType, setFilterType] = useState<string>(FilterTypeEnum.PK);
 
-  const { globalError, setGlobalError } = useContext(AquaContext);
+  const { globalError, setGlobalError, dispatchFilter } = useAquaContext();
 
   useEffect(() => {
     const fetchResults = async () => {
       try {
         let result = await getFrequency(sliderIndex);
-        setActualFrequency(result);
+        // setActualFrequency(result);
         result = await getQuality(sliderIndex);
         setActualQuality(result);
         setFilterType(await getType(sliderIndex));
@@ -55,7 +57,11 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
   const handleFrequencySubmit = async (newValue: number) => {
     try {
       await setFrequency(sliderIndex, newValue);
-      setActualFrequency(newValue);
+      dispatchFilter({
+        type: FilterActionEnum.FREQUENCY,
+        index: sliderIndex,
+        newValue,
+      });
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
@@ -84,24 +90,24 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
   return (
     <div className="col band">
       <Dropdown
-        name={`${actualFrequency}-filter-type`}
+        name={`${filter.frequency}-filter-type`}
         value={filterType}
         options={FILTER_OPTIONS}
         isDisabled={!!globalError}
         handleChange={handleFilterTypeSubmit}
       />
       <NumberInput
-        value={actualFrequency}
+        value={filter.frequency}
         min={MIN_FREQUENCY}
         max={MAX_FREQUENCY}
-        name={`${actualFrequency}-frequency`}
+        name={`${filter.frequency}-frequency`}
         isDisabled={!!globalError}
         showArrows
         handleSubmit={handleFrequencySubmit}
       />
       <div className="col center slider">
         <Slider
-          name={`${actualFrequency}-gain`}
+          name={`${filter.frequency}-gain`}
           min={MIN_GAIN}
           max={MAX_GAIN}
           getValue={getSliderGain}
@@ -112,7 +118,7 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
         value={actualQuality}
         min={MIN_QUALITY}
         max={MAX_QUALITY}
-        name={`${actualFrequency}-quality`}
+        name={`${filter.frequency}-quality`}
         isDisabled={!!globalError}
         floatPrecision={3}
         showArrows

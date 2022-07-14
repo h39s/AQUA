@@ -1,5 +1,6 @@
 enum ChannelEnum {
   HEALTH_CHECK = 'healthCheck',
+  GET_STATE = 'getState',
   GET_ENABLE = 'getEnable',
   SET_ENABLE = 'setEnable',
   GET_PREAMP = 'getPreamp',

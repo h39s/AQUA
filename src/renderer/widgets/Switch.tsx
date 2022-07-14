@@ -1,10 +1,10 @@
-import { KeyboardEvent, useEffect, useContext } from 'react';
-import { AquaContext } from '../utils/AquaContext';
+import { KeyboardEvent, useEffect } from 'react';
 import '../styles/Switch.scss';
 
 interface ISwitchProps {
   id: string;
   isOn: boolean;
+  isDisabled: boolean;
   handleToggle: () => void;
   onLoad: () => void;
 }
@@ -13,15 +13,15 @@ interface ISwitchProps {
 export default function Switch({
   id,
   isOn,
+  isDisabled,
   handleToggle,
   onLoad,
 }: ISwitchProps) {
-  const { globalError } = useContext(AquaContext);
   useEffect(() => {
-    if (!globalError) {
+    if (!isDisabled) {
       onLoad();
     }
-  }, [onLoad, globalError]);
+  }, [onLoad, isDisabled]);
 
   const handleKeyUp = (e: KeyboardEvent) => {
     if (e.code === 'Enter') {
@@ -39,7 +39,7 @@ export default function Switch({
         className="switch-checkbox"
         onChange={handleToggle}
         onKeyUp={handleKeyUp}
-        disabled={!!globalError}
+        disabled={isDisabled}
       />
       <div role="button" className="switch-label" aria-label={id}>
         <span className="switch-button" />
