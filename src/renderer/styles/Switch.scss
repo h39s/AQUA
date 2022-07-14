@@ -63,11 +63,11 @@ $switch-padding: 8px;
 
     // Unchecked and disabled input
     &:disabled + .switch-label {
-      background: $primary-default;
+      background: $primary-light;
       cursor: default;
 
       .switch-button {
-        background: $primary-light;
+        background: $primary-lighter;
       }
     }
   }
@@ -98,11 +98,11 @@ $switch-padding: 8px;
 
     // Checked and disabled input
     &:disabled + .switch-label {
-      background: $primary-light;
+      background: $primary-lighter;
       cursor: default;
 
       .switch-button {
-        background: $primary-default;
+        background: $primary-light;
       }
     }
   }

@@ -134,6 +134,11 @@ ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
   }
 });
 
+ipcMain.on(ChannelEnum.GET_STATE, async (event) => {
+  const reply: TSuccess<IState> = { result: state };
+  event.reply(ChannelEnum.GET_STATE, reply);
+});
+
 ipcMain.on(ChannelEnum.GET_ENABLE, async (event) => {
   const reply: TSuccess<boolean> = { result: !!state.isEnabled };
   event.reply(ChannelEnum.GET_ENABLE, reply);

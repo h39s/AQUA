@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   createContext,
   ReactNode,
   useContext,
+  useEffect,
   useReducer,
   useState,
 } from 'react';
@@ -13,12 +13,14 @@ import {
   IState,
 } from '../../common/constants';
 import { ErrorDescription } from '../../common/errors';
+import { getEqualizerState } from './equalizerApi';
 
 export enum FilterActionEnum {
   FREQUENCY,
   GAIN,
   QUALITY,
   TYPE,
+  INIT,
 }
 
 type NumericalFilterAction =
@@ -26,9 +28,10 @@ type NumericalFilterAction =
   | FilterActionEnum.GAIN
   | FilterActionEnum.QUALITY;
 
-type FilterAction =
+export type FilterAction =
   | { type: NumericalFilterAction; index: number; newValue: number }
-  | { type: FilterActionEnum.TYPE; index: number; newValue: FilterTypeEnum };
+  | { type: FilterActionEnum.TYPE; index: number; newValue: FilterTypeEnum }
+  | { type: FilterActionEnum.INIT; filters: IFilter[] };
 
 type FilterDispatch = (action: FilterAction) => void;
 
@@ -44,26 +47,7 @@ export interface IAquaContext extends IState {
   // setFilterType: (index: number, newType: FilterTypeEnum) => void;
 }
 
-// const defaultAquaContext: IAquaContext = {
-//   globalError: undefined,
-//   isEnabled: DEFAULT_STATE.isEnabled,
-//   preAmp: DEFAULT_STATE.preAmp,
-//   filters: DEFAULT_STATE.filters,
-//   setGlobalError: (_newValue?: ErrorDescription) => {},
-//   setIsEnabled: (_newValue: boolean) => {},
-//   setPreAmp: (_newValue: number) => {},
-//   dispatch: ,
-//   // setFilterFrequency: (_index: number, _newFrequency: number) => {},
-//   // setFilterGain: (_index: number, _newGain: number) => {},
-//   // setFilterQuality: (_index: number, _newQuality: number) => {},
-//   // setFilterType: (_index: number, _newType: FilterTypeEnum) => {},
-// };
-
 const AquaContext = createContext<IAquaContext | undefined>(undefined);
-
-interface IAquaProviderProps {
-  children: ReactNode;
-}
 
 type IFilterReducer = (filters: IFilter[], action: FilterAction) => IFilter[];
 
@@ -88,9 +72,27 @@ const filterReducer: IFilterReducer = (
       return filters.map((f, index) =>
         index === action.index ? { ...f, type: action.newValue } : f
       );
+    case FilterActionEnum.INIT:
+      return action.filters;
     default:
       throw new Error('Unhandled action type should not occur');
   }
+};
+
+export interface IAquaProviderWrapperProps {
+  value: IAquaContext;
+  children: ReactNode;
+}
+
+interface IAquaProviderProps {
+  children: ReactNode;
+}
+
+export const AquaProviderWrapper = ({
+  value,
+  children,
+}: IAquaProviderWrapperProps) => {
+  return <AquaContext.Provider value={value}>{children}</AquaContext.Provider>;
 };
 
 export const AquaProvider = ({ children }: IAquaProviderProps) => {
@@ -104,8 +106,22 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
     DEFAULT_STATE.filters
   );
 
+  useEffect(() => {
+    const fetchResults = async () => {
+      try {
+        const state = await getEqualizerState();
+        setIsEnabled(state.isEnabled);
+        setPreAmp(state.preAmp);
+        dispatchFilter({ type: FilterActionEnum.INIT, filters: state.filters });
+      } catch (e) {
+        setGlobalError(e as ErrorDescription);
+      }
+    };
+    fetchResults();
+  }, []);
+
   return (
-    <AquaContext.Provider
+    <AquaProviderWrapper
       value={{
         globalError,
         isEnabled,
@@ -122,7 +138,7 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
       }}
     >
       {children}
-    </AquaContext.Provider>
+    </AquaProviderWrapper>
   );
 };
 
