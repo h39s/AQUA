@@ -1,23 +1,60 @@
-@import './color';
-@import './spacing';
+@import 'color';
+@import 'constant';
+@import 'spacing';
 
 body {
   position: relative;
   color: white;
-  height: 100vh;
   background: $primary-dark;
   font-family: sans-serif;
   font-size: 1em;
   overflow-y: hidden;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   margin: 0px;
 
   #root {
-    height: 100%;
-    width: 100%;
+    // Spacing and height
+    padding: $spacing-m;
+    padding-top: $spacing-s;
+    height: calc(100vh - $titlebar-height - $spacing-m - $spacing-s);
+    width: calc(100vw - 2 * $spacing-m);
+
+    // Add flex so we can split space bweteen parametric and graph views
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-s;
   }
+}
+
+.titlebar {
+  background-color: $primary-dark;
+  height: $titlebar-height;
+  width: 100%;
+  -webkit-app-region: drag; /* Allow user to drag the window using this titlebar */
+  -webkit-user-select: none; /* Prevent user from selecting things */
+  user-select: none;
+
+  span {
+    height: 100%;
+    display: flex;
+    margin-left: $spacing-m;
+    justify-content: end;
+    flex-direction: column;
+  }
+}
+
+.parameteric-wrapper {
+  flex: 1;
+  gap: $spacing-s;
+}
+
+.graph-wrapper {
+  flex: 1;
+  border-radius: $spacing-m;
+  border: 2px solid $secondary-default;
 }
 
 .row {

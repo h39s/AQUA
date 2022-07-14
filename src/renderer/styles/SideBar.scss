@@ -3,9 +3,9 @@
 @import 'spacing';
 
 .sideBar {
-  height: 100%;
   width: calc(100% - $content-width);
-  gap: $spacing-m;
   padding: $spacing-s;
-  border-right: 2px solid $white;
+
+  border-radius: $spacing-m;
+  background: $primary-default;
 }

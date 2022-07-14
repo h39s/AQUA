@@ -1,17 +1,21 @@
-@import './constant';
-@import './spacing';
+@import 'color';
+@import 'constant';
+@import 'spacing';
 
-$band-height: 382px;
+$band-height: 398px;
 $band-width: 64px;
 
 .mainContent {
-  height: 100%;
   width: $content-width;
   display: grid;
   grid-template-columns: 128px 1fr 48px;
   grid-template-rows: 100%;
   gap: $spacing-s;
+  padding: $spacing-s;
   justify-items: center;
+
+  border-radius: $spacing-m;
+  border: 2px solid $secondary-default;
 
   .bandLabel {
     height: $band-height;
@@ -26,26 +30,32 @@ $band-width: 64px;
     .rowLabel {
       margin: $spacing-s 0;
     }
+
+    &::before,
+    &::after {
+      // Insert space above and below band so scrollbar has padding
+      content: ' ';
+    }
   }
 
   .bands {
     justify-content: space-between;
     width: 100%;
-    height: 100%;
     gap: $spacing-s;
     overflow-x: auto;
     overflow-y: hidden;
 
-    &::before,
-    &::after {
-      content: ' '; /* Insert space before the first item and after the last one */
-    }
-  }
+    .band {
+      height: $band-height;
+      width: $band-width;
+      gap: $spacing-s;
 
-  .band {
-    height: $band-height;
-    width: $band-width;
-    gap: $spacing-s;
+      &::before,
+      &::after {
+        // Insert space above and below band so scrollbar has padding
+        content: ' ';
+      }
+    }
   }
 
   .sliderButtons {
