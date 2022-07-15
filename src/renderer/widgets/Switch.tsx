@@ -7,7 +7,7 @@ interface ISwitchProps {
   isOn: boolean;
   isDisabled: boolean;
   handleToggle: () => void;
-  onLoad: () => void;
+  onLoad?: () => void;
 }
 
 // Structure taken from https://upmostly.com/tutorials/build-a-react-switch-toggle-component
@@ -19,7 +19,7 @@ export default function Switch({
   onLoad,
 }: ISwitchProps) {
   useEffect(() => {
-    if (!isDisabled) {
+    if (onLoad && !isDisabled) {
       onLoad();
     }
   }, [onLoad, isDisabled]);

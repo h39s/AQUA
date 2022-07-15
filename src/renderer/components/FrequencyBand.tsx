@@ -32,6 +32,19 @@ interface IFrequencyBandProps {
 const FrequencyBand = ({ sliderIndex, filter }: IFrequencyBandProps) => {
   const { globalError, setGlobalError, dispatchFilter } = useAquaContext();
 
+  const handleGainSubmit = async (newValue: number) => {
+    try {
+      await setGain(sliderIndex, newValue);
+      dispatchFilter({
+        type: FilterActionEnum.GAIN,
+        index: sliderIndex,
+        newValue,
+      });
+    } catch (e) {
+      setGlobalError(e as ErrorDescription);
+    }
+  };
+
   const handleFrequencySubmit = async (newValue: number) => {
     try {
       await setFrequency(sliderIndex, newValue);
@@ -71,8 +84,6 @@ const FrequencyBand = ({ sliderIndex, filter }: IFrequencyBandProps) => {
     }
   };
 
-  const getSliderGain = useCallback(() => getGain(sliderIndex), [sliderIndex]);
-
   return (
     <div className="col band">
       <Dropdown
@@ -96,8 +107,8 @@ const FrequencyBand = ({ sliderIndex, filter }: IFrequencyBandProps) => {
           name={`${filter.frequency}-gain`}
           min={MIN_GAIN}
           max={MAX_GAIN}
-          getValue={getSliderGain}
-          setValue={(newValue: number) => setGain(sliderIndex, newValue)}
+          value={filter.gain}
+          setValue={handleGainSubmit}
         />
       </div>
       <NumberInput

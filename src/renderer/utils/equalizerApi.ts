@@ -130,6 +130,7 @@ export const disableEqualizer = (): Promise<void> => {
 
 /**
  * Get the current equalizer status
+ * @deprecated - Removing with the context refactor
  * @returns { Promise<boolean> } true for on, false for off, exception otherwise
  */
 export const getEqualizerStatus = (): Promise<boolean> => {
@@ -141,6 +142,7 @@ export const getEqualizerStatus = (): Promise<boolean> => {
 
 /**
  * Get the current main preamplification gain value
+ * @deprecated - Removing with the context refactor
  * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
  */
 export const getMainPreAmp = (): Promise<number> => {
@@ -166,6 +168,7 @@ export const setMainPreAmp = (gain: number) => {
 
 /**
  * Get the a slider's gain value
+ * @deprecated - Removing with the context refactor
  * @param {number} index - index of the slider being adjusted
  * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
  */

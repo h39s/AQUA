@@ -72,7 +72,7 @@ const filterReducer: IFilterReducer = (
       );
     case FilterActionEnum.GAIN:
       return filters.map((f, index) =>
-        index === action.index ? { ...f, frequency: action.newValue } : f
+        index === action.index ? { ...f, gain: action.newValue } : f
       );
     case FilterActionEnum.QUALITY:
       return filters.map((f, index) =>

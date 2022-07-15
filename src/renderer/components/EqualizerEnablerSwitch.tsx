@@ -32,7 +32,6 @@ export default function EqualizerEnablerSwitch({
       id={id}
       isOn={isEnabled}
       handleToggle={handleToggleEqualizer}
-      onLoad={() => {}}
       isDisabled={!!globalError}
     />
   );
