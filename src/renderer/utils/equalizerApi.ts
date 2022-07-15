@@ -5,7 +5,6 @@ import {
   getErrorDescription,
 } from 'common/errors';
 import {
-  FilterTypeEnum,
   IState,
   MAX_FREQUENCY,
   MAX_GAIN,
@@ -87,17 +86,6 @@ const setterResponseHandler = buildResponseHandler<void>((_result, resolve) =>
 );
 
 /**
- * Perform a health check to verify whether EqualizerAPO is installed
- * @deprecated - Removing with the context refactor
- * @returns { Promise<void> } exception if EqualizerAPO is not okay.
- */
-export const healthCheck = (): Promise<void> => {
-  const channel = ChannelEnum.HEALTH_CHECK;
-  window.electron.ipcRenderer.sendMessage(channel, []);
-  return promisifyResult(setterResponseHandler, channel);
-};
-
-/**
  * Get the full equalizer state
  * @returns { Promise<IState> } true for on, false for off, exception otherwise
  */
@@ -129,29 +117,6 @@ export const disableEqualizer = (): Promise<void> => {
 };
 
 /**
- * Get the current equalizer status
- * @deprecated - Removing with the context refactor
- * @returns { Promise<boolean> } true for on, false for off, exception otherwise
- */
-export const getEqualizerStatus = (): Promise<boolean> => {
-  const channel = ChannelEnum.GET_ENABLE;
-  window.electron.ipcRenderer.sendMessage(channel, []);
-
-  return promisifyResult(simpleResponseHandler<boolean>(), channel);
-};
-
-/**
- * Get the current main preamplification gain value
- * @deprecated - Removing with the context refactor
- * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
- */
-export const getMainPreAmp = (): Promise<number> => {
-  const channel = ChannelEnum.GET_PREAMP;
-  window.electron.ipcRenderer.sendMessage(channel, []);
-  return promisifyResult(simpleResponseHandler<number>(), channel);
-};
-
-/**
  * Adjusts the main preamplification gain value
  * @param {number} gain - new gain value in [-30, 30]
  */
@@ -164,18 +129,6 @@ export const setMainPreAmp = (gain: number) => {
   }
   window.electron.ipcRenderer.sendMessage(channel, [gain]);
   return promisifyResult(setterResponseHandler, channel);
-};
-
-/**
- * Get the a slider's gain value
- * @deprecated - Removing with the context refactor
- * @param {number} index - index of the slider being adjusted
- * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
- */
-export const getGain = (index: number): Promise<number> => {
-  const channel = ChannelEnum.GET_FILTER_GAIN;
-  window.electron.ipcRenderer.sendMessage(channel, [index]);
-  return promisifyResult(simpleResponseHandler<number>(), channel + index);
 };
 
 /**
@@ -195,18 +148,6 @@ export const setGain = (index: number, gain: number) => {
 };
 
 /**
- * Get a slider's frequency
- * @deprecated - Removing with the context refactor
- * @param {number} index - index of the slider being adjusted
- * @returns { Promise<number> } frequency - frequency value in the range [0, 20000]
- */
-export const getFrequency = (index: number): Promise<number> => {
-  const channel = ChannelEnum.GET_FILTER_FREQUENCY;
-  window.electron.ipcRenderer.sendMessage(channel, [index]);
-  return promisifyResult(simpleResponseHandler<number>(), channel + index);
-};
-
-/**
  * Adjusts a slider's frequency
  * @param {number} index - index of the slider being adjusted
  * @param {frequency} frequency - new frequency value in [0, 20000]
@@ -220,18 +161,6 @@ export const setFrequency = (index: number, frequency: number) => {
   }
   window.electron.ipcRenderer.sendMessage(channel, [index, frequency]);
   return promisifyResult(setterResponseHandler, channel + index);
-};
-
-/**
- * Get a slider's quality
- * @deprecated - Removing with the context refactor
- * @param {number} index - index of the slider being adjusted
- * @returns { Promise<number> } quality - value in the range [0.001, 999.999]
- */
-export const getQuality = (index: number): Promise<number> => {
-  const channel = ChannelEnum.GET_FILTER_QUALITY;
-  window.electron.ipcRenderer.sendMessage(channel, [index]);
-  return promisifyResult(simpleResponseHandler<number>(), channel + index);
 };
 
 /**
@@ -251,21 +180,6 @@ export const setQuality = (index: number, quality: number) => {
 };
 
 /**
- * Get a slider's quality
- * @deprecated - Removing with the context refactor
- * @param {number} index - index of the slider being adjusted
- * @returns { Promise<FilterTypeEnum> } filter type - value in FilterTypeEnum
- */
-export const getType = (index: number): Promise<FilterTypeEnum> => {
-  const channel = ChannelEnum.GET_FILTER_TYPE;
-  window.electron.ipcRenderer.sendMessage(channel, [index]);
-  return promisifyResult<FilterTypeEnum>(
-    simpleResponseHandler<FilterTypeEnum>(),
-    channel + index
-  );
-};
-
-/**
  * Adjusts a slider's quality
  * @param {number} index - index of the slider being adjusted
  * @param {string} filterType - new filter type
@@ -274,17 +188,6 @@ export const setType = (index: number, filterType: string) => {
   const channel = ChannelEnum.SET_FILTER_TYPE;
   window.electron.ipcRenderer.sendMessage(channel, [index, filterType]);
   return promisifyResult(setterResponseHandler, channel + index);
-};
-
-/**
- * Get number of equalizer bands
- * @deprecated - Removing with the context refactor
- * @returns { Promise<number> } exception if failed
- */
-export const getEqualizerSliderCount = (): Promise<number> => {
-  const channel = ChannelEnum.GET_FILTER_COUNT;
-  window.electron.ipcRenderer.sendMessage(channel, []);
-  return promisifyResult(simpleResponseHandler<number>(), channel);
 };
 
 /**
