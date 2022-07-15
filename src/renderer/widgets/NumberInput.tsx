@@ -60,16 +60,21 @@ const NumberInput = ({
   const onInput = (e: ChangeEvent<HTMLInputElement>) => {
     const { value: input } = e.target;
 
-    // Allow user to clear input and type an initial negative sign or period or 0.
+    // Allow user to clear input and type an initial negative sign or period or nothing.
     // In the case of integers, no subsequent characters are allowed after a 0
     if (
       input === '' ||
-      input === '0' ||
       (input === '.' && floatPrecision > 0) ||
-      (min < 0 && (input === '-' || input === '-0'))
+      (min < 0 && input === '-')
     ) {
       setInternalValue(input);
       setHasChanges(input !== value.toString());
+      return;
+    }
+
+    const isNegative = input.charAt(0) === '-';
+    // Disallow the negative sign if the minimum is non-negative
+    if (isNegative && min >= 0) {
       return;
     }
 
@@ -80,23 +85,32 @@ const NumberInput = ({
       // returns the integer value parsed up to that point. parseInt truncates
       // numbers to integer values. Leading and trailing spaces are allowed.
       num = parseInt(input, 10);
-      if (num.toString() !== input) {
+
+      // Parsed value should match the string input
+      if (num !== 0 && num.toString() !== input) {
         // illegal character in the input or number too large
         return;
       }
+
+      // When the numerical value is 0, only allow a string containing 0s
+      const zeroCount = input.match(/0/g)?.length || 0;
+      const positiveInput = isNegative ? input.substring(1) : input;
+      if (num === 0 && zeroCount !== positiveInput.length) {
+        return;
+      }
     } else {
+      const decimalCount = input.match(/\./g)?.length || 0;
+
       // If parseFloat encounters a character other than a plus sign (+),
       // minus sign (- U+002D HYPHEN-MINUS), numeral (0–9), decimal point (.),
       // or exponent (e or E), it returns the value up to that character,
       // ignoring the invalid character and characters following it.
-      // We disallow e / E.
-      if (input.match(/e|E/)) {
-        return;
-      }
-
-      const isNegative = input.charAt(0) === '-';
-      // Disallow the negative sign if the minimum is non-negative
-      if (isNegative && min >= 0) {
+      // We disallow e / E. We also disallow multiple -'ve signs or decimal points
+      if (
+        input.match(/e|E/) ||
+        (input.match(/-/g)?.length || 0) > 1 ||
+        decimalCount > 1
+      ) {
         return;
       }
 
@@ -111,9 +125,23 @@ const NumberInput = ({
         positiveInput.charAt(0) === '.' ? '0' : ''
       }${positiveInput}1`;
       num = parseFloat(testInput);
+      const actualNum = parseFloat(input);
 
-      if (num.toString() !== testInput) {
+      // Parsed value should match the string input
+      if (actualNum !== 0 && num.toString() !== testInput) {
         // illegal character in the input
+        return;
+      }
+
+      // When the actual numerical value is 0, only allow a string containing
+      // - any number of 0s and
+      // - at most one decimal point
+      // - at most one negative sign
+      const zeroCount = positiveInput.match(/0/g)?.length || 0;
+      if (
+        actualNum === 0 &&
+        zeroCount + decimalCount !== positiveInput.length
+      ) {
         return;
       }
     }

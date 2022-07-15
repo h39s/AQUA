@@ -168,6 +168,9 @@ describe('NumberInput', () => {
     await clearAndType(user, input, '-2.6e10');
     await user.keyboard('{Enter}');
     expect(handleSubmit).toBeCalledWith(-2.6);
+
+    await clearAndType(user, input, '--1.1');
+    expect(input).toHaveValue('-1.1');
   });
 
   it('should be able to round to the correct float precision', async () => {
@@ -217,6 +220,110 @@ describe('NumberInput', () => {
     expect(handleSubmit).toBeCalledWith(0.13);
   });
 
+  it('should be able to alter first digit in front of integer with trailing zeros', async () => {
+    const testValue = 1000;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-2000}
+        max={2000}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={0}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    input.focus();
+    await user.keyboard('{ArrowLeft}{ArrowLeft}{ArrowLeft}{Backspace}2{Enter}');
+    expect(handleSubmit).toBeCalledWith(2000);
+
+    await clearAndType(user, input, '-1000');
+    await user.keyboard('{ArrowLeft}{ArrowLeft}{ArrowLeft}{Backspace}2{Enter}');
+    expect(handleSubmit).toBeCalledWith(-2000);
+  });
+
+  it('should be not be able to enter a zero with float notation for integer inputs', async () => {
+    const testValue = 1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-1}
+        max={1}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={0}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await clearAndType(user, input, '0.0');
+    expect(input).toHaveValue('00');
+    await clearAndType(user, input, '0e10');
+    expect(input).toHaveValue('00');
+
+    await clearAndType(user, input, '-0.0');
+    expect(input).toHaveValue('-00');
+    await clearAndType(user, input, '-0e10');
+    expect(input).toHaveValue('-00');
+  });
+
+  it('should be able to alter first digit in front of float with trailing zeros', async () => {
+    const testValue = 10.1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-30}
+        max={30}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={1}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    input.focus();
+    await user.keyboard('{ArrowLeft}{ArrowLeft}{ArrowLeft}{Backspace}2{Enter}');
+    expect(handleSubmit).toBeCalledWith(20.1);
+
+    await clearAndType(user, input, '-10.1');
+    await user.keyboard('{ArrowLeft}{ArrowLeft}{ArrowLeft}{Backspace}2{Enter}');
+    expect(handleSubmit).toBeCalledWith(-20.1);
+  });
+
+  it('should be not be able to enter a zero with invalid float notation for float inputs', async () => {
+    const testValue = 1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-1}
+        max={1}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={1}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await clearAndType(user, input, '0.0.');
+    expect(input).toHaveValue('0.0');
+    await clearAndType(user, input, '0e10');
+    expect(input).toHaveValue('00');
+
+    await clearAndType(user, input, '-0.0.');
+    expect(input).toHaveValue('-0.0');
+    await clearAndType(user, input, '-0e10');
+    expect(input).toHaveValue('-00');
+  });
+
   it('should be able to enter a number in the range without a 0 prior to the decimal point', async () => {
     const testValue = 1;
     const { user } = setup(
@@ -261,6 +368,10 @@ describe('NumberInput', () => {
     expect(input).toHaveValue('1');
     await user.keyboard('{Enter}');
     expect(handleSubmit).toBeCalledWith(1);
+
+    input.focus();
+    await user.keyboard('{ArrowLeft}-{Enter}');
+    expect(handleSubmit).toBeCalledWith(1);
   });
 
   it('should not be able to enter a negative sign for floats when min is non-negative', async () => {
@@ -282,6 +393,10 @@ describe('NumberInput', () => {
     await clearAndType(user, input, '-1.12');
     expect(input).toHaveValue('1.12');
     await user.keyboard('{Enter}');
+    expect(handleSubmit).toBeCalledWith(1.12);
+
+    input.focus();
+    await user.keyboard('{ArrowLeft}{ArrowLeft}{ArrowLeft}{ArrowLeft}-{Enter}');
     expect(handleSubmit).toBeCalledWith(1.12);
   });
 
