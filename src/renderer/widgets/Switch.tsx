@@ -1,6 +1,7 @@
 import { KeyboardEvent, useEffect } from 'react';
 import '../styles/Switch.scss';
 
+// TODO: remove or refactor onLoad
 interface ISwitchProps {
   id: string;
   isOn: boolean;

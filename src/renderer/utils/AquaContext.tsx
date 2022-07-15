@@ -1,12 +1,14 @@
 import {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useReducer,
   useState,
 } from 'react';
 import {
+  DEFAULT_FILTER,
   DEFAULT_STATE,
   FilterTypeEnum,
   IFilter,
@@ -16,11 +18,13 @@ import { ErrorDescription } from '../../common/errors';
 import { getEqualizerState } from './equalizerApi';
 
 export enum FilterActionEnum {
+  INIT,
   FREQUENCY,
   GAIN,
   QUALITY,
   TYPE,
-  INIT,
+  ADD,
+  REMOVE,
 }
 
 type NumericalFilterAction =
@@ -29,14 +33,18 @@ type NumericalFilterAction =
   | FilterActionEnum.QUALITY;
 
 export type FilterAction =
+  | { type: FilterActionEnum.INIT; filters: IFilter[] }
   | { type: NumericalFilterAction; index: number; newValue: number }
   | { type: FilterActionEnum.TYPE; index: number; newValue: FilterTypeEnum }
-  | { type: FilterActionEnum.INIT; filters: IFilter[] };
+  | { type: FilterActionEnum.ADD }
+  | { type: FilterActionEnum.REMOVE; index: number };
 
 type FilterDispatch = (action: FilterAction) => void;
 
 export interface IAquaContext extends IState {
+  isLoading: boolean;
   globalError: ErrorDescription | undefined;
+  performHealthCheck: () => void;
   setGlobalError: (newValue?: ErrorDescription) => void;
   setIsEnabled: (newValue: boolean) => void;
   setPreAmp: (newValue: number) => void;
@@ -56,6 +64,8 @@ const filterReducer: IFilterReducer = (
   action: FilterAction
 ) => {
   switch (action.type) {
+    case FilterActionEnum.INIT:
+      return action.filters;
     case FilterActionEnum.FREQUENCY:
       return filters.map((f, index) =>
         index === action.index ? { ...f, frequency: action.newValue } : f
@@ -72,8 +82,10 @@ const filterReducer: IFilterReducer = (
       return filters.map((f, index) =>
         index === action.index ? { ...f, type: action.newValue } : f
       );
-    case FilterActionEnum.INIT:
-      return action.filters;
+    case FilterActionEnum.ADD:
+      return [...filters, { ...DEFAULT_FILTER }];
+    case FilterActionEnum.REMOVE:
+      return filters.filter((_, index) => index !== action.index);
     default:
       throw new Error('Unhandled action type should not occur');
   }
@@ -106,27 +118,35 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
     DEFAULT_STATE.filters
   );
 
-  useEffect(() => {
-    const fetchResults = async () => {
-      try {
-        const state = await getEqualizerState();
-        setIsEnabled(state.isEnabled);
-        setPreAmp(state.preAmp);
-        dispatchFilter({ type: FilterActionEnum.INIT, filters: state.filters });
-      } catch (e) {
-        setGlobalError(e as ErrorDescription);
-      }
-    };
-    fetchResults();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const performHealthCheck = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const state = await getEqualizerState();
+      setIsEnabled(state.isEnabled);
+      setPreAmp(state.preAmp);
+      dispatchFilter({ type: FilterActionEnum.INIT, filters: state.filters });
+      setGlobalError(undefined);
+    } catch (e) {
+      setGlobalError(e as ErrorDescription);
+    }
+    setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    performHealthCheck();
+  }, [performHealthCheck]);
 
   return (
     <AquaProviderWrapper
       value={{
+        isLoading,
         globalError,
         isEnabled,
         preAmp,
         filters,
+        performHealthCheck,
         setGlobalError,
         setIsEnabled,
         setPreAmp,

@@ -88,6 +88,7 @@ const setterResponseHandler = buildResponseHandler<void>((_result, resolve) =>
 
 /**
  * Perform a health check to verify whether EqualizerAPO is installed
+ * @deprecated - Removing with the context refactor
  * @returns { Promise<void> } exception if EqualizerAPO is not okay.
  */
 export const healthCheck = (): Promise<void> => {
@@ -192,6 +193,7 @@ export const setGain = (index: number, gain: number) => {
 
 /**
  * Get a slider's frequency
+ * @deprecated - Removing with the context refactor
  * @param {number} index - index of the slider being adjusted
  * @returns { Promise<number> } frequency - frequency value in the range [0, 20000]
  */
@@ -219,6 +221,7 @@ export const setFrequency = (index: number, frequency: number) => {
 
 /**
  * Get a slider's quality
+ * @deprecated - Removing with the context refactor
  * @param {number} index - index of the slider being adjusted
  * @returns { Promise<number> } quality - value in the range [0.001, 999.999]
  */
@@ -246,6 +249,7 @@ export const setQuality = (index: number, quality: number) => {
 
 /**
  * Get a slider's quality
+ * @deprecated - Removing with the context refactor
  * @param {number} index - index of the slider being adjusted
  * @returns { Promise<FilterTypeEnum> } filter type - value in FilterTypeEnum
  */
@@ -271,6 +275,7 @@ export const setType = (index: number, filterType: string) => {
 
 /**
  * Get number of equalizer bands
+ * @deprecated - Removing with the context refactor
  * @returns { Promise<number> } exception if failed
  */
 export const getEqualizerSliderCount = (): Promise<number> => {

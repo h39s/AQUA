@@ -4,10 +4,12 @@ import { ErrorDescription } from 'common/errors';
 import { FilterAction, IAquaContext } from 'renderer/utils/AquaContext';
 
 const defaultAquaContext: IAquaContext = {
+  isLoading: false,
   globalError: undefined,
   isEnabled: DEFAULT_STATE.isEnabled,
   preAmp: DEFAULT_STATE.preAmp,
   filters: DEFAULT_STATE.filters,
+  performHealthCheck: () => {},
   setGlobalError: (_newValue?: ErrorDescription) => {},
   setIsEnabled: (_newValue: boolean) => {},
   setPreAmp: (_newValue: number) => {},

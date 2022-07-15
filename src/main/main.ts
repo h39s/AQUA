@@ -127,6 +127,7 @@ const handleUpdate = async (
   save(state);
 };
 
+// TODO: remove this
 ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
   const res = await updateConfigPath(event, ChannelEnum.HEALTH_CHECK);
   if (res) {
@@ -135,10 +136,17 @@ ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
 });
 
 ipcMain.on(ChannelEnum.GET_STATE, async (event) => {
-  const reply: TSuccess<IState> = { result: state };
-  event.reply(ChannelEnum.GET_STATE, reply);
+  const channel = ChannelEnum.GET_STATE;
+  const res = await updateConfigPath(event, ChannelEnum.HEALTH_CHECK);
+  if (res) {
+    const reply: TSuccess<IState> = { result: state };
+    event.reply(channel, reply);
+  } else {
+    handleError(event, channel, ErrorCode.CONFIG_NOT_FOUND);
+  }
 });
 
+// TODO: remove this
 ipcMain.on(ChannelEnum.GET_ENABLE, async (event) => {
   const reply: TSuccess<boolean> = { result: !!state.isEnabled };
   event.reply(ChannelEnum.GET_ENABLE, reply);
@@ -204,6 +212,7 @@ ipcMain.on(ChannelEnum.SET_FILTER_GAIN, async (event, arg) => {
   await handleUpdate(event, channel + filterIndex);
 });
 
+// TODO: remove this
 ipcMain.on(ChannelEnum.GET_FILTER_FREQUENCY, async (event, arg) => {
   const channel = ChannelEnum.GET_FILTER_FREQUENCY;
   const filterIndex = parseInt(arg[0], 10) || 0;
@@ -240,6 +249,7 @@ ipcMain.on(ChannelEnum.SET_FILTER_FREQUENCY, async (event, arg) => {
   await handleUpdate(event, channel + filterIndex);
 });
 
+// TODO: remove this
 ipcMain.on(ChannelEnum.GET_FILTER_QUALITY, async (event, arg) => {
   const channel = ChannelEnum.GET_FILTER_QUALITY;
   const filterIndex = parseInt(arg[0], 10) || 0;
@@ -276,6 +286,7 @@ ipcMain.on(ChannelEnum.SET_FILTER_QUALITY, async (event, arg) => {
   await handleUpdate(event, channel + filterIndex);
 });
 
+// TODO: remove this
 ipcMain.on(ChannelEnum.GET_FILTER_TYPE, async (event, arg) => {
   const channel = ChannelEnum.GET_FILTER_TYPE;
   const filterIndex = parseInt(arg[0], 10) || 0;
@@ -328,7 +339,7 @@ ipcMain.on(ChannelEnum.ADD_FILTER, async (event) => {
     return;
   }
 
-  state.filters.push(DEFAULT_FILTER);
+  state.filters.push({ ...DEFAULT_FILTER });
   await handleUpdate(event, channel);
 });
 

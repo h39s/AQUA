@@ -9,13 +9,10 @@ import {
   MIN_GAIN,
   MIN_QUALITY,
 } from 'common/constants';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import Dropdown from '../widgets/Dropdown';
 import {
-  getFrequency,
   getGain,
-  getQuality,
-  getType,
   setFrequency,
   setGain,
   setQuality,
@@ -33,26 +30,7 @@ interface IFrequencyBandProps {
 }
 
 const FrequencyBand = ({ sliderIndex, filter }: IFrequencyBandProps) => {
-  // const [actualFrequency, setActualFrequency] = useState<number>(0);
-  const [actualQuality, setActualQuality] = useState<number>(0);
-  const [filterType, setFilterType] = useState<string>(FilterTypeEnum.PK);
-
   const { globalError, setGlobalError, dispatchFilter } = useAquaContext();
-
-  useEffect(() => {
-    const fetchResults = async () => {
-      try {
-        let result = await getFrequency(sliderIndex);
-        // setActualFrequency(result);
-        result = await getQuality(sliderIndex);
-        setActualQuality(result);
-        setFilterType(await getType(sliderIndex));
-      } catch (e) {
-        setGlobalError(e as ErrorDescription);
-      }
-    };
-    fetchResults();
-  }, [setGlobalError, sliderIndex]);
 
   const handleFrequencySubmit = async (newValue: number) => {
     try {
@@ -70,7 +48,11 @@ const FrequencyBand = ({ sliderIndex, filter }: IFrequencyBandProps) => {
   const handleQualitySubmit = async (newValue: number) => {
     try {
       await setQuality(sliderIndex, newValue);
-      setActualQuality(newValue);
+      dispatchFilter({
+        type: FilterActionEnum.QUALITY,
+        index: sliderIndex,
+        newValue,
+      });
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
@@ -79,7 +61,11 @@ const FrequencyBand = ({ sliderIndex, filter }: IFrequencyBandProps) => {
   const handleFilterTypeSubmit = async (newValue: string) => {
     try {
       await setType(sliderIndex, newValue);
-      setFilterType(newValue);
+      dispatchFilter({
+        type: FilterActionEnum.TYPE,
+        index: sliderIndex,
+        newValue: newValue as FilterTypeEnum,
+      });
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
@@ -91,7 +77,7 @@ const FrequencyBand = ({ sliderIndex, filter }: IFrequencyBandProps) => {
     <div className="col band">
       <Dropdown
         name={`${filter.frequency}-filter-type`}
-        value={filterType}
+        value={filter.type}
         options={FILTER_OPTIONS}
         isDisabled={!!globalError}
         handleChange={handleFilterTypeSubmit}
@@ -115,7 +101,7 @@ const FrequencyBand = ({ sliderIndex, filter }: IFrequencyBandProps) => {
         />
       </div>
       <NumberInput
-        value={actualQuality}
+        value={filter.quality}
         min={MIN_QUALITY}
         max={MAX_QUALITY}
         name={`${filter.frequency}-quality`}
