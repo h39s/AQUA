@@ -127,9 +127,17 @@ const handleUpdate = async (
   save(state);
 };
 
+// TODO: remove this
+ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
+  const res = await updateConfigPath(event, ChannelEnum.HEALTH_CHECK);
+  if (res) {
+    await handleUpdate(event, ChannelEnum.HEALTH_CHECK);
+  }
+});
+
 ipcMain.on(ChannelEnum.GET_STATE, async (event) => {
   const channel = ChannelEnum.GET_STATE;
-  const res = await updateConfigPath(event, channel);
+  const res = await updateConfigPath(event, ChannelEnum.HEALTH_CHECK);
   if (res) {
     const reply: TSuccess<IState> = { result: state };
     event.reply(channel, reply);
@@ -138,10 +146,21 @@ ipcMain.on(ChannelEnum.GET_STATE, async (event) => {
   }
 });
 
+// TODO: remove this
+ipcMain.on(ChannelEnum.GET_ENABLE, async (event) => {
+  const reply: TSuccess<boolean> = { result: !!state.isEnabled };
+  event.reply(ChannelEnum.GET_ENABLE, reply);
+});
+
 ipcMain.on(ChannelEnum.SET_ENABLE, async (event, arg) => {
   const value = parseInt(arg[0], 10) || 0;
   state.isEnabled = value !== 0;
   await handleUpdate(event, ChannelEnum.SET_ENABLE);
+});
+
+ipcMain.on(ChannelEnum.GET_PREAMP, async (event) => {
+  const reply: TSuccess<number> = { result: state.preAmp || 0 };
+  event.reply(ChannelEnum.GET_PREAMP, reply);
 });
 
 ipcMain.on(ChannelEnum.SET_PREAMP, async (event, arg) => {
@@ -155,6 +174,22 @@ ipcMain.on(ChannelEnum.SET_PREAMP, async (event, arg) => {
 
   state.preAmp = gain;
   await handleUpdate(event, channel);
+});
+
+ipcMain.on(ChannelEnum.GET_FILTER_GAIN, async (event, arg) => {
+  const channel = ChannelEnum.GET_FILTER_GAIN;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+
+  // Filter index must be within the length of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  const reply: TSuccess<number> = {
+    result: state.filters[filterIndex].gain || 0,
+  };
+  event.reply(channel + filterIndex, reply);
 });
 
 ipcMain.on(ChannelEnum.SET_FILTER_GAIN, async (event, arg) => {
@@ -177,6 +212,23 @@ ipcMain.on(ChannelEnum.SET_FILTER_GAIN, async (event, arg) => {
   await handleUpdate(event, channel + filterIndex);
 });
 
+// TODO: remove this
+ipcMain.on(ChannelEnum.GET_FILTER_FREQUENCY, async (event, arg) => {
+  const channel = ChannelEnum.GET_FILTER_FREQUENCY;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+
+  // Filter index must be within the length of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  const reply: TSuccess<number> = {
+    result: state.filters[filterIndex].frequency || 10,
+  };
+  event.reply(channel + filterIndex, reply);
+});
+
 ipcMain.on(ChannelEnum.SET_FILTER_FREQUENCY, async (event, arg) => {
   const channel = ChannelEnum.SET_FILTER_FREQUENCY;
   const filterIndex = parseInt(arg[0], 10) || 0;
@@ -195,6 +247,23 @@ ipcMain.on(ChannelEnum.SET_FILTER_FREQUENCY, async (event, arg) => {
 
   state.filters[filterIndex].frequency = frequency;
   await handleUpdate(event, channel + filterIndex);
+});
+
+// TODO: remove this
+ipcMain.on(ChannelEnum.GET_FILTER_QUALITY, async (event, arg) => {
+  const channel = ChannelEnum.GET_FILTER_QUALITY;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+
+  // Filter index must be within the length of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  const reply: TSuccess<number> = {
+    result: state.filters[filterIndex].quality || 10,
+  };
+  event.reply(channel + filterIndex, reply);
 });
 
 ipcMain.on(ChannelEnum.SET_FILTER_QUALITY, async (event, arg) => {
@@ -217,6 +286,23 @@ ipcMain.on(ChannelEnum.SET_FILTER_QUALITY, async (event, arg) => {
   await handleUpdate(event, channel + filterIndex);
 });
 
+// TODO: remove this
+ipcMain.on(ChannelEnum.GET_FILTER_TYPE, async (event, arg) => {
+  const channel = ChannelEnum.GET_FILTER_TYPE;
+  const filterIndex = parseInt(arg[0], 10) || 0;
+
+  // Filter index must be within the length of the filters array
+  if (filterIndex < 0 || filterIndex >= state.filters.length) {
+    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  const reply: TSuccess<string> = {
+    result: state.filters[filterIndex].type,
+  };
+  event.reply(channel + filterIndex, reply);
+});
+
 ipcMain.on(ChannelEnum.SET_FILTER_TYPE, async (event, arg) => {
   const channel = ChannelEnum.SET_FILTER_TYPE;
   const filterIndex = parseInt(arg[0], 10) || 0;
@@ -235,6 +321,13 @@ ipcMain.on(ChannelEnum.SET_FILTER_TYPE, async (event, arg) => {
 
   state.filters[filterIndex].type = filterType as FilterTypeEnum;
   await handleUpdate(event, channel + filterIndex);
+});
+
+ipcMain.on(ChannelEnum.GET_FILTER_COUNT, async (event) => {
+  const reply: TSuccess<number> = {
+    result: state.filters.length,
+  };
+  event.reply(ChannelEnum.GET_FILTER_COUNT, reply);
 });
 
 ipcMain.on(ChannelEnum.ADD_FILTER, async (event) => {

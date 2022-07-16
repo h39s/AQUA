@@ -9,8 +9,10 @@ import {
   MIN_GAIN,
   MIN_QUALITY,
 } from 'common/constants';
+import { useCallback } from 'react';
 import Dropdown from '../widgets/Dropdown';
 import {
+  getGain,
   setFrequency,
   setGain,
   setQuality,

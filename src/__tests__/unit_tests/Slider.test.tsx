@@ -8,14 +8,17 @@ import Slider from '../../renderer/components/Slider';
 
 describe('Slider', () => {
   const name = 'Slider';
+  const getValue = jest.fn();
   const setValue = jest.fn();
 
   beforeEach(() => {
+    getValue.mockClear();
     setValue.mockClear();
   });
 
   it('should render with name and initial value', async () => {
     const testValue = 1;
+    getValue.mockReturnValue(testValue);
     await act(async () => {
       setup(
         <AquaProviderWrapper value={defaultAquaContext}>
@@ -23,7 +26,7 @@ describe('Slider', () => {
             name={name}
             min={-5}
             max={5}
-            value={testValue}
+            getValue={getValue}
             setValue={setValue}
           />
         </AquaProviderWrapper>
@@ -38,6 +41,7 @@ describe('Slider', () => {
   it('should update range to match number', async () => {
     const user = userEvent.setup();
     const testValue = 1;
+    getValue.mockReturnValue(testValue);
     await act(async () => {
       setup(
         <AquaProviderWrapper value={defaultAquaContext}>
@@ -45,7 +49,7 @@ describe('Slider', () => {
             name={name}
             min={-5}
             max={5}
-            value={testValue}
+            getValue={getValue}
             setValue={setValue}
           />
         </AquaProviderWrapper>
@@ -67,6 +71,7 @@ describe('Slider', () => {
 
   it('should update number to match range', async () => {
     const testValue = 1;
+    getValue.mockReturnValue(testValue);
     await act(async () => {
       setup(
         <AquaProviderWrapper value={defaultAquaContext}>
@@ -74,7 +79,7 @@ describe('Slider', () => {
             name={name}
             min={-5}
             max={5}
-            value={testValue}
+            getValue={getValue}
             setValue={setValue}
           />
         </AquaProviderWrapper>
