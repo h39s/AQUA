@@ -245,7 +245,7 @@ describe('NumberInput', () => {
     expect(handleSubmit).toBeCalledWith(-2000);
   });
 
-  it('should be not be able to enter a zero with float notation for integer inputs', async () => {
+  it('should not be able to enter a zero with float notation for integer inputs', async () => {
     const testValue = 1;
     const { user } = setup(
       <NumberInput
@@ -273,7 +273,7 @@ describe('NumberInput', () => {
   });
 
   it('should be able to alter first digit in front of float with trailing zeros', async () => {
-    const testValue = 10.1;
+    const testValue = 10;
     const { user } = setup(
       <NumberInput
         name={id}
@@ -288,16 +288,16 @@ describe('NumberInput', () => {
     const input = screen.getByLabelText(id);
     expect(input).toHaveValue(`${testValue}`);
 
-    input.focus();
+    await clearAndType(user, input, '10.0');
     await user.keyboard('{ArrowLeft}{ArrowLeft}{ArrowLeft}{Backspace}2{Enter}');
-    expect(handleSubmit).toBeCalledWith(20.1);
+    expect(handleSubmit).toBeCalledWith(20);
 
-    await clearAndType(user, input, '-10.1');
+    await clearAndType(user, input, '-10.0');
     await user.keyboard('{ArrowLeft}{ArrowLeft}{ArrowLeft}{Backspace}2{Enter}');
-    expect(handleSubmit).toBeCalledWith(-20.1);
+    expect(handleSubmit).toBeCalledWith(-20);
   });
 
-  it('should be not be able to enter a zero with invalid float notation for float inputs', async () => {
+  it('should not be able to enter a zero with invalid float notation for float inputs', async () => {
     const testValue = 1;
     const { user } = setup(
       <NumberInput

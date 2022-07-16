@@ -105,7 +105,7 @@ const NumberInput = ({
       // minus sign (- U+002D HYPHEN-MINUS), numeral (0–9), decimal point (.),
       // or exponent (e or E), it returns the value up to that character,
       // ignoring the invalid character and characters following it.
-      // We disallow e / E. We also disallow multiple -'ve signs or decimal points
+      // We disallow e / E, multiple -'ve signs and multiple decimal points
       if (
         input.match(/e|E/) ||
         (input.match(/-/g)?.length || 0) > 1 ||
