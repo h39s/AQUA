@@ -6,6 +6,7 @@ import {
 } from 'common/errors';
 import {
   FilterTypeEnum,
+  IState,
   MAX_FREQUENCY,
   MAX_GAIN,
   MAX_QUALITY,
@@ -51,7 +52,9 @@ const promisifyResult = <Type>(
   });
 };
 
-const buildResponseHandler = <Type extends string | number | boolean | void>(
+const buildResponseHandler = <
+  Type extends string | number | boolean | void | IState
+>(
   resultEvaluator: (
     result: Type,
     resolve: (value: Type | PromiseLike<Type>) => void,
@@ -73,7 +76,7 @@ const buildResponseHandler = <Type extends string | number | boolean | void>(
 };
 
 const simpleResponseHandler = <
-  Type extends string | number | boolean | void
+  Type extends string | number | boolean | void | IState
 >() =>
   buildResponseHandler<Type>((result, resolve) => {
     resolve(result);
@@ -85,12 +88,24 @@ const setterResponseHandler = buildResponseHandler<void>((_result, resolve) =>
 
 /**
  * Perform a health check to verify whether EqualizerAPO is installed
+ * @deprecated - Removing with the context refactor
  * @returns { Promise<void> } exception if EqualizerAPO is not okay.
  */
 export const healthCheck = (): Promise<void> => {
   const channel = ChannelEnum.HEALTH_CHECK;
   window.electron.ipcRenderer.sendMessage(channel, []);
   return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Get the full equalizer state
+ * @returns { Promise<IState> } return the state, exception if failed.
+ */
+export const getEqualizerState = (): Promise<IState> => {
+  const channel = ChannelEnum.GET_STATE;
+  window.electron.ipcRenderer.sendMessage(channel, []);
+
+  return promisifyResult(simpleResponseHandler<IState>(), channel);
 };
 
 /**
@@ -115,6 +130,7 @@ export const disableEqualizer = (): Promise<void> => {
 
 /**
  * Get the current equalizer status
+ * @deprecated - Removing with the context refactor
  * @returns { Promise<boolean> } true for on, false for off, exception otherwise
  */
 export const getEqualizerStatus = (): Promise<boolean> => {
@@ -126,6 +142,7 @@ export const getEqualizerStatus = (): Promise<boolean> => {
 
 /**
  * Get the current main preamplification gain value
+ * @deprecated - Removing with the context refactor
  * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
  */
 export const getMainPreAmp = (): Promise<number> => {
@@ -151,6 +168,7 @@ export const setMainPreAmp = (gain: number) => {
 
 /**
  * Get the a slider's gain value
+ * @deprecated - Removing with the context refactor
  * @param {number} index - index of the slider being adjusted
  * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
  */
@@ -178,6 +196,7 @@ export const setGain = (index: number, gain: number) => {
 
 /**
  * Get a slider's frequency
+ * @deprecated - Removing with the context refactor
  * @param {number} index - index of the slider being adjusted
  * @returns { Promise<number> } frequency - frequency value in the range [0, 20000]
  */
@@ -205,6 +224,7 @@ export const setFrequency = (index: number, frequency: number) => {
 
 /**
  * Get a slider's quality
+ * @deprecated - Removing with the context refactor
  * @param {number} index - index of the slider being adjusted
  * @returns { Promise<number> } quality - value in the range [0.001, 999.999]
  */
@@ -232,6 +252,7 @@ export const setQuality = (index: number, quality: number) => {
 
 /**
  * Get a slider's quality
+ * @deprecated - Removing with the context refactor
  * @param {number} index - index of the slider being adjusted
  * @returns { Promise<FilterTypeEnum> } filter type - value in FilterTypeEnum
  */
@@ -257,6 +278,7 @@ export const setType = (index: number, filterType: string) => {
 
 /**
  * Get number of equalizer bands
+ * @deprecated - Removing with the context refactor
  * @returns { Promise<number> } exception if failed
  */
 export const getEqualizerSliderCount = (): Promise<number> => {

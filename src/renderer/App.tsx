@@ -1,71 +1,45 @@
-import { ErrorDescription } from 'common/errors';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './styles/App.scss';
-import { healthCheck } from './utils/equalizerApi';
 import MainContent from './MainContent';
-import { AquaContext } from './utils/AquaContext';
+import { AquaProvider, useAquaContext } from './utils/AquaContext';
 import PrereqMissingModal from './PrereqMissingModal';
 import SideBar from './SideBar';
 
 const AppContent = () => {
+  const { isLoading, globalError, performHealthCheck } = useAquaContext();
   return (
     <>
-      <div className="parameteric-wrapper row">
-        <SideBar />
-        <MainContent />
-      </div>
-      {/* <div className="graph-wrapper" /> */}
+      {isLoading ? (
+        <div className="center full row">
+          <h1>Loading...</h1>
+        </div>
+      ) : (
+        <div className="parameteric-wrapper row">
+          <SideBar />
+          <MainContent />
+        </div>
+        // <div className="graph-wrapper" />
+      )}
+      {globalError && (
+        <PrereqMissingModal
+          isLoading={isLoading}
+          onRetry={performHealthCheck}
+          errorMsg={globalError.shortError}
+          actionMsg={globalError.action}
+        />
+      )}
     </>
   );
 };
 
 export default function App() {
-  const [globalError, setGlobalError] = useState<
-    ErrorDescription | undefined
-  >();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const isMounted = useRef<boolean>(false);
-
-  const performHealthCheck = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      await healthCheck();
-      setGlobalError(undefined);
-      isMounted.current = true;
-    } catch (e) {
-      setGlobalError(e as ErrorDescription);
-    }
-    setIsLoading(false);
-  }, []);
-
-  useEffect(() => {
-    performHealthCheck();
-  }, [performHealthCheck]);
-
   return (
-    <AquaContext.Provider value={{ globalError, setGlobalError }}>
+    <AquaProvider>
       <Router>
         <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                {isMounted.current && <AppContent />}
-                {globalError && (
-                  <PrereqMissingModal
-                    isLoading={isLoading}
-                    onRetry={performHealthCheck}
-                    errorMsg={globalError.shortError}
-                    actionMsg={globalError.action}
-                  />
-                )}
-              </>
-            }
-          />
+          <Route path="/" element={<AppContent />} />
         </Routes>
       </Router>
-    </AquaContext.Provider>
+    </AquaProvider>
   );
 }

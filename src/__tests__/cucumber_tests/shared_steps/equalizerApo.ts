@@ -1,5 +1,6 @@
 import { DefineStepFunction } from 'jest-cucumber';
-import { flush, IState } from 'main/flush';
+import { IState } from 'common/constants';
+import { flush } from 'main/flush';
 import { getConfigPath, isEqualizerAPOInstalled } from 'main/registry';
 
 export const givenEqualizerApoIsInstalled = (given: DefineStepFunction) => {

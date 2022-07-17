@@ -1,8 +1,7 @@
-import { ErrorDescription } from 'common/errors';
-import { useEffect, useContext, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import NumberInput from '../widgets/NumberInput';
 import RangeInput from '../widgets/RangeInput';
-import { AquaContext } from '../utils/AquaContext';
+import { useAquaContext } from '../utils/AquaContext';
 import '../styles/Slider.scss';
 import { useThrottle } from '../utils/utils';
 
@@ -10,54 +9,37 @@ interface ISliderProps {
   name: string;
   min: number;
   max: number;
-  getValue: () => Promise<number>;
+  value: number;
   setValue: (newValue: number) => Promise<void>;
 }
 
-const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
+const Slider = ({ name, min, max, value, setValue }: ISliderProps) => {
   const INTERVAL = 200;
-  const [sliderValue, setSliderValue] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { globalError, setGlobalError } = useContext(AquaContext);
+  const { globalError } = useAquaContext();
 
-  const isDisabled = useMemo(
-    () => !!globalError || isLoading,
-    [globalError, isLoading]
-  );
+  // Local copy of slider value used so that the number input increases smoothly while throttling EQ APO writes
+  const [sliderValue, setSliderValue] = useState<number>(value);
 
   useEffect(() => {
-    const fetchResults = async () => {
-      setIsLoading(true);
-      try {
-        const initValue = await getValue();
-        setSliderValue(initValue);
-      } catch (e) {
-        setGlobalError(e as ErrorDescription);
-      }
-      setIsLoading(false);
-    };
-    fetchResults();
-  }, [getValue, setGlobalError]);
+    // TODO: investigate whether this is the best way to synchronize values
+    setSliderValue(value);
+  }, [value]);
 
-  const handleChangeGain = async (newValue: number) => {
-    try {
-      await setValue(newValue);
-    } catch (e) {
-      setGlobalError(e as ErrorDescription);
-    }
+  const handleChangeValue = async (newValue: number) => {
+    await setValue(newValue);
   };
 
-  const throttledSetValue = useThrottle(handleChangeGain, INTERVAL);
+  const throttledSetValue = useThrottle(handleChangeValue, INTERVAL);
 
   // Helpers for adjusting the preamp gain value
-  const handleChangeGainWithThrottle = async (newValue: number) => {
+  const handleChangeValueWithThrottle = async (newValue: number) => {
     setSliderValue(newValue);
     throttledSetValue(newValue);
   };
 
-  const handleChangeGainWithoutThrottle = async (newValue: number) => {
+  const handleChangeValueWithoutThrottle = async (newValue: number) => {
     setSliderValue(newValue);
-    handleChangeGain(newValue);
+    handleChangeValue(newValue);
   };
 
   return (
@@ -67,17 +49,17 @@ const Slider = ({ name, min, max, getValue, setValue }: ISliderProps) => {
         value={sliderValue}
         min={min}
         max={max}
-        handleChange={handleChangeGainWithThrottle}
-        handleMouseUp={handleChangeGainWithoutThrottle}
-        isDisabled={isDisabled}
+        handleChange={handleChangeValueWithThrottle}
+        handleMouseUp={handleChangeValueWithoutThrottle}
+        isDisabled={!!globalError}
       />
       <NumberInput
         name={`${name}-number`}
         value={sliderValue}
         min={min}
         max={max}
-        handleSubmit={handleChangeGainWithoutThrottle}
-        isDisabled={isDisabled}
+        handleSubmit={handleChangeValueWithoutThrottle}
+        isDisabled={!!globalError}
         floatPrecision={1}
         shouldRoundToHalf
       />

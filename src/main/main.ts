@@ -14,10 +14,8 @@ import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import {
   checkConfigFile,
-  DEFAULT_FILTER,
   fetchSettings,
   flush,
-  IState,
   save,
   updateConfig,
 } from './flush';
@@ -26,7 +24,9 @@ import { resolveHtmlPath } from './util';
 import { getConfigPath, isEqualizerAPOInstalled } from './registry';
 import ChannelEnum from '../common/channels';
 import {
+  DEFAULT_FILTER,
   FilterTypeEnum,
+  IState,
   MAX_FREQUENCY,
   MAX_GAIN,
   MAX_NUM_FILTERS,
@@ -128,9 +128,21 @@ const handleUpdate = async (
 };
 
 ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
-  const res = await updateConfigPath(event, ChannelEnum.HEALTH_CHECK);
+  const channel = ChannelEnum.HEALTH_CHECK;
+  const res = await updateConfigPath(event, channel);
   if (res) {
-    await handleUpdate(event, ChannelEnum.HEALTH_CHECK);
+    await handleUpdate(event, channel);
+  }
+});
+
+ipcMain.on(ChannelEnum.GET_STATE, async (event) => {
+  const channel = ChannelEnum.GET_STATE;
+  const res = await updateConfigPath(event, channel);
+  if (res) {
+    const reply: TSuccess<IState> = { result: state };
+    event.reply(channel, reply);
+  } else {
+    handleError(event, channel, ErrorCode.CONFIG_NOT_FOUND);
   }
 });
 
@@ -323,7 +335,7 @@ ipcMain.on(ChannelEnum.ADD_FILTER, async (event) => {
     return;
   }
 
-  state.filters.push(DEFAULT_FILTER);
+  state.filters.push({ ...DEFAULT_FILTER });
   await handleUpdate(event, channel);
 });
 

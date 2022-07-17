@@ -41,14 +41,14 @@ $range-thumb-height: 20px;
         var(--sx) 100% no-repeat $secondary-light;
 
       &:disabled {
-        background: linear-gradient($primary-default, $primary-default) 0 /
-          var(--sx) 100% no-repeat $primary-light;
+        background: linear-gradient($primary-light, $primary-light) 0 /
+          var(--sx) 100% no-repeat primary-lighter;
       }
     }
 
     &:disabled::-webkit-slider-runnable-track {
-      background: linear-gradient($primary-default, $primary-default) 0 /
-        var(--sx) 100% no-repeat $primary-lighter;
+      background: linear-gradient($primary-light, $primary-light) 0 / var(--sx)
+        100% no-repeat $primary-lighter;
       cursor: default;
     }
 

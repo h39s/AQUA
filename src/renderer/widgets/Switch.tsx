@@ -1,28 +1,20 @@
-import { KeyboardEvent, useEffect, useContext } from 'react';
-import { AquaContext } from '../utils/AquaContext';
+import { KeyboardEvent } from 'react';
 import '../styles/Switch.scss';
 
 interface ISwitchProps {
   id: string;
   isOn: boolean;
+  isDisabled: boolean;
   handleToggle: () => void;
-  onLoad: () => void;
 }
 
 // Structure taken from https://upmostly.com/tutorials/build-a-react-switch-toggle-component
 export default function Switch({
   id,
   isOn,
+  isDisabled,
   handleToggle,
-  onLoad,
 }: ISwitchProps) {
-  const { globalError } = useContext(AquaContext);
-  useEffect(() => {
-    if (!globalError) {
-      onLoad();
-    }
-  }, [onLoad, globalError]);
-
   const handleKeyUp = (e: KeyboardEvent) => {
     if (e.code === 'Enter') {
       handleToggle();
@@ -39,7 +31,7 @@ export default function Switch({
         className="switch-checkbox"
         onChange={handleToggle}
         onKeyUp={handleKeyUp}
-        disabled={!!globalError}
+        disabled={isDisabled}
       />
       <div role="button" className="switch-label" aria-label={id}>
         <span className="switch-button" />

@@ -4,6 +4,7 @@ export enum ErrorCode {
   TIMEOUT,
   INVALID_PARAMETER,
   FAILURE,
+  UI_FAILURE,
 }
 
 export type ErrorDescription = {
@@ -40,6 +41,12 @@ export const errors: Record<ErrorCode, ErrorDescription> = {
     action:
       'Please restart the application. If the error persists, try reaching out to the developers to resolve the issue.',
     code: ErrorCode.FAILURE,
+  },
+  [ErrorCode.UI_FAILURE]: {
+    shortError: 'UI Error: Failed to apply equalizer settings.',
+    action:
+      'Please restart the application. If the error persists, try reaching out to the developers to resolve the issue.',
+    code: ErrorCode.UI_FAILURE,
   },
 };
 

@@ -1,6 +1,7 @@
 import { ErrorDescription } from 'common/errors';
 import {
   FilterTypeEnum,
+  IFilter,
   MAX_FREQUENCY,
   MAX_GAIN,
   MAX_QUALITY,
@@ -8,54 +9,48 @@ import {
   MIN_GAIN,
   MIN_QUALITY,
 } from 'common/constants';
-import { useCallback, useContext, useEffect, useState } from 'react';
 import Dropdown from '../widgets/Dropdown';
 import {
-  getFrequency,
-  getGain,
-  getQuality,
-  getType,
   setFrequency,
   setGain,
   setQuality,
   setType,
 } from '../utils/equalizerApi';
 import NumberInput from '../widgets/NumberInput';
-import { AquaContext } from '../utils/AquaContext';
+import { FilterActionEnum, useAquaContext } from '../utils/AquaContext';
 import Slider from './Slider';
 import '../styles/MainContent.scss';
 import { FILTER_OPTIONS } from '../icons/FilterTypeIcon';
 
 interface IFrequencyBandProps {
   sliderIndex: number;
+  filter: IFilter;
 }
 
-const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
-  const [actualFrequency, setActualFrequency] = useState<number>(0);
-  const [actualQuality, setActualQuality] = useState<number>(0);
-  const [filterType, setFilterType] = useState<string>(FilterTypeEnum.PK);
+const FrequencyBand = ({ sliderIndex, filter }: IFrequencyBandProps) => {
+  const { globalError, setGlobalError, dispatchFilter } = useAquaContext();
 
-  const { globalError, setGlobalError } = useContext(AquaContext);
-
-  useEffect(() => {
-    const fetchResults = async () => {
-      try {
-        let result = await getFrequency(sliderIndex);
-        setActualFrequency(result);
-        result = await getQuality(sliderIndex);
-        setActualQuality(result);
-        setFilterType(await getType(sliderIndex));
-      } catch (e) {
-        setGlobalError(e as ErrorDescription);
-      }
-    };
-    fetchResults();
-  }, [setGlobalError, sliderIndex]);
+  const handleGainSubmit = async (newValue: number) => {
+    try {
+      await setGain(sliderIndex, newValue);
+      dispatchFilter({
+        type: FilterActionEnum.GAIN,
+        index: sliderIndex,
+        newValue,
+      });
+    } catch (e) {
+      setGlobalError(e as ErrorDescription);
+    }
+  };
 
   const handleFrequencySubmit = async (newValue: number) => {
     try {
       await setFrequency(sliderIndex, newValue);
-      setActualFrequency(newValue);
+      dispatchFilter({
+        type: FilterActionEnum.FREQUENCY,
+        index: sliderIndex,
+        newValue,
+      });
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
@@ -64,7 +59,11 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
   const handleQualitySubmit = async (newValue: number) => {
     try {
       await setQuality(sliderIndex, newValue);
-      setActualQuality(newValue);
+      dispatchFilter({
+        type: FilterActionEnum.QUALITY,
+        index: sliderIndex,
+        newValue,
+      });
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
@@ -73,46 +72,48 @@ const FrequencyBand = ({ sliderIndex }: IFrequencyBandProps) => {
   const handleFilterTypeSubmit = async (newValue: string) => {
     try {
       await setType(sliderIndex, newValue);
-      setFilterType(newValue);
+      dispatchFilter({
+        type: FilterActionEnum.TYPE,
+        index: sliderIndex,
+        newValue: newValue as FilterTypeEnum,
+      });
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
   };
 
-  const getSliderGain = useCallback(() => getGain(sliderIndex), [sliderIndex]);
-
   return (
     <div className="col band">
       <Dropdown
-        name={`${actualFrequency}-filter-type`}
-        value={filterType}
+        name={`${filter.frequency}-filter-type`}
+        value={filter.type}
         options={FILTER_OPTIONS}
         isDisabled={!!globalError}
         handleChange={handleFilterTypeSubmit}
       />
       <NumberInput
-        value={actualFrequency}
+        value={filter.frequency}
         min={MIN_FREQUENCY}
         max={MAX_FREQUENCY}
-        name={`${actualFrequency}-frequency`}
+        name={`${filter.frequency}-frequency`}
         isDisabled={!!globalError}
         showArrows
         handleSubmit={handleFrequencySubmit}
       />
       <div className="col center slider">
         <Slider
-          name={`${actualFrequency}-gain`}
+          name={`${filter.frequency}-gain`}
           min={MIN_GAIN}
           max={MAX_GAIN}
-          getValue={getSliderGain}
-          setValue={(newValue: number) => setGain(sliderIndex, newValue)}
+          value={filter.gain}
+          setValue={handleGainSubmit}
         />
       </div>
       <NumberInput
-        value={actualQuality}
+        value={filter.quality}
         min={MIN_QUALITY}
         max={MAX_QUALITY}
-        name={`${actualFrequency}-quality`}
+        name={`${filter.frequency}-quality`}
         isDisabled={!!globalError}
         floatPrecision={3}
         showArrows

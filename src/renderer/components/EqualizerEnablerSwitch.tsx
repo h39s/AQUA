@@ -1,11 +1,7 @@
 import { ErrorDescription } from 'common/errors';
-import { useCallback, useContext, useState } from 'react';
-import {
-  disableEqualizer,
-  enableEqualizer,
-  getEqualizerStatus,
-} from '../utils/equalizerApi';
-import { AquaContext } from '../utils/AquaContext';
+import { useCallback } from 'react';
+import { disableEqualizer, enableEqualizer } from '../utils/equalizerApi';
+import { useAquaContext } from '../utils/AquaContext';
 import Switch from '../widgets/Switch';
 
 interface IEqualizerEnablerSwitchProps {
@@ -15,36 +11,28 @@ interface IEqualizerEnablerSwitchProps {
 export default function EqualizerEnablerSwitch({
   id,
 }: IEqualizerEnablerSwitchProps) {
-  const { setGlobalError } = useContext(AquaContext);
-  const [equalizerEnabled, setEqualizerEnabled] = useState<boolean>(false);
-
-  const equalizerEnablerOnLoad = useCallback(async () => {
-    try {
-      setEqualizerEnabled(await getEqualizerStatus());
-    } catch (e) {
-      setGlobalError(e as ErrorDescription);
-    }
-  }, [setGlobalError]);
+  const { globalError, isEnabled, setGlobalError, setIsEnabled } =
+    useAquaContext();
 
   const handleToggleEqualizer = useCallback(async () => {
     try {
-      if (equalizerEnabled) {
+      if (isEnabled) {
         await disableEqualizer();
       } else {
         await enableEqualizer();
       }
-      setEqualizerEnabled(!equalizerEnabled);
+      setIsEnabled(!isEnabled);
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
-  }, [equalizerEnabled, setGlobalError]);
+  }, [isEnabled, setGlobalError, setIsEnabled]);
 
   return (
     <Switch
       id={id}
-      isOn={equalizerEnabled}
+      isOn={isEnabled}
       handleToggle={handleToggleEqualizer}
-      onLoad={equalizerEnablerOnLoad}
+      isDisabled={!!globalError}
     />
   );
 }

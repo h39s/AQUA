@@ -1,5 +1,3 @@
-import { clamp } from '../renderer/utils/utils';
-
 /** ----- Application Constants ----- */
 
 export const MAX_GAIN = 30;
@@ -41,32 +39,45 @@ export const FilterTypeToLabelMap: Record<FilterTypeEnum, string> = {
   // [FilterTypeEnum.NO]: 'Notch Filter',
 };
 
-/** ----- Peace specific ----- */
+/** ----- Application Interfaces ----- */
 
-// Peace returns numerical values as unsigned integers
-// This is the offset for the value -1000, used when fetching gain values
-const OVERFLOW_OFFSET = 4294967296;
+export interface IFilter {
+  frequency: number;
+  gain: number;
+  type: FilterTypeEnum;
+  quality: number;
+}
 
-export const peaceGainOutputToDb = (result: number) => {
-  // If gain is larger than MAX_GAIN, assume that Peace returned an unsigned negative number
-  // If after adjusting for the unsigned number gives a positive value, default to -30
-  if (result / 1000 > MAX_GAIN && (result - OVERFLOW_OFFSET) / 1000 > 0) {
-    return MIN_GAIN;
-  }
+export interface IState {
+  isEnabled: boolean;
+  preAmp: number;
+  filters: IFilter[];
+}
 
-  const gain =
-    result / 1000 > MAX_GAIN
-      ? (result - OVERFLOW_OFFSET) / 1000 // Unsigned negative case
-      : result / 1000; // Positive value case
+/** ----- Default Values ----- */
 
-  // Round up any lower gain values up to MIN_GAIN
-  return Math.max(gain, MIN_GAIN);
+const FIXED_FREQUENCIES = [
+  32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000,
+];
+
+export const DEFAULT_FILTER: IFilter = {
+  frequency: 1000,
+  gain: 0,
+  quality: 1,
+  type: FilterTypeEnum.PK,
 };
 
-export const peaceFrequencyOutputToNormal = (result: number) => {
-  return clamp(result, MIN_FREQUENCY, MAX_FREQUENCY);
-};
+const DEFAULT_FILTERS: IFilter[] = FIXED_FREQUENCIES.map((f) => {
+  return {
+    frequency: f,
+    gain: 0,
+    quality: 1,
+    type: FilterTypeEnum.PK,
+  };
+});
 
-export const peaceQualityOutputToNormal = (result: number) => {
-  return clamp(result, MIN_FREQUENCY, MAX_FREQUENCY) / 1000;
+export const DEFAULT_STATE: IState = {
+  isEnabled: true,
+  preAmp: 0,
+  filters: DEFAULT_FILTERS,
 };

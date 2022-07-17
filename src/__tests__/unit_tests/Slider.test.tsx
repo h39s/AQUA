@@ -1,31 +1,32 @@
 import '@testing-library/jest-dom';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { AquaProviderWrapper } from 'renderer/utils/AquaContext';
+import defaultAquaContext from '../utils/mockAquaProvider';
 import { clearAndType, setup } from '../utils/userEventUtils';
 import Slider from '../../renderer/components/Slider';
 
 describe('Slider', () => {
   const name = 'Slider';
-  const getValue = jest.fn();
   const setValue = jest.fn();
 
   beforeEach(() => {
-    getValue.mockClear();
     setValue.mockClear();
   });
 
   it('should render with name and initial value', async () => {
     const testValue = 1;
-    getValue.mockReturnValue(testValue);
     await act(async () => {
       setup(
-        <Slider
-          name={name}
-          min={-5}
-          max={5}
-          getValue={getValue}
-          setValue={setValue}
-        />
+        <AquaProviderWrapper value={defaultAquaContext}>
+          <Slider
+            name={name}
+            min={-5}
+            max={5}
+            value={testValue}
+            setValue={setValue}
+          />
+        </AquaProviderWrapper>
       );
     });
     const rangeInput = screen.getByLabelText(`${name}-range`);
@@ -37,16 +38,17 @@ describe('Slider', () => {
   it('should update range to match number', async () => {
     const user = userEvent.setup();
     const testValue = 1;
-    getValue.mockReturnValue(testValue);
     await act(async () => {
       setup(
-        <Slider
-          name={name}
-          min={-5}
-          max={5}
-          getValue={getValue}
-          setValue={setValue}
-        />
+        <AquaProviderWrapper value={defaultAquaContext}>
+          <Slider
+            name={name}
+            min={-5}
+            max={5}
+            value={testValue}
+            setValue={setValue}
+          />
+        </AquaProviderWrapper>
       );
     });
     const rangeInput = screen.getByLabelText(`${name}-range`);
@@ -65,16 +67,17 @@ describe('Slider', () => {
 
   it('should update number to match range', async () => {
     const testValue = 1;
-    getValue.mockReturnValue(testValue);
     await act(async () => {
       setup(
-        <Slider
-          name={name}
-          min={-5}
-          max={5}
-          getValue={getValue}
-          setValue={setValue}
-        />
+        <AquaProviderWrapper value={defaultAquaContext}>
+          <Slider
+            name={name}
+            min={-5}
+            max={5}
+            value={testValue}
+            setValue={setValue}
+          />
+        </AquaProviderWrapper>
       );
     });
     const rangeInput = screen.getByLabelText(`${name}-range`);
