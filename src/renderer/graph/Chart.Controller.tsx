@@ -1,4 +1,3 @@
-/** MultilineChart.controller.js */
 import { useMemo } from 'react';
 import * as d3 from 'd3';
 
@@ -30,11 +29,6 @@ const useController = ({ data, width, height }: IChartControllerProps) => {
     [data]
   );
 
-  const xScale = useMemo(
-    () => d3.scaleTime().domain([xMin, xMax]).range([0, width]),
-    [xMin, xMax, width]
-  );
-
   const xScaleFreq = useMemo(
     () =>
       d3
@@ -54,14 +48,6 @@ const useController = ({ data, width, height }: IChartControllerProps) => {
     [data]
   );
 
-  const yScale = useMemo(() => {
-    const indention = (yMax - yMin) * 0.5;
-    return d3
-      .scaleLinear()
-      .domain([yMin - indention, yMax + indention])
-      .range([height, 0]);
-  }, [height, yMin, yMax]);
-
   const yScaleGain = useMemo(
     () =>
       d3
@@ -76,9 +62,7 @@ const useController = ({ data, width, height }: IChartControllerProps) => {
 
   return {
     yTickFormat,
-    xScale,
     xScaleFreq,
-    yScale,
     yScaleGain,
     xMin,
     xMax,

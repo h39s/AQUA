@@ -1,6 +1,5 @@
 import { ErrorDescription } from 'common/errors';
 import { MAX_NUM_FILTERS, MIN_NUM_FILTERS } from 'common/constants';
-import portfolio from './graph/portfolio.json';
 import gains from './graph/sample_gains.json';
 import {
   addEqualizerSlider,
@@ -12,7 +11,7 @@ import PlusIcon from './icons/PlusIcon';
 import Button from './widgets/Button';
 import { FilterActionEnum, useAquaContext } from './utils/AquaContext';
 import './styles/MainContent.scss';
-import MultilineChart from './graph/MultilineChart';
+import Chart from './graph/Chart';
 
 const MainContent = () => {
   const { filters, dispatchFilter, setGlobalError } = useAquaContext();

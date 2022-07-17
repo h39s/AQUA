@@ -1,9 +1,8 @@
-/** MultilineChart.js */
 import { useMemo } from 'react';
 import Axis from './Axis';
-import Curve from './Curve';
+import Curve, { AnimationOptionsEnum } from './Curve';
 import GridLine from './GridLine';
-import useController, { ChartData } from './MultilineChart.controller';
+import useController, { ChartData } from './Chart.Controller';
 
 interface Margins {
   top: number;
@@ -33,9 +32,11 @@ const MultilineChart = ({ data = [], dimensions }: IChartProps) => {
     () => height + margins.top + margins.bottom,
     [height, margins]
   );
-  const { yTickFormat, xScale, xScaleFreq, yScale, yScaleGain } = useController(
-    { data, width, height }
-  );
+  const { yTickFormat, xScaleFreq, yScaleGain } = useController({
+    data,
+    width,
+    height,
+  });
 
   return (
     <svg width={svgWidth} height={svgHeight}>
@@ -76,9 +77,11 @@ const MultilineChart = ({ data = [], dimensions }: IChartProps) => {
           <Curve
             key={e.name}
             data={e.items}
-            xScale={xScale}
-            yScale={yScale}
+            xScale={xScaleFreq}
+            yScale={yScaleGain}
             color={e.color}
+            transform="translate(50, 10)"
+            animation={AnimationOptionsEnum.LEFT}
           />
         ))}
         <Axis
