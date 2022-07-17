@@ -99,7 +99,7 @@ export const healthCheck = (): Promise<void> => {
 
 /**
  * Get the full equalizer state
- * @returns { Promise<IState> } true for on, false for off, exception otherwise
+ * @returns { Promise<IState> } return the state, exception if failed.
  */
 export const getEqualizerState = (): Promise<IState> => {
   const channel = ChannelEnum.GET_STATE;

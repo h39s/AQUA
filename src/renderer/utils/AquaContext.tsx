@@ -49,10 +49,6 @@ export interface IAquaContext extends IState {
   setIsEnabled: (newValue: boolean) => void;
   setPreAmp: (newValue: number) => void;
   dispatchFilter: FilterDispatch;
-  // setFilterFrequency: (index: number, newFrequency: number) => void;
-  // setFilterGain: (index: number, newGain: number) => void;
-  // setFilterQuality: (index: number, newQuality: number) => void;
-  // setFilterType: (index: number, newType: FilterTypeEnum) => void;
 }
 
 const AquaContext = createContext<IAquaContext | undefined>(undefined);
@@ -87,6 +83,7 @@ const filterReducer: IFilterReducer = (
     case FilterActionEnum.REMOVE:
       return filters.filter((_, index) => index !== action.index);
     default:
+      // throw getErrorDescription(ErrorCode.UI_FAILURE)
       throw new Error('Unhandled action type should not occur');
   }
 };
@@ -151,10 +148,6 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
         setIsEnabled,
         setPreAmp,
         dispatchFilter,
-        // setFilterFrequency,
-        // setFilterGain,
-        // setFilterQuality,
-        // setFilterType,
       }}
     >
       {children}

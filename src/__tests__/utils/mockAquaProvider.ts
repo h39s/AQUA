@@ -14,10 +14,6 @@ const defaultAquaContext: IAquaContext = {
   setIsEnabled: (_newValue: boolean) => {},
   setPreAmp: (_newValue: number) => {},
   dispatchFilter: (_action: FilterAction) => {},
-  // setFilterFrequency: (_index: number, _newFrequency: number) => {},
-  // setFilterGain: (_index: number, _newGain: number) => {},
-  // setFilterQuality: (_index: number, _newQuality: number) => {},
-  // setFilterType: (_index: number, _newType: FilterTypeEnum) => {},
 };
 
 export default defaultAquaContext;
