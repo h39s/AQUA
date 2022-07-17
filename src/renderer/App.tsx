@@ -4,9 +4,30 @@ import MainContent from './MainContent';
 import { AquaProvider, useAquaContext } from './utils/AquaContext';
 import PrereqMissingModal from './PrereqMissingModal';
 import SideBar from './SideBar';
+import Chart from './graph/Chart';
+import gains from './graph/sample_gains.json';
 
 const AppContent = () => {
   const { isLoading, globalError, performHealthCheck } = useAquaContext();
+
+  const portfolioData = {
+    name: 'Response',
+    color: '#ffffff',
+    items: gains,
+  };
+  const chartData = [portfolioData];
+
+  const dimensions = {
+    width: 928,
+    height: 334,
+    margins: {
+      top: 30,
+      right: 30,
+      bottom: 30,
+      left: 30,
+    },
+  };
+
   return (
     <>
       {isLoading ? (
@@ -14,11 +35,15 @@ const AppContent = () => {
           <h1>Loading...</h1>
         </div>
       ) : (
-        <div className="parameteric-wrapper row">
-          <SideBar />
-          <MainContent />
-        </div>
-        // <div className="graph-wrapper" />
+        <>
+          <div className="parameteric-wrapper row">
+            <SideBar />
+            <MainContent />
+          </div>
+          <div className="graph-wrapper">
+            <Chart data={chartData} dimensions={dimensions} />
+          </div>
+        </>
       )}
       {globalError && (
         <PrereqMissingModal
