@@ -1,25 +1,44 @@
 /** MultilineChart.js */
-import React, { useEffect } from 'react';
+import { useMemo } from 'react';
 import Line from './Line';
-import useController from './MultilineChart.controller';
+import useController, { ChartData } from './MultilineChart.controller';
 import GridLine from './GridLine';
 import Axis from './Axis';
 
-interface Props {
-  data: any;
-  dimensions: any;
+interface Margins {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
 }
 
-const MultilineChart = ({ data = [], dimensions = {} }: Props) => {
-  const { width, height, margin = {} } = dimensions;
-  const svgWidth = width + margin.left + margin.right;
-  const svgHeight = height + margin.top + margin.bottom;
-  const controller = useController({ data, width, height });
-  const { yTickFormat, xScale, yScale, yScaleForAxis } = controller;
+interface ChartDimensions {
+  height: number;
+  width: number;
+  margins: Margins;
+}
+
+interface IChartProps {
+  data: ChartData[];
+  dimensions: ChartDimensions;
+}
+
+const MultilineChart = ({ data = [], dimensions }: IChartProps) => {
+  const { width, height, margins } = dimensions;
+  const svgWidth = useMemo(
+    () => width + margins.left + margins.right,
+    [width, margins]
+  );
+  const svgHeight = useMemo(
+    () => height + margins.top + margins.bottom,
+    [height, margins]
+  );
+  const { yTickFormat, xScale, xScaleFreq, yScale, yScaleGain, yScaleForAxis } =
+    useController({ data, width, height });
 
   return (
     <svg width={svgWidth} height={svgHeight}>
-      <g transform={`translate(${margin.left},${margin.top})`}>
+      <g transform={`translate(${margins.left},${margins.top})`}>
         <GridLine
           type="vertical"
           scale={xScale}
@@ -40,7 +59,7 @@ const MultilineChart = ({ data = [], dimensions = {} }: Props) => {
           size={width}
           disableAnimation
         />
-        {data.map((e: any) => (
+        {data.map((e: ChartData) => (
           <Line
             key={e.name}
             data={e.items}
@@ -51,16 +70,16 @@ const MultilineChart = ({ data = [], dimensions = {} }: Props) => {
         ))}
         <Axis
           type="left"
-          scale={yScaleForAxis}
-          transform="translate(50, -10)"
-          ticks={5}
+          scale={yScaleGain}
+          transform="translate(50, 10)"
+          ticks={7}
           tickFormat={yTickFormat}
         />
         <Axis
           type="bottom"
-          scale={xScale}
-          transform={`translate(10, ${height - height / 6})`}
-          ticks={5}
+          scale={xScaleFreq}
+          transform={`translate(10, ${height - margins.bottom})`}
+          ticks={7}
         />
       </g>
     </svg>

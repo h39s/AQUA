@@ -1,6 +1,7 @@
 import { ErrorDescription } from 'common/errors';
 import { MAX_NUM_FILTERS, MIN_NUM_FILTERS } from 'common/constants';
 import portfolio from './graph/portfolio.json';
+import gains from './graph/sample_gains.json';
 import {
   addEqualizerSlider,
   removeEqualizerSlider,
@@ -36,16 +37,16 @@ const MainContent = () => {
   };
 
   const portfolioData = {
-    name: 'Portfolio',
+    name: 'Response',
     color: '#ffffff',
-    items: portfolio.map((d) => ({ ...d, date: new Date(d.date) })),
+    items: gains,
   };
   const chartData = [portfolioData];
 
   const dimensions = {
     width: 630,
     height: 300,
-    margin: {
+    margins: {
       top: 30,
       right: 30,
       bottom: 30,

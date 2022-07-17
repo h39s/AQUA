@@ -2,20 +2,31 @@
 import { useMemo } from 'react';
 import * as d3 from 'd3';
 
-interface Props {
-  data: any;
-  width: any;
-  height: any;
+interface DataElement {
+  x: any;
+  y: any;
 }
 
-const useController = ({ data, width, height }: Props) => {
+export interface ChartData {
+  name: string;
+  color: string; // #ffffff
+  items: DataElement[];
+}
+
+interface IChartControllerProps {
+  data: ChartData[];
+  width: number;
+  height: number;
+}
+
+const useController = ({ data, width, height }: IChartControllerProps) => {
   const xMin = useMemo(
-    () => d3.min(data, ({ items }) => d3.min(items, ({ date }) => date)),
+    () => d3.min(data, ({ items }) => d3.min(items, ({ x }) => x)),
     [data]
   );
 
   const xMax = useMemo(
-    () => d3.max(data, ({ items }) => d3.max(items, ({ date }) => date)),
+    () => d3.max(data, ({ items }) => d3.max(items, ({ x }) => x)),
     [data]
   );
 
@@ -24,13 +35,22 @@ const useController = ({ data, width, height }: Props) => {
     [xMin, xMax, width]
   );
 
+  const xScaleFreq = useMemo(
+    () =>
+      d3
+        .scaleLog()
+        .domain([20, 20000])
+        .range([width * 0.1, 0.9 * width]),
+    [width]
+  );
+
   const yMin = useMemo(
-    () => d3.min(data, ({ items }) => d3.min(items, ({ value }) => value)),
+    () => d3.min(data, ({ items }) => d3.min(items, ({ y }) => y)),
     [data]
   );
 
   const yMax = useMemo(
-    () => d3.max(data, ({ items }) => d3.max(items, ({ value }) => value)),
+    () => d3.max(data, ({ items }) => d3.max(items, ({ y }) => y)),
     [data]
   );
 
@@ -42,19 +62,34 @@ const useController = ({ data, width, height }: Props) => {
       .range([height, 0]);
   }, [height, yMin, yMax]);
 
+  const yScaleGain = useMemo(
+    () =>
+      d3
+        .scaleLinear()
+        .domain([-30, 30])
+        .range([0.8 * height, 0]),
+    [height]
+  );
+
   const yScaleForAxis = useMemo(
     () => d3.scaleBand().domain([yMin, yMax]).range([height, 0]),
     [height, yMin, yMax]
   );
 
-  const yTickFormat = (d) =>
-    `${parseFloat(d) > 0 ? '+' : ''}${d3.format('.2%')(d / 100)}`;
+  const yTickFormat = (domainValue: d3.NumberValue, _index: number) =>
+    `${domainValue > 0 ? '+' : ''}${d3.format('.2')(domainValue)}dB`;
 
   return {
     yTickFormat,
     xScale,
+    xScaleFreq,
     yScale,
+    yScaleGain,
     yScaleForAxis,
+    xMin,
+    xMax,
+    yMin,
+    yMax,
   };
 };
 
