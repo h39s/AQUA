@@ -2,15 +2,15 @@
 import { useMemo } from 'react';
 import * as d3 from 'd3';
 
-interface DataElement {
-  x: any;
-  y: any;
+export interface ChartDataPoint {
+  x: number;
+  y: number;
 }
 
 export interface ChartData {
   name: string;
   color: string; // #ffffff
-  items: DataElement[];
+  items: ChartDataPoint[];
 }
 
 interface IChartControllerProps {
@@ -21,12 +21,12 @@ interface IChartControllerProps {
 
 const useController = ({ data, width, height }: IChartControllerProps) => {
   const xMin = useMemo(
-    () => d3.min(data, ({ items }) => d3.min(items, ({ x }) => x)),
+    () => d3.min(data, ({ items }) => d3.min(items, ({ x }) => x)) || 0,
     [data]
   );
 
   const xMax = useMemo(
-    () => d3.max(data, ({ items }) => d3.max(items, ({ x }) => x)),
+    () => d3.max(data, ({ items }) => d3.max(items, ({ x }) => x)) || 0,
     [data]
   );
 
@@ -40,17 +40,17 @@ const useController = ({ data, width, height }: IChartControllerProps) => {
       d3
         .scaleLog()
         .domain([20, 20000])
-        .range([width * 0.1, 0.9 * width]),
+        .range([width * 0.1, 0.95 * width]),
     [width]
   );
 
   const yMin = useMemo(
-    () => d3.min(data, ({ items }) => d3.min(items, ({ y }) => y)),
+    () => d3.min(data, ({ items }) => d3.min(items, ({ y }) => y)) || 0,
     [data]
   );
 
   const yMax = useMemo(
-    () => d3.max(data, ({ items }) => d3.max(items, ({ y }) => y)),
+    () => d3.max(data, ({ items }) => d3.max(items, ({ y }) => y)) || 0,
     [data]
   );
 
@@ -67,16 +67,11 @@ const useController = ({ data, width, height }: IChartControllerProps) => {
       d3
         .scaleLinear()
         .domain([-30, 30])
-        .range([0.8 * height, 0]),
+        .range([0.8 * height, 0.05 * height]),
     [height]
   );
 
-  const yScaleForAxis = useMemo(
-    () => d3.scaleBand().domain([yMin, yMax]).range([height, 0]),
-    [height, yMin, yMax]
-  );
-
-  const yTickFormat = (domainValue: d3.NumberValue, _index: number) =>
+  const yTickFormat = (domainValue: d3.NumberValue) =>
     `${domainValue > 0 ? '+' : ''}${d3.format('.2')(domainValue)}dB`;
 
   return {
@@ -85,7 +80,6 @@ const useController = ({ data, width, height }: IChartControllerProps) => {
     xScaleFreq,
     yScale,
     yScaleGain,
-    yScaleForAxis,
     xMin,
     xMax,
     yMin,

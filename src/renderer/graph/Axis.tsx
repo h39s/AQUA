@@ -6,7 +6,7 @@ interface IAxisProps {
   scale: d3.AxisScale<d3.NumberValue>;
   ticks: number;
   transform: string;
-  tickFormat?: (domainValue: d3.NumberValue, index: number) => string;
+  tickFormat?: (domainValue: d3.NumberValue) => string;
   disableAnimation?: boolean;
 }
 

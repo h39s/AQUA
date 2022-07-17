@@ -1,9 +1,9 @@
 /** MultilineChart.js */
 import { useMemo } from 'react';
-import Line from './Line';
-import useController, { ChartData } from './MultilineChart.controller';
-import GridLine from './GridLine';
 import Axis from './Axis';
+import Curve from './Curve';
+import GridLine from './GridLine';
+import useController, { ChartData } from './MultilineChart.controller';
 
 interface Margins {
   top: number;
@@ -33,34 +33,47 @@ const MultilineChart = ({ data = [], dimensions }: IChartProps) => {
     () => height + margins.top + margins.bottom,
     [height, margins]
   );
-  const { yTickFormat, xScale, xScaleFreq, yScale, yScaleGain, yScaleForAxis } =
-    useController({ data, width, height });
+  const { yTickFormat, xScale, xScaleFreq, yScale, yScaleGain } = useController(
+    { data, width, height }
+  );
 
   return (
     <svg width={svgWidth} height={svgHeight}>
       <g transform={`translate(${margins.left},${margins.top})`}>
         <GridLine
           type="vertical"
-          scale={xScale}
-          ticks={5}
-          size={height}
-          transform={`translate(0, ${height})`}
+          scale={xScaleFreq}
+          tickValues={[20, 100, 200, 1000, 2000, 10000, 20000]}
+          size={0.9 * height}
+          transform={`translate(10, ${0.9 * height})`}
+        />
+        <GridLine
+          type="vertical"
+          scale={xScaleFreq}
+          tickValues={[
+            40, 60, 80, 120, 140, 160, 180, 400, 600, 800, 1200, 1400, 1600,
+            1800, 4000, 6000, 8000, 12000, 14000, 16000, 18000,
+          ]}
+          size={0.85 * height}
+          transform={`translate(10, ${0.875 * height})`}
         />
         <GridLine
           type="horizontal"
-          scale={yScaleForAxis}
-          ticks={2}
+          scale={yScaleGain}
+          tickValues={[-30, -20, -10, 10, 20, 30]}
           size={width}
+          transform="translate(50, 10)"
         />
         <GridLine
           type="horizontal"
-          scale={yScale}
-          ticks={1}
+          scale={yScaleGain}
+          tickValues={[0]}
           size={width}
-          disableAnimation
+          color="#F7844F"
+          transform="translate(50, 10)"
         />
         {data.map((e: ChartData) => (
-          <Line
+          <Curve
             key={e.name}
             data={e.items}
             xScale={xScale}
