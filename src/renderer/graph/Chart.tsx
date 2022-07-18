@@ -52,7 +52,7 @@ const Chart = ({ data = [], dimensions }: IChartProps) => {
       width={svgWidth}
       height={svgHeight}
       style={{
-        margin: `${dimensions.margins.left}px ${dimensions.margins.top}px ${dimensions.margins.right}px ${dimensions.margins.bottom}px`,
+        margin: `${dimensions.margins.top}px ${dimensions.margins.right}px ${dimensions.margins.bottom}px ${dimensions.margins.left}px`,
       }}
     >
       <GridLine

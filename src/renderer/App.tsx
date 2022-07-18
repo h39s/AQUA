@@ -1,32 +1,19 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './styles/App.scss';
+import { useCallback, useState } from 'react';
 import MainContent from './MainContent';
 import { AquaProvider, useAquaContext } from './utils/AquaContext';
 import PrereqMissingModal from './PrereqMissingModal';
 import SideBar from './SideBar';
-import Chart from './graph/Chart';
-import gains from './graph/sample_gains.json';
+import FrequencyResponseChart from './graph/FrequencyResponseChart';
 
 const AppContent = () => {
   const { isLoading, globalError, performHealthCheck } = useAquaContext();
+  const [showChartView, setShowChartView] = useState(false);
 
-  const portfolioData = {
-    name: 'Response',
-    color: '#ffffff',
-    items: gains,
-  };
-  const chartData = [portfolioData];
-
-  const dimensions = {
-    width: 988,
-    height: 400,
-    margins: {
-      top: 30,
-      right: 30,
-      bottom: 30,
-      left: 30,
-    },
-  };
+  const toggleShowChartView = useCallback(() => {
+    setShowChartView(!showChartView);
+  }, [showChartView]);
 
   return (
     <>
@@ -37,12 +24,17 @@ const AppContent = () => {
       ) : (
         <>
           <div className="parameteric-wrapper row">
-            <SideBar />
+            <SideBar
+              showChartView={showChartView}
+              toggleShowChartView={toggleShowChartView}
+            />
             <MainContent />
           </div>
-          <div className="graph-wrapper">
-            <Chart data={chartData} dimensions={dimensions} />
-          </div>
+          {showChartView && (
+            <div className="graph-wrapper">
+              <FrequencyResponseChart />
+            </div>
+          )}
         </>
       )}
       {globalError && (
