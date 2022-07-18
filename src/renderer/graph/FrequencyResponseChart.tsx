@@ -1,11 +1,19 @@
-import gains from './sample_gains.json';
+import { useMemo } from 'react';
+import { useAquaContext } from 'renderer/utils/AquaContext';
 import Chart from './Chart';
+import { getDataPoints } from './utils';
 
 const FrequencyResponseChart = () => {
+  const { filters, preAmp } = useAquaContext();
+
+  const data = useMemo(() => {
+    return getDataPoints(preAmp, filters);
+  }, [filters, preAmp]);
+
   const portfolioData = {
     name: 'Response',
     color: '#ffffff',
-    items: gains,
+    items: data,
   };
   const chartData = [portfolioData];
 

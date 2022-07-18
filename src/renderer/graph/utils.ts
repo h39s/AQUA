@@ -1,5 +1,6 @@
 import { FilterTypeEnum, IFilter } from 'common/constants';
 import { range } from 'renderer/utils/utils';
+import { ChartDataPoint } from './ChartController';
 
 const SAMPLE_FREQUENCY = 96000;
 
@@ -11,17 +12,14 @@ interface ITransferFuncCoeffs {
   a2: number;
 }
 
-interface IDataPoint {
-  x: number;
-  y: number;
-}
+export const getTFCoefficients = (filter: IFilter) => {
+  const {
+    type: filterType,
+    frequency,
+    gain: dbGain,
+    quality: userQuality,
+  } = filter;
 
-export const getTFCoefficients = (
-  filterType: FilterTypeEnum,
-  frequency: number,
-  dbGain: number,
-  quality: number
-) => {
   // Handle these filter types differently:
   // 'peak', 'low-shelf-fixed', 'high-shelf-fixed', 'low-shelf-q', 'high-shelf-q', 'low-shelf-db', 'high-shelf-db'
   const specialFilters = new Set([
@@ -29,7 +27,7 @@ export const getTFCoefficients = (
     FilterTypeEnum.HSC,
     FilterTypeEnum.LSC,
   ]);
-  const gainFactor = filterType in specialFilters ? 40 : 20;
+  const gainFactor = specialFilters.has(filterType) ? 40 : 20;
   const gain = 10 ** (dbGain / gainFactor);
 
   const omega = (2 * Math.PI * frequency) / SAMPLE_FREQUENCY;
@@ -44,8 +42,10 @@ export const getTFCoefficients = (
   let alpha = 0;
   let beta = 0;
 
+  let quality = userQuality;
+
   const shelfFilters = new Set([FilterTypeEnum.HSC, FilterTypeEnum.LSC]);
-  if (filterType in shelfFilters) {
+  if (shelfFilters.has(filterType)) {
     // TODO: add additional shelf filter cases when /if we add them in
     // if (filterType in {'low-shelf-fixed', 'high-shelf-fixed'}){
     //     quality = 0.9
@@ -155,17 +155,13 @@ export const gainAtFrequency = (f: number, c: ITransferFuncCoeffs) => {
   return 10 * Math.log10(numerator / denominator);
 };
 
-export const getDataPoints = (
-  preAmp: number,
-  filters: IFilter[],
-  tfs: ITransferFuncCoeffs[]
-) => {
+export const getDataPoints = (preAmp: number, filters: IFilter[]) => {
   const NUM_STEPS = 1000;
-  const filterGains: number[][] = Array(filters.length).fill(
+  const tfs = filters.map((f) => getTFCoefficients(f));
+  const filterGains: number[][] = Array(tfs.length).fill(
     Array(NUM_STEPS + 1).fill(0)
   );
   const totalGains: number[] = Array(NUM_STEPS + 1).fill(0);
-  const data: IDataPoint[] = Array(NUM_STEPS + 1).fill({ x: 0, y: 0 });
 
   const GRAPH_START = 10;
   const GRAPH_END = 20000;
@@ -174,6 +170,9 @@ export const getDataPoints = (
   const logEnd = Math.log10(GRAPH_END);
   const step = (logEnd - logStart) / NUM_STEPS;
   const frequencies = range(logStart, logEnd + step, step).map((p) => 10 ** p);
+  const data: ChartDataPoint[] = frequencies.map((f) => {
+    return { x: f, y: 0 };
+  });
 
   for (let i = 0; i < frequencies.length; i += 1) {
     totalGains[i] = preAmp;
@@ -182,7 +181,6 @@ export const getDataPoints = (
       filterGains[j][i] = freqFilterGain;
       totalGains[i] += freqFilterGain;
     }
-    data[i].x = frequencies[i];
     data[i].y = totalGains[i];
   }
 
