@@ -4,6 +4,10 @@ export const clamp = (num: number, min: number, max: number) => {
   return Math.min(Math.max(num, min), max);
 };
 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from#sequence_generator_range
+export const range = (start: number, stop: number, step: number) =>
+  Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
+
 // https://overreacted.io/making-setinterval-declarative-with-react-hooks/
 export const useInterval = (callback: () => void, delay?: number) => {
   const savedCallback = useRef<() => void>();

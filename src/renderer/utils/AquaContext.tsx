@@ -83,7 +83,6 @@ const filterReducer: IFilterReducer = (
     case FilterActionEnum.REMOVE:
       return filters.filter((_, index) => index !== action.index);
     default:
-      // throw getErrorDescription(ErrorCode.UI_FAILURE)
       throw new Error('Unhandled action type should not occur');
   }
 };
