@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { useCallback, useEffect, useRef } from 'react';
-import { ChartDataPoint } from './Chart.Controller';
+import { ChartDataPoint } from './ChartController';
 
 export enum AnimationOptionsEnum {
   LEFT = 'left',

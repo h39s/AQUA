@@ -6,9 +6,16 @@ export interface ChartDataPoint {
   y: number;
 }
 
+export interface Padding {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
 export interface ChartData {
   name: string;
-  color: string; // #ffffff
+  color: string; // #ffffff, white, rgba(255, 255, 255, 0.5)
   items: ChartDataPoint[];
 }
 
@@ -16,9 +23,15 @@ interface IChartControllerProps {
   data: ChartData[];
   width: number;
   height: number;
+  padding: Padding;
 }
 
-const useController = ({ data, width, height }: IChartControllerProps) => {
+const useController = ({
+  data,
+  width,
+  height,
+  padding,
+}: IChartControllerProps) => {
   const xMin = useMemo(
     () => d3.min(data, ({ items }) => d3.min(items, ({ x }) => x)) || 0,
     [data]
@@ -33,9 +46,9 @@ const useController = ({ data, width, height }: IChartControllerProps) => {
     () =>
       d3
         .scaleLog()
-        .domain([20, 20000])
-        .range([width * 0.1, 0.95 * width]),
-    [width]
+        .domain([10, 25000])
+        .range([padding.left, width - padding.right]),
+    [padding.left, padding.right, width]
   );
 
   const yMin = useMemo(
@@ -52,9 +65,9 @@ const useController = ({ data, width, height }: IChartControllerProps) => {
     () =>
       d3
         .scaleLinear()
-        .domain([-30, 30])
-        .range([0.8 * height, 0.05 * height]),
-    [height]
+        .domain([-40, 40])
+        .range([height - padding.bottom, padding.top]),
+    [height, padding.bottom, padding.top]
   );
 
   const yTickFormat = (domainValue: d3.NumberValue) =>

@@ -4,8 +4,8 @@ import { useEffect, useRef } from 'react';
 interface IAxisProps {
   type: 'bottom' | 'left';
   scale: d3.AxisScale<d3.NumberValue>;
-  ticks: number;
-  transform: string;
+  tickValues: number[];
+  transform?: string;
   tickFormat?: (domainValue: d3.NumberValue) => string;
   disableAnimation?: boolean;
 }
@@ -13,7 +13,7 @@ interface IAxisProps {
 const Axis = ({
   type,
   scale,
-  ticks,
+  tickValues,
   transform,
   tickFormat,
   disableAnimation,
@@ -22,8 +22,8 @@ const Axis = ({
   useEffect(() => {
     const axisGenerator = type === 'left' ? d3.axisLeft : d3.axisBottom;
     const axis = tickFormat
-      ? axisGenerator(scale).ticks(ticks).tickFormat(tickFormat)
-      : axisGenerator(scale).ticks(ticks);
+      ? axisGenerator(scale).tickValues(tickValues).tickFormat(tickFormat)
+      : axisGenerator(scale).tickValues(tickValues);
 
     if (ref.current) {
       const axisGroup = d3.select(ref.current);
@@ -40,7 +40,7 @@ const Axis = ({
         .attr('color', 'white')
         .attr('font-size', '0.75rem');
     }
-  }, [scale, ticks, tickFormat, disableAnimation, type]);
+  }, [scale, tickValues, tickFormat, disableAnimation, type]);
 
   return <g name="axis-frequency" ref={ref} transform={transform} />;
 };

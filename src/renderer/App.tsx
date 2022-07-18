@@ -18,8 +18,8 @@ const AppContent = () => {
   const chartData = [portfolioData];
 
   const dimensions = {
-    width: 928,
-    height: 334,
+    width: 988,
+    height: 400,
     margins: {
       top: 30,
       right: 30,
