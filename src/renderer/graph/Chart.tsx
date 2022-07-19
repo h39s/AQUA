@@ -40,7 +40,7 @@ const Chart = ({ data = [], dimensions }: IChartProps) => {
     bottom: 30,
   };
 
-  const { yTickFormat, xScaleFreq, yScaleGain } = useController({
+  const { xTickFormat, yTickFormat, xScaleFreq, yScaleGain } = useController({
     data,
     width: svgWidth,
     height: svgHeight,
@@ -109,6 +109,7 @@ const Chart = ({ data = [], dimensions }: IChartProps) => {
         scale={xScaleFreq}
         transform={`translate(0, ${svgHeight - padding.bottom})`}
         tickValues={[20, 100, 200, 1000, 2000, 10000, 20000]}
+        tickFormat={xTickFormat}
       />
     </svg>
   );

@@ -70,10 +70,14 @@ const useController = ({
     [height, padding.bottom, padding.top]
   );
 
+  const xTickFormat = (domainValue: d3.NumberValue) =>
+    `${d3.format('~s')(domainValue)} Hz`;
+
   const yTickFormat = (domainValue: d3.NumberValue) =>
-    `${domainValue > 0 ? '+' : ''}${d3.format('.2')(domainValue)}dB`;
+    `${domainValue > 0 ? '+' : ''}${d3.format('.2')(domainValue)} dB`;
 
   return {
+    xTickFormat,
     yTickFormat,
     xScaleFreq,
     yScaleGain,

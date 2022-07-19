@@ -3,6 +3,9 @@ import { range } from 'renderer/utils/utils';
 import { ChartDataPoint } from './ChartController';
 
 const SAMPLE_FREQUENCY = 96000;
+const NUM_STEPS = 1000;
+const GRAPH_START = 10;
+const GRAPH_END = 20000;
 
 interface ITransferFuncCoeffs {
   b0: number;
@@ -155,16 +158,55 @@ export const gainAtFrequency = (f: number, c: ITransferFuncCoeffs) => {
   return 10 * Math.log10(numerator / denominator);
 };
 
+export const getFilterPoints = (filter: IFilter) => {
+  const tf = getTFCoefficients(filter);
+
+  const logStart = Math.log10(GRAPH_START);
+  const logEnd = Math.log10(GRAPH_END);
+  const step = (logEnd - logStart) / NUM_STEPS;
+
+  const frequencies = range(logStart, logEnd + step, step).map((p) => 10 ** p);
+  const data: ChartDataPoint[] = frequencies.map((f) => {
+    return { x: f, y: 0 };
+  });
+
+  for (let i = 0; i < frequencies.length; i += 1) {
+    const freqFilterGain = gainAtFrequency(frequencies[i], tf);
+    data[i].y = freqFilterGain;
+  }
+
+  return data;
+};
+
+export const getTotalPoints = (
+  preAmp: number,
+  filterLines: ChartDataPoint[][]
+) => {
+  const logStart = Math.log10(GRAPH_START);
+  const logEnd = Math.log10(GRAPH_END);
+  const step = (logEnd - logStart) / NUM_STEPS;
+
+  const frequencies = range(logStart, logEnd + step, step).map((p) => 10 ** p);
+  const data: ChartDataPoint[] = frequencies.map((f) => {
+    return { x: f, y: 0 };
+  });
+
+  for (let i = 0; i < frequencies.length; i += 1) {
+    data[i].y = preAmp;
+    for (let j = 0; j < filterLines.length; j += 1) {
+      data[i].y += filterLines[j][i].y;
+    }
+  }
+
+  return data;
+};
+
 export const getDataPoints = (preAmp: number, filters: IFilter[]) => {
-  const NUM_STEPS = 1000;
   const tfs = filters.map((f) => getTFCoefficients(f));
   const filterGains: number[][] = Array(tfs.length).fill(
     Array(NUM_STEPS + 1).fill(0)
   );
   const totalGains: number[] = Array(NUM_STEPS + 1).fill(0);
-
-  const GRAPH_START = 10;
-  const GRAPH_END = 20000;
 
   const logStart = Math.log10(GRAPH_START);
   const logEnd = Math.log10(GRAPH_END);
