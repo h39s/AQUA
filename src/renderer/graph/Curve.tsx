@@ -9,6 +9,7 @@ export enum AnimationOptionsEnum {
 }
 
 interface ICurveProps {
+  name: string;
   xScale: d3.AxisScale<d3.NumberValue>;
   yScale: d3.AxisScale<d3.NumberValue>;
   color: string;
@@ -18,6 +19,7 @@ interface ICurveProps {
 }
 
 const Curve = ({
+  name,
   xScale,
   yScale,
   color = 'white',
@@ -96,6 +98,7 @@ const Curve = ({
 
   return (
     <path
+      name={name}
       ref={ref}
       stroke={color}
       strokeWidth={3}

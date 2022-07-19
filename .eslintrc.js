@@ -11,6 +11,7 @@ module.exports = {
     // defaultProps is going to be deprecated and we should turn off this rule.
     'react/require-default-props': 'off',
     'no-await-in-loop': 'off',
+    'import/prefer-default-export': 'warn',
     curly: ['error', 'all'],
   },
   parserOptions: {

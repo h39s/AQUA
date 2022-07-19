@@ -90,6 +90,7 @@ const Chart = ({ data = [], dimensions }: IChartProps) => {
       {data.map((e: ChartData) => (
         <Curve
           key={e.name}
+          name={e.name}
           data={e.items}
           xScale={xScaleFreq}
           yScale={yScaleGain}
