@@ -56,7 +56,7 @@ const getTFCoefficients = (filter: IFilter) => {
       filterType === FilterTypeEnum.HSC
     ) {
       // eslint-disable-next-line no-param-reassign
-      quality /= 12;
+      quality /= 2;
       // } else if ( filterType in {'low-shelf-db', 'high-shelf-db'}){
       //     quality = 1 / (((1/(quality**2))-2)/(gain+1/gain)+1)
     }
