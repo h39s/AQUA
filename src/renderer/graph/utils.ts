@@ -1,11 +1,9 @@
 import { FilterTypeEnum, IFilter } from 'common/constants';
 import { range } from 'renderer/utils/utils';
-import { ChartDataPoint } from './ChartController';
+import { ChartDataPoint, GRAPH_START, GRAPH_END } from './ChartController';
 
 const SAMPLE_FREQUENCY = 96000;
 const NUM_STEPS = 1000;
-const GRAPH_START = 10;
-const GRAPH_END = 20000;
 
 interface ITransferFuncCoeffs {
   b0: number;
@@ -15,7 +13,7 @@ interface ITransferFuncCoeffs {
   a2: number;
 }
 
-export const getTFCoefficients = (filter: IFilter) => {
+const getTFCoefficients = (filter: IFilter) => {
   const {
     type: filterType,
     frequency,
@@ -143,7 +141,7 @@ export const getTFCoefficients = (filter: IFilter) => {
   return { b0, b1, b2, a1, a2 } as ITransferFuncCoeffs;
 };
 
-export const gainAtFrequency = (f: number, c: ITransferFuncCoeffs) => {
+const gainAtFrequency = (f: number, c: ITransferFuncCoeffs) => {
   const { b0, b1, b2, a1, a2 } = c;
   const phi = Math.sin((2 * Math.PI * f) / (2 * SAMPLE_FREQUENCY)) ** 2;
   const numerator =

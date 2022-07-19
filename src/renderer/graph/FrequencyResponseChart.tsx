@@ -1,9 +1,9 @@
 import { IFilter } from 'common/constants';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { useAquaContext } from 'renderer/utils/AquaContext';
 import Chart from './Chart';
 import { ChartDataPoint } from './ChartController';
-import { getDataPoints, getFilterPoints, getTotalPoints } from './utils';
+import { getFilterPoints, getTotalPoints } from './utils';
 
 const isFilterEqual = (f1: IFilter, f2: IFilter) => {
   return (
@@ -16,34 +16,32 @@ const isFilterEqual = (f1: IFilter, f2: IFilter) => {
 
 const FrequencyResponseChart = () => {
   const { filters, preAmp } = useAquaContext();
+  const prevFilters = useRef<IFilter[]>([]);
+  const prevFilterLines = useRef<ChartDataPoint[][]>([]);
 
-  const [localFilters, setLocalFilters] = useState<IFilter[]>([]);
-  const [filterLines, setFiltersLines] = useState<ChartDataPoint[][]>([]);
-
-  // const data = useMemo(() => {
-  //   return getDataPoints(preAmp, filters);
-  // }, [filters, preAmp]);
-
-  useEffect(() => {
+  const chartData = useMemo(() => {
+    // Update filter lines that have changed
     const updatedFilterLines = filters.map((f, index) =>
-      index < localFilters.length && isFilterEqual(f, localFilters[index])
-        ? filterLines[index]
+      index < prevFilters.current.length &&
+      isFilterEqual(f, prevFilters.current[index])
+        ? prevFilterLines.current[index]
         : getFilterPoints(f)
     );
-    setFiltersLines(updatedFilterLines);
-    setLocalFilters(filters);
-  }, [filterLines, filters, localFilters, preAmp]);
 
-  const data = useMemo(() => {
-    return getTotalPoints(preAmp, filterLines);
-  }, [filterLines, preAmp]);
+    // Update past state
+    prevFilterLines.current = updatedFilterLines;
+    prevFilters.current = filters;
 
-  const portfolioData = {
-    name: 'Response',
-    color: '#ffffff',
-    items: data,
-  };
-  const chartData = [portfolioData];
+    // Compute and return new chart data
+    const data = getTotalPoints(preAmp, updatedFilterLines);
+    return [
+      {
+        name: 'Response',
+        color: '#ffffff',
+        items: data,
+      },
+    ];
+  }, [filters, preAmp]);
 
   const dimensions = {
     width: 988,

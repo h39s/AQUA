@@ -1,6 +1,9 @@
 import { useMemo } from 'react';
 import * as d3 from 'd3';
 
+export const GRAPH_START = 10;
+export const GRAPH_END = 25000;
+
 export interface ChartDataPoint {
   x: number;
   y: number;
@@ -46,7 +49,7 @@ const useController = ({
     () =>
       d3
         .scaleLog()
-        .domain([10, 25000])
+        .domain([GRAPH_START, GRAPH_END])
         .range([padding.left, width - padding.right]),
     [padding.left, padding.right, width]
   );

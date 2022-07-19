@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { ChartDataPoint } from './ChartController';
 
 export enum AnimationOptionsEnum {
@@ -38,6 +38,7 @@ const Curve = ({
       .ease(d3.easeLinear)
       .attr('stroke-dashoffset', 0);
   }, []);
+
   const animateFadeIn = useCallback(() => {
     d3.select(ref.current)
       .transition()
@@ -45,6 +46,7 @@ const Curve = ({
       .ease(d3.easeLinear)
       .attr('opacity', 1);
   }, []);
+
   const noneAnimation = useCallback(() => {
     d3.select(ref.current).attr('opacity', 1);
   }, []);
@@ -62,7 +64,7 @@ const Curve = ({
         noneAnimation();
         break;
     }
-  }, [animateLeft, animateFadeIn, noneAnimation, animation, data]);
+  }, [animateLeft, animateFadeIn, noneAnimation, animation]);
 
   // Recalculate line length if scale has changed
   useEffect(() => {
@@ -75,17 +77,26 @@ const Curve = ({
     }
   }, [xScale, yScale, animation]);
 
-  const line = d3
-    .line<ChartDataPoint>()
-    .x(({ x }) => xScale(x) || 0)
-    .y(({ y }) => yScale(y) || 0);
+  const line = useMemo(
+    () =>
+      d3
+        .line<ChartDataPoint>()
+        .x(({ x }) => xScale(x) || 0)
+        .y(({ y }) => yScale(y) || 0),
+    [xScale, yScale]
+  );
 
-  const d = line(data);
+  const d = useMemo(() => line(data), [data, line]);
+
+  useEffect(() => {
+    if (ref.current) {
+      d3.select(ref.current).transition().duration(500).attr('d', d);
+    }
+  }, [d]);
 
   return (
     <path
       ref={ref}
-      d={d || ''}
       stroke={color}
       strokeWidth={3}
       fill="none"
