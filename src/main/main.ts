@@ -359,6 +359,22 @@ ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
   await handleUpdate(event, channel);
 });
 
+ipcMain.on(ChannelEnum.SET_WINDOW_SIZE, async (event, arg) => {
+  const channel = ChannelEnum.SET_WINDOW_SIZE;
+  const value = parseInt(arg[0], 10);
+
+  if (mainWindow) {
+    if (value) {
+      mainWindow.setSize(1024, 1000);
+    } else {
+      mainWindow.setSize(1024, 590);
+    }
+  }
+
+  const reply: TSuccess<void> = { result: undefined };
+  event.reply(channel, reply);
+});
+
 ipcMain.on('quit-app', () => {
   app.quit();
 });
@@ -408,6 +424,7 @@ const createMainWindow = async () => {
     maxWidth: 1024,
     height: 590,
     minHeight: 590,
+    maxHeight: 1000,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged

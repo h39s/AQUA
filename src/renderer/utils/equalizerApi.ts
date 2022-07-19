@@ -306,3 +306,23 @@ export const removeEqualizerSlider = (index: number): Promise<void> => {
   window.electron.ipcRenderer.sendMessage(channel, [index]);
   return promisifyResult(setterResponseHandler, channel);
 };
+
+/**
+ * Increase Window Size
+ * @returns { Promise<void> } exception if failed.
+ */
+export const increaseWindowSize = (): Promise<void> => {
+  const channel = ChannelEnum.SET_WINDOW_SIZE;
+  window.electron.ipcRenderer.sendMessage(channel, [1]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Decrease Window Size
+ * @returns { Promise<void> } exception if failed.
+ */
+export const decreaseWindowSize = (): Promise<void> => {
+  const channel = ChannelEnum.SET_WINDOW_SIZE;
+  window.electron.ipcRenderer.sendMessage(channel, [0]);
+  return promisifyResult(setterResponseHandler, channel);
+};
