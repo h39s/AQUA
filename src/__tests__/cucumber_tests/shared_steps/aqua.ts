@@ -42,7 +42,9 @@ export const givenEnabledState = (
     /^Aqua equalizer state is (enabled|disabled)$/,
     async (state: string) => {
       const desiredState = state === 'enabled';
-      const equalizerSwitch = await webdriver.driver.$('.sideBar .switch');
+      const equalizerSwitch = await webdriver.driver.$(
+        '.sideBar label[class="switch"][for="equalizerEnabler"]'
+      );
 
       const switchOn = await equalizerSwitch
         .$('[aria-checked="true"]')

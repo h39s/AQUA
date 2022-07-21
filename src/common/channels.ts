@@ -1,5 +1,6 @@
 enum ChannelEnum {
   HEALTH_CHECK = 'healthCheck',
+  SET_WINDOW_SIZE = 'setWindowSize',
   GET_STATE = 'getState',
   GET_ENABLE = 'getEnable',
   SET_ENABLE = 'setEnable',
