@@ -361,10 +361,8 @@ ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
 
 ipcMain.on(ChannelEnum.SET_WINDOW_SIZE, async (event, arg) => {
   const channel = ChannelEnum.SET_WINDOW_SIZE;
-  const value = parseInt(arg[0], 10);
-
   if (mainWindow) {
-    if (value) {
+    if (arg[0]) {
       mainWindow.setSize(1024, 1000);
     } else {
       mainWindow.setSize(1024, 590);

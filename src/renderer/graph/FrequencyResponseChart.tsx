@@ -1,7 +1,7 @@
 import { IFilter } from 'common/constants';
 import { useMemo, useRef } from 'react';
 import { useAquaContext } from 'renderer/utils/AquaContext';
-import Chart from './Chart';
+import Chart, { ChartDimensions } from './Chart';
 import { ChartDataPoint } from './ChartController';
 import { getFilterPoints, getTotalPoints } from './utils';
 
@@ -43,7 +43,7 @@ const FrequencyResponseChart = () => {
     ];
   }, [filters, preAmp]);
 
-  const dimensions = {
+  const dimensions: ChartDimensions = {
     width: 988,
     height: 400,
     margins: {

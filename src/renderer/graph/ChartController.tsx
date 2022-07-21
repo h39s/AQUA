@@ -9,7 +9,7 @@ export interface ChartDataPoint {
   y: number;
 }
 
-export interface Padding {
+export interface MarginLike {
   left: number;
   top: number;
   right: number;
@@ -26,7 +26,7 @@ interface IChartControllerProps {
   data: ChartData[];
   width: number;
   height: number;
-  padding: Padding;
+  padding: MarginLike;
 }
 
 const useController = ({

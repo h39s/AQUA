@@ -43,7 +43,7 @@ const SideBar = ({ showChartView, toggleShowChartView }: Props) => {
         />
       </div>
       <div className="col center">
-        <h3>Chart View</h3>
+        <h3>Graph EQ</h3>
         <Switch
           id="chartEnabler"
           isOn={showChartView}

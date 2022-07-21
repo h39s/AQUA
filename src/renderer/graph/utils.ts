@@ -55,7 +55,6 @@ const getTFCoefficients = (filter: IFilter) => {
       filterType === FilterTypeEnum.LSC ||
       filterType === FilterTypeEnum.HSC
     ) {
-      // eslint-disable-next-line no-param-reassign
       quality /= 2;
       // } else if ( filterType in {'low-shelf-db', 'high-shelf-db'}){
       //     quality = 1 / (((1/(quality**2))-2)/(gain+1/gain)+1)
@@ -163,6 +162,7 @@ export const getFilterPoints = (filter: IFilter) => {
   const logEnd = Math.log10(GRAPH_END);
   const step = (logEnd - logStart) / NUM_STEPS;
 
+  // TODO: consider hard coding frequencies maybe
   const frequencies = range(logStart, logEnd + step, step).map((p) => 10 ** p);
   const data: ChartDataPoint[] = frequencies.map((f) => {
     return { x: f, y: 0 };

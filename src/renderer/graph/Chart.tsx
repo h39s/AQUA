@@ -2,19 +2,12 @@ import { useMemo } from 'react';
 import Axis from './Axis';
 import Curve, { AnimationOptionsEnum } from './Curve';
 import GridLine from './GridLine';
-import useController, { ChartData } from './ChartController';
+import useController, { ChartData, MarginLike } from './ChartController';
 
-interface Margins {
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-}
-
-interface ChartDimensions {
+export interface ChartDimensions {
   height: number;
   width: number;
-  margins: Margins;
+  margins: MarginLike;
 }
 
 interface IChartProps {
