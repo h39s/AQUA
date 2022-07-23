@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { clearAndType, setup } from '../utils/userEventUtils';
 import NumberInput from '../../renderer/widgets/NumberInput';
 
@@ -47,6 +47,53 @@ describe('NumberInput', () => {
     expect(input).toHaveValue('-');
   });
 
+  it('should discard changes when Esc is pressed', async () => {
+    const testValue = 0;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={0}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await user.click(input);
+    await clearAndType(user, input, '-1');
+    expect(input).toHaveValue('-1');
+    await user.keyboard('{Escape}');
+    expect(input).not.toHaveFocus();
+    expect(input).toHaveValue('0');
+  });
+
+  it('should submit changes when input is blurred', async () => {
+    const testValue = 0;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={1}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await user.click(input);
+    await clearAndType(user, input, '-1');
+    input.blur();
+    expect(input).not.toHaveFocus();
+    expect(handleSubmit).toBeCalledWith(-1);
+  });
+
   it('should allow input to be changed to a negative value', async () => {
     const testValue = 0;
     const { user } = setup(
@@ -83,6 +130,7 @@ describe('NumberInput', () => {
 
     await user.click(input);
     await user.keyboard('{Enter}');
+    expect(input).not.toHaveFocus();
     expect(handleSubmit).toBeCalledWith(-5);
   });
 

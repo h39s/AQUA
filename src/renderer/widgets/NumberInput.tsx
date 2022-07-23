@@ -162,9 +162,44 @@ const NumberInput = ({
   };
 
   // Helper for discarding changes
-  const onBlur = () => {
+  const onDiscard = () => {
     setHasChanges(false);
     setInternalValue(value.toString());
+  };
+
+  const onSubmit = async () => {
+    let num = NaN;
+    if (floatPrecision === 0) {
+      num = parseInt(internalValue, 10);
+    } else {
+      // 20.6031, round to 20.605
+      // 20.6031 => multiply precisionFactor and floor to truncate
+      // => 20603.1 => 20603
+      // if round divide by 10
+      // => 2060.3 => 4120.6 => 4121 => 2060.5
+      // then multiply by 10
+      // => 20605
+      // finally divide precisionFactor
+      num = parseFloat(internalValue);
+      num = Math.round(num * precisionFactor);
+      if (shouldRoundToHalf) {
+        num = Math.round(num / 5) * 5;
+      }
+      num /= precisionFactor;
+    }
+    if (Number.isNaN(num)) {
+      return;
+    }
+    const newValue: number = clamp(num, min, max);
+
+    setHasChanges(false);
+    if (newValue === value) {
+      // Need this because useEffect would otherwise not trigger
+      // since value would not change after we call handleSubmit
+      setInternalValue(value.toString());
+    }
+    // Call handler on the parent
+    await handleSubmit(newValue);
   };
 
   const onArrow = async (isIncrement: boolean) => {
@@ -180,42 +215,13 @@ const NumberInput = ({
   };
 
   // Helper for detecting use of the ENTER or TAB keys
-  const listenForEnter = (e: KeyboardEvent) => {
+  const listenForEnter = async (e: KeyboardEvent) => {
     if (e.code === 'Enter' || e.code === 'Tab') {
-      let num = NaN;
-      if (floatPrecision === 0) {
-        num = parseInt(internalValue, 10);
-      } else {
-        // 20.6031, round to 20.605
-        // 20.6031 => multiply precisionFactor and floor to truncate
-        // => 20603.1 => 20603
-        // if round divide by 10
-        // => 2060.3 => 4120.6 => 4121 => 2060.5
-        // then multiply by 10
-        // => 20605
-        // finally divide precisionFactor
-        num = parseFloat(internalValue);
-        num = Math.round(num * precisionFactor);
-        if (shouldRoundToHalf) {
-          num = Math.round(num / 5) * 5;
-        }
-        num /= precisionFactor;
-      }
-      if (Number.isNaN(num)) {
-        return;
-      }
-      const newValue: number = clamp(num, min, max);
-
-      setHasChanges(false);
-      if (newValue === value) {
-        // Need this because useEffect would otherwise not trigger
-        // since value would not change after we call handleSubmit
-        setInternalValue(value.toString());
-      }
-      // Call handler on the parent
-      handleSubmit(newValue);
+      // Blur input to trigger the onSubmit handler
+      inputRef.current?.blur();
     } else if (e.code === 'Escape') {
-      onBlur();
+      onDiscard();
+      inputRef.current?.blur();
     }
   };
 
@@ -234,7 +240,7 @@ const NumberInput = ({
           aria-label={name}
           value={internalValue}
           onInput={onInput}
-          onBlur={onBlur}
+          onBlur={onSubmit}
           onKeyDown={listenForEnter}
           disabled={isDisabled}
           style={{ textAlign: showArrows ? 'left' : 'center' }}
