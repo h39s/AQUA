@@ -17,11 +17,13 @@ interface INumberInputProps {
   value: number;
   min: number;
   max: number;
-  floatPrecision?: number;
   isDisabled: boolean;
+  floatPrecision?: number;
+  maxDigits?: number;
   showArrows?: boolean;
   showLabel?: boolean;
   shouldRoundToHalf?: boolean;
+  shouldAutoGrow?: boolean;
   handleSubmit: (newValue: number) => Promise<void>;
 }
 
@@ -32,20 +34,24 @@ const NumberInput = ({
   max,
   isDisabled,
   showArrows = false,
+  maxDigits = 5,
   floatPrecision = 0,
   shouldRoundToHalf = false,
   showLabel = false,
+  shouldAutoGrow = false,
   handleSubmit,
 }: INumberInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [internalValue, setInternalValue] = useState<string>(value.toString());
-  const [valueLength, setValueLength] = useState<number>(0);
+  const [valueLength, setValueLength] = useState<number>(maxDigits);
   const [hasChanges, setHasChanges] = useState<boolean>(false);
 
   // Update input valueLength
   useLayoutEffect(() => {
-    setValueLength(inputRef.current?.value.length || 0);
-  }, [internalValue]);
+    if (shouldAutoGrow) {
+      setValueLength(inputRef.current?.value.length || 0);
+    }
+  }, [internalValue, shouldAutoGrow]);
 
   // Synchronize local input value with prop value
   useEffect(() => {
@@ -146,8 +152,8 @@ const NumberInput = ({
       }
     }
 
-    // Prevent user from typing numbers that are too large or use more than 7 characters
-    if (Math.abs(num) >= 100000 || input.length > 7) {
+    // Prevent user from typing numbers that are too large or use more than maxDigits numerical digits
+    if (Math.abs(num) >= 10 ** maxDigits || input.length > maxDigits + 2) {
       return;
     }
 
@@ -231,8 +237,8 @@ const NumberInput = ({
           onBlur={onBlur}
           onKeyDown={listenForEnter}
           disabled={isDisabled}
+          style={{ textAlign: showArrows ? 'left' : 'center' }}
         />
-        {hasChanges && <span className="asterisk">*</span>}
         {showArrows && (
           <div className="arrows">
             <ArrowButton
@@ -248,6 +254,14 @@ const NumberInput = ({
               isDisabled={isDisabled}
             />
           </div>
+        )}
+        {hasChanges && (
+          <span
+            className="asterisk"
+            style={{ paddingLeft: showArrows ? '12px' : '' }}
+          >
+            *
+          </span>
         )}
       </div>
       {showLabel && name}
