@@ -10,6 +10,7 @@ $input-height: 24px;
     position: relative; // necessary so that the absolutely positioned asterisks will scroll with the input
     border: 2px solid $secondary-default;
     border-radius: 4px;
+    justify-content: start;
 
     &:focus:not(:focus-within) {
       // TODO: can't figure out how to differentiate between only focus and focus-visible for text inputs
@@ -43,8 +44,15 @@ $input-height: 24px;
     margin-top: -$spacing-m;
   }
 
+  &:hover {
+    .arrows {
+      visibility: visible;
+    }
+  }
+
   .arrows {
     display: flex;
+    visibility: hidden;
     flex-direction: column;
     gap: 2px;
 

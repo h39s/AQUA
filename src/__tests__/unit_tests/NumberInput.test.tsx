@@ -477,4 +477,50 @@ describe('NumberInput', () => {
     await user.keyboard('{Enter}');
     expect(handleSubmit).toBeCalledWith(0.6);
   });
+
+  /**
+   * Note that we are unable to test that the arrows are not visible in this unit test
+   *  this is because the CSS isn't loaded into the testing renderer.
+   * See for more details:
+   *  https://stackoverflow.com/questions/52813527/cannot-check-expectelm-not-tobevisible-for-semantic-ui-react-component
+   */
+  it('should be able to increase the value using the up arrow', async () => {
+    const testValue = 1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={0}
+        showArrows
+      />
+    );
+    const upArrow = screen.getByLabelText(`Increase ${id}`);
+    expect(upArrow).toBeInTheDocument();
+    await user.click(upArrow);
+    expect(handleSubmit).toBeCalledWith(2);
+  });
+
+  it('should be able to decrease the value using the up arrow', async () => {
+    const testValue = 1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={0}
+        showArrows
+      />
+    );
+    const downArrow = screen.getByLabelText(`Decrease ${id}`);
+    expect(downArrow).toBeInTheDocument();
+    await user.click(downArrow);
+    expect(handleSubmit).toBeCalledWith(0);
+  });
 });

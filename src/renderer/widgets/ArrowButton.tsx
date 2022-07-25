@@ -63,6 +63,7 @@ const ArrowButton = ({
   const onMouseDown = (e: MouseEvent) => {
     e.preventDefault();
     handleArrowInput();
+    buttonRef.current?.focus();
   };
 
   return (
