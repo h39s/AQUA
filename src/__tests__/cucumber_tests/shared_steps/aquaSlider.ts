@@ -149,7 +149,7 @@ export const whenSetFrequencyQualityUsingArrows = (
       for (let i = 0; i < times; i += 1) {
         await button.click();
         // wait 500 ms for the action. necessary
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
   );
@@ -264,7 +264,7 @@ export const whenSetBandFrequencyUsingArrows = (
       for (let i = 0; i < times; i += 1) {
         await button.click();
         // wait 500 ms for the action. necessary
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
   );

@@ -66,7 +66,9 @@ describe('NumberInput', () => {
     await user.click(input);
     await clearAndType(user, input, '-1');
     expect(input).toHaveValue('-1');
-    await user.keyboard('{Escape}');
+    await act(async () => {
+      await user.keyboard('{Escape}');
+    });
     expect(input).not.toHaveFocus();
     expect(input).toHaveValue('0');
   });
@@ -89,7 +91,10 @@ describe('NumberInput', () => {
 
     await user.click(input);
     await clearAndType(user, input, '-1');
-    input.blur();
+
+    await act(async () => {
+      input.blur();
+    });
     expect(input).not.toHaveFocus();
     expect(handleSubmit).toBeCalledWith(-1);
   });
