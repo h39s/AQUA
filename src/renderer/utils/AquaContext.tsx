@@ -47,6 +47,7 @@ export interface IAquaContext extends IState {
   performHealthCheck: () => void;
   setGlobalError: (newValue?: ErrorDescription) => void;
   setIsEnabled: (newValue: boolean) => void;
+  setAutoPreampOn: (newValue: boolean) => void;
   setPreAmp: (newValue: number) => void;
   dispatchFilter: FilterDispatch;
 }
@@ -110,6 +111,9 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
     ErrorDescription | undefined
   >();
   const [isEnabled, setIsEnabled] = useState<boolean>(DEFAULT_STATE.isEnabled);
+  const [isAutoPreampOn, setAutoPreampOn] = useState<boolean>(
+    DEFAULT_STATE.isAutoPreampOn
+  );
   const [preAmp, setPreAmp] = useState<number>(DEFAULT_STATE.preAmp);
   const [filters, dispatchFilter] = useReducer<IFilterReducer>(
     filterReducer,
@@ -123,6 +127,7 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
     try {
       const state = await getEqualizerState();
       setIsEnabled(state.isEnabled);
+      setAutoPreampOn(state.isAutoPreampOn);
       setPreAmp(state.preAmp);
       dispatchFilter({ type: FilterActionEnum.INIT, filters: state.filters });
       setGlobalError(undefined);
@@ -142,11 +147,13 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
         isLoading,
         globalError,
         isEnabled,
+        isAutoPreampOn,
         preAmp,
         filters,
         performHealthCheck,
         setGlobalError,
         setIsEnabled,
+        setAutoPreampOn,
         setPreAmp,
         dispatchFilter,
       }}

@@ -4,6 +4,7 @@ enum ChannelEnum {
   GET_STATE = 'getState',
   GET_ENABLE = 'getEnable',
   SET_ENABLE = 'setEnable',
+  SET_AUTOPREAMP = 'setAutoPreAmp',
   GET_PREAMP = 'getPreamp',
   SET_PREAMP = 'setPreamp',
   GET_FILTER_GAIN = 'getFilterGain',

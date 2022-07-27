@@ -16,6 +16,7 @@ export const givenCanWriteToAquaConfig = (given: DefineStepFunction) => {
   given('Aqua can write to Aqua config', async () => {
     const emptyState: IState = {
       isEnabled: false,
+      isAutoPreampOn: false,
       preAmp: 0,
       filters: [],
     };

@@ -129,6 +129,26 @@ export const disableEqualizer = (): Promise<void> => {
 };
 
 /**
+ * Enable Auto Pre-amp
+ * @returns { Promise<void> } exception if failed.
+ */
+export const enableAutoPreamp = (): Promise<void> => {
+  const channel = ChannelEnum.SET_AUTOPREAMP;
+  window.electron.ipcRenderer.sendMessage(channel, [true]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Disable Auto Pre-amp
+ * @returns { Promise<void> } exception if failed.
+ */
+export const disableAutoPreamp = (): Promise<void> => {
+  const channel = ChannelEnum.SET_AUTOPREAMP;
+  window.electron.ipcRenderer.sendMessage(channel, [false]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
  * Get the current equalizer status
  * @deprecated - Removing with the context refactor
  * @returns { Promise<boolean> } true for on, false for off, exception otherwise

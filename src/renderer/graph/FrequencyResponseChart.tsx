@@ -1,8 +1,10 @@
 import { IFilter } from 'common/constants';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useAquaContext } from 'renderer/utils/AquaContext';
+import { setMainPreAmp } from 'renderer/utils/equalizerApi';
+import { clamp } from 'renderer/utils/utils';
 import Chart, { ChartDimensions } from './Chart';
-import { ChartDataPoint } from './ChartController';
+import { ChartData, ChartDataPoint } from './ChartController';
 import { getFilterPoints, getTotalPoints } from './utils';
 
 const isFilterEqual = (f1: IFilter, f2: IFilter) => {
@@ -15,11 +17,14 @@ const isFilterEqual = (f1: IFilter, f2: IFilter) => {
 };
 
 const FrequencyResponseChart = () => {
-  const { filters, preAmp } = useAquaContext();
+  const { filters, preAmp, isAutoPreampOn, setPreAmp } = useAquaContext();
   const prevFilters = useRef<IFilter[]>([]);
   const prevFilterLines = useRef<ChartDataPoint[][]>([]);
 
-  const chartData = useMemo(() => {
+  const {
+    chartData,
+    autoPreAmpValue,
+  }: { chartData: ChartData[]; autoPreAmpValue: number } = useMemo(() => {
     // Update filter lines that have changed
     const updatedFilterLines = filters.map((f, index) =>
       index < prevFilters.current.length &&
@@ -34,14 +39,36 @@ const FrequencyResponseChart = () => {
 
     // Compute and return new chart data
     const data = getTotalPoints(preAmp, updatedFilterLines);
-    return [
-      {
-        name: 'Response',
-        color: '#ffffff',
-        items: data,
-      },
-    ];
+
+    const highestPoint = data.reduce((previousValue, currentValue) => {
+      if (previousValue) {
+        return previousValue.y < currentValue.y ? currentValue : previousValue;
+      }
+      return currentValue;
+    });
+
+    return {
+      chartData: [
+        {
+          name: 'Response',
+          color: '#ffffff',
+          items: data,
+        },
+      ],
+      autoPreAmpValue: clamp(
+        Math.round(-1 * (highestPoint.y - preAmp)),
+        -30,
+        30
+      ),
+    };
   }, [filters, preAmp]);
+
+  useEffect(() => {
+    if (isAutoPreampOn) {
+      setMainPreAmp(autoPreAmpValue);
+      setPreAmp(autoPreAmpValue);
+    }
+  }, [autoPreAmpValue, isAutoPreampOn, setPreAmp]);
 
   const dimensions: ChartDimensions = {
     width: 988,

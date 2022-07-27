@@ -3,9 +3,13 @@
 @import 'spacing';
 
 .sideBar {
-  width: calc(100% - $content-width);
+  min-width: $sidebar-width;
   padding: $spacing-s;
 
   border-radius: $spacing-m;
   background: $primary-default;
+
+  .switch[for='chartEnabler'] {
+    margin-bottom: 1em;
+  }
 }

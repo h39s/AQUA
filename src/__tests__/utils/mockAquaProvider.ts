@@ -7,11 +7,13 @@ const defaultAquaContext: IAquaContext = {
   isLoading: false,
   globalError: undefined,
   isEnabled: DEFAULT_STATE.isEnabled,
+  isAutoPreampOn: DEFAULT_STATE.isAutoPreampOn,
   preAmp: DEFAULT_STATE.preAmp,
   filters: DEFAULT_STATE.filters,
   performHealthCheck: () => {},
   setGlobalError: (_newValue?: ErrorDescription) => {},
   setIsEnabled: (_newValue: boolean) => {},
+  setAutoPreampOn: (_newValue: boolean) => {},
   setPreAmp: (_newValue: number) => {},
   dispatchFilter: (_action: FilterAction) => {},
 };

@@ -157,6 +157,12 @@ ipcMain.on(ChannelEnum.SET_ENABLE, async (event, arg) => {
   await handleUpdate(event, ChannelEnum.SET_ENABLE);
 });
 
+ipcMain.on(ChannelEnum.SET_AUTOPREAMP, async (event, arg) => {
+  // eslint-disable-next-line prefer-destructuring
+  state.isAutoPreampOn = arg[0];
+  await handleUpdate(event, ChannelEnum.SET_AUTOPREAMP);
+});
+
 ipcMain.on(ChannelEnum.GET_PREAMP, async (event) => {
   const reply: TSuccess<number> = { result: state.preAmp || 0 };
   event.reply(ChannelEnum.GET_PREAMP, reply);
@@ -363,9 +369,13 @@ ipcMain.on(ChannelEnum.SET_WINDOW_SIZE, async (event, arg) => {
   const channel = ChannelEnum.SET_WINDOW_SIZE;
   if (mainWindow) {
     if (arg[0]) {
-      mainWindow.setSize(1024, 1000);
+      mainWindow.setMaximumSize(1024, 1036);
+      mainWindow.setSize(1024, 1036);
+      mainWindow.setMinimumSize(1024, 1036);
     } else {
-      mainWindow.setSize(1024, 590);
+      mainWindow.setMinimumSize(1024, 626);
+      mainWindow.setSize(1024, 626);
+      mainWindow.setMaximumSize(1024, 626);
     }
   }
 
@@ -420,9 +430,9 @@ const createMainWindow = async () => {
     width: 1024,
     minWidth: 1024,
     maxWidth: 1024,
-    height: 590,
-    minHeight: 590,
-    maxHeight: 1000,
+    height: 626,
+    minHeight: 626,
+    maxHeight: 1036,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged

@@ -9,6 +9,7 @@ interface IRangeInputProps {
   min: number;
   max: number;
   isDisabled: boolean;
+  width: number;
   handleChange: (newValue: number) => Promise<void>;
   handleMouseUp: (newValue: number) => Promise<void>;
 }
@@ -19,6 +20,7 @@ const RangeInput = ({
   min,
   max,
   isDisabled,
+  width,
   handleChange,
   handleMouseUp,
 }: IRangeInputProps) => {
@@ -69,6 +71,8 @@ const RangeInput = ({
             '--min': min,
             '--max': max,
             '--val': value,
+            width: `${width}px`,
+            margin: `${width / 2}px 0px`,
           } as CSSProperties
         }
       />
