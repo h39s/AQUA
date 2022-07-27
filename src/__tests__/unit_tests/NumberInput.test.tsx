@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { clearAndType, setup } from '../utils/userEventUtils';
 import NumberInput from '../../renderer/widgets/NumberInput';
 
@@ -47,6 +47,58 @@ describe('NumberInput', () => {
     expect(input).toHaveValue('-');
   });
 
+  it('should discard changes when Esc is pressed', async () => {
+    const testValue = 0;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={0}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await user.click(input);
+    await clearAndType(user, input, '-1');
+    expect(input).toHaveValue('-1');
+    await act(async () => {
+      await user.keyboard('{Escape}');
+    });
+    expect(input).not.toHaveFocus();
+    expect(input).toHaveValue('0');
+  });
+
+  it('should submit changes when input is blurred', async () => {
+    const testValue = 0;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={1}
+      />
+    );
+    const input = screen.getByLabelText(id);
+    expect(input).toHaveValue(`${testValue}`);
+
+    await user.click(input);
+    await clearAndType(user, input, '-1');
+
+    await act(async () => {
+      input.blur();
+    });
+    expect(input).not.toHaveFocus();
+    expect(handleSubmit).toBeCalledWith(-1);
+  });
+
   it('should allow input to be changed to a negative value', async () => {
     const testValue = 0;
     const { user } = setup(
@@ -83,6 +135,7 @@ describe('NumberInput', () => {
 
     await user.click(input);
     await user.keyboard('{Enter}');
+    expect(input).not.toHaveFocus();
     expect(handleSubmit).toBeCalledWith(-5);
   });
 
@@ -423,5 +476,51 @@ describe('NumberInput', () => {
     await clearAndType(user, input, '0.6');
     await user.keyboard('{Enter}');
     expect(handleSubmit).toBeCalledWith(0.6);
+  });
+
+  /**
+   * Note that we are unable to test that the arrows are not visible in this unit test
+   *  this is because the CSS isn't loaded into the testing renderer.
+   * See for more details:
+   *  https://stackoverflow.com/questions/52813527/cannot-check-expectelm-not-tobevisible-for-semantic-ui-react-component
+   */
+  it('should be able to increase the value using the up arrow', async () => {
+    const testValue = 1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={0}
+        showArrows
+      />
+    );
+    const upArrow = screen.getByLabelText(`Increase ${id}`);
+    expect(upArrow).toBeInTheDocument();
+    await user.click(upArrow);
+    expect(handleSubmit).toBeCalledWith(2);
+  });
+
+  it('should be able to decrease the value using the up arrow', async () => {
+    const testValue = 1;
+    const { user } = setup(
+      <NumberInput
+        name={id}
+        min={-5}
+        max={5}
+        handleSubmit={handleSubmit}
+        value={testValue}
+        isDisabled={false}
+        floatPrecision={0}
+        showArrows
+      />
+    );
+    const downArrow = screen.getByLabelText(`Decrease ${id}`);
+    expect(downArrow).toBeInTheDocument();
+    await user.click(downArrow);
+    expect(handleSubmit).toBeCalledWith(0);
   });
 });

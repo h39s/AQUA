@@ -17,11 +17,13 @@ interface INumberInputProps {
   value: number;
   min: number;
   max: number;
-  floatPrecision?: number;
   isDisabled: boolean;
+  floatPrecision?: number;
+  maxDigits?: number;
   showArrows?: boolean;
   showLabel?: boolean;
   shouldRoundToHalf?: boolean;
+  shouldAutoGrow?: boolean;
   handleSubmit: (newValue: number) => Promise<void>;
 }
 
@@ -32,20 +34,24 @@ const NumberInput = ({
   max,
   isDisabled,
   showArrows = false,
+  maxDigits = 5,
   floatPrecision = 0,
   shouldRoundToHalf = false,
   showLabel = false,
+  shouldAutoGrow = false,
   handleSubmit,
 }: INumberInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [internalValue, setInternalValue] = useState<string>(value.toString());
-  const [valueLength, setValueLength] = useState<number>(0);
+  const [valueLength, setValueLength] = useState<number>(maxDigits);
   const [hasChanges, setHasChanges] = useState<boolean>(false);
 
   // Update input valueLength
   useLayoutEffect(() => {
-    setValueLength(inputRef.current?.value.length || 0);
-  }, [internalValue]);
+    if (shouldAutoGrow) {
+      setValueLength(inputRef.current?.value.length || 0);
+    }
+  }, [internalValue, shouldAutoGrow]);
 
   // Synchronize local input value with prop value
   useEffect(() => {
@@ -146,8 +152,8 @@ const NumberInput = ({
       }
     }
 
-    // Prevent user from typing numbers that are too large or use more than 7 characters
-    if (Math.abs(num) >= 100000 || input.length > 7) {
+    // Prevent user from typing numbers that are too large or use more than maxDigits numerical digits
+    if (Math.abs(num) >= 10 ** maxDigits || input.length > maxDigits + 2) {
       return;
     }
 
@@ -156,9 +162,44 @@ const NumberInput = ({
   };
 
   // Helper for discarding changes
-  const onBlur = () => {
+  const onDiscard = () => {
     setHasChanges(false);
     setInternalValue(value.toString());
+  };
+
+  const onSubmit = async () => {
+    let num = NaN;
+    if (floatPrecision === 0) {
+      num = parseInt(internalValue, 10);
+    } else {
+      // 20.6031, round to 20.605
+      // 20.6031 => multiply precisionFactor and floor to truncate
+      // => 20603.1 => 20603
+      // if round divide by 10
+      // => 2060.3 => 4120.6 => 4121 => 2060.5
+      // then multiply by 10
+      // => 20605
+      // finally divide precisionFactor
+      num = parseFloat(internalValue);
+      num = Math.round(num * precisionFactor);
+      if (shouldRoundToHalf) {
+        num = Math.round(num / 5) * 5;
+      }
+      num /= precisionFactor;
+    }
+    if (Number.isNaN(num)) {
+      return;
+    }
+    const newValue: number = clamp(num, min, max);
+
+    setHasChanges(false);
+    if (newValue === value) {
+      // Need this because useEffect would otherwise not trigger
+      // since value would not change after we call handleSubmit
+      setInternalValue(value.toString());
+    }
+    // Call handler on the parent
+    await handleSubmit(newValue);
   };
 
   const onArrow = async (isIncrement: boolean) => {
@@ -174,42 +215,13 @@ const NumberInput = ({
   };
 
   // Helper for detecting use of the ENTER or TAB keys
-  const listenForEnter = (e: KeyboardEvent) => {
+  const listenForEnter = async (e: KeyboardEvent) => {
     if (e.code === 'Enter' || e.code === 'Tab') {
-      let num = NaN;
-      if (floatPrecision === 0) {
-        num = parseInt(internalValue, 10);
-      } else {
-        // 20.6031, round to 20.605
-        // 20.6031 => multiply precisionFactor and floor to truncate
-        // => 20603.1 => 20603
-        // if round divide by 10
-        // => 2060.3 => 4120.6 => 4121 => 2060.5
-        // then multiply by 10
-        // => 20605
-        // finally divide precisionFactor
-        num = parseFloat(internalValue);
-        num = Math.round(num * precisionFactor);
-        if (shouldRoundToHalf) {
-          num = Math.round(num / 5) * 5;
-        }
-        num /= precisionFactor;
-      }
-      if (Number.isNaN(num)) {
-        return;
-      }
-      const newValue: number = clamp(num, min, max);
-
-      setHasChanges(false);
-      if (newValue === value) {
-        // Need this because useEffect would otherwise not trigger
-        // since value would not change after we call handleSubmit
-        setInternalValue(value.toString());
-      }
-      // Call handler on the parent
-      handleSubmit(newValue);
+      // Blur input to trigger the onSubmit handler
+      inputRef.current?.blur();
     } else if (e.code === 'Escape') {
-      onBlur();
+      onDiscard();
+      inputRef.current?.blur();
     }
   };
 
@@ -228,11 +240,11 @@ const NumberInput = ({
           aria-label={name}
           value={internalValue}
           onInput={onInput}
-          onBlur={onBlur}
+          onBlur={onSubmit}
           onKeyDown={listenForEnter}
           disabled={isDisabled}
+          style={{ textAlign: showArrows ? 'left' : 'center' }}
         />
-        {hasChanges && <span className="asterisk">*</span>}
         {showArrows && (
           <div className="arrows">
             <ArrowButton
@@ -248,6 +260,14 @@ const NumberInput = ({
               isDisabled={isDisabled}
             />
           </div>
+        )}
+        {hasChanges && (
+          <span
+            className="asterisk"
+            style={{ paddingLeft: showArrows ? '12px' : '' }}
+          >
+            *
+          </span>
         )}
       </div>
       {showLabel && name}

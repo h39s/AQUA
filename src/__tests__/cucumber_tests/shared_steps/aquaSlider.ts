@@ -142,14 +142,19 @@ export const whenSetFrequencyQualityUsingArrows = (
   when(
     /^I click on the (up|down) arrow for the quality for frequency (\d+)Hz (\d+) times$/,
     async (direction: string, frequency: number, times: number) => {
-      const element = await webdriver.driver.$(
+      const label = await webdriver.driver.$(
         `.mainContent label[for="${frequency}-quality"]`
       );
-      const button = await element.$(`.arrow-${direction}`);
+      const hiddenButton = await label.$(`.arrow-${direction}`);
+      expect(await hiddenButton.isDisplayed()).toBeFalsy();
+
+      await label.moveTo({ xOffset: 1, yOffset: 1 });
+      const button = await label.$(`.arrow-${direction}`);
+      expect(await button.isDisplayed()).toBeTruthy();
       for (let i = 0; i < times; i += 1) {
         await button.click();
         // wait 500 ms for the action. necessary
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
   );
@@ -257,14 +262,21 @@ export const whenSetBandFrequencyUsingArrows = (
   when(
     /^I click on the (up|down) arrow of band (\d+) (\d+) times$/,
     async (direction: string, bandIndex: number, times: number) => {
-      const button = await webdriver.driver
+      // Note that this assumes that the frequency label is the first one in the band
+      const label = await webdriver.driver
         .$$('.band')
-        [bandIndex - 1].$(`.arrow-${direction}`);
+        [bandIndex - 1].$('label');
+      const hiddenButton = await label.$(`.arrow-${direction}`);
+      expect(await hiddenButton.isDisplayed()).toBeFalsy();
+
+      await label.moveTo({ xOffset: 1, yOffset: 1 });
+      const button = await label.$(`.arrow-${direction}`);
+      expect(await button.isDisplayed()).toBeTruthy();
 
       for (let i = 0; i < times; i += 1) {
         await button.click();
         // wait 500 ms for the action. necessary
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
   );

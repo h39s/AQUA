@@ -7,25 +7,18 @@ $input-height: 24px;
   gap: $spacing-s;
 
   .inputWrapper {
-    align-self: flex-end;
-  }
-
-  input[type='text'] {
-    background: $primary-dark;
+    position: relative; // necessary so that the absolutely positioned asterisks will scroll with the input
     border: 2px solid $secondary-default;
     border-radius: 4px;
-    color: $white;
-    padding: $spacing-xs;
-    height: $input-height;
-    width: max($input-height, var(--input-width));
-    text-align: center;
+    justify-content: start;
 
-    &:focus:not(:focus-visible) {
+    &:focus:not(:focus-within) {
       // TODO: can't figure out how to differentiate between only focus and focus-visible for text inputs
       outline: 1px solid $secondary-default;
     }
 
-    &:focus-visible {
+    // add outline whenever the input or arrow buttons are focused
+    &:focus-within {
       outline: 2px solid $white;
     }
 
@@ -35,22 +28,36 @@ $input-height: 24px;
     }
   }
 
+  input[type='text'] {
+    background: $primary-dark;
+    border: none;
+    outline: none;
+    color: $white;
+    padding: $spacing-xs;
+    height: $input-height;
+    width: max($input-height, var(--input-width));
+  }
+
   .asterisk {
     position: absolute;
-    margin-left: calc(
-      $spacing-xl + max($input-height, var(--input-width)) / 2 + $spacing-s
-    );
+    margin-left: calc($spacing-m + var(--input-width));
     margin-top: -$spacing-m;
+  }
+
+  &:hover {
+    .arrows {
+      visibility: visible;
+    }
   }
 
   .arrows {
     display: flex;
+    visibility: hidden;
     flex-direction: column;
-    margin-left: 2px;
     gap: 2px;
 
     svg {
-      width: 16px;
+      width: 12px;
       height: auto;
     }
   }
