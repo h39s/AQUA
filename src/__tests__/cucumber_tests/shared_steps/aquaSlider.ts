@@ -95,6 +95,24 @@ export const whenSetFrequencyGain = (
   );
 };
 
+export const whenSetFrequencyGainWithText = (
+  when: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
+  when(
+    /^I set gain of slider of frequency (\d+)Hz to (\d+)db$/,
+    async (frequency: number, gain: string) => {
+      const inputElement = await webdriver.driver.$(
+        `.mainContent label[for="${frequency}-gain-number"] input`
+      );
+      await inputElement.setValue(parseInt(gain, 10));
+      await inputElement.keys('Tab');
+      // wait 1000 ms for the action.
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  );
+};
+
 // ====================================
 
 const setFrequencyQuality = async (

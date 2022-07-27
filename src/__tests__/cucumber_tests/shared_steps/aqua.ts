@@ -69,3 +69,24 @@ export const whenSetEnabledState = (
     await new Promise((resolve) => setTimeout(resolve, 1000));
   });
 };
+
+export const givenAutoPreampState = (
+  when: DefineStepFunction,
+  webdriver: { driver: Driver | undefined }
+) => {
+  when(/^auto pre-amp is (on|off)$/, async (state: string) => {
+    const desiredState = state === 'on';
+    const equalizerSwitch = await webdriver.driver.$(
+      '.sideBar label[class="switch"][for="autoPreampEnabler"]'
+    );
+
+    const switchOn = await equalizerSwitch
+      .$('[aria-checked="true"]')
+      .isExisting();
+    if ((desiredState && !switchOn) || (!desiredState && switchOn)) {
+      equalizerSwitch.click();
+      // wait 1000 ms for the action.
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  });
+};
