@@ -1,4 +1,4 @@
-import { ChangeEvent, CSSProperties, useRef } from 'react';
+import { ChangeEvent, CSSProperties, useMemo, useRef } from 'react';
 import ArrowButton from './ArrowButton';
 import '../styles/RangeInput.scss';
 import { clamp } from '../utils/utils';
@@ -9,6 +9,7 @@ interface IRangeInputProps {
   min: number;
   max: number;
   isDisabled: boolean;
+  incrementPrecision?: number;
   handleChange: (newValue: number) => Promise<void>;
   handleMouseUp: (newValue: number) => Promise<void>;
 }
@@ -19,6 +20,7 @@ const RangeInput = ({
   min,
   max,
   isDisabled,
+  incrementPrecision = 1,
   handleChange,
   handleMouseUp,
 }: IRangeInputProps) => {
@@ -31,9 +33,13 @@ const RangeInput = ({
     handleChange(newValue);
   };
 
+  const factor = useMemo(() => 10 ** incrementPrecision, [incrementPrecision]);
+  const increment = useMemo(() => 1 / factor, [factor]);
+
   const onArrowInput = (isIncrement: boolean) => {
-    const offset = isIncrement ? 1 : -1;
-    const newValue = clamp(offset + value, min, max);
+    const offset = isIncrement ? increment : -increment;
+    const newValue =
+      Math.round(clamp(offset + value, min, max) * factor) / factor;
     handleChange(newValue);
   };
 
@@ -58,6 +64,7 @@ const RangeInput = ({
         min={min}
         max={max}
         value={value}
+        step={increment}
         name={name}
         aria-label={name}
         onChange={onRangeInput}
