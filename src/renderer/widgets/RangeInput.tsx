@@ -20,7 +20,7 @@ const RangeInput = ({
   min,
   max,
   isDisabled,
-  incrementPrecision = 1,
+  incrementPrecision = 0,
   handleChange,
   handleMouseUp,
 }: IRangeInputProps) => {
