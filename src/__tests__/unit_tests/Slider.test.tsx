@@ -89,4 +89,53 @@ describe('Slider', () => {
     expect(rangeInput).toHaveValue('4');
     expect(numberInput).toHaveValue('4');
   });
+
+  it('should increment value by 0.1 using the up arrow', async () => {
+    const testValue = 1;
+    const user = userEvent.setup();
+    await act(async () => {
+      setup(
+        <AquaProviderWrapper value={defaultAquaContext}>
+          <Slider
+            name={name}
+            min={-5}
+            max={5}
+            value={testValue}
+            setValue={setValue}
+          />
+        </AquaProviderWrapper>
+      );
+    });
+
+    const rangeInput = screen.getByLabelText(`${name}-range`);
+    const numberInput = screen.getByLabelText(`${name}-number`);
+
+    const arrow = screen.getByLabelText(`Increase ${name}-range`);
+    await user.click(arrow);
+    expect(rangeInput).toHaveValue('1.1');
+    expect(numberInput).toHaveValue('1.1');
+  });
+
+  it('should alow up to two decimal digits in number', async () => {
+    const user = userEvent.setup();
+    const testValue = 1;
+    await act(async () => {
+      setup(
+        <AquaProviderWrapper value={defaultAquaContext}>
+          <Slider
+            name={name}
+            min={-5}
+            max={5}
+            value={testValue}
+            setValue={setValue}
+          />
+        </AquaProviderWrapper>
+      );
+    });
+    const numberInput = screen.getByLabelText(`${name}-number`);
+    await clearAndType(user, numberInput, '-1.123');
+    expect(numberInput).toHaveValue('-1.123');
+    await user.keyboard('{Enter}');
+    expect(numberInput).toHaveValue('-1.12');
+  });
 });
