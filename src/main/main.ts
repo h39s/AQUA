@@ -164,7 +164,7 @@ ipcMain.on(ChannelEnum.GET_PREAMP, async (event) => {
 
 ipcMain.on(ChannelEnum.SET_PREAMP, async (event, arg) => {
   const channel = ChannelEnum.SET_PREAMP;
-  const gain = parseInt(arg[0], 10) || 0;
+  const gain = parseFloat(arg[0]) || 0;
 
   if (gain < MIN_GAIN || gain > MAX_GAIN) {
     handleError(event, channel, ErrorCode.INVALID_PARAMETER);

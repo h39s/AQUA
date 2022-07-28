@@ -43,9 +43,8 @@ export const readAquaConfig = (configPath: string) => {
     } else if (line.indexOf('Channel: ') !== -1) {
       state.channel = line.substring('Channel: '.length);
     } else if (line.indexOf('Preamp: ') !== -1) {
-      state.preamp = parseInt(
-        line.substring('Preamp: '.length, line.length - 2),
-        10
+      state.preamp = parseFloat(
+        line.substring('Preamp: '.length, line.length - 2)
       );
       if (Number.isNaN(state.preamp)) {
         throw new Error(`Invalid preamp line "${line}"`);
@@ -219,11 +218,11 @@ export const thenBandFrequency = (then: DefineStepFunction) => {
 
 export const thenPreampGain = (then: DefineStepFunction) => {
   then(
-    /^Aqua config should show a preamp gain of (-?\d+)dB$/,
+    /^Aqua config should show a preamp gain of (-?\d+(\.\d+)?)dB$/,
     async (gain: string) => {
       const configPath = await getConfigPath();
       const config = readAquaConfig(configPath);
-      expect(config.preamp).toBe(parseInt(gain, 10));
+      expect(config.preamp).toBe(parseFloat(gain));
     }
   );
 };
