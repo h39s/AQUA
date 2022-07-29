@@ -63,6 +63,7 @@ const Slider = ({ name, min, max, value, setValue }: ISliderProps) => {
         handleSubmit={handleChangeValueWithoutThrottle}
         isDisabled={!!globalError}
         floatPrecision={1}
+        showArrows
       />
     </div>
   );

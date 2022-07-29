@@ -16,4 +16,4 @@ Feature: Set preamplification gain
       And the preamp gain is 0dB
       And Aqua equalizer state is enabled
     When I click on the up arrow for the preamp gain 3 times
-    Then Aqua config should show a preamp gain of 0.3dB
+    Then Aqua config should show a preamp gain of 3.0dB
