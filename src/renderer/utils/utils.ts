@@ -1,5 +1,10 @@
 import { RefObject, useEffect, useMemo, useRef } from 'react';
 
+export const getMaxIntegerDigitCount = (num: number) => {
+  const absNum = Math.round(Math.abs(num));
+  return absNum > 0 ? Math.ceil(Math.log10(absNum)) : 1;
+};
+
 export const clamp = (num: number, min: number, max: number) => {
   return Math.min(Math.max(num, min), max);
 };

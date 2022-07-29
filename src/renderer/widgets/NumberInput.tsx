@@ -10,7 +10,7 @@ import {
 } from 'react';
 import ArrowButton from './ArrowButton';
 import '../styles/NumberInput.scss';
-import { clamp } from '../utils/utils';
+import { clamp, getMaxIntegerDigitCount } from '../utils/utils';
 
 interface INumberInputProps {
   name: string;
@@ -19,7 +19,6 @@ interface INumberInputProps {
   max: number;
   isDisabled: boolean;
   floatPrecision?: number;
-  maxDigits?: number;
   showArrows?: boolean;
   showLabel?: boolean;
   shouldRoundToHalf?: boolean;
@@ -34,7 +33,6 @@ const NumberInput = ({
   max,
   isDisabled,
   showArrows = false,
-  maxDigits = 5,
   floatPrecision = 0,
   shouldRoundToHalf = false,
   showLabel = false,
@@ -42,9 +40,23 @@ const NumberInput = ({
   handleSubmit,
 }: INumberInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [internalValue, setInternalValue] = useState<string>(value.toString());
-  const [valueLength, setValueLength] = useState<number>(maxDigits);
+  const [internalValue, setInternalValue] = useState<string>(
+    value.toFixed(floatPrecision)
+  );
   const [hasChanges, setHasChanges] = useState<boolean>(false);
+
+  const maxIntegerDigits = useMemo(() => {
+    const minDigitCount = getMaxIntegerDigitCount(min);
+    const maxDigitCount = getMaxIntegerDigitCount(max);
+
+    return Math.max(minDigitCount, maxDigitCount);
+  }, [min, max]);
+
+  const maxDigits = useMemo(() => {
+    const floatOffset = floatPrecision > 0 ? 2 : 0;
+    return maxIntegerDigits + floatPrecision + floatOffset;
+  }, [floatPrecision, maxIntegerDigits]);
+  const [valueLength, setValueLength] = useState<number>(maxDigits);
 
   // Update input valueLength
   useLayoutEffect(() => {
@@ -55,8 +67,8 @@ const NumberInput = ({
 
   // Synchronize local input value with prop value
   useEffect(() => {
-    setInternalValue(value.toString());
-  }, [value]);
+    setInternalValue(value.toFixed(floatPrecision));
+  }, [floatPrecision, value]);
 
   const precisionFactor: number = useMemo(
     () => 10 ** floatPrecision,
@@ -153,7 +165,16 @@ const NumberInput = ({
     }
 
     // Prevent user from typing numbers that are too large or use more than maxDigits numerical digits
-    if (Math.abs(num) >= 10 ** maxDigits || input.length > maxDigits + 2) {
+    if (Math.abs(num) >= 10 ** maxIntegerDigits || input.length > maxDigits) {
+      return;
+    }
+
+    // Prevent user from typing more than floatPrecision decimals
+    const decimalIndex = input.indexOf('.');
+    if (
+      decimalIndex !== -1 &&
+      input.substring(decimalIndex + 1).length > floatPrecision
+    ) {
       return;
     }
 
@@ -164,7 +185,7 @@ const NumberInput = ({
   // Helper for discarding changes
   const onDiscard = () => {
     setHasChanges(false);
-    setInternalValue(value.toString());
+    setInternalValue(value.toFixed(floatPrecision));
   };
 
   const onSubmit = async () => {
@@ -196,7 +217,7 @@ const NumberInput = ({
     if (newValue === value) {
       // Need this because useEffect would otherwise not trigger
       // since value would not change after we call handleSubmit
-      setInternalValue(value.toString());
+      setInternalValue(newValue.toFixed(floatPrecision));
     }
     // Call handler on the parent
     await handleSubmit(newValue);
@@ -209,7 +230,7 @@ const NumberInput = ({
     // Need to round the value because of floating addition imprecision
     let newValue = clamp(offset + value, min, max);
     newValue = Math.round(newValue * precisionFactor) / precisionFactor;
-    setInternalValue(newValue.toString());
+    setInternalValue(newValue.toFixed(floatPrecision));
     setHasChanges(false);
     handleSubmit(newValue);
   };

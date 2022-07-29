@@ -10,6 +10,7 @@ interface IRangeInputProps {
   max: number;
   isDisabled: boolean;
   incrementPrecision?: number;
+  displayPrecision?: number;
   handleChange: (newValue: number) => Promise<void>;
   handleMouseUp: (newValue: number) => Promise<void>;
 }
@@ -21,6 +22,7 @@ const RangeInput = ({
   max,
   isDisabled,
   incrementPrecision = 0,
+  displayPrecision = 1,
   handleChange,
   handleMouseUp,
 }: IRangeInputProps) => {
@@ -33,8 +35,15 @@ const RangeInput = ({
     handleChange(newValue);
   };
 
-  const factor = useMemo(() => 10 ** incrementPrecision, [incrementPrecision]);
-  const increment = useMemo(() => 1 / factor, [factor]);
+  const factor = useMemo(() => 10 ** displayPrecision, [displayPrecision]);
+  const increment = useMemo(
+    () => 1 / 10 ** incrementPrecision,
+    [incrementPrecision]
+  );
+  const step = useMemo(
+    () => increment + (value - Math.round(value)),
+    [increment, value]
+  );
 
   const onArrowInput = (isIncrement: boolean) => {
     const offset = isIncrement ? increment : -increment;
@@ -64,7 +73,7 @@ const RangeInput = ({
         min={min}
         max={max}
         value={value}
-        step={increment}
+        step={step}
         name={name}
         aria-label={name}
         onChange={onRangeInput}
