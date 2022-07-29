@@ -123,11 +123,32 @@ describe('RangeInput', () => {
         value={testValue}
         isDisabled={false}
         incrementPrecision={1}
+        displayPrecision={1}
       />
     );
     const arrow = screen.getByLabelText(`Increase ${name}`);
     await user.click(arrow);
     expect(handleChange).toBeCalledWith(0.1);
+  });
+
+  it('should increment value using up arrow for non-integer increment', async () => {
+    const testValue = 0.4;
+    const { user } = setup(
+      <RangeInput
+        name={name}
+        min={-5}
+        max={5}
+        handleChange={handleChange}
+        handleMouseUp={handleMouseUp}
+        value={testValue}
+        isDisabled={false}
+        incrementPrecision={0}
+        displayPrecision={1}
+      />
+    );
+    const arrow = screen.getByLabelText(`Increase ${name}`);
+    await user.click(arrow);
+    expect(handleChange).toBeCalledWith(1.4);
   });
 
   it('should be disabled', async () => {

@@ -53,9 +53,10 @@ const NumberInput = ({
   }, [min, max]);
 
   const maxDigits = useMemo(() => {
-    const floatOffset = floatPrecision > 0 ? 2 : 0;
-    return maxIntegerDigits + floatPrecision + floatOffset;
-  }, [floatPrecision, maxIntegerDigits]);
+    const negativeOffset = min < 0 ? 1 : 0;
+    const floatOffset = floatPrecision > 0 ? 1 : 0;
+    return maxIntegerDigits + floatPrecision + negativeOffset + floatOffset;
+  }, [floatPrecision, maxIntegerDigits, min]);
   const [valueLength, setValueLength] = useState<number>(maxDigits);
 
   // Update input valueLength
@@ -142,11 +143,11 @@ const NumberInput = ({
       const testInput = `${
         positiveInput.charAt(0) === '.' ? '0' : ''
       }${positiveInput}1`;
-      num = parseFloat(testInput);
-      const actualNum = parseFloat(input);
+      const testNum = parseFloat(testInput);
+      num = parseFloat(input);
 
       // Parsed value should match the string input
-      if (actualNum !== 0 && num.toString() !== testInput) {
+      if (num !== 0 && testNum.toString() !== testInput) {
         // illegal character in the input
         return;
       }
@@ -156,10 +157,7 @@ const NumberInput = ({
       // - at most one decimal point
       // - at most one negative sign
       const zeroCount = positiveInput.match(/0/g)?.length || 0;
-      if (
-        actualNum === 0 &&
-        zeroCount + decimalCount !== positiveInput.length
-      ) {
+      if (num === 0 && zeroCount + decimalCount !== positiveInput.length) {
         return;
       }
     }
@@ -189,6 +187,11 @@ const NumberInput = ({
   };
 
   const onSubmit = async () => {
+    if (internalValue === '' || internalValue === '-') {
+      onDiscard();
+      return;
+    }
+
     let num = NaN;
     if (floatPrecision === 0) {
       num = parseInt(internalValue, 10);
