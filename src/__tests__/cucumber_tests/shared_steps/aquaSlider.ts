@@ -290,7 +290,7 @@ export const whenSetBandFrequencyUsingArrows = (
 
 // ====================================
 
-const setPreampGain = async (
+const setPreAmpGain = async (
   webdriver: { driver: Driver | undefined },
   position: string
 ) => {
@@ -308,7 +308,7 @@ const setPreampGain = async (
   await new Promise((resolve) => setTimeout(resolve, 1000));
 };
 
-const setPreampGainNumber = async (
+const setPreAmpGainNumber = async (
   webdriver: { driver: Driver | undefined },
   gain: number
 ) => {
@@ -321,28 +321,28 @@ const setPreampGainNumber = async (
   await new Promise((resolve) => setTimeout(resolve, 1000));
 };
 
-export const givenPreampGain = (
+export const givenPreAmpGain = (
   given: DefineStepFunction,
   webdriver: { driver: Driver | undefined }
 ) => {
   given(/^the preamp gain is (-?\d+)dB$/, async (gain: number) => {
-    await setPreampGainNumber(webdriver, gain);
+    await setPreAmpGainNumber(webdriver, gain);
   });
 };
 
-export const whenSetPreampGain = (
+export const whenSetPreAmpGain = (
   when: DefineStepFunction,
   webdriver: { driver: Driver | undefined }
 ) => {
   when(
     /^I set gain of the preamp slider to the (top|bottom)$/,
     async (position: string) => {
-      await setPreampGain(webdriver, position);
+      await setPreAmpGain(webdriver, position);
     }
   );
 };
 
-export const whenSetPreampGainUsingArrows = (
+export const whenSetPreAmpGainUsingArrows = (
   when: DefineStepFunction,
   webdriver: { driver: Driver | undefined }
 ) => {

@@ -1,36 +1,36 @@
 import { ErrorDescription } from 'common/errors';
 import { useCallback } from 'react';
-import { disableAutoPreamp, enableAutoPreamp } from '../utils/equalizerApi';
+import { disableAutoPreAmp, enableAutoPreAmp } from '../utils/equalizerApi';
 import { useAquaContext } from '../utils/AquaContext';
 import Switch from '../widgets/Switch';
 
-interface IAutoPreampEnablerSwitchProps {
+interface IAutoPreAmpEnablerSwitchProps {
   id: string;
 }
 
-export default function AutoPreampEnablerSwitch({
+export default function AutoPreAmpEnablerSwitch({
   id,
-}: IAutoPreampEnablerSwitchProps) {
-  const { globalError, isAutoPreampOn, setGlobalError, setAutoPreampOn } =
+}: IAutoPreAmpEnablerSwitchProps) {
+  const { globalError, isAutoPreAmpOn, setGlobalError, setAutoPreAmpOn } =
     useAquaContext();
 
   const handleToggle = useCallback(async () => {
     try {
-      if (isAutoPreampOn) {
-        await disableAutoPreamp();
+      if (isAutoPreAmpOn) {
+        await disableAutoPreAmp();
       } else {
-        await enableAutoPreamp();
+        await enableAutoPreAmp();
       }
-      setAutoPreampOn(!isAutoPreampOn);
+      setAutoPreAmpOn(!isAutoPreAmpOn);
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
-  }, [isAutoPreampOn, setGlobalError, setAutoPreampOn]);
+  }, [isAutoPreAmpOn, setGlobalError, setAutoPreAmpOn]);
 
   return (
     <Switch
       id={id}
-      isOn={isAutoPreampOn}
+      isOn={isAutoPreAmpOn}
       handleToggle={handleToggle}
       isDisabled={!!globalError}
     />

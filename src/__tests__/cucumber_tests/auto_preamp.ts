@@ -10,7 +10,7 @@ import {
   startChromeDriver,
   stopChromeDriver,
 } from '__tests__/utils/webdriver';
-import { givenAquaIsRunning, givenAutoPreampState } from './shared_steps/aqua';
+import { givenAquaIsRunning, givenAutoPreAmpState } from './shared_steps/aqua';
 import {
   givenBandCount,
   whenSetBandFrequency,
@@ -20,7 +20,8 @@ import {
   givenCanWriteToAquaConfig,
   givenEqualizerApoIsInstalled,
 } from './shared_steps/equalizerApo';
-import { thenPreampGain } from './shared_steps/config';
+import { thenPreAmpGain } from './shared_steps/config';
+import { givenChartViewEnabledState } from './shared_steps/aquaGraph';
 
 const chromeDriver = startChromeDriver();
 
@@ -34,14 +35,15 @@ defineFeature(feature, (test) => {
     givenEqualizerApoIsInstalled(given);
     givenCanWriteToAquaConfig(given);
     givenAquaIsRunning(given, webdriver, chromeDriver);
+    givenChartViewEnabledState(given, webdriver);
     givenBandCount(given, webdriver);
-    givenAutoPreampState(given, webdriver);
+    givenAutoPreAmpState(given, webdriver);
 
     whenSetBandFrequency(when, webdriver);
     whenSetBandFrequency(when, webdriver);
     whenSetFrequencyGainWithText(when, webdriver);
     whenSetFrequencyGainWithText(when, webdriver);
-    thenPreampGain(then);
+    thenPreAmpGain(then);
   }, 50000);
 });
 

@@ -5,6 +5,7 @@ Feature: Auto Pre-amp
     Given EqualizerAPO is installed
       And Aqua can write to Aqua config
       And Aqua is running
+      And ChartView is disabled
       And there are 2 frequency bands
       And auto pre-amp is on
     When I set the frequency of band 1 to 1000Hz

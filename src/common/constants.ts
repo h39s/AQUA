@@ -39,6 +39,10 @@ export const FilterTypeToLabelMap: Record<FilterTypeEnum, string> = {
   // [FilterTypeEnum.NO]: 'Notch Filter',
 };
 
+export const WINDOW_WIDTH = 1024;
+export const WINDOW_HEIGHT = 626;
+export const WINDOW_HEIGHT_EXPANDED = 1036;
+
 /** ----- Application Interfaces ----- */
 
 export interface IFilter {
@@ -50,7 +54,7 @@ export interface IFilter {
 
 export interface IState {
   isEnabled: boolean;
-  isAutoPreampOn: boolean;
+  isAutoPreAmpOn: boolean;
   preAmp: number;
   filters: IFilter[];
 }
@@ -79,7 +83,7 @@ const DEFAULT_FILTERS: IFilter[] = FIXED_FREQUENCIES.map((f) => {
 
 export const DEFAULT_STATE: IState = {
   isEnabled: true,
-  isAutoPreampOn: true,
+  isAutoPreAmpOn: true,
   preAmp: 0,
   filters: DEFAULT_FILTERS,
 };

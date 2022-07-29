@@ -70,14 +70,14 @@ export const whenSetEnabledState = (
   });
 };
 
-export const givenAutoPreampState = (
+export const givenAutoPreAmpState = (
   given: DefineStepFunction,
   webdriver: { driver: Driver | undefined }
 ) => {
   given(/^auto pre-amp is (on|off)$/, async (state: string) => {
     const desiredState = state === 'on';
     const equalizerSwitch = await webdriver.driver.$(
-      '.sideBar label[class="switch"][for="autoPreampEnabler"]'
+      '.sideBar label[class="switch"][for="autoPreAmpEnabler"]'
     );
 
     const switchOn = await equalizerSwitch

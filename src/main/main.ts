@@ -35,6 +35,9 @@ import {
   MIN_GAIN,
   MIN_NUM_FILTERS,
   MIN_QUALITY,
+  WINDOW_HEIGHT,
+  WINDOW_HEIGHT_EXPANDED,
+  WINDOW_WIDTH,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
 import { TSuccess, TError } from '../renderer/utils/equalizerApi';
@@ -157,10 +160,10 @@ ipcMain.on(ChannelEnum.SET_ENABLE, async (event, arg) => {
   await handleUpdate(event, ChannelEnum.SET_ENABLE);
 });
 
-ipcMain.on(ChannelEnum.SET_AUTOPREAMP, async (event, arg) => {
+ipcMain.on(ChannelEnum.SET_AUTO_PREAMP, async (event, arg) => {
   // eslint-disable-next-line prefer-destructuring
-  state.isAutoPreampOn = arg[0];
-  await handleUpdate(event, ChannelEnum.SET_AUTOPREAMP);
+  state.isAutoPreAmpOn = arg[0];
+  await handleUpdate(event, ChannelEnum.SET_AUTO_PREAMP);
 });
 
 ipcMain.on(ChannelEnum.GET_PREAMP, async (event) => {
@@ -369,13 +372,13 @@ ipcMain.on(ChannelEnum.SET_WINDOW_SIZE, async (event, arg) => {
   const channel = ChannelEnum.SET_WINDOW_SIZE;
   if (mainWindow) {
     if (arg[0]) {
-      mainWindow.setMaximumSize(1024, 1036);
-      mainWindow.setSize(1024, 1036);
-      mainWindow.setMinimumSize(1024, 1036);
+      mainWindow.setMaximumSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
+      mainWindow.setSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
+      mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
     } else {
-      mainWindow.setMinimumSize(1024, 626);
-      mainWindow.setSize(1024, 626);
-      mainWindow.setMaximumSize(1024, 626);
+      mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+      mainWindow.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+      mainWindow.setMaximumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     }
   }
 

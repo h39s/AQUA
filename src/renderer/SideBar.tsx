@@ -5,7 +5,7 @@ import Slider from './components/Slider';
 import './styles/SideBar.scss';
 import { useAquaContext } from './utils/AquaContext';
 import Switch from './widgets/Switch';
-import AutoPreampEnablerSwitch from './components/AutoPreampEnablerSwitch';
+import AutoPreAmpEnablerSwitch from './components/AutoPreAmpEnablerSwitch';
 
 interface Props {
   showChartView: boolean;
@@ -16,12 +16,12 @@ const SideBar = ({ showChartView, toggleShowChartView }: Props) => {
   const MIN = -30;
   const MAX = 30;
 
-  const { preAmp, setGlobalError, setPreAmp, setAutoPreampOn } =
+  const { preAmp, setGlobalError, setPreAmp, setAutoPreAmpOn } =
     useAquaContext();
 
   const setGain = async (newValue: number) => {
     try {
-      await setAutoPreampOn(false);
+      await setAutoPreAmpOn(false);
       await setMainPreAmp(newValue);
       setPreAmp(newValue);
     } catch (e) {
@@ -32,11 +32,12 @@ const SideBar = ({ showChartView, toggleShowChartView }: Props) => {
   return (
     <div className="col sideBar center">
       <div className="col center">
-        <h3>Enable</h3>
+        <h4>Enable</h4>
         <EqualizerEnablerSwitch id="equalizerEnabler" />
       </div>
       <div>
-        <h3>Pre-Amp Gain</h3>
+        <h4>Pre-Amp Gain</h4>
+        <div>+30 dB</div>
         <Slider
           name="Pre-Amplification Gain (dB)"
           min={MIN}
@@ -44,14 +45,16 @@ const SideBar = ({ showChartView, toggleShowChartView }: Props) => {
           value={preAmp}
           sliderHeight={100}
           setValue={setGain}
-        />
+        >
+          <div>-30 dB</div>
+        </Slider>
       </div>
       <div className="col center">
-        <h3>Auto Pre-amp</h3>
-        <AutoPreampEnablerSwitch id="autoPreampEnabler" />
+        <h4>Auto Pre-amp</h4>
+        <AutoPreAmpEnablerSwitch id="autoPreAmpEnabler" />
       </div>
       <div className="col center">
-        <h3>Graph EQ</h3>
+        <h4>Graph EQ</h4>
         <Switch
           id="chartEnabler"
           isOn={showChartView}

@@ -17,7 +17,7 @@ const isFilterEqual = (f1: IFilter, f2: IFilter) => {
 };
 
 const FrequencyResponseChart = () => {
-  const { filters, preAmp, isAutoPreampOn, setPreAmp } = useAquaContext();
+  const { filters, preAmp, isAutoPreAmpOn, setPreAmp } = useAquaContext();
   const prevFilters = useRef<IFilter[]>([]);
   const prevFilterLines = useRef<ChartDataPoint[][]>([]);
 
@@ -64,11 +64,11 @@ const FrequencyResponseChart = () => {
   }, [filters, preAmp]);
 
   useEffect(() => {
-    if (isAutoPreampOn) {
+    if (isAutoPreAmpOn) {
       setMainPreAmp(autoPreAmpValue);
       setPreAmp(autoPreAmpValue);
     }
-  }, [autoPreAmpValue, isAutoPreampOn, setPreAmp]);
+  }, [autoPreAmpValue, isAutoPreAmpOn, setPreAmp]);
 
   const dimensions: ChartDimensions = {
     width: 988,

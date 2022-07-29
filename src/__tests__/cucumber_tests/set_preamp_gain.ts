@@ -12,11 +12,11 @@ import {
 } from '__tests__/utils/webdriver';
 import { givenAquaIsRunning, givenEnabledState } from './shared_steps/aqua';
 import {
-  givenPreampGain,
-  whenSetPreampGain,
-  whenSetPreampGainUsingArrows,
+  givenPreAmpGain,
+  whenSetPreAmpGain,
+  whenSetPreAmpGainUsingArrows,
 } from './shared_steps/aquaSlider';
-import { thenPreampGain } from './shared_steps/config';
+import { thenPreAmpGain } from './shared_steps/config';
 import {
   givenCanWriteToAquaConfig,
   givenEqualizerApoIsInstalled,
@@ -36,19 +36,19 @@ defineFeature(feature, (test) => {
     givenAquaIsRunning(given, webdriver, chromeDriver);
     givenEnabledState(given, webdriver);
 
-    whenSetPreampGain(when, webdriver);
-    thenPreampGain(then);
+    whenSetPreAmpGain(when, webdriver);
+    thenPreAmpGain(then);
   }, 30000);
 
   test('Set preamp gain using the arrows', async ({ given, when, then }) => {
     givenEqualizerApoIsInstalled(given);
     givenCanWriteToAquaConfig(given);
     givenAquaIsRunning(given, webdriver, chromeDriver);
-    givenPreampGain(given, webdriver);
+    givenPreAmpGain(given, webdriver);
     givenEnabledState(given, webdriver);
 
-    whenSetPreampGainUsingArrows(when, webdriver);
-    thenPreampGain(then);
+    whenSetPreAmpGainUsingArrows(when, webdriver);
+    thenPreAmpGain(then);
   }, 30000);
 });
 
