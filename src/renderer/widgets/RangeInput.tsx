@@ -28,13 +28,6 @@ const RangeInput = ({
 }: IRangeInputProps) => {
   // Store a copy of the last value so it isn't lost to the throttle
   const lastValue = useRef<number | undefined>(undefined);
-
-  const onRangeInput = (e: ChangeEvent<HTMLInputElement>) => {
-    const newValue: number = clamp(parseInt(e.target.value, 10), min, max);
-    lastValue.current = newValue;
-    handleChange(newValue);
-  };
-
   const factor = useMemo(() => 10 ** displayPrecision, [displayPrecision]);
   const increment = useMemo(
     () => 1 / 10 ** incrementPrecision,
@@ -44,6 +37,13 @@ const RangeInput = ({
     () => increment + (value - Math.round(value)),
     [increment, value]
   );
+
+  const onRangeInput = (e: ChangeEvent<HTMLInputElement>) => {
+    const newValue: number =
+      Math.round(clamp(parseFloat(e.target.value), min, max) * factor) / factor;
+    lastValue.current = newValue;
+    handleChange(newValue);
+  };
 
   const onArrowInput = (isIncrement: boolean) => {
     const offset = isIncrement ? increment : -increment;
