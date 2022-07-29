@@ -4,15 +4,10 @@ import EqualizerEnablerSwitch from './components/EqualizerEnablerSwitch';
 import Slider from './components/Slider';
 import './styles/SideBar.scss';
 import { useAquaContext } from './utils/AquaContext';
-import Switch from './widgets/Switch';
 import AutoPreAmpEnablerSwitch from './components/AutoPreAmpEnablerSwitch';
+import GraphViewSwitch from './components/GraphViewSwitch';
 
-interface Props {
-  showChartView: boolean;
-  toggleShowChartView: () => void;
-}
-
-const SideBar = ({ showChartView, toggleShowChartView }: Props) => {
+const SideBar = () => {
   const MIN = -30;
   const MAX = 30;
 
@@ -43,7 +38,7 @@ const SideBar = ({ showChartView, toggleShowChartView }: Props) => {
           min={MIN}
           max={MAX}
           value={preAmp}
-          sliderHeight={100}
+          sliderHeight={110}
           setValue={setGain}
         >
           <div>-30 dB</div>
@@ -55,12 +50,7 @@ const SideBar = ({ showChartView, toggleShowChartView }: Props) => {
       </div>
       <div className="col center">
         <h4>Graph EQ</h4>
-        <Switch
-          id="chartEnabler"
-          isOn={showChartView}
-          handleToggle={toggleShowChartView}
-          isDisabled={false}
-        />
+        <GraphViewSwitch id="graphViewEnabler" />
       </div>
     </div>
   );

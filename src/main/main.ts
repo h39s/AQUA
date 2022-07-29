@@ -166,6 +166,12 @@ ipcMain.on(ChannelEnum.SET_AUTO_PREAMP, async (event, arg) => {
   await handleUpdate(event, ChannelEnum.SET_AUTO_PREAMP);
 });
 
+ipcMain.on(ChannelEnum.SET_GRAPH_VIEW, async (event, arg) => {
+  // eslint-disable-next-line prefer-destructuring
+  state.isGraphViewOn = arg[0];
+  await handleUpdate(event, ChannelEnum.SET_GRAPH_VIEW);
+});
+
 ipcMain.on(ChannelEnum.GET_PREAMP, async (event) => {
   const reply: TSuccess<number> = { result: state.preAmp || 0 };
   event.reply(ChannelEnum.GET_PREAMP, reply);

@@ -5,6 +5,7 @@ enum ChannelEnum {
   GET_ENABLE = 'getEnable',
   SET_ENABLE = 'setEnable',
   SET_AUTO_PREAMP = 'setAutoPreAmp',
+  SET_GRAPH_VIEW = 'setGraphView',
   GET_PREAMP = 'getPreAmp',
   SET_PREAMP = 'setPreAmp',
   GET_FILTER_GAIN = 'getFilterGain',

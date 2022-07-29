@@ -129,7 +129,7 @@ export const disableEqualizer = (): Promise<void> => {
 };
 
 /**
- * Enable Auto Pre-amp
+ * Enable Auto Pre-Amp
  * @returns { Promise<void> } exception if failed.
  */
 export const enableAutoPreAmp = (): Promise<void> => {
@@ -139,11 +139,31 @@ export const enableAutoPreAmp = (): Promise<void> => {
 };
 
 /**
- * Disable Auto Pre-amp
+ * Disable Auto Pre-Amp
  * @returns { Promise<void> } exception if failed.
  */
 export const disableAutoPreAmp = (): Promise<void> => {
   const channel = ChannelEnum.SET_AUTO_PREAMP;
+  window.electron.ipcRenderer.sendMessage(channel, [false]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Enable Graph View
+ * @returns { Promise<void> } exception if failed.
+ */
+export const enableGraphView = (): Promise<void> => {
+  const channel = ChannelEnum.SET_GRAPH_VIEW;
+  window.electron.ipcRenderer.sendMessage(channel, [true]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Disable Graph View
+ * @returns { Promise<void> } exception if failed.
+ */
+export const disableGraphView = (): Promise<void> => {
+  const channel = ChannelEnum.SET_GRAPH_VIEW;
   window.electron.ipcRenderer.sendMessage(channel, [false]);
   return promisifyResult(setterResponseHandler, channel);
 };

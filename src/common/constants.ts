@@ -55,6 +55,7 @@ export interface IFilter {
 export interface IState {
   isEnabled: boolean;
   isAutoPreAmpOn: boolean;
+  isGraphViewOn: boolean;
   preAmp: number;
   filters: IFilter[];
 }
@@ -84,6 +85,7 @@ const DEFAULT_FILTERS: IFilter[] = FIXED_FREQUENCIES.map((f) => {
 export const DEFAULT_STATE: IState = {
   isEnabled: true,
   isAutoPreAmpOn: true,
+  isGraphViewOn: false,
   preAmp: 0,
   filters: DEFAULT_FILTERS,
 };
