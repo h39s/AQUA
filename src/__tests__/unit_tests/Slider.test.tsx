@@ -33,7 +33,7 @@ describe('Slider', () => {
     await waitFor(() => expect(rangeInput).not.toBeDisabled());
     expect(rangeInput).toHaveValue(`${testValue}`);
     expect(screen.getByLabelText(`${name}-number`)).toHaveValue(
-      testValue.toFixed(1)
+      testValue.toFixed(2)
     );
   });
 
@@ -56,7 +56,7 @@ describe('Slider', () => {
     const rangeInput = screen.getByLabelText(`${name}-range`);
     const numberInput = screen.getByLabelText(`${name}-number`);
     expect(rangeInput).toHaveValue(`${testValue}`);
-    expect(numberInput).toHaveValue(testValue.toFixed(1));
+    expect(numberInput).toHaveValue(testValue.toFixed(2));
 
     await clearAndType(user, numberInput, '-6');
     expect(rangeInput).toHaveValue(`${testValue}`);
@@ -64,7 +64,7 @@ describe('Slider', () => {
 
     await user.keyboard('{Enter}');
     expect(rangeInput).toHaveValue('-5');
-    expect(numberInput).toHaveValue('-5.0');
+    expect(numberInput).toHaveValue('-5.00');
   });
 
   it('should update number to match range', async () => {
@@ -85,11 +85,11 @@ describe('Slider', () => {
     const rangeInput = screen.getByLabelText(`${name}-range`);
     const numberInput = screen.getByLabelText(`${name}-number`);
     expect(rangeInput).toHaveValue(`${testValue}`);
-    expect(numberInput).toHaveValue(testValue.toFixed(1));
+    expect(numberInput).toHaveValue(testValue.toFixed(2));
 
     fireEvent.input(rangeInput, { target: { value: 4 } });
     expect(rangeInput).toHaveValue('4');
-    expect(numberInput).toHaveValue('4.0');
+    expect(numberInput).toHaveValue('4.00');
   });
 
   it('should increment value by 1 using the up arrow', async () => {
@@ -115,10 +115,10 @@ describe('Slider', () => {
     const arrow = screen.getByLabelText(`Increase ${name}-range`);
     await user.click(arrow);
     expect(rangeInput).toHaveValue('2');
-    expect(numberInput).toHaveValue('2.0');
+    expect(numberInput).toHaveValue('2.00');
   });
 
-  it('should allow up to one decimal digits in number', async () => {
+  it('should allow up to two decimal digits in number', async () => {
     const user = userEvent.setup();
     const testValue = 1;
     await act(async () => {
@@ -135,9 +135,9 @@ describe('Slider', () => {
       );
     });
     const numberInput = screen.getByLabelText(`${name}-number`);
-    await clearAndType(user, numberInput, '-1.12');
-    expect(numberInput).toHaveValue('-1.1');
+    await clearAndType(user, numberInput, '1.123');
+    expect(numberInput).toHaveValue('1.123');
     await user.keyboard('{Enter}');
-    expect(numberInput).toHaveValue('-1.1');
+    expect(numberInput).toHaveValue('1.12');
   });
 });

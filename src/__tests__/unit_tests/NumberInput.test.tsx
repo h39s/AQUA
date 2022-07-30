@@ -253,54 +253,6 @@ describe('NumberInput', () => {
     expect(input).toHaveValue('-1.1');
   });
 
-  describe('Max Digits', () => {
-    it('should be prevent typing more digits than the max digits in the integer', async () => {
-      const testValue = 1;
-      const { user } = setup(
-        <NumberInput
-          name={id}
-          min={-1}
-          max={20}
-          handleSubmit={handleSubmit}
-          value={testValue}
-          isDisabled={false}
-        />
-      );
-      const input = screen.getByLabelText(id);
-      expect(input).toHaveValue(`${testValue}`);
-
-      await clearAndType(user, input, '100');
-      await user.keyboard('{Enter}');
-      expect(handleSubmit).toBeCalledWith(10);
-
-      await clearAndType(user, input, '-11');
-      await user.keyboard('{Enter}');
-      expect(handleSubmit).toBeCalledWith(-1);
-    });
-
-    it('should be prevent typing more digits than the max digits in the integer part of the float', async () => {
-      const testValue = 0;
-      const { user } = setup(
-        <NumberInput
-          name={id}
-          min={-15}
-          max={1}
-          handleSubmit={handleSubmit}
-          value={testValue}
-          isDisabled={false}
-          floatPrecision={2}
-        />
-      );
-      const input = screen.getByLabelText(id);
-      expect(input).toHaveValue(testValue.toFixed(2));
-
-      await clearAndType(user, input, '-125.12');
-      await user.keyboard('{Enter}');
-      screen.logTestingPlaygroundURL();
-      expect(handleSubmit).toBeCalledWith(-12.12);
-    });
-  });
-
   describe('Precision', () => {
     it('should be able to truncate to the correct float precision', async () => {
       const testValue = 1;
@@ -348,6 +300,29 @@ describe('NumberInput', () => {
       await clearAndType(user, input, '-1.1621');
       await user.keyboard('{Enter}');
       expect(handleSubmit).toBeCalledWith(-1.15);
+    });
+
+    it('should prevent typing more digits than the max digits', async () => {
+      const testValue = 0;
+      const { user } = setup(
+        <NumberInput
+          name={id}
+          min={-15}
+          max={1}
+          handleSubmit={handleSubmit}
+          value={testValue}
+          isDisabled={false}
+          floatPrecision={2}
+        />
+      );
+      const input = screen.getByLabelText(id);
+      expect(input).toHaveValue(testValue.toFixed(2));
+
+      await clearAndType(user, input, '-12.121');
+      expect(input).toHaveValue('-12.12');
+
+      await clearAndType(user, input, '12345678');
+      expect(input).toHaveValue('123456');
     });
   });
 
