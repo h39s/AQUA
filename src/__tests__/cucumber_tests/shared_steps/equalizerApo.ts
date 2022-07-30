@@ -17,6 +17,7 @@ export const givenCanWriteToAquaConfig = (given: DefineStepFunction) => {
     const emptyState: IState = {
       isEnabled: false,
       isAutoPreAmpOn: false,
+      isGraphViewOn: false,
       preAmp: 0,
       filters: [],
     };
