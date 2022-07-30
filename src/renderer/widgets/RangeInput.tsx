@@ -29,13 +29,17 @@ const RangeInput = ({
   // Store a copy of the last value so it isn't lost to the throttle
   const lastValue = useRef<number | undefined>(undefined);
   const factor = useMemo(() => 10 ** displayPrecision, [displayPrecision]);
+
+  // Simplify the value so that the css variables have a smaller range of values to work with
+  const rangeValue = useMemo(() => Math.round(value), [value]);
+
   const increment = useMemo(
     () => 1 / 10 ** incrementPrecision,
     [incrementPrecision]
   );
   const step = useMemo(
-    () => increment + (value - Math.round(value)),
-    [increment, value]
+    () => Math.round(increment + (value - Math.round(value)) * factor) / factor,
+    [factor, increment, value]
   );
 
   const onRangeInput = (e: ChangeEvent<HTMLInputElement>) => {
@@ -72,7 +76,7 @@ const RangeInput = ({
         type="range"
         min={min}
         max={max}
-        value={value}
+        value={rangeValue}
         step={step}
         name={name}
         aria-label={name}
