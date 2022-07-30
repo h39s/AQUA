@@ -53,7 +53,7 @@ const Slider = ({ name, min, max, value, setValue }: ISliderProps) => {
         handleMouseUp={handleChangeValueWithoutThrottle}
         isDisabled={!!globalError}
         incrementPrecision={0}
-        displayPrecision={1}
+        displayPrecision={2}
       />
       <NumberInput
         name={`${name}-number`}
@@ -62,7 +62,7 @@ const Slider = ({ name, min, max, value, setValue }: ISliderProps) => {
         max={max}
         handleSubmit={handleChangeValueWithoutThrottle}
         isDisabled={!!globalError}
-        floatPrecision={1}
+        floatPrecision={2}
         showArrows
       />
     </div>

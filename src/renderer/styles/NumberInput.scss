@@ -11,6 +11,8 @@ $input-height: 24px;
     border: 2px solid $secondary-default;
     border-radius: 4px;
     justify-content: start;
+    background: $primary-dark;
+    width: min-content;
 
     &:focus:not(:focus-within) {
       // TODO: can't figure out how to differentiate between only focus and focus-visible for text inputs
@@ -40,7 +42,7 @@ $input-height: 24px;
 
   .asterisk {
     position: absolute;
-    margin-left: calc($spacing-m + var(--input-width));
+    margin-left: calc($spacing-s + var(--input-width));
     margin-top: -$spacing-m;
   }
 

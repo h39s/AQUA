@@ -45,18 +45,16 @@ const NumberInput = ({
   );
   const [hasChanges, setHasChanges] = useState<boolean>(false);
 
-  const maxIntegerDigits = useMemo(() => {
+  const maxDigits = useMemo(() => {
     const minDigitCount = getMaxIntegerDigitCount(min);
     const maxDigitCount = getMaxIntegerDigitCount(max);
 
-    return Math.max(minDigitCount, maxDigitCount);
-  }, [min, max]);
+    const maxIntegerDigits = Math.max(minDigitCount, maxDigitCount);
 
-  const maxDigits = useMemo(() => {
     const negativeOffset = min < 0 ? 1 : 0;
     const floatOffset = floatPrecision > 0 ? 1 : 0;
     return maxIntegerDigits + floatPrecision + negativeOffset + floatOffset;
-  }, [floatPrecision, maxIntegerDigits, min]);
+  }, [floatPrecision, max, min]);
   const [valueLength, setValueLength] = useState<number>(maxDigits);
 
   // Update input valueLength
@@ -163,16 +161,7 @@ const NumberInput = ({
     }
 
     // Prevent user from typing numbers that are too large or use more than maxDigits numerical digits
-    if (Math.abs(num) >= 10 ** maxIntegerDigits || input.length > maxDigits) {
-      return;
-    }
-
-    // Prevent user from typing more than floatPrecision decimals
-    const decimalIndex = input.indexOf('.');
-    if (
-      decimalIndex !== -1 &&
-      input.substring(decimalIndex + 1).length > floatPrecision
-    ) {
+    if (input.length > maxDigits) {
       return;
     }
 

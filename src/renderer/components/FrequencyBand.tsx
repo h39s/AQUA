@@ -115,7 +115,7 @@ const FrequencyBand = ({ sliderIndex, filter }: IFrequencyBandProps) => {
         max={MAX_QUALITY}
         name={`${filter.frequency}-quality`}
         isDisabled={!!globalError}
-        floatPrecision={1}
+        floatPrecision={2}
         showArrows
         handleSubmit={handleQualitySubmit}
       />
