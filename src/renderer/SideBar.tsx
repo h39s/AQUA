@@ -40,9 +40,8 @@ const SideBar = () => {
           value={preAmp}
           sliderHeight={110}
           setValue={setGain}
-        >
-          <div>-30 dB</div>
-        </Slider>
+          label="-30 dB"
+        />
       </div>
       <div className="col center">
         <h4>Auto Pre-amp</h4>

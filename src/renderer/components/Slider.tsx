@@ -11,7 +11,7 @@ interface ISliderProps {
   max: number;
   value: number;
   sliderHeight?: number;
-  children?: JSX.Element;
+  label?: string;
   setValue: (newValue: number) => Promise<void>;
 }
 
@@ -21,7 +21,7 @@ const Slider = ({
   max,
   value,
   sliderHeight = 150,
-  children,
+  label,
   setValue,
 }: ISliderProps) => {
   const INTERVAL = 200;
@@ -64,7 +64,7 @@ const Slider = ({
         handleMouseUp={handleChangeValueWithoutThrottle}
         isDisabled={!!globalError}
       />
-      {children}
+      {label && <div>{label}</div>}
       <NumberInput
         name={`${name}-number`}
         value={sliderValue}
