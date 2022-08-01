@@ -22,6 +22,7 @@ describe('RangeInput', () => {
         max={5}
         handleChange={handleChange}
         handleMouseUp={handleMouseUp}
+        width={150}
         value={testValue}
         isDisabled={false}
       />
@@ -38,6 +39,7 @@ describe('RangeInput', () => {
         max={5}
         handleChange={handleChange}
         handleMouseUp={handleMouseUp}
+        width={150}
         value={testValue}
         isDisabled={false}
       />
@@ -61,6 +63,7 @@ describe('RangeInput', () => {
         max={5}
         handleChange={handleChange}
         handleMouseUp={handleMouseUp}
+        width={150}
         value={testValue}
         isDisabled={false}
       />
@@ -84,6 +87,7 @@ describe('RangeInput', () => {
         max={5}
         handleChange={handleChange}
         handleMouseUp={handleMouseUp}
+        width={150}
         value={testValue}
         isDisabled={false}
       />
@@ -102,6 +106,7 @@ describe('RangeInput', () => {
         max={5}
         handleChange={handleChange}
         handleMouseUp={handleMouseUp}
+        width={150}
         value={testValue}
         isDisabled={false}
       />
@@ -120,6 +125,7 @@ describe('RangeInput', () => {
         max={5}
         handleChange={handleChange}
         handleMouseUp={handleMouseUp}
+        width={150}
         value={testValue}
         isDisabled
       />

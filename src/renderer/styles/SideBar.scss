@@ -3,9 +3,17 @@
 @import 'spacing';
 
 .sideBar {
-  width: calc(100% - $content-width);
+  min-width: $sidebar-width;
   padding: $spacing-s;
 
   border-radius: $spacing-m;
   background: $primary-default;
+
+  .switch[for='graphViewEnabler'] {
+    margin-bottom: 1em;
+  }
+
+  h4 {
+    margin: 1em 0 1em 0;
+  }
 }

@@ -10,46 +10,41 @@ import {
   startChromeDriver,
   stopChromeDriver,
 } from '__tests__/utils/webdriver';
-import { givenAquaIsRunning, givenEnabledState } from './shared_steps/aqua';
+import { givenAquaIsRunning, givenAutoPreAmpState } from './shared_steps/aqua';
 import {
-  givenPreAmpGain,
-  whenSetPreAmpGain,
-  whenSetPreAmpGainUsingArrows,
+  givenBandCount,
+  whenSetBandFrequency,
+  whenSetFrequencyGainWithText,
 } from './shared_steps/aquaSlider';
-import { thenPreAmpGain } from './shared_steps/config';
 import {
   givenCanWriteToAquaConfig,
   givenEqualizerApoIsInstalled,
 } from './shared_steps/equalizerApo';
+import { thenPreAmpGain } from './shared_steps/config';
+import { givenChartViewEnabledState } from './shared_steps/aquaGraph';
 
 const chromeDriver = startChromeDriver();
 
 const feature = loadFeature(
-  './src/__tests__/cucumber_tests/features/set_preamp_gain.feature'
+  './src/__tests__/cucumber_tests/features/auto_preamp.feature'
 );
 const webdriver: { driver: Driver } = { driver: undefined };
 
 defineFeature(feature, (test) => {
-  test('Set preamp gain using the slider', async ({ given, when, then }) => {
+  test('Apply auto pre-amp', async ({ given, when, then }) => {
     givenEqualizerApoIsInstalled(given);
     givenCanWriteToAquaConfig(given);
     givenAquaIsRunning(given, webdriver, chromeDriver);
-    givenEnabledState(given, webdriver);
+    givenChartViewEnabledState(given, webdriver);
+    givenBandCount(given, webdriver);
+    givenAutoPreAmpState(given, webdriver);
 
-    whenSetPreAmpGain(when, webdriver);
+    whenSetBandFrequency(when, webdriver);
+    whenSetBandFrequency(when, webdriver);
+    whenSetFrequencyGainWithText(when, webdriver);
+    whenSetFrequencyGainWithText(when, webdriver);
     thenPreAmpGain(then);
-  }, 30000);
-
-  test('Set preamp gain using the arrows', async ({ given, when, then }) => {
-    givenEqualizerApoIsInstalled(given);
-    givenCanWriteToAquaConfig(given);
-    givenAquaIsRunning(given, webdriver, chromeDriver);
-    givenPreAmpGain(given, webdriver);
-    givenEnabledState(given, webdriver);
-
-    whenSetPreAmpGainUsingArrows(when, webdriver);
-    thenPreAmpGain(then);
-  }, 30000);
+  }, 50000);
 });
 
 afterAll(() => {

@@ -106,6 +106,7 @@ const FrequencyBand = ({ sliderIndex, filter }: IFrequencyBandProps) => {
           min={MIN_GAIN}
           max={MAX_GAIN}
           value={filter.gain}
+          sliderHeight={250}
           setValue={handleGainSubmit}
         />
       </div>

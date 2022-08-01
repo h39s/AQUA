@@ -12,7 +12,6 @@ $range-thumb-height: 20px;
   input[type='range'] {
     -webkit-appearance: none;
     height: $range-track-height;
-    width: $range-track-width;
     background: transparent;
     transform: rotate(-90deg);
     margin: calc($range-track-width / 2) 0px;

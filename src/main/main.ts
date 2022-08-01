@@ -35,6 +35,9 @@ import {
   MIN_GAIN,
   MIN_NUM_FILTERS,
   MIN_QUALITY,
+  WINDOW_HEIGHT,
+  WINDOW_HEIGHT_EXPANDED,
+  WINDOW_WIDTH,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
 import { TSuccess, TError } from '../renderer/utils/equalizerApi';
@@ -155,6 +158,18 @@ ipcMain.on(ChannelEnum.SET_ENABLE, async (event, arg) => {
   const value = parseInt(arg[0], 10) || 0;
   state.isEnabled = value !== 0;
   await handleUpdate(event, ChannelEnum.SET_ENABLE);
+});
+
+ipcMain.on(ChannelEnum.SET_AUTO_PREAMP, async (event, arg) => {
+  // eslint-disable-next-line prefer-destructuring
+  state.isAutoPreAmpOn = arg[0];
+  await handleUpdate(event, ChannelEnum.SET_AUTO_PREAMP);
+});
+
+ipcMain.on(ChannelEnum.SET_GRAPH_VIEW, async (event, arg) => {
+  // eslint-disable-next-line prefer-destructuring
+  state.isGraphViewOn = arg[0];
+  await handleUpdate(event, ChannelEnum.SET_GRAPH_VIEW);
 });
 
 ipcMain.on(ChannelEnum.GET_PREAMP, async (event) => {
@@ -363,9 +378,13 @@ ipcMain.on(ChannelEnum.SET_WINDOW_SIZE, async (event, arg) => {
   const channel = ChannelEnum.SET_WINDOW_SIZE;
   if (mainWindow) {
     if (arg[0]) {
-      mainWindow.setSize(1024, 1000);
+      mainWindow.setMaximumSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
+      mainWindow.setSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
+      mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
     } else {
-      mainWindow.setSize(1024, 590);
+      mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+      mainWindow.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+      mainWindow.setMaximumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     }
   }
 
@@ -420,9 +439,9 @@ const createMainWindow = async () => {
     width: 1024,
     minWidth: 1024,
     maxWidth: 1024,
-    height: 590,
-    minHeight: 590,
-    maxHeight: 1000,
+    height: 626,
+    minHeight: 626,
+    maxHeight: 1036,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
