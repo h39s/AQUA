@@ -11,7 +11,7 @@ export const stateToString = (state: IState) => {
 
   output.push('Device: all');
   output.push('Channel: all');
-  output.push(`Preamp: ${state.preAmp}dB`);
+  output.push(`PreAmp: ${state.preAmp}dB`);
 
   // Using individual filter bands
   output = output.concat(

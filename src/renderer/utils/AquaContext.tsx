@@ -47,6 +47,8 @@ export interface IAquaContext extends IState {
   performHealthCheck: () => void;
   setGlobalError: (newValue?: ErrorDescription) => void;
   setIsEnabled: (newValue: boolean) => void;
+  setAutoPreAmpOn: (newValue: boolean) => void;
+  setGraphViewOn: (newValue: boolean) => void;
   setPreAmp: (newValue: number) => void;
   dispatchFilter: FilterDispatch;
 }
@@ -110,6 +112,12 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
     ErrorDescription | undefined
   >();
   const [isEnabled, setIsEnabled] = useState<boolean>(DEFAULT_STATE.isEnabled);
+  const [isAutoPreAmpOn, setAutoPreAmpOn] = useState<boolean>(
+    DEFAULT_STATE.isAutoPreAmpOn
+  );
+  const [isGraphViewOn, setGraphViewOn] = useState<boolean>(
+    DEFAULT_STATE.isGraphViewOn
+  );
   const [preAmp, setPreAmp] = useState<number>(DEFAULT_STATE.preAmp);
   const [filters, dispatchFilter] = useReducer<IFilterReducer>(
     filterReducer,
@@ -123,6 +131,8 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
     try {
       const state = await getEqualizerState();
       setIsEnabled(state.isEnabled);
+      setAutoPreAmpOn(state.isAutoPreAmpOn);
+      setGraphViewOn(state.isGraphViewOn);
       setPreAmp(state.preAmp);
       dispatchFilter({ type: FilterActionEnum.INIT, filters: state.filters });
       setGlobalError(undefined);
@@ -142,11 +152,15 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
         isLoading,
         globalError,
         isEnabled,
+        isAutoPreAmpOn,
+        isGraphViewOn,
         preAmp,
         filters,
         performHealthCheck,
         setGlobalError,
         setIsEnabled,
+        setAutoPreAmpOn,
+        setGraphViewOn,
         setPreAmp,
         dispatchFilter,
       }}
