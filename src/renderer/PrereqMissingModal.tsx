@@ -29,20 +29,20 @@ export default function PrereqMissingModal({
         </div>
         <div className="footer row">
           <Button
-            ariaLabel="Retry"
+            ariaLabel="Exit"
             isDisabled={isLoading}
-            className="small"
-            handleChange={onRetry}
-          >
-            Retry
-          </Button>
-          <Button
-            ariaLabel="Close"
-            isDisabled={isLoading}
-            className="small"
+            className="default"
             handleChange={handleClose}
           >
-            Close
+            Exit
+          </Button>
+          <Button
+            ariaLabel="Retry"
+            isDisabled={isLoading}
+            className="default"
+            handleChange={onRetry}
+          >
+            Close & Retry
           </Button>
         </div>
       </div>

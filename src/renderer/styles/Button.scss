@@ -22,6 +22,10 @@ $button-height: 100px;
     height: fit-content;
   }
 
+  &.default {
+    padding: $spacing-s $spacing-m;
+  }
+
   path {
     fill: $white;
   }

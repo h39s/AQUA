@@ -39,7 +39,7 @@ const MainContent = () => {
         <span className="rowLabel">Filter Type</span>
         <span className="rowLabel">Frequency (Hz)</span>
         <div className="col">
-          <span>30dB</span>
+          <span>+30dB</span>
           <span>0dB</span>
           <span>-30dB</span>
         </div>
