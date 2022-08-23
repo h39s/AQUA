@@ -12,10 +12,9 @@ import {
   FilterTypeEnum,
   IFilter,
   IState,
-  MAX_FREQUENCY,
-  MIN_FREQUENCY,
 } from '../../common/constants';
 import { ErrorDescription } from '../../common/errors';
+import { computeAvgFreq } from '../../common/utils';
 import { getEqualizerState } from './equalizerApi';
 
 export enum FilterActionEnum {
@@ -81,24 +80,17 @@ const filterReducer: IFilterReducer = (
       return filters.map((f, index) =>
         index === action.index ? { ...f, type: action.newValue } : f
       );
-    case FilterActionEnum.ADD: {
-      // TODO: create an util so this can be shared
-      const index = action.index || filters.length;
-      const lo = index === 0 ? MIN_FREQUENCY : filters[index - 1].frequency;
-      const hi =
-        index === filters.length ? MAX_FREQUENCY : filters[index].frequency;
-      const frequency = (lo + hi) / 2;
+    case FilterActionEnum.ADD:
       return [
-        ...filters.slice(0, index),
+        ...filters.slice(0, action.index || filters.length),
         {
-          frequency,
+          frequency: computeAvgFreq(filters, action.index || filters.length),
           gain: 0,
           quality: 1,
           type: FilterTypeEnum.PK,
         },
-        ...filters.slice(index),
+        ...filters.slice(action.index || filters.length),
       ];
-    }
     case FilterActionEnum.REMOVE:
       return filters.filter((_, index) => index !== action.index);
     default:

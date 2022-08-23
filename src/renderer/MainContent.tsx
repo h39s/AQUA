@@ -17,11 +17,11 @@ const MainContent = () => {
   const { filters, dispatchFilter, setGlobalError } = useAquaContext();
   const [isLoading, setIsLoading] = useState(false);
 
-  const onAddEqualizerSlider = async (insertIndex?: number) => {
+  const onAddEqualizerSlider = async () => {
     setIsLoading(true);
     try {
-      await addEqualizerSlider(insertIndex);
-      dispatchFilter({ type: FilterActionEnum.ADD, index: insertIndex });
+      await addEqualizerSlider();
+      dispatchFilter({ type: FilterActionEnum.ADD });
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
@@ -54,20 +54,28 @@ const MainContent = () => {
         <span className="rowLabel">Quality</span>
       </div>
       <div className="bands row center">
-        {filters.map((filter, sliderIndex) => (
-          <>
-            <FrequencyBand
-              sliderIndex={sliderIndex}
-              filter={filter}
-              // eslint-disable-next-line react/no-array-index-key
-              key={`slider-${sliderIndex}`}
-            />
-            <AddSliderDivider
-              sliderIndex={sliderIndex}
-              isDisabled={filters.length >= MAX_NUM_FILTERS || isLoading}
-            />
-          </>
-        ))}
+        {filters
+          .flatMap((filter, sliderIndex) => [
+            { filter, sliderIndex },
+            { sliderIndex },
+          ])
+          .map(({ filter, sliderIndex }) =>
+            filter ? (
+              <FrequencyBand
+                sliderIndex={sliderIndex}
+                filter={filter}
+                // eslint-disable-next-line react/no-array-index-key
+                key={`slider-${sliderIndex}`}
+              />
+            ) : (
+              <AddSliderDivider
+                sliderIndex={sliderIndex}
+                isDisabled={filters.length >= MAX_NUM_FILTERS || isLoading}
+                // eslint-disable-next-line react/no-array-index-key
+                key={`add-slider-${sliderIndex}`}
+              />
+            )
+          )}
       </div>
       <div className="col center sliderButtons">
         <Button

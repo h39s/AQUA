@@ -39,6 +39,7 @@ import {
   WINDOW_WIDTH,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
+import { computeAvgFreq } from '../common/utils';
 import { TSuccess, TError } from '../renderer/utils/equalizerApi';
 
 export default class AppUpdater {
@@ -342,7 +343,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_COUNT, async (event) => {
 
 ipcMain.on(ChannelEnum.ADD_FILTER, async (event, arg) => {
   const channel = ChannelEnum.ADD_FILTER;
-  const insertIndex = arg[0];
+  const insertIndex = arg[0] || state.filters.length;
 
   // Cannot exceed the maximum number of filters
   if (state.filters.length === MAX_NUM_FILTERS) {
@@ -350,17 +351,8 @@ ipcMain.on(ChannelEnum.ADD_FILTER, async (event, arg) => {
     return;
   }
 
-  // TODO: Convert this into a util function so it can be shared
-  const lo =
-    insertIndex === 0
-      ? MIN_FREQUENCY
-      : state.filters[insertIndex - 1].frequency;
-  const hi =
-    insertIndex === state.filters.length
-      ? MAX_FREQUENCY
-      : state.filters[insertIndex].frequency;
-  const frequency = (lo + hi) / 2;
-  state.filters.splice(insertIndex || state.filters.length, 0, {
+  const frequency = computeAvgFreq(state.filters, insertIndex);
+  state.filters.splice(insertIndex, 0, {
     frequency,
     gain: 0,
     quality: 1,
