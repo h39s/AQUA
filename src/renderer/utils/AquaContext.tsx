@@ -8,11 +8,12 @@ import {
   useState,
 } from 'react';
 import {
-  DEFAULT_FILTER,
   DEFAULT_STATE,
   FilterTypeEnum,
   IFilter,
   IState,
+  MAX_FREQUENCY,
+  MIN_FREQUENCY,
 } from '../../common/constants';
 import { ErrorDescription } from '../../common/errors';
 import { getEqualizerState } from './equalizerApi';
@@ -36,7 +37,7 @@ export type FilterAction =
   | { type: FilterActionEnum.INIT; filters: IFilter[] }
   | { type: NumericalFilterAction; index: number; newValue: number }
   | { type: FilterActionEnum.TYPE; index: number; newValue: FilterTypeEnum }
-  | { type: FilterActionEnum.ADD }
+  | { type: FilterActionEnum.ADD; index?: number }
   | { type: FilterActionEnum.REMOVE; index: number };
 
 type FilterDispatch = (action: FilterAction) => void;
@@ -80,8 +81,24 @@ const filterReducer: IFilterReducer = (
       return filters.map((f, index) =>
         index === action.index ? { ...f, type: action.newValue } : f
       );
-    case FilterActionEnum.ADD:
-      return [...filters, { ...DEFAULT_FILTER }];
+    case FilterActionEnum.ADD: {
+      // TODO: create an util so this can be shared
+      const index = action.index || filters.length;
+      const lo = index === 0 ? MIN_FREQUENCY : filters[index - 1].frequency;
+      const hi =
+        index === filters.length ? MAX_FREQUENCY : filters[index].frequency;
+      const frequency = (lo + hi) / 2;
+      return [
+        ...filters.slice(0, index),
+        {
+          frequency,
+          gain: 0,
+          quality: 1,
+          type: FilterTypeEnum.PK,
+        },
+        ...filters.slice(index),
+      ];
+    }
     case FilterActionEnum.REMOVE:
       return filters.filter((_, index) => index !== action.index);
     default:

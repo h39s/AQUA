@@ -1,0 +1,51 @@
+@import 'color';
+@import 'constant';
+@import 'spacing';
+
+.addFilter {
+  height: $band-height;
+  gap: $spacing-m;
+  padding: 0 $spacing-s;
+
+  .divider {
+    width: 2px;
+    height: 25%;
+    background: $secondary-default;
+  }
+
+  svg path {
+    fill: $secondary-default;
+  }
+
+  * {
+    opacity: 0;
+    transition: opacity 300ms cubic-bezier(0, 1, 0.4, 1) 300ms;
+  }
+
+  &:hover *,
+  &:focus-visible * {
+    opacity: 1;
+  }
+
+  &:active {
+    * {
+      opacity: 1;
+    }
+
+    .divider {
+      background: $secondary-dark;
+    }
+
+    svg path {
+      fill: $secondary-dark;
+    }
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &[aria-disabled='true'] * {
+    opacity: 0;
+  }
+}

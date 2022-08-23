@@ -24,7 +24,6 @@ import { resolveHtmlPath } from './util';
 import { getConfigPath, isEqualizerAPOInstalled } from './registry';
 import ChannelEnum from '../common/channels';
 import {
-  DEFAULT_FILTER,
   FilterTypeEnum,
   IState,
   MAX_FREQUENCY,
@@ -341,8 +340,9 @@ ipcMain.on(ChannelEnum.GET_FILTER_COUNT, async (event) => {
   event.reply(ChannelEnum.GET_FILTER_COUNT, reply);
 });
 
-ipcMain.on(ChannelEnum.ADD_FILTER, async (event) => {
+ipcMain.on(ChannelEnum.ADD_FILTER, async (event, arg) => {
   const channel = ChannelEnum.ADD_FILTER;
+  const insertIndex = arg[0];
 
   // Cannot exceed the maximum number of filters
   if (state.filters.length === MAX_NUM_FILTERS) {
@@ -350,7 +350,22 @@ ipcMain.on(ChannelEnum.ADD_FILTER, async (event) => {
     return;
   }
 
-  state.filters.push({ ...DEFAULT_FILTER });
+  // TODO: Convert this into a util function so it can be shared
+  const lo =
+    insertIndex === 0
+      ? MIN_FREQUENCY
+      : state.filters[insertIndex - 1].frequency;
+  const hi =
+    insertIndex === state.filters.length
+      ? MAX_FREQUENCY
+      : state.filters[insertIndex].frequency;
+  const frequency = (lo + hi) / 2;
+  state.filters.splice(insertIndex || state.filters.length, 0, {
+    frequency,
+    gain: 0,
+    quality: 1,
+    type: FilterTypeEnum.PK,
+  });
   await handleUpdate(event, channel);
 });
 

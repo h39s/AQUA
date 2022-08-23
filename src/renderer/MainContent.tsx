@@ -1,5 +1,6 @@
 import { ErrorDescription } from 'common/errors';
 import { MAX_NUM_FILTERS, MIN_NUM_FILTERS } from 'common/constants';
+import { useState } from 'react';
 import {
   addEqualizerSlider,
   removeEqualizerSlider,
@@ -10,20 +11,25 @@ import PlusIcon from './icons/PlusIcon';
 import Button from './widgets/Button';
 import { FilterActionEnum, useAquaContext } from './utils/AquaContext';
 import './styles/MainContent.scss';
+import AddSliderDivider from './components/AddSliderDivider';
 
 const MainContent = () => {
   const { filters, dispatchFilter, setGlobalError } = useAquaContext();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onAddEqualizerSlider = async () => {
+  const onAddEqualizerSlider = async (insertIndex?: number) => {
+    setIsLoading(true);
     try {
-      await addEqualizerSlider();
-      dispatchFilter({ type: FilterActionEnum.ADD });
+      await addEqualizerSlider(insertIndex);
+      dispatchFilter({ type: FilterActionEnum.ADD, index: insertIndex });
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
+    setIsLoading(false);
   };
 
   const onRemoveEqualizerSlider = async () => {
+    setIsLoading(true);
     try {
       const removeIndex = filters.length - 1;
       await removeEqualizerSlider(removeIndex);
@@ -31,6 +37,7 @@ const MainContent = () => {
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -48,18 +55,24 @@ const MainContent = () => {
       </div>
       <div className="bands row center">
         {filters.map((filter, sliderIndex) => (
-          <FrequencyBand
-            sliderIndex={sliderIndex}
-            filter={filter}
-            // eslint-disable-next-line react/no-array-index-key
-            key={`slider-${sliderIndex}`}
-          />
+          <>
+            <FrequencyBand
+              sliderIndex={sliderIndex}
+              filter={filter}
+              // eslint-disable-next-line react/no-array-index-key
+              key={`slider-${sliderIndex}`}
+            />
+            <AddSliderDivider
+              sliderIndex={sliderIndex}
+              isDisabled={filters.length >= MAX_NUM_FILTERS || isLoading}
+            />
+          </>
         ))}
       </div>
       <div className="col center sliderButtons">
         <Button
           ariaLabel="Add Equalizer Slider"
-          isDisabled={filters.length >= MAX_NUM_FILTERS}
+          isDisabled={filters.length >= MAX_NUM_FILTERS || isLoading}
           className="sliderButton"
           handleChange={onAddEqualizerSlider}
         >
@@ -67,7 +80,7 @@ const MainContent = () => {
         </Button>
         <Button
           ariaLabel="Remove Equalizer Slider"
-          isDisabled={filters.length <= MIN_NUM_FILTERS}
+          isDisabled={filters.length <= MIN_NUM_FILTERS || isLoading}
           className="sliderButton"
           handleChange={onRemoveEqualizerSlider}
         >

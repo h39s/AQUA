@@ -2,8 +2,7 @@
 @import 'constant';
 @import 'spacing';
 
-$band-height: 500px;
-$band-width: 64px;
+// band width and height from constants file
 
 .mainContent {
   width: $content-width;
@@ -42,7 +41,6 @@ $band-width: 64px;
     justify-content: space-between;
     padding: 0 2px; // add some horizontal padding so the outline isn't cut off at either end
     width: 100%;
-    gap: $spacing-s;
     overflow-x: auto;
     overflow-y: hidden;
 
