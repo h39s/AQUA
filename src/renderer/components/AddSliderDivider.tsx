@@ -1,25 +1,29 @@
 import { ErrorDescription } from 'common/errors';
-import { KeyboardEvent, useRef, useState } from 'react';
+import { KeyboardEvent, useMemo, useRef, useState } from 'react';
 import { addEqualizerSlider } from '../utils/equalizerApi';
 import PlusIcon from '../icons/PlusIcon';
 import { FilterActionEnum, useAquaContext } from '../utils/AquaContext';
 import '../styles/AddSliderDivider.scss';
 
 interface IAddSliderDividerProps {
-  isDisabled: boolean;
   sliderIndex: number;
+  isMaxSliderCount: boolean;
 }
 
 const AddSliderDivider = ({
-  isDisabled,
   sliderIndex,
+  isMaxSliderCount,
 }: IAddSliderDividerProps) => {
   const { dispatchFilter, setGlobalError } = useAquaContext();
   const ref = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const isAddDisabled = useMemo(
+    () => isLoading || isMaxSliderCount,
+    [isLoading, isMaxSliderCount]
+  );
 
   const onAddEqualizerSlider = async (insertIndex?: number) => {
-    if (isLoading) {
+    if (isAddDisabled) {
       return;
     }
 
@@ -39,7 +43,7 @@ const AddSliderDivider = ({
     e: KeyboardEvent<HTMLDivElement>,
     insertIndex: number
   ) => {
-    if (e.code === 'Enter' && !isLoading) {
+    if (e.code === 'Enter') {
       onAddEqualizerSlider(insertIndex);
     }
   };
@@ -52,7 +56,7 @@ const AddSliderDivider = ({
       onClick={() => onAddEqualizerSlider(sliderIndex + 1)}
       onKeyUp={(e) => handleKeyUp(e, sliderIndex + 1)}
       tabIndex={0}
-      aria-disabled={isLoading || isDisabled}
+      aria-disabled={isAddDisabled}
     >
       <div className="divider" />
       <PlusIcon />

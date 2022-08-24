@@ -1,15 +1,14 @@
 @import 'color';
-@import 'constant';
 @import 'spacing';
 
 .addFilter {
-  height: $band-height;
+  cursor: pointer;
   gap: $spacing-m;
   padding: 0 $spacing-s;
 
   .divider {
     width: 2px;
-    height: 25%;
+    height: calc(250px / 2 - 12px - $spacing-m);
     background: $secondary-default;
   }
 
@@ -45,7 +44,11 @@
     outline: none;
   }
 
-  &[aria-disabled='true'] * {
-    opacity: 0;
+  &[aria-disabled='true'] {
+    cursor: default;
+
+    * {
+      opacity: 0;
+    }
   }
 }

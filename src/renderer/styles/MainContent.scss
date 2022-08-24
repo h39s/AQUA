@@ -7,10 +7,11 @@
 .mainContent {
   width: $content-width;
   display: grid;
-  grid-template-columns: 128px 1fr 48px;
+  grid-template-columns: 128px 1fr;
   grid-template-rows: 100%;
   gap: $spacing-s;
-  padding: $spacing-s;
+  // Add additional space to the right to balance the spacing better
+  padding: $spacing-s $spacing-l $spacing-s $spacing-s;
   justify-items: center;
 
   border-radius: $spacing-m;
@@ -38,31 +39,11 @@
   }
 
   .bands {
+    position: relative;
     justify-content: space-between;
     padding: 0 2px; // add some horizontal padding so the outline isn't cut off at either end
     width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-
-    .band {
-      width: $band-width;
-      gap: $spacing-s;
-
-      &::before,
-      &::after {
-        // Insert space above and below band so scrollbar has padding
-        content: ' ';
-      }
-    }
-  }
-
-  .sliderButtons {
-    height: $band-height;
-    gap: $spacing-xs;
-
-    .sliderButton {
-      height: 100px;
-      width: 24px;
-    }
   }
 }
