@@ -45,7 +45,7 @@ const NumberInput = ({
   );
   const [hasChanges, setHasChanges] = useState<boolean>(false);
 
-  const maxDigits = useMemo(() => {
+  const maxChars = useMemo(() => {
     const minDigitCount = getMaxIntegerDigitCount(min);
     const maxDigitCount = getMaxIntegerDigitCount(max);
 
@@ -55,7 +55,7 @@ const NumberInput = ({
     const floatOffset = floatPrecision > 0 ? 1 : 0;
     return maxIntegerDigits + floatPrecision + negativeOffset + floatOffset;
   }, [floatPrecision, max, min]);
-  const [valueLength, setValueLength] = useState<number>(maxDigits);
+  const [valueLength, setValueLength] = useState<number>(maxChars);
 
   // Update input valueLength
   useLayoutEffect(() => {
@@ -160,8 +160,8 @@ const NumberInput = ({
       }
     }
 
-    // Prevent user from typing numbers that are too large or use more than maxDigits numerical digits
-    if (input.length > maxDigits) {
+    // Prevent user from typing numbers that are too large or use more than maxChars numerical digits
+    if (input.length > maxChars) {
       return;
     }
 
@@ -176,7 +176,11 @@ const NumberInput = ({
   };
 
   const onSubmit = async () => {
-    if (internalValue === '' || internalValue === '-') {
+    if (
+      internalValue === '' ||
+      internalValue === '-' ||
+      internalValue === '.'
+    ) {
       onDiscard();
       return;
     }
