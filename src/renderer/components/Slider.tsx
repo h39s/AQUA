@@ -36,6 +36,7 @@ const Slider = ({
   }, [value]);
 
   const handleChangeValue = async (newValue: number) => {
+    console.log(`throttle ${newValue}`);
     await setValue(newValue);
   };
 

@@ -100,7 +100,7 @@ export const whenSetFrequencyGainWithText = (
   webdriver: { driver: Driver | undefined }
 ) => {
   when(
-    /^I set gain of slider of frequency (\d+)Hz to (\d+)db$/,
+    /^I set gain of slider of frequency (\d+)Hz to (\d+(?:.\d+)?)db$/,
     async (frequency: number, gain: string) => {
       const inputElement = await webdriver.driver.$(
         `.mainContent label[for="${frequency}-gain-number"] input`

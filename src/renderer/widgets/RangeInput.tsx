@@ -48,6 +48,7 @@ const RangeInput = ({
     const newValue: number =
       Math.round(clamp(parseFloat(e.target.value), min, max) * factor) / factor;
     lastValue.current = newValue;
+    console.log(`range ${newValue}`);
     handleChange(newValue);
   };
 
@@ -55,6 +56,7 @@ const RangeInput = ({
     const offset = isIncrement ? increment : -increment;
     const newValue =
       Math.round(clamp(offset + value, min, max) * factor) / factor;
+    console.log(`range ${newValue}`);
     handleChange(newValue);
   };
 
@@ -78,8 +80,8 @@ const RangeInput = ({
         type="range"
         min={min}
         max={max}
-        value={rangeValue}
-        step={step}
+        value={value}
+        step={0.01}
         name={name}
         aria-label={name}
         onChange={onRangeInput}
