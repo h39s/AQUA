@@ -42,9 +42,10 @@ export const readAquaConfig = (configPath: string) => {
       state.device = line.substring('Device: '.length);
     } else if (line.indexOf('Channel: ') !== -1) {
       state.channel = line.substring('Channel: '.length);
-    } else if (line.indexOf('PreAmp: ') !== -1) {
+    } else if (line.indexOf('Preamp: ') !== -1) {
+      // These MUST use "Preamp" without a capitalized P for Equalizer APO to work
       state.preamp = parseFloat(
-        line.substring('PreAamp: '.length, line.length - 2)
+        line.substring('Preamp: '.length, line.length - 2)
       );
       if (Number.isNaN(state.preamp)) {
         throw new Error(`Invalid preAmp line "${line}"`);
