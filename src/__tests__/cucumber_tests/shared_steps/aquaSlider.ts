@@ -105,7 +105,7 @@ export const whenSetFrequencyGainWithText = (
       const inputElement = await webdriver.driver.$(
         `.mainContent label[for="${frequency}-gain-number"] input`
       );
-      await inputElement.setValue(parseInt(gain, 10));
+      await inputElement.setValue(parseFloat(gain));
       await inputElement.keys('Tab');
       // wait 1000 ms for the action.
       await new Promise((resolve) => setTimeout(resolve, 1000));
