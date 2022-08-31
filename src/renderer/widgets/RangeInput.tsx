@@ -39,16 +39,11 @@ const RangeInput = ({
     () => 1 / 10 ** incrementPrecision,
     [incrementPrecision]
   );
-  const step = useMemo(
-    () => Math.round(increment + (value - Math.round(value)) * factor) / factor,
-    [factor, increment, value]
-  );
 
   const onRangeInput = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue: number =
       Math.round(clamp(parseFloat(e.target.value), min, max) * factor) / factor;
     lastValue.current = newValue;
-    console.log(`range ${newValue}`);
     handleChange(newValue);
   };
 
@@ -56,7 +51,6 @@ const RangeInput = ({
     const offset = isIncrement ? increment : -increment;
     const newValue =
       Math.round(clamp(offset + value, min, max) * factor) / factor;
-    console.log(`range ${newValue}`);
     handleChange(newValue);
   };
 
@@ -80,7 +74,7 @@ const RangeInput = ({
         type="range"
         min={min}
         max={max}
-        value={value}
+        value={rangeValue}
         step={0.01}
         name={name}
         aria-label={name}
@@ -92,7 +86,7 @@ const RangeInput = ({
           {
             '--min': min,
             '--max': max,
-            '--val': value,
+            '--val': rangeValue,
             width: `${width}px`,
             margin: `${width / 2}px 0px`,
           } as CSSProperties

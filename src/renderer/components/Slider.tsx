@@ -24,7 +24,7 @@ const Slider = ({
   label,
   setValue,
 }: ISliderProps) => {
-  const INTERVAL = 200;
+  const INTERVAL = 100;
   const { globalError } = useAquaContext();
 
   // Local copy of slider value used so that the number input increases smoothly while throttling EQ APO writes
@@ -36,7 +36,6 @@ const Slider = ({
   }, [value]);
 
   const handleChangeValue = async (newValue: number) => {
-    console.log(`throttle ${newValue}`);
     await setValue(newValue);
   };
 
