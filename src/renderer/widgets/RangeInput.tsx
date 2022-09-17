@@ -33,6 +33,9 @@ const RangeInput = ({
   const factor = useMemo(() => 10 ** displayPrecision, [displayPrecision]);
 
   // Simplify the value so that the css variables have a smaller range of values to work with
+  // which seems to slightly improve the jitter caused by jat-82. Ideally, we should
+  // be just using the value itself (i.e. there is no reason to round)
+  // TODO: fix the root cause of this error.
   const rangeValue = useMemo(() => Math.round(value), [value]);
 
   const increment = useMemo(
