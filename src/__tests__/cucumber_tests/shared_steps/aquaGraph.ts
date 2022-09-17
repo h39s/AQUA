@@ -7,15 +7,15 @@ export const givenChartViewEnabledState = (
 ) => {
   when(/^ChartView is (enabled|disabled)$/, async (state: string) => {
     const desiredState = state === 'enabled';
-    const chartViewSwitch = await webdriver.driver.$(
-      '.sideBar label[class="switch"][for="chartEnabler"]'
+    const graphViewSwitch = await webdriver.driver.$(
+      '.sideBar label[class="switch"][for="graphViewEnabler"]'
     );
 
-    const switchOn = await chartViewSwitch
+    const switchOn = await graphViewSwitch
       .$('[aria-checked="true"]')
       .isExisting();
     if ((desiredState && !switchOn) || (!desiredState && switchOn)) {
-      chartViewSwitch.click();
+      graphViewSwitch.click();
       // wait 1000 ms for the action.
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }

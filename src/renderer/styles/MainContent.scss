@@ -3,7 +3,7 @@
 @import 'spacing';
 
 $band-height: 500px;
-$band-width: 64px;
+// $band-width: 64px;
 
 .mainContent {
   width: $content-width;
@@ -47,7 +47,7 @@ $band-width: 64px;
     overflow-y: hidden;
 
     .band {
-      width: $band-width;
+      height: $band-height;
       gap: $spacing-s;
 
       &::before,

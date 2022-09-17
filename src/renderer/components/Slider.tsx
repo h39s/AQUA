@@ -24,7 +24,7 @@ const Slider = ({
   label,
   setValue,
 }: ISliderProps) => {
-  const INTERVAL = 200;
+  const INTERVAL = 100;
   const { globalError } = useAquaContext();
 
   // Local copy of slider value used so that the number input increases smoothly while throttling EQ APO writes
@@ -41,7 +41,7 @@ const Slider = ({
 
   const throttledSetValue = useThrottle(handleChangeValue, INTERVAL);
 
-  // Helpers for adjusting the preamp gain value
+  // Helpers for adjusting the preAmp gain value
   const handleChangeValueWithThrottle = async (newValue: number) => {
     setSliderValue(newValue);
     throttledSetValue(newValue);
@@ -63,6 +63,8 @@ const Slider = ({
         handleChange={handleChangeValueWithThrottle}
         handleMouseUp={handleChangeValueWithoutThrottle}
         isDisabled={!!globalError}
+        incrementPrecision={0}
+        displayPrecision={2}
       />
       {label && <div>{label}</div>}
       <NumberInput
@@ -72,8 +74,8 @@ const Slider = ({
         max={max}
         handleSubmit={handleChangeValueWithoutThrottle}
         isDisabled={!!globalError}
-        floatPrecision={1}
-        shouldRoundToHalf
+        floatPrecision={2}
+        showArrows
       />
     </div>
   );

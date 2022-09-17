@@ -10,7 +10,11 @@ import {
   startChromeDriver,
   stopChromeDriver,
 } from '__tests__/utils/webdriver';
-import { givenAquaIsRunning, givenAutoPreAmpState } from './shared_steps/aqua';
+import {
+  givenAquaIsRunning,
+  givenAutoPreAmpState,
+  givenEnabledState,
+} from './shared_steps/aqua';
 import {
   givenBandCount,
   whenSetBandFrequency,
@@ -35,6 +39,7 @@ defineFeature(feature, (test) => {
     givenEqualizerApoIsInstalled(given);
     givenCanWriteToAquaConfig(given);
     givenAquaIsRunning(given, webdriver, chromeDriver);
+    givenEnabledState(given, webdriver);
     givenChartViewEnabledState(given, webdriver);
     givenBandCount(given, webdriver);
     givenAutoPreAmpState(given, webdriver);

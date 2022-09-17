@@ -56,11 +56,9 @@ const FrequencyResponseChart = () => {
           items: data,
         },
       ],
-      autoPreAmpValue: clamp(
-        Math.round(-1 * (highestPoint.y - preAmp)),
-        -30,
-        30
-      ),
+      // Rounding to two decimals
+      autoPreAmpValue:
+        Math.round(clamp(-1 * (highestPoint.y - preAmp), -30, 30) * 100) / 100,
     };
   }, [filters, preAmp]);
 
