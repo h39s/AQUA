@@ -114,7 +114,8 @@
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-router-dom": "^6.3.0",
-    "regedit": "^5.1.1"
+    "regedit": "^5.1.1",
+    "uid": "^2.0.0"
   },
   "devDependencies": {
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.6",

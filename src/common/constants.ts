@@ -46,6 +46,7 @@ export const WINDOW_HEIGHT_EXPANDED = 1036;
 /** ----- Application Interfaces ----- */
 
 export interface IFilter {
+  id: string;
   frequency: number;
   gain: number;
   type: FilterTypeEnum;
@@ -67,14 +68,16 @@ const FIXED_FREQUENCIES = [
 ];
 
 export const DEFAULT_FILTER: IFilter = {
+  id: '0',
   frequency: 1000,
   gain: 0,
   quality: 1,
   type: FilterTypeEnum.PK,
 };
 
-const DEFAULT_FILTERS: IFilter[] = FIXED_FREQUENCIES.map((f) => {
+const DEFAULT_FILTERS: IFilter[] = FIXED_FREQUENCIES.map((f, index) => {
   return {
+    id: index.toString(),
     frequency: f,
     gain: 0,
     quality: 1,

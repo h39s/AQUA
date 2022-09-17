@@ -7,7 +7,10 @@ import {
   useReducer,
   useState,
 } from 'react';
+// import { sync as uid } from 'uid-safe';
+import { uid } from 'uid';
 import {
+  DEFAULT_FILTER,
   DEFAULT_STATE,
   FilterTypeEnum,
   IFilter,
@@ -57,17 +60,29 @@ const AquaContext = createContext<IAquaContext | undefined>(undefined);
 
 type IFilterReducer = (filters: IFilter[], action: FilterAction) => IFilter[];
 
+const sortHelper = (a: IFilter, b: IFilter) => a.frequency - b.frequency;
+
 const filterReducer: IFilterReducer = (
   filters: IFilter[],
   action: FilterAction
 ) => {
   switch (action.type) {
     case FilterActionEnum.INIT:
-      return action.filters;
-    case FilterActionEnum.FREQUENCY:
-      return filters.map((f, index) =>
-        index === action.index ? { ...f, frequency: action.newValue } : f
+      console.log(
+        'init',
+        action.filters
+          .map((filter) => (filter.id ? filter : { ...filter, id: uid(8) }))
+          .sort(sortHelper)
       );
+      return action.filters
+        .map((filter) => (filter.id ? filter : { ...filter, id: uid(8) }))
+        .sort(sortHelper);
+    case FilterActionEnum.FREQUENCY:
+      return filters
+        .map((f, index) =>
+          index === action.index ? { ...f, frequency: action.newValue } : f
+        )
+        .sort(sortHelper);
     case FilterActionEnum.GAIN:
       return filters.map((f, index) =>
         index === action.index ? { ...f, gain: action.newValue } : f
@@ -84,13 +99,12 @@ const filterReducer: IFilterReducer = (
       return [
         ...filters.slice(0, action.index),
         {
+          ...DEFAULT_FILTER,
+          id: uid(8),
           frequency: computeAvgFreq(filters, action.index),
-          gain: 0,
-          quality: 1,
-          type: FilterTypeEnum.PK,
         },
         ...filters.slice(action.index),
-      ];
+      ].sort(sortHelper);
     case FilterActionEnum.REMOVE:
       return filters.filter((_, index) => index !== action.index);
     default:

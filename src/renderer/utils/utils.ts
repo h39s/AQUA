@@ -92,3 +92,16 @@ export const useFocusOutside = <T extends HTMLElement = HTMLElement>(
     return () => document.removeEventListener('focusin', handleFocus, true);
   }, [handleFocus]);
 };
+
+// https://reactjs.org/docs/hooks-faq.html#how-to-get-the-previous-props-or-state
+const usePrevious = <T>(value: T) => {
+  const prevChildrenRef = useRef<T | undefined>();
+
+  useEffect(() => {
+    prevChildrenRef.current = value;
+  }, [value]);
+
+  return prevChildrenRef.current;
+};
+
+export default usePrevious;
