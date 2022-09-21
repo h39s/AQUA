@@ -331,10 +331,10 @@ export const getEqualizerSliderCount = (): Promise<number> => {
  * Add another slider
  * @returns { Promise<void> } exception if failed
  */
-export const addEqualizerSlider = (index: number): Promise<void> => {
+export const addEqualizerSlider = (index: number): Promise<string> => {
   const channel = ChannelEnum.ADD_FILTER;
   window.electron.ipcRenderer.sendMessage(channel, [index]);
-  return promisifyResult(setterResponseHandler, channel);
+  return promisifyResult(simpleResponseHandler<string>(), channel);
 };
 
 /**

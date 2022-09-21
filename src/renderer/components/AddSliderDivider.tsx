@@ -29,8 +29,12 @@ const AddSliderDivider = ({
 
     setIsLoading(true);
     try {
-      await addEqualizerSlider(insertIndex);
-      dispatchFilter({ type: FilterActionEnum.ADD, index: insertIndex });
+      const filterId = await addEqualizerSlider(insertIndex);
+      dispatchFilter({
+        type: FilterActionEnum.ADD,
+        index: insertIndex,
+        id: filterId,
+      });
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }

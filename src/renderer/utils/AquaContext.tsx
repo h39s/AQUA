@@ -7,7 +7,6 @@ import {
   useReducer,
   useState,
 } from 'react';
-// import { sync as uid } from 'uid-safe';
 import { uid } from 'uid';
 import {
   DEFAULT_FILTER,
@@ -39,7 +38,7 @@ export type FilterAction =
   | { type: FilterActionEnum.INIT; filters: IFilter[] }
   | { type: NumericalFilterAction; index: number; newValue: number }
   | { type: FilterActionEnum.TYPE; index: number; newValue: FilterTypeEnum }
-  | { type: FilterActionEnum.ADD; index: number }
+  | { type: FilterActionEnum.ADD; index: number; id: string }
   | { type: FilterActionEnum.REMOVE; index: number };
 
 type FilterDispatch = (action: FilterAction) => void;
@@ -100,7 +99,7 @@ const filterReducer: IFilterReducer = (
         ...filters.slice(0, action.index),
         {
           ...DEFAULT_FILTER,
-          id: uid(8),
+          id: action.id,
           frequency: computeAvgFreq(filters, action.index),
         },
         ...filters.slice(action.index),

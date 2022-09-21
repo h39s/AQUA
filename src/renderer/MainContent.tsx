@@ -4,6 +4,7 @@ import FrequencyBand from './components/FrequencyBand';
 import { useAquaContext } from './utils/AquaContext';
 import './styles/MainContent.scss';
 import AddSliderDivider from './components/AddSliderDivider';
+import usePrevious from './utils/utils';
 
 interface IBoundingBoxMap {
   [key: string]: DOMRect;
@@ -26,35 +27,20 @@ export const calculateBoundingBoxes = (children: (HTMLDivElement | null)[]) => {
 const MainContent = () => {
   const { filters } = useAquaContext();
   const [boundingBox, setBoundingBox] = useState<IBoundingBoxMap>({});
-  const [prevBoundingBox, setPrevBoundingBox] = useState<IBoundingBoxMap>({});
   const filterRefs = useRef<(HTMLDivElement | null)[]>([]);
-  // const prevChildren = usePrevious(filterRefs.current);
-  const prevChildren = useRef<(HTMLDivElement | null)[]>(filterRefs.current);
-
-  console.log('rerender');
+  const prevBoundingBox = usePrevious<IBoundingBoxMap>(boundingBox);
 
   useLayoutEffect(() => {
     const newBoundingBox = calculateBoundingBoxes(filterRefs.current);
-    console.log('refs bounding box', filterRefs.current.length, newBoundingBox);
     setBoundingBox(newBoundingBox);
-    prevChildren.current = [...filterRefs.current];
     filterRefs.current = [];
-    console.log(filterRefs.current.length, prevChildren.current.length);
   }, [filters]);
 
-  useLayoutEffect(() => {
-    if (prevChildren) {
-      const newValue = calculateBoundingBoxes(prevChildren.current);
-      console.log('refs prev bounding box', prevChildren.current, newValue);
-      setPrevBoundingBox(newValue);
-    }
-  }, [prevChildren]);
-
   useEffect(() => {
-    const hasPrevBoundingBox = Object.keys(prevBoundingBox).length;
+    const hasPrevBoundingBox =
+      prevBoundingBox && Object.keys(prevBoundingBox).length;
 
     if (hasPrevBoundingBox) {
-      console.log('animate');
       filterRefs.current.forEach((child) => {
         if (child) {
           const firstBox = prevBoundingBox[child.id];
@@ -75,8 +61,6 @@ const MainContent = () => {
                 child.style.transition = 'transform 500ms';
               });
             });
-
-            setPrevBoundingBox({});
           }
         }
       });
