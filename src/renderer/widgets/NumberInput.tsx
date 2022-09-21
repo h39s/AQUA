@@ -10,7 +10,7 @@ import {
 } from 'react';
 import ArrowButton from './ArrowButton';
 import '../styles/NumberInput.scss';
-import { clamp } from '../utils/utils';
+import { clamp, getMaxIntegerDigitCount } from '../utils/utils';
 
 interface INumberInputProps {
   name: string;
@@ -19,7 +19,6 @@ interface INumberInputProps {
   max: number;
   isDisabled: boolean;
   floatPrecision?: number;
-  maxDigits?: number;
   showArrows?: boolean;
   showLabel?: boolean;
   shouldRoundToHalf?: boolean;
@@ -34,7 +33,6 @@ const NumberInput = ({
   max,
   isDisabled,
   showArrows = false,
-  maxDigits = 5,
   floatPrecision = 0,
   shouldRoundToHalf = false,
   showLabel = false,
@@ -42,9 +40,22 @@ const NumberInput = ({
   handleSubmit,
 }: INumberInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [internalValue, setInternalValue] = useState<string>(value.toString());
-  const [valueLength, setValueLength] = useState<number>(maxDigits);
+  const [internalValue, setInternalValue] = useState<string>(
+    value.toFixed(floatPrecision)
+  );
   const [hasChanges, setHasChanges] = useState<boolean>(false);
+
+  const maxChars = useMemo(() => {
+    const minDigitCount = getMaxIntegerDigitCount(min);
+    const maxDigitCount = getMaxIntegerDigitCount(max);
+
+    const maxIntegerDigits = Math.max(minDigitCount, maxDigitCount);
+
+    const negativeOffset = min < 0 ? 1 : 0;
+    const floatOffset = floatPrecision > 0 ? 1 : 0;
+    return maxIntegerDigits + floatPrecision + negativeOffset + floatOffset;
+  }, [floatPrecision, max, min]);
+  const [valueLength, setValueLength] = useState<number>(maxChars);
 
   // Update input valueLength
   useLayoutEffect(() => {
@@ -55,8 +66,8 @@ const NumberInput = ({
 
   // Synchronize local input value with prop value
   useEffect(() => {
-    setInternalValue(value.toString());
-  }, [value]);
+    setInternalValue(value.toFixed(floatPrecision));
+  }, [floatPrecision, value]);
 
   const precisionFactor: number = useMemo(
     () => 10 ** floatPrecision,
@@ -130,11 +141,11 @@ const NumberInput = ({
       const testInput = `${
         positiveInput.charAt(0) === '.' ? '0' : ''
       }${positiveInput}1`;
-      num = parseFloat(testInput);
-      const actualNum = parseFloat(input);
+      const testNum = parseFloat(testInput);
+      num = parseFloat(input);
 
       // Parsed value should match the string input
-      if (actualNum !== 0 && num.toString() !== testInput) {
+      if (num !== 0 && testNum.toString() !== testInput) {
         // illegal character in the input
         return;
       }
@@ -144,16 +155,13 @@ const NumberInput = ({
       // - at most one decimal point
       // - at most one negative sign
       const zeroCount = positiveInput.match(/0/g)?.length || 0;
-      if (
-        actualNum === 0 &&
-        zeroCount + decimalCount !== positiveInput.length
-      ) {
+      if (num === 0 && zeroCount + decimalCount !== positiveInput.length) {
         return;
       }
     }
 
-    // Prevent user from typing numbers that are too large or use more than maxDigits numerical digits
-    if (Math.abs(num) >= 10 ** maxDigits || input.length > maxDigits + 2) {
+    // Prevent user from typing numbers that are too large or use more than maxChars numerical digits
+    if (input.length > maxChars) {
       return;
     }
 
@@ -164,10 +172,19 @@ const NumberInput = ({
   // Helper for discarding changes
   const onDiscard = () => {
     setHasChanges(false);
-    setInternalValue(value.toString());
+    setInternalValue(value.toFixed(floatPrecision));
   };
 
   const onSubmit = async () => {
+    if (
+      internalValue === '' ||
+      internalValue === '-' ||
+      internalValue === '.'
+    ) {
+      onDiscard();
+      return;
+    }
+
     let num = NaN;
     if (floatPrecision === 0) {
       num = parseInt(internalValue, 10);
@@ -196,7 +213,7 @@ const NumberInput = ({
     if (newValue === value) {
       // Need this because useEffect would otherwise not trigger
       // since value would not change after we call handleSubmit
-      setInternalValue(value.toString());
+      setInternalValue(newValue.toFixed(floatPrecision));
     }
     // Call handler on the parent
     await handleSubmit(newValue);
@@ -209,7 +226,7 @@ const NumberInput = ({
     // Need to round the value because of floating addition imprecision
     let newValue = clamp(offset + value, min, max);
     newValue = Math.round(newValue * precisionFactor) / precisionFactor;
-    setInternalValue(newValue.toString());
+    setInternalValue(newValue.toFixed(floatPrecision));
     setHasChanges(false);
     handleSubmit(newValue);
   };

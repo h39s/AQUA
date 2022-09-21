@@ -11,6 +11,7 @@ export const stateToString = (state: IState) => {
 
   output.push('Device: all');
   output.push('Channel: all');
+  // This line MUST be "Preamp" without a capitalized P for Equalizer APO to work
   output.push(`Preamp: ${state.preAmp}dB`);
 
   // Using individual filter bands

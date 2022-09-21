@@ -161,7 +161,7 @@ const FrequencyBand = ({
           max={MAX_QUALITY}
           name={`${filter.frequency}-quality`}
           isDisabled={!!globalError}
-          floatPrecision={3}
+          floatPrecision={2}
           showArrows
           handleSubmit={handleQualitySubmit}
         />

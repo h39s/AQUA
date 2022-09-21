@@ -6,7 +6,7 @@ export const MIN_GAIN = -30;
 export const MAX_FREQUENCY = 20000;
 export const MIN_FREQUENCY = 1;
 export const MAX_QUALITY = 100;
-export const MIN_QUALITY = 0.001;
+export const MIN_QUALITY = 0.01;
 
 export const MAX_NUM_FILTERS = 20; // TODO: Investigate an appropriate value for this
 export const MIN_NUM_FILTERS = 1;

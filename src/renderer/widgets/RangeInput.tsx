@@ -1,4 +1,4 @@
-import { ChangeEvent, CSSProperties, useRef } from 'react';
+import { ChangeEvent, CSSProperties, useMemo, useRef } from 'react';
 import ArrowButton from './ArrowButton';
 import '../styles/RangeInput.scss';
 import { clamp } from '../utils/utils';
@@ -9,6 +9,8 @@ interface IRangeInputProps {
   min: number;
   max: number;
   isDisabled: boolean;
+  incrementPrecision?: number;
+  displayPrecision?: number;
   width: number;
   handleChange: (newValue: number) => Promise<void>;
   handleMouseUp: (newValue: number) => Promise<void>;
@@ -20,22 +22,38 @@ const RangeInput = ({
   min,
   max,
   isDisabled,
+  incrementPrecision = 0,
+  displayPrecision = 1,
   width,
   handleChange,
   handleMouseUp,
 }: IRangeInputProps) => {
   // Store a copy of the last value so it isn't lost to the throttle
   const lastValue = useRef<number | undefined>(undefined);
+  const factor = useMemo(() => 10 ** displayPrecision, [displayPrecision]);
+
+  // Simplify the value so that the css variables have a smaller range of values to work with
+  // which seems to slightly improve the jitter caused by jat-82. Ideally, we should
+  // be just using the value itself (i.e. there is no reason to round)
+  // TODO: fix the root cause of this error.
+  const rangeValue = useMemo(() => Math.round(value), [value]);
+
+  const increment = useMemo(
+    () => 1 / 10 ** incrementPrecision,
+    [incrementPrecision]
+  );
 
   const onRangeInput = (e: ChangeEvent<HTMLInputElement>) => {
-    const newValue: number = clamp(parseInt(e.target.value, 10), min, max);
+    const newValue: number =
+      Math.round(clamp(parseFloat(e.target.value), min, max) * factor) / factor;
     lastValue.current = newValue;
     handleChange(newValue);
   };
 
   const onArrowInput = (isIncrement: boolean) => {
-    const offset = isIncrement ? 1 : -1;
-    const newValue = clamp(offset + value, min, max);
+    const offset = isIncrement ? increment : -increment;
+    const newValue =
+      Math.round(clamp(offset + value, min, max) * factor) / factor;
     handleChange(newValue);
   };
 
@@ -59,7 +77,8 @@ const RangeInput = ({
         type="range"
         min={min}
         max={max}
-        value={value}
+        value={rangeValue}
+        step={0.01}
         name={name}
         aria-label={name}
         onChange={onRangeInput}
@@ -70,7 +89,7 @@ const RangeInput = ({
           {
             '--min': min,
             '--max': max,
-            '--val': value,
+            '--val': rangeValue,
             width: `${width}px`,
             margin: `${width / 2}px 0px`,
           } as CSSProperties
