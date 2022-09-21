@@ -10,8 +10,12 @@
   }
 
   .band {
-    width: $band-width;
+    // width: $band-width;
     gap: $spacing-s;
+    .numberInput,
+    .dropdown {
+      align-self: center;
+    }
 
     &::before,
     &::after {
@@ -27,6 +31,7 @@
     opacity: 0;
     z-index: 1;
 
+    &:focus-visible:not([aria-disabled='true']),
     &:hover:not([aria-disabled='true']) {
       & + .band {
         filter: blur(1px);
@@ -38,7 +43,8 @@
     }
 
     &:focus-visible:not([aria-disabled='true']) {
-      outline: 2px solid $white;
+      opacity: 1;
+      outline: none;
     }
 
     &[aria-disabled='true'] {

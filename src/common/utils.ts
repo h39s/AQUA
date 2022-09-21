@@ -13,5 +13,5 @@ export const computeAvgFreq = (filters: IFilter[], insertIndex: number) => {
       ? MAX_FREQUENCY
       : filters[insertIndex].frequency;
   const exponent = (Math.log10(lo) + Math.log10(hi)) / 2;
-  return roundToPrecision(10 ** exponent, 1);
+  return roundToPrecision(10 ** exponent, 0);
 };

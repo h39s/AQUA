@@ -18,18 +18,18 @@ describe('utils', () => {
   describe('computeAvgFreq', () => {
     const filters = [...DEFAULT_STATE.filters];
     it('should compute average of first filter and min frequency for index 0', () => {
-      expect(computeAvgFreq(filters, 0)).toBe(5.7);
+      expect(computeAvgFreq(filters, 0)).toBe(6);
     });
 
     it('should compute average of last filter and max frequency for last index', () => {
-      expect(computeAvgFreq(filters, filters.length)).toBe(17888.5);
+      expect(computeAvgFreq(filters, filters.length)).toBe(17889);
     });
 
     it('should compute average of neighbouring filters for intermediary indices', () => {
       // Compute harmonic mean between 64Hz and 125Hz
-      expect(computeAvgFreq(filters, 2)).toBe(89.4);
+      expect(computeAvgFreq(filters, 2)).toBe(89);
       // Compute harmonic mean between 250Hz and 500Hz
-      expect(computeAvgFreq(filters, 4)).toBe(353.6);
+      expect(computeAvgFreq(filters, 4)).toBe(354);
     });
   });
 });
