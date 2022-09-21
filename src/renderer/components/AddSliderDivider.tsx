@@ -32,7 +32,6 @@ const AddSliderDivider = ({
       const filterId = await addEqualizerSlider(insertIndex);
       dispatchFilter({
         type: FilterActionEnum.ADD,
-        index: insertIndex,
         id: filterId,
       });
     } catch (e) {

@@ -4,7 +4,7 @@ import FrequencyBand from './components/FrequencyBand';
 import { useAquaContext } from './utils/AquaContext';
 import './styles/MainContent.scss';
 import AddSliderDivider from './components/AddSliderDivider';
-import usePrevious from './utils/utils';
+import { usePrevious } from './utils/utils';
 
 interface IBoundingBoxMap {
   [key: string]: DOMRect;
@@ -90,9 +90,9 @@ const MainContent = () => {
         {filters
           .flatMap((filter, sliderIndex) => [
             { filter, sliderIndex },
-            { sliderIndex },
+            { id: filter.id, sliderIndex },
           ])
-          .map(({ filter, sliderIndex }) =>
+          .map(({ filter, id, sliderIndex }) =>
             filter ? (
               <FrequencyBand
                 sliderIndex={sliderIndex}
@@ -105,8 +105,7 @@ const MainContent = () => {
               <AddSliderDivider
                 sliderIndex={sliderIndex}
                 isMaxSliderCount={filters.length >= MAX_NUM_FILTERS}
-                // eslint-disable-next-line react/no-array-index-key
-                key={`add-slider-${sliderIndex}`}
+                key={`add-slider-${id}`}
               />
             )
           )}

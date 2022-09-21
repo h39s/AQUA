@@ -54,7 +54,7 @@ const FrequencyBand = forwardRef(
         await setGain(sliderIndex, newValue);
         dispatchFilter({
           type: FilterActionEnum.GAIN,
-          index: sliderIndex,
+          id: filter.id,
           newValue,
         });
       } catch (e) {
@@ -67,7 +67,7 @@ const FrequencyBand = forwardRef(
         await setFrequency(sliderIndex, newValue);
         dispatchFilter({
           type: FilterActionEnum.FREQUENCY,
-          index: sliderIndex,
+          id: filter.id,
           newValue,
         });
       } catch (e) {
@@ -80,7 +80,7 @@ const FrequencyBand = forwardRef(
         await setQuality(sliderIndex, newValue);
         dispatchFilter({
           type: FilterActionEnum.QUALITY,
-          index: sliderIndex,
+          id: filter.id,
           newValue,
         });
       } catch (e) {
@@ -93,7 +93,7 @@ const FrequencyBand = forwardRef(
         await setType(sliderIndex, newValue);
         dispatchFilter({
           type: FilterActionEnum.TYPE,
-          index: sliderIndex,
+          id: filter.id,
           newValue: newValue as FilterTypeEnum,
         });
       } catch (e) {
@@ -109,7 +109,7 @@ const FrequencyBand = forwardRef(
       setIsLoading(true);
       try {
         await removeEqualizerSlider(sliderIndex);
-        dispatchFilter({ type: FilterActionEnum.REMOVE, index: sliderIndex });
+        dispatchFilter({ type: FilterActionEnum.REMOVE, id: filter.id });
       } catch (e) {
         setGlobalError(e as ErrorDescription);
       }

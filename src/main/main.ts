@@ -42,6 +42,7 @@ import {
 import { ErrorCode } from '../common/errors';
 import { computeAvgFreq } from '../common/utils';
 import { TSuccess, TError } from '../renderer/utils/equalizerApi';
+import { sortHelper } from '../renderer/utils/utils';
 
 export default class AppUpdater {
   constructor() {
@@ -362,13 +363,15 @@ ipcMain.on(ChannelEnum.ADD_FILTER, async (event, arg) => {
 
   const frequency = computeAvgFreq(state.filters, insertIndex);
   const filterId = uid(8);
-  state.filters.splice(insertIndex, 0, {
-    id: filterId,
-    frequency,
-    gain: 0,
-    quality: 1,
-    type: FilterTypeEnum.PK,
-  });
+  state.filters
+    .splice(insertIndex, 0, {
+      id: filterId,
+      frequency,
+      gain: 0,
+      quality: 1,
+      type: FilterTypeEnum.PK,
+    })
+    .sort(sortHelper);
   await handleUpdateHelper(event, channel, filterId);
 });
 

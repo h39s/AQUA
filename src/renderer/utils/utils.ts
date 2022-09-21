@@ -1,3 +1,4 @@
+import { IFilter } from 'common/constants';
 import { RefObject, useEffect, useMemo, useRef } from 'react';
 
 export const getMaxIntegerDigitCount = (num: number) => {
@@ -94,7 +95,7 @@ export const useFocusOutside = <T extends HTMLElement = HTMLElement>(
 };
 
 // https://reactjs.org/docs/hooks-faq.html#how-to-get-the-previous-props-or-state
-const usePrevious = <T>(value: T) => {
+export const usePrevious = <T>(value: T) => {
   const prevChildrenRef = useRef<T | undefined>();
 
   useEffect(() => {
@@ -104,4 +105,4 @@ const usePrevious = <T>(value: T) => {
   return prevChildrenRef.current;
 };
 
-export default usePrevious;
+export const sortHelper = (a: IFilter, b: IFilter) => a.frequency - b.frequency;
