@@ -7,31 +7,39 @@ export const givenBandCount = (
   webdriver: { driver: Driver | undefined }
 ) => {
   given(/^there are (\d+) frequency bands$/, async (count: number) => {
-    let sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
+    let sliderElems = await webdriver.driver
+      .$('.mainContent')
+      .$$('.bandWrapper');
     let sliderLength = sliderElems.length;
-    const addButton = await webdriver.driver.$(
-      '.mainContent [aria-label="Add Equalizer Slider"]'
-    );
-    const removeButton = await webdriver.driver.$(
-      '.mainContent [aria-label="Remove Equalizer Slider"]'
-    );
 
     while (sliderLength > count) {
+      // Find any delete button
+      const removeButton = await webdriver.driver
+        .$('.mainContent')
+        .$('.removeFilter');
       removeButton.click();
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       do {
-        sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
+        sliderElems = await webdriver.driver
+          .$('.mainContent')
+          .$$('.bandWrapper');
       } while (sliderElems.length === sliderLength);
       sliderLength = sliderElems.length;
     }
 
     while (sliderLength < count) {
+      // Find any add button
+      const addButton = await webdriver.driver
+        .$('.mainContent')
+        .$('.addFilter');
       addButton.click();
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       do {
-        sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
+        sliderElems = await webdriver.driver
+          .$('.mainContent')
+          .$$('.bandWrapper');
       } while (sliderElems.length === sliderLength);
       sliderLength = sliderElems.length;
     }

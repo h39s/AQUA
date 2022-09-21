@@ -19,6 +19,7 @@ import {
   givenBandCount,
   whenSetBandFrequency,
   whenSetFrequencyGainWithText,
+  whenSetFrequencyQuality,
 } from './shared_steps/aquaSlider';
 import {
   givenCanWriteToAquaConfig,
@@ -46,6 +47,8 @@ defineFeature(feature, (test) => {
 
     whenSetBandFrequency(when, webdriver);
     whenSetBandFrequency(when, webdriver);
+    whenSetFrequencyQuality(when, webdriver);
+    whenSetFrequencyQuality(when, webdriver);
     whenSetFrequencyGainWithText(when, webdriver);
     whenSetFrequencyGainWithText(when, webdriver);
     thenPreAmpGain(then);
