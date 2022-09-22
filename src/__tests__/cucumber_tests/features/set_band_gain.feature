@@ -5,6 +5,7 @@ Feature: Set gain of a frequency band
     Given EqualizerAPO is installed
       And Aqua can write to Aqua config
       And Aqua is running
+      And the frequency of band 1 is 1000Hz
       And Aqua equalizer state is enabled
     When I set gain of slider of frequency 1000Hz to bottom
     Then Aqua config file should show gain of -30dB for frequency 1000Hz

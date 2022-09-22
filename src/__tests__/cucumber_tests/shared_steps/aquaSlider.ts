@@ -54,14 +54,14 @@ export const whenChangeBandCount = (
     const isAdd = action === 'add';
 
     if (isAdd) {
-      const addButton = await webdriver.driver.$(
-        '.mainContent [aria-label="Add Equalizer Slider"]'
-      );
+      const addButton = await webdriver.driver
+        .$('.mainContent')
+        .$('.addFilter');
       addButton.click();
     } else {
-      const removeButton = await webdriver.driver.$(
-        '.mainContent [aria-label="Remove Equalizer Slider"]'
-      );
+      const removeButton = await webdriver.driver
+        .$('.mainContent')
+        .$('.removeFilter');
       removeButton.click();
     }
 
@@ -82,9 +82,9 @@ const setFrequencyGain = async (
   );
   const coord = { x: 0, y: 0 };
   if (position === 'top') {
-    coord.y = -100;
+    coord.y = -150;
   } else if (position === 'bottom') {
-    coord.y = 100;
+    coord.y = 150;
   }
   element.dragAndDrop(coord);
   // wait 1000 ms for the action.

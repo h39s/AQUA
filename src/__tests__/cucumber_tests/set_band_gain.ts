@@ -11,7 +11,10 @@ import {
   stopChromeDriver,
 } from '__tests__/utils/webdriver';
 import { givenAquaIsRunning, givenEnabledState } from './shared_steps/aqua';
-import { whenSetFrequencyGain } from './shared_steps/aquaSlider';
+import {
+  givenBandFrequency,
+  whenSetFrequencyGain,
+} from './shared_steps/aquaSlider';
 import { thenFrequencyGain } from './shared_steps/config';
 import {
   givenCanWriteToAquaConfig,
@@ -30,6 +33,7 @@ defineFeature(feature, (test) => {
     givenEqualizerApoIsInstalled(given);
     givenCanWriteToAquaConfig(given);
     givenAquaIsRunning(given, webdriver, chromeDriver);
+    givenBandFrequency(given, webdriver);
     givenEnabledState(given, webdriver);
 
     whenSetFrequencyGain(when, webdriver);
