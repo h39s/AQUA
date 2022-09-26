@@ -27,13 +27,41 @@ export const calculateBoundingBoxes = (children: (HTMLDivElement | null)[]) => {
 const MainContent = () => {
   const { filters } = useAquaContext();
   const [boundingBox, setBoundingBox] = useState<IBoundingBoxMap>({});
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const filterRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const prevBoundingBox = usePrevious<IBoundingBoxMap>(boundingBox);
+  const [prevBoundingBox, clearPrevBoundingBox] =
+    usePrevious<IBoundingBoxMap>(boundingBox);
 
-  useLayoutEffect(() => {
+  const updateBoundingBox = () => {
     const newBoundingBox = calculateBoundingBoxes(filterRefs.current);
     setBoundingBox(newBoundingBox);
     filterRefs.current = [];
+  };
+
+  useEffect(() => {
+    let handler: NodeJS.Timeout;
+    const onScroll = () => {
+      if (handler) {
+        clearTimeout(handler);
+      }
+      handler = setTimeout(() => {
+        // Update bounding boxes when a scroll event ends
+        updateBoundingBox();
+        // Clear the previous bounding box value to prevent animation due to the scroll
+        clearPrevBoundingBox();
+      }, 200); // default 200 ms
+    };
+
+    const element = wrapperRef.current;
+    element?.addEventListener('scroll', onScroll);
+    return () => {
+      element?.removeEventListener('scroll', onScroll);
+    };
+  }, [wrapperRef, clearPrevBoundingBox]);
+
+  useLayoutEffect(() => {
+    // Update bounding boxes when a frequency value is updated
+    updateBoundingBox();
   }, [filters]);
 
   useEffect(() => {
@@ -80,7 +108,7 @@ const MainContent = () => {
         <span className="rowLabel">Gain (dB)</span>
         <span className="rowLabel">Quality</span>
       </div>
-      <div className="bands row center">
+      <div ref={wrapperRef} className="bands row center">
         <AddSliderDivider
           sliderIndex={-1}
           isMaxSliderCount={filters.length >= MAX_NUM_FILTERS}

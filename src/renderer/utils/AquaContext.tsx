@@ -39,7 +39,7 @@ export type FilterAction =
   | { type: FilterActionEnum.INIT; filters: IFilter[] }
   | { type: NumericalFilterAction; id: string; newValue: number }
   | { type: FilterActionEnum.TYPE; id: string; newValue: FilterTypeEnum }
-  | { type: FilterActionEnum.ADD; id: string }
+  | { type: FilterActionEnum.ADD; id: string; index: number }
   | { type: FilterActionEnum.REMOVE; id: string };
 
 type FilterDispatch = (action: FilterAction) => void;
@@ -69,12 +69,17 @@ const filterReducer: IFilterReducer = (
       return action.filters
         .map((filter) => (filter.id ? filter : { ...filter, id: uid(8) }))
         .sort(sortHelper);
-    case FilterActionEnum.FREQUENCY:
-      return filters
-        .map((f) =>
-          f.id === action.id ? { ...f, frequency: action.newValue } : f
-        )
-        .sort(sortHelper);
+    case FilterActionEnum.FREQUENCY: {
+      const hasChanges =
+        filters.find((f) => f.id === action.id)?.frequency !== action.newValue;
+      return !hasChanges
+        ? filters
+        : filters
+            .map((f) =>
+              f.id === action.id ? { ...f, frequency: action.newValue } : f
+            )
+            .sort(sortHelper);
+    }
     case FilterActionEnum.GAIN:
       return filters.map((f) =>
         f.id === action.id ? { ...f, gain: action.newValue } : f
@@ -93,7 +98,7 @@ const filterReducer: IFilterReducer = (
         {
           ...DEFAULT_FILTER,
           id: action.id,
-          frequency: computeAvgFreq(filters, action.id),
+          frequency: computeAvgFreq(filters, action.index),
         },
       ].sort(sortHelper);
     case FilterActionEnum.REMOVE:

@@ -33,6 +33,7 @@ const AddSliderDivider = ({
       dispatchFilter({
         type: FilterActionEnum.ADD,
         id: filterId,
+        index: insertIndex,
       });
     } catch (e) {
       setGlobalError(e as ErrorDescription);
