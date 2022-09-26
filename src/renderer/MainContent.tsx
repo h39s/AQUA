@@ -21,6 +21,12 @@ const MainContent = () => {
         <span className="rowLabel">Quality</span>
       </div>
       <div className="bands row center">
+        <AddSliderDivider
+          sliderIndex={-1}
+          isMaxSliderCount={filters.length >= MAX_NUM_FILTERS}
+          // eslint-disable-next-line react/no-array-index-key
+          key={`add-slider-${-1}`}
+        />
         {filters
           .flatMap((filter, sliderIndex) => [
             { filter, sliderIndex },

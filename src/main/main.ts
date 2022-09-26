@@ -343,7 +343,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_COUNT, async (event) => {
 
 ipcMain.on(ChannelEnum.ADD_FILTER, async (event, arg) => {
   const channel = ChannelEnum.ADD_FILTER;
-  const insertIndex = arg[0] || state.filters.length;
+  const insertIndex: number = arg[0];
 
   // Cannot exceed the maximum number of filters
   if (state.filters.length === MAX_NUM_FILTERS) {
@@ -363,7 +363,7 @@ ipcMain.on(ChannelEnum.ADD_FILTER, async (event, arg) => {
 
 ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
   const channel = ChannelEnum.REMOVE_FILTER;
-  const filterIndex = parseInt(arg[0], 10);
+  const filterIndex: number = arg[0];
 
   // Filter index must be within the length of the filters array
   if (filterIndex < 0 || filterIndex >= state.filters.length) {

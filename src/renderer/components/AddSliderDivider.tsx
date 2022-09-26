@@ -22,7 +22,7 @@ const AddSliderDivider = ({
     [isLoading, isMaxSliderCount]
   );
 
-  const onAddEqualizerSlider = async (insertIndex?: number) => {
+  const onAddEqualizerSlider = async (insertIndex: number) => {
     if (isAddDisabled) {
       return;
     }

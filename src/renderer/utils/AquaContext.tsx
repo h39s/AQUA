@@ -36,7 +36,7 @@ export type FilterAction =
   | { type: FilterActionEnum.INIT; filters: IFilter[] }
   | { type: NumericalFilterAction; index: number; newValue: number }
   | { type: FilterActionEnum.TYPE; index: number; newValue: FilterTypeEnum }
-  | { type: FilterActionEnum.ADD; index?: number }
+  | { type: FilterActionEnum.ADD; index: number }
   | { type: FilterActionEnum.REMOVE; index: number };
 
 type FilterDispatch = (action: FilterAction) => void;
@@ -82,14 +82,14 @@ const filterReducer: IFilterReducer = (
       );
     case FilterActionEnum.ADD:
       return [
-        ...filters.slice(0, action.index || filters.length),
+        ...filters.slice(0, action.index),
         {
-          frequency: computeAvgFreq(filters, action.index || filters.length),
+          frequency: computeAvgFreq(filters, action.index),
           gain: 0,
           quality: 1,
           type: FilterTypeEnum.PK,
         },
-        ...filters.slice(action.index || filters.length),
+        ...filters.slice(action.index),
       ];
     case FilterActionEnum.REMOVE:
       return filters.filter((_, index) => index !== action.index);
