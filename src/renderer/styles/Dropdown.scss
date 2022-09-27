@@ -6,6 +6,7 @@
   position: relative;
 
   [role='menu'] {
+    cursor: pointer;
     background: $primary-dark;
     color: $white;
     border: solid 2px $secondary-default;
@@ -74,6 +75,7 @@
     z-index: 1;
 
     li {
+      cursor: pointer;
       padding: $spacing-xs;
       align-content: center;
       font-size: small;

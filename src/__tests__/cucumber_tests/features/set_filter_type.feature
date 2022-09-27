@@ -5,6 +5,7 @@ Feature: Set filter type of a frequency band
     Given EqualizerAPO is installed
       And Aqua can write to Aqua config
       And Aqua is running
+      And the frequency of band 1 is 125Hz
       And the filter type is LSC filter for the band with frequency 125Hz
       And Aqua equalizer state is enabled
     When I set the filter type to PK filter for the band with frequency 125Hz

@@ -24,7 +24,6 @@ import { resolveHtmlPath } from './util';
 import { getConfigPath, isEqualizerAPOInstalled } from './registry';
 import ChannelEnum from '../common/channels';
 import {
-  DEFAULT_FILTER,
   FilterTypeEnum,
   IState,
   MAX_FREQUENCY,
@@ -40,6 +39,7 @@ import {
   WINDOW_WIDTH,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
+import { computeAvgFreq } from '../common/utils';
 import { TSuccess, TError } from '../renderer/utils/equalizerApi';
 
 export default class AppUpdater {
@@ -341,8 +341,9 @@ ipcMain.on(ChannelEnum.GET_FILTER_COUNT, async (event) => {
   event.reply(ChannelEnum.GET_FILTER_COUNT, reply);
 });
 
-ipcMain.on(ChannelEnum.ADD_FILTER, async (event) => {
+ipcMain.on(ChannelEnum.ADD_FILTER, async (event, arg) => {
   const channel = ChannelEnum.ADD_FILTER;
+  const insertIndex: number = arg[0];
 
   // Cannot exceed the maximum number of filters
   if (state.filters.length === MAX_NUM_FILTERS) {
@@ -350,13 +351,19 @@ ipcMain.on(ChannelEnum.ADD_FILTER, async (event) => {
     return;
   }
 
-  state.filters.push({ ...DEFAULT_FILTER });
+  const frequency = computeAvgFreq(state.filters, insertIndex);
+  state.filters.splice(insertIndex, 0, {
+    frequency,
+    gain: 0,
+    quality: 1,
+    type: FilterTypeEnum.PK,
+  });
   await handleUpdate(event, channel);
 });
 
 ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
   const channel = ChannelEnum.REMOVE_FILTER;
-  const filterIndex = parseInt(arg[0], 10);
+  const filterIndex: number = arg[0];
 
   // Filter index must be within the length of the filters array
   if (filterIndex < 0 || filterIndex >= state.filters.length) {
