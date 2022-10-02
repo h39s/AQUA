@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { MAX_NUM_FILTERS, MIN_NUM_FILTERS } from 'common/constants';
 import FrequencyBand from './components/FrequencyBand';
 import { useAquaContext } from './utils/AquaContext';
@@ -112,31 +112,21 @@ const MainContent = () => {
         <AddSliderDivider
           sliderIndex={-1}
           isMaxSliderCount={filters.length >= MAX_NUM_FILTERS}
-          // eslint-disable-next-line react/no-array-index-key
-          key={`add-slider-${-1}`}
         />
-        {filters
-          .flatMap((filter, sliderIndex) => [
-            { filter, sliderIndex },
-            { id: filter.id, sliderIndex },
-          ])
-          .map(({ filter, id, sliderIndex }) =>
-            filter ? (
-              <FrequencyBand
-                sliderIndex={sliderIndex}
-                filter={filter}
-                isMinSliderCount={filters.length <= MIN_NUM_FILTERS}
-                key={`slider-${filter.id}`}
-                ref={(element) => filterRefs.current.push(element)}
-              />
-            ) : (
-              <AddSliderDivider
-                sliderIndex={sliderIndex}
-                isMaxSliderCount={filters.length >= MAX_NUM_FILTERS}
-                key={`add-slider-${id}`}
-              />
-            )
-          )}
+        {filters.map((filter, sliderIndex) => (
+          <Fragment key={`slider-${filter.id}`}>
+            <FrequencyBand
+              sliderIndex={sliderIndex}
+              filter={filter}
+              isMinSliderCount={filters.length <= MIN_NUM_FILTERS}
+              ref={(element) => filterRefs.current.push(element)}
+            />
+            <AddSliderDivider
+              sliderIndex={sliderIndex}
+              isMaxSliderCount={filters.length >= MAX_NUM_FILTERS}
+            />
+          </Fragment>
+        ))}
       </div>
     </div>
   );

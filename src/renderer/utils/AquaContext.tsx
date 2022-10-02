@@ -69,17 +69,12 @@ const filterReducer: IFilterReducer = (
       return action.filters
         .map((filter) => (filter.id ? filter : { ...filter, id: uid(8) }))
         .sort(sortHelper);
-    case FilterActionEnum.FREQUENCY: {
-      const hasChanges =
-        filters.find((f) => f.id === action.id)?.frequency !== action.newValue;
-      return !hasChanges
-        ? filters
-        : filters
-            .map((f) =>
-              f.id === action.id ? { ...f, frequency: action.newValue } : f
-            )
-            .sort(sortHelper);
-    }
+    case FilterActionEnum.FREQUENCY:
+      return filters
+        .map((f) =>
+          f.id === action.id ? { ...f, frequency: action.newValue } : f
+        )
+        .sort(sortHelper);
     case FilterActionEnum.GAIN:
       return filters.map((f) =>
         f.id === action.id ? { ...f, gain: action.newValue } : f

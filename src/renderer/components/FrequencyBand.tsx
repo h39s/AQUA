@@ -123,6 +123,7 @@ const FrequencyBand = forwardRef(
     };
 
     return (
+      // Need to specify the id here for the sorting to work
       <div ref={ref} id={filter.id} className="col bandWrapper">
         <div
           role="button"
