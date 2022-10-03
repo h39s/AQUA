@@ -2,7 +2,12 @@ import { useMemo } from 'react';
 import Axis from './Axis';
 import Curve, { AnimationOptionsEnum } from './Curve';
 import GridLine from './GridLine';
-import useController, { ChartData, MarginLike } from './ChartController';
+import useController, {
+  ChartCurveData,
+  ChartPointsData,
+  MarginLike,
+} from './ChartController';
+import Points from './Points';
 
 export interface ChartDimensions {
   height: number;
@@ -11,11 +16,12 @@ export interface ChartDimensions {
 }
 
 interface IChartProps {
-  data: ChartData[];
+  data: ChartCurveData[];
   dimensions: ChartDimensions;
+  points: ChartPointsData[];
 }
 
-const Chart = ({ data = [], dimensions }: IChartProps) => {
+const Chart = ({ data = [], dimensions, points = [] }: IChartProps) => {
   const { width, height, margins } = dimensions;
   const svgWidth = useMemo(
     () => width - margins.left - margins.right,
@@ -80,7 +86,7 @@ const Chart = ({ data = [], dimensions }: IChartProps) => {
         color="#F7844F"
         transform={`translate(${padding.left}, 0)`}
       />
-      {data.map((e: ChartData) => (
+      {data.map((e: ChartCurveData) => (
         <Curve
           key={e.name}
           name={e.name}
@@ -89,6 +95,17 @@ const Chart = ({ data = [], dimensions }: IChartProps) => {
           yScale={yScaleGain}
           color={e.color}
           animation={AnimationOptionsEnum.LEFT}
+        />
+      ))}
+      {points.map((e: ChartPointsData) => (
+        <Points
+          key={e.name}
+          name={e.name}
+          data={e.items}
+          xScale={xScaleFreq}
+          yScale={yScaleGain}
+          color={e.color}
+          animation={AnimationOptionsEnum.NONE}
         />
       ))}
       <Axis

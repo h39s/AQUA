@@ -4,8 +4,13 @@ import { useAquaContext } from 'renderer/utils/AquaContext';
 import { setMainPreAmp } from 'renderer/utils/equalizerApi';
 import { clamp } from 'renderer/utils/utils';
 import Chart, { ChartDimensions } from './Chart';
-import { ChartData, ChartDataPoint } from './ChartController';
-import { getFilterPoints, getTotalPoints } from './utils';
+import {
+  ChartCurveData,
+  ChartPointsData,
+  ChartDataPoint,
+  ChartDataPointWithId,
+} from './ChartController';
+import { getFilterPoints, getSpecificPoints, getTotalPoints } from './utils';
 
 const isFilterEqual = (f1: IFilter, f2: IFilter) => {
   return (
@@ -21,25 +26,71 @@ const FrequencyResponseChart = () => {
     useAquaContext();
   const prevFilters = useRef<IFilter[]>([]);
   const prevFilterLines = useRef<ChartDataPoint[][]>([]);
+  const prevFreqPoints = useRef<ChartDataPointWithId[][]>([]);
 
   const {
     chartData,
+    pointData,
     autoPreAmpValue,
-  }: { chartData: ChartData[]; autoPreAmpValue: number } = useMemo(() => {
+  }: {
+    chartData: ChartCurveData[];
+    pointData: ChartPointsData[];
+    autoPreAmpValue: number;
+  } = useMemo(() => {
+    const freqData = filters.map(({ id, frequency }) => {
+      return { frequency, id };
+    });
+
+    const isFreqDiff =
+      prevFilters.current.length === freqData.length &&
+      !prevFilters.current.every(
+        ({ frequency }, i) => frequency === freqData[i].frequency
+      );
+
+    // TODO: add id to frequency lines to track repeats and new lines
+
     // Update filter lines that have changed
-    const updatedFilterLines = filters.map((f, index) =>
-      index < prevFilters.current.length &&
-      isFilterEqual(f, prevFilters.current[index])
-        ? prevFilterLines.current[index]
-        : getFilterPoints(f)
-    );
+    const { data: updatedFilterLines, points: updatedFreqPoints } = filters
+      .map((f, index) => {
+        // New filters have no previous data
+        if (index >= prevFilterLines.current.length) {
+          return getFilterPoints(f, freqData);
+        }
+
+        // Filter changes can impact both the curve and the points so update both
+        const hasFilterChanges = !isFilterEqual(f, prevFilters.current[index]);
+        if (hasFilterChanges) {
+          return getFilterPoints(f, freqData);
+        }
+
+        return {
+          data: prevFilterLines.current[index],
+          // Update points if other filter frequencies changed
+          points: isFreqDiff
+            ? getSpecificPoints(f, freqData)
+            : prevFreqPoints.current[index],
+        };
+      })
+      .reduce<{ data: ChartDataPoint[][]; points: ChartDataPointWithId[][] }>(
+        (acc, curr) => {
+          acc.data.push(curr.data);
+          acc.points.push(curr.points);
+          return acc;
+        },
+        { data: [], points: [] }
+      );
 
     // Update past state
+    prevFreqPoints.current = updatedFreqPoints;
     prevFilterLines.current = updatedFilterLines;
     prevFilters.current = filters;
 
     // Compute and return new chart data
-    const data = getTotalPoints(preAmp, updatedFilterLines);
+    const { data, points } = getTotalPoints(
+      preAmp,
+      updatedFilterLines,
+      updatedFreqPoints
+    );
 
     const highestPoint = data.reduce((previousValue, currentValue) => {
       if (previousValue) {
@@ -54,6 +105,13 @@ const FrequencyResponseChart = () => {
           name: 'Response',
           color: '#ffffff',
           items: data,
+        },
+      ],
+      pointData: [
+        {
+          name: 'Points',
+          color: '#4fc3f7',
+          items: points,
         },
       ],
       // Rounding to two decimals
@@ -83,7 +141,7 @@ const FrequencyResponseChart = () => {
     <>
       {isGraphViewOn && (
         <div className="graph-wrapper">
-          <Chart data={chartData} dimensions={dimensions} />
+          <Chart data={chartData} dimensions={dimensions} points={pointData} />
         </div>
       )}
     </>

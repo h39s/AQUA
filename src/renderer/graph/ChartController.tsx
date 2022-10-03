@@ -9,6 +9,10 @@ export interface ChartDataPoint {
   y: number;
 }
 
+export interface ChartDataPointWithId extends ChartDataPoint {
+  id: string;
+}
+
 export interface MarginLike {
   left: number;
   top: number;
@@ -16,14 +20,20 @@ export interface MarginLike {
   bottom: number;
 }
 
-export interface ChartData {
+export interface ChartCurveData {
   name: string;
   color: string; // #ffffff, white, rgba(255, 255, 255, 0.5)
   items: ChartDataPoint[];
 }
 
+export interface ChartPointsData {
+  name: string;
+  color: string; // #ffffff, white, rgba(255, 255, 255, 0.5)
+  items: ChartDataPointWithId[];
+}
+
 interface IChartControllerProps {
-  data: ChartData[];
+  data: ChartCurveData[];
   width: number;
   height: number;
   padding: MarginLike;
