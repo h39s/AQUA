@@ -9,9 +9,9 @@ import {
 } from 'react';
 import { uid } from 'uid';
 import {
-  DEFAULT_FILTER,
-  DEFAULT_STATE,
   FilterTypeEnum,
+  getDefaultFilter,
+  getDefaultState,
   IFilter,
   IState,
 } from '../../common/constants';
@@ -66,6 +66,8 @@ const filterReducer: IFilterReducer = (
 ) => {
   switch (action.type) {
     case FilterActionEnum.INIT:
+      // Keeping the check for the id for backwards compatibility
+      // TODO: Remove the id check once this is no longer a concern
       return action.filters
         .map((filter) => (filter.id ? filter : { ...filter, id: uid(8) }))
         .sort(sortHelper);
@@ -91,7 +93,7 @@ const filterReducer: IFilterReducer = (
       return [
         ...filters,
         {
-          ...DEFAULT_FILTER,
+          ...getDefaultFilter(),
           id: action.id,
           frequency: computeAvgFreq(filters, action.index),
         },
@@ -125,6 +127,9 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
   const [globalError, setGlobalError] = useState<
     ErrorDescription | undefined
   >();
+
+  const DEFAULT_STATE = getDefaultState();
+
   const [isEnabled, setIsEnabled] = useState<boolean>(DEFAULT_STATE.isEnabled);
   const [isAutoPreAmpOn, setAutoPreAmpOn] = useState<boolean>(
     DEFAULT_STATE.isAutoPreAmpOn

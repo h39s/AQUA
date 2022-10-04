@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { DEFAULT_STATE, IState } from '../common/constants';
+import { getDefaultState, IState } from '../common/constants';
 
 export const stateToString = (state: IState) => {
   if (!state.isEnabled) {
@@ -49,7 +49,7 @@ export const fetchSettings = () => {
     return JSON.parse(content) as IState;
   } catch (ex) {
     // if unable to fetch the state, use a default one
-    return DEFAULT_STATE;
+    return getDefaultState();
   }
 };
 

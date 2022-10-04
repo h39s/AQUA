@@ -1,4 +1,4 @@
-import { DEFAULT_STATE } from 'common/constants';
+import { getDefaultState } from 'common/constants';
 import { computeAvgFreq, roundToPrecision } from 'common/utils';
 
 describe('utils', () => {
@@ -16,7 +16,7 @@ describe('utils', () => {
   });
 
   describe('computeAvgFreq', () => {
-    const filters = [...DEFAULT_STATE.filters];
+    const filters = [...getDefaultState().filters];
     it('should compute average of first filter and min frequency for index 0', () => {
       expect(computeAvgFreq(filters, 0)).toBe(6);
     });

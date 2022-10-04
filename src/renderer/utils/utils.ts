@@ -10,6 +10,8 @@ export const clamp = (num: number, min: number, max: number) => {
   return Math.min(Math.max(num, min), max);
 };
 
+export const sortHelper = (a: IFilter, b: IFilter) => a.frequency - b.frequency;
+
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from#sequence_generator_range
 export const range = (start: number, stop: number, step: number) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
@@ -108,5 +110,3 @@ export const usePrevious = <T>(value: T): [T | undefined, () => void] => {
 
   return [prevChildrenRef.current, clearValue];
 };
-
-export const sortHelper = (a: IFilter, b: IFilter) => a.frequency - b.frequency;

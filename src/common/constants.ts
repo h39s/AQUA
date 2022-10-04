@@ -1,5 +1,7 @@
 /** ----- Application Constants ----- */
 
+import { uid } from 'uid';
+
 export const MAX_GAIN = 30;
 export const MIN_GAIN = -30;
 
@@ -53,11 +55,14 @@ export interface IFilter {
   quality: number;
 }
 
-export interface IState {
+export interface IBasicState {
   isEnabled: boolean;
   isAutoPreAmpOn: boolean;
   isGraphViewOn: boolean;
   preAmp: number;
+}
+
+export interface IState extends IBasicState {
   filters: IFilter[];
 }
 
@@ -67,28 +72,31 @@ const FIXED_FREQUENCIES = [
   32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000,
 ];
 
-export const DEFAULT_FILTER: IFilter = {
-  id: '0',
+const DEFAULT_FILTER_TEMPLATE = {
   frequency: 1000,
   gain: 0,
   quality: 1,
   type: FilterTypeEnum.PK,
 };
 
-const DEFAULT_FILTERS: IFilter[] = FIXED_FREQUENCIES.map((f, index) => {
+export const getDefaultFilter = () => {
   return {
-    id: index.toString(),
-    frequency: f,
-    gain: 0,
-    quality: 1,
-    type: FilterTypeEnum.PK,
+    id: uid(8),
+    ...DEFAULT_FILTER_TEMPLATE,
   };
-});
+};
 
-export const DEFAULT_STATE: IState = {
-  isEnabled: true,
-  isAutoPreAmpOn: true,
-  isGraphViewOn: false,
-  preAmp: 0,
-  filters: DEFAULT_FILTERS,
+const getDefaultFilters = (): IFilter[] =>
+  FIXED_FREQUENCIES.map((f) => {
+    return { ...getDefaultFilter(), frequency: f };
+  });
+
+export const getDefaultState = (): IState => {
+  return {
+    isEnabled: true,
+    isAutoPreAmpOn: true,
+    isGraphViewOn: false,
+    preAmp: 0,
+    filters: getDefaultFilters(),
+  };
 };
