@@ -52,7 +52,7 @@ const SortWrapper = ({
   wrapperRef,
 }: {
   children: CustomElement[];
-  wrapperRef: HTMLDivElement | null;
+  wrapperRef: RefObject<HTMLDivElement | null>;
 }): JSX.Element => {
   const [boundingBox, setBoundingBox] = useState<IBoundingBoxMap>({});
   const [prevBoundingBox, setPrevBoundingBox] = useState<IBoundingBoxMap>({});
@@ -62,7 +62,7 @@ const SortWrapper = ({
     [children]
   );
 
-  const [prevRefs, clearPrevChildren] = usePrevious(refs);
+  const prevRefs = usePrevious(refs);
 
   useEffect(() => {
     let handler: NodeJS.Timeout;
@@ -71,19 +71,17 @@ const SortWrapper = ({
         clearTimeout(handler);
       }
       handler = setTimeout(() => {
-        console.log('update bb');
         // Update bounding boxes when a scroll event ends
         const newBoundingBox = calculateBoundingBoxes(refs);
         if (Object.keys(newBoundingBox).length) {
           setBoundingBox(newBoundingBox);
         }
-        // Clear the previous bounding box value to prevent animation due to the scroll
-        setPrevBoundingBox({});
+        // Reset the previous bounding box value to prevent animation due to the scroll
+        setPrevBoundingBox(newBoundingBox);
       }, 200); // default 200 ms
     };
 
-    const element = wrapperRef;
-    console.log(wrapperRef);
+    const element = wrapperRef.current;
     element?.addEventListener('scroll', onScroll);
     return () => {
       element?.removeEventListener('scroll', onScroll);
@@ -124,7 +122,7 @@ const SortWrapper = ({
                 // After the previous frame, remove
                 // the transistion to play the animation
                 domNode.style.transform = '';
-                domNode.style.transition = 'transform 5s';
+                domNode.style.transition = 'transform 500ms';
               });
             });
           }

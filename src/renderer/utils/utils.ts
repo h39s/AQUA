@@ -97,16 +97,12 @@ export const useFocusOutside = <T extends HTMLElement = HTMLElement>(
 };
 
 // https://reactjs.org/docs/hooks-faq.html#how-to-get-the-previous-props-or-state
-export const usePrevious = <T>(value: T): [T | undefined, () => void] => {
+export const usePrevious = <T>(value: T): T | undefined => {
   const prevChildrenRef = useRef<T | undefined>();
 
   useEffect(() => {
     prevChildrenRef.current = value;
   }, [value]);
 
-  const clearValue = () => {
-    prevChildrenRef.current = undefined;
-  };
-
-  return [prevChildrenRef.current, clearValue];
+  return prevChildrenRef.current;
 };

@@ -1,17 +1,9 @@
-import {
-  createRef,
-  Fragment,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import { createRef, Fragment } from 'react';
 import { MAX_NUM_FILTERS, MIN_NUM_FILTERS } from 'common/constants';
 import FrequencyBand from './components/FrequencyBand';
 import { useAquaContext } from './utils/AquaContext';
 import './styles/MainContent.scss';
 import AddSliderDivider from './components/AddSliderDivider';
-import { usePrevious } from './utils/utils';
 import SortWrapper from './SortWrapper';
 
 interface IBoundingBoxMap {
@@ -34,28 +26,7 @@ export const calculateBoundingBoxes = (children: (HTMLDivElement | null)[]) => {
 
 const MainContent = () => {
   const { filters } = useAquaContext();
-  const wrapperRef = useRef<HTMLDivElement>(null);
-
-  // useEffect(() => {
-  //   let handler: NodeJS.Timeout;
-  //   const onScroll = () => {
-  //     if (handler) {
-  //       clearTimeout(handler);
-  //     }
-  //     handler = setTimeout(() => {
-  //       // Update bounding boxes when a scroll event ends
-  //       updateBoundingBox();
-  //       // Clear the previous bounding box value to prevent animation due to the scroll
-  //       clearPrevBoundingBox();
-  //     }, 200); // default 200 ms
-  //   };
-
-  //   const element = wrapperRef.current;
-  //   element?.addEventListener('scroll', onScroll);
-  //   return () => {
-  //     element?.removeEventListener('scroll', onScroll);
-  //   };
-  // }, [wrapperRef, clearPrevBoundingBox]);
+  const wrapperRef = createRef<HTMLDivElement>();
 
   return (
     <div className="center mainContent">
@@ -75,7 +46,7 @@ const MainContent = () => {
           sliderIndex={-1}
           isMaxSliderCount={filters.length >= MAX_NUM_FILTERS}
         />
-        <SortWrapper wrapperRef={wrapperRef.current}>
+        <SortWrapper wrapperRef={wrapperRef}>
           {filters.map((filter, sliderIndex) => (
             <Fragment key={`slider-${filter.id}`}>
               <FrequencyBand
