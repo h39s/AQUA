@@ -5,6 +5,7 @@ import {
   RefObject,
   ReactElement,
   useMemo,
+  useRef,
 } from 'react';
 import { usePrevious } from './utils/utils';
 
@@ -12,11 +13,17 @@ interface IBoundingBoxMap {
   [key: string]: DOMRect;
 }
 
+interface IChildPositions {
+  bounds: IBoundingBoxMap;
+  scrollLeft: number;
+}
+
 type CustomElement = ReactElement & { ref?: RefObject<HTMLDivElement | null> };
 
 // codesandbox.io/s/reorder-elements-with-slide-transition-and-react-hooks-flip-forked-wjojyy?file=/src/helpers/calculateBoundingBoxes.js:28-370
-export const calculateBoundingBoxes = (
-  refs: RefObject<HTMLDivElement | null>[]
+export const calculateChildPositions = (
+  refs: RefObject<HTMLDivElement | null>[],
+  wrapperRef: RefObject<HTMLDivElement>
 ) => {
   const boundingBoxes: IBoundingBoxMap = {};
 
@@ -27,8 +34,12 @@ export const calculateBoundingBoxes = (
       boundingBoxes[domNode.id] = nodeBoundingBox;
     }
   });
+  const positions: IChildPositions = {
+    bounds: { ...boundingBoxes },
+    scrollLeft: wrapperRef.current ? wrapperRef.current.scrollLeft : 0,
+  };
 
-  return boundingBoxes;
+  return positions;
 };
 
 const getRefs = (element?: CustomElement) => {
@@ -52,65 +63,51 @@ const SortWrapper = ({
   wrapperRef,
 }: {
   children: CustomElement[];
-  wrapperRef: RefObject<HTMLDivElement | null>;
+  wrapperRef: RefObject<HTMLDivElement>;
 }): JSX.Element => {
-  const [boundingBox, setBoundingBox] = useState<IBoundingBoxMap>({});
-  const [prevBoundingBox, setPrevBoundingBox] = useState<IBoundingBoxMap>({});
+  const [childPositions, setChildPositions] = useState<IChildPositions>({
+    bounds: {},
+    scrollLeft: 0,
+  });
+  const [prevChildPositions, setPrevChildPositions] = useState<IChildPositions>(
+    { bounds: {}, scrollLeft: 0 }
+  );
 
   const refs = useMemo(
     () => children.flatMap((child) => getRefs(child)).filter((c) => c),
     [children]
   );
 
-  const prevRefs = usePrevious(refs);
+  const prevChildrenRef = useRef<any[]>();
 
   useEffect(() => {
-    let handler: NodeJS.Timeout;
-    const onScroll = () => {
-      if (handler) {
-        clearTimeout(handler);
-      }
-      handler = setTimeout(() => {
-        // Update bounding boxes when a scroll event ends
-        const newBoundingBox = calculateBoundingBoxes(refs);
-        if (Object.keys(newBoundingBox).length) {
-          setBoundingBox(newBoundingBox);
-        }
-        // Reset the previous bounding box value to prevent animation due to the scroll
-        setPrevBoundingBox(newBoundingBox);
-      }, 200); // default 200 ms
-    };
+    const newPositions = calculateChildPositions(refs, wrapperRef);
+    if (Object.keys(newPositions.bounds).length) {
+      setChildPositions(newPositions);
+    }
 
-    const element = wrapperRef.current;
-    element?.addEventListener('scroll', onScroll);
-    return () => {
-      element?.removeEventListener('scroll', onScroll);
-    };
+    const prev = calculateChildPositions(
+      prevChildrenRef.current || [],
+      wrapperRef
+    );
+    setPrevChildPositions(prev);
   }, [refs, wrapperRef]);
 
-  useLayoutEffect(() => {
-    const newBoundingBox = calculateBoundingBoxes(refs);
-    if (Object.keys(newBoundingBox).length) {
-      setBoundingBox(newBoundingBox);
-    }
-  }, [refs]);
-
-  useLayoutEffect(() => {
-    const prev = calculateBoundingBoxes(prevRefs || []);
-    setPrevBoundingBox(prev);
-  }, [prevRefs]);
-
   useEffect(() => {
-    const hasPrevBoundingBox = Object.keys(prevBoundingBox).length;
+    const hasPrevBoundingBox = Object.keys(prevChildPositions.bounds).length;
 
     if (hasPrevBoundingBox) {
+      const scrollLeftDiff =
+        childPositions.scrollLeft - prevChildPositions.scrollLeft;
       refs.forEach((ref) => {
         if (ref?.current) {
           const domNode = ref.current;
-          const firstBox = prevBoundingBox[domNode.id];
-          const lastBox = boundingBox[domNode.id];
+          const firstBox = prevChildPositions.bounds[domNode.id];
+          const lastBox = childPositions.bounds[domNode.id];
           // firstBox will be undefined for new filters
-          const changeInX = firstBox ? firstBox.left - lastBox.left : 0;
+          const changeInX = firstBox
+            ? firstBox.left - (lastBox.left + scrollLeftDiff)
+            : 0;
 
           if (changeInX) {
             requestAnimationFrame(() => {
@@ -118,18 +115,26 @@ const SortWrapper = ({
               domNode.style.transform = `translateX(${changeInX}px)`;
               domNode.style.transition = 'transform 0s';
 
-              requestAnimationFrame(() => {
-                // After the previous frame, remove
-                // the transistion to play the animation
-                domNode.style.transform = '';
-                domNode.style.transition = 'transform 500ms';
-              });
+              setTimeout(
+                () =>
+                  requestAnimationFrame(() => {
+                    // After the previous frame, remove
+                    // the transistion to play the animation
+                    domNode.style.transform = '';
+                    domNode.style.transition = 'transform 5s';
+                  }),
+                2000
+              );
             });
           }
         }
       });
     }
-  }, [boundingBox, prevBoundingBox, refs]);
+  }, [childPositions, prevChildPositions, refs]);
+
+  useEffect(() => {
+    prevChildrenRef.current = refs;
+  }, [refs]);
 
   return <>{children}</>;
 };
