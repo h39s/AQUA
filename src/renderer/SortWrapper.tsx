@@ -1,29 +1,22 @@
 import {
   useState,
-  useLayoutEffect,
   useEffect,
   RefObject,
   ReactElement,
   useMemo,
   useRef,
+  useLayoutEffect,
 } from 'react';
-import { usePrevious } from './utils/utils';
 
 interface IBoundingBoxMap {
   [key: string]: DOMRect;
 }
 
-interface IChildPositions {
-  bounds: IBoundingBoxMap;
-  scrollLeft: number;
-}
-
 type CustomElement = ReactElement & { ref?: RefObject<HTMLDivElement | null> };
 
 // codesandbox.io/s/reorder-elements-with-slide-transition-and-react-hooks-flip-forked-wjojyy?file=/src/helpers/calculateBoundingBoxes.js:28-370
-export const calculateChildPositions = (
-  refs: RefObject<HTMLDivElement | null>[],
-  wrapperRef: RefObject<HTMLDivElement>
+export const calculateBoundingBoxes = (
+  refs: RefObject<HTMLDivElement | null>[]
 ) => {
   const boundingBoxes: IBoundingBoxMap = {};
 
@@ -34,17 +27,15 @@ export const calculateChildPositions = (
       boundingBoxes[domNode.id] = nodeBoundingBox;
     }
   });
-  const positions: IChildPositions = {
-    bounds: { ...boundingBoxes },
-    scrollLeft: wrapperRef.current ? wrapperRef.current.scrollLeft : 0,
-  };
 
-  return positions;
+  return boundingBoxes;
 };
 
-const getRefs = (element?: CustomElement) => {
+const getRefs = (
+  element?: CustomElement
+): RefObject<HTMLDivElement | null>[] | RefObject<HTMLDivElement | null> => {
   if (!element) {
-    return undefined;
+    return [];
   }
 
   if (element.ref) {
@@ -55,7 +46,29 @@ const getRefs = (element?: CustomElement) => {
     return element.props.children.flatMap((c: CustomElement) => getRefs(c));
   }
 
-  return undefined;
+  return [];
+};
+
+const isBoundingBoxDifferent = (
+  boundMap1: IBoundingBoxMap,
+  boundMap2: IBoundingBoxMap
+) => {
+  const keys1 = Object.keys(boundMap1);
+  const keys2 = Object.keys(boundMap2);
+
+  if (keys1.length !== keys2.length) {
+    return true;
+  }
+
+  for (let i = 0; i < keys1.length; i += 1) {
+    if (
+      keys1[i] !== keys2[i] ||
+      boundMap1[keys1[i]].left !== boundMap2[keys1[i]].left
+    ) {
+      return true;
+    }
+  }
+  return false;
 };
 
 const SortWrapper = ({
@@ -65,45 +78,43 @@ const SortWrapper = ({
   children: CustomElement[];
   wrapperRef: RefObject<HTMLDivElement>;
 }): JSX.Element => {
-  const [childPositions, setChildPositions] = useState<IChildPositions>({
-    bounds: {},
-    scrollLeft: 0,
-  });
-  const [prevChildPositions, setPrevChildPositions] = useState<IChildPositions>(
-    { bounds: {}, scrollLeft: 0 }
-  );
+  const [boundingBoxes, setBoundingBoxes] = useState<IBoundingBoxMap>({});
+  const prevBoundingBoxesRef = useRef<IBoundingBoxMap>({});
 
-  const refs = useMemo(
-    () => children.flatMap((child) => getRefs(child)).filter((c) => c),
+  const [scrollLeft, setScrollLeft] = useState<number>(0);
+  const prevScrollRef = useRef<number>(0);
+
+  const refs: RefObject<HTMLDivElement | null>[] = useMemo(
+    () => children.flatMap((child) => getRefs(child)),
     [children]
   );
 
-  const prevChildrenRef = useRef<any[]>();
-
-  useEffect(() => {
-    const newPositions = calculateChildPositions(refs, wrapperRef);
-    if (Object.keys(newPositions.bounds).length) {
-      setChildPositions(newPositions);
+  useLayoutEffect(() => {
+    // Update current children position information on first rerender thus triggering a second rerender
+    // Note that this information will not be updated in other useEffects until a second rerender
+    const newPositions = calculateBoundingBoxes(refs);
+    if (Object.keys(newPositions).length) {
+      setBoundingBoxes(newPositions);
     }
-
-    const prev = calculateChildPositions(
-      prevChildrenRef.current || [],
-      wrapperRef
-    );
-    setPrevChildPositions(prev);
   }, [refs, wrapperRef]);
 
   useEffect(() => {
-    const hasPrevBoundingBox = Object.keys(prevChildPositions.bounds).length;
+    // Compute and update the scrollLeft value of the wrapperRef
+    // Can only do this in a useEffect and not a useLayoutEffect because the wrapper element needs to have rendered first
+    const currentScroll = wrapperRef.current?.scrollLeft || 0;
+    setScrollLeft(currentScroll);
 
-    if (hasPrevBoundingBox) {
-      const scrollLeftDiff =
-        childPositions.scrollLeft - prevChildPositions.scrollLeft;
+    const prevBoundingBoxes = prevBoundingBoxesRef?.current || {};
+
+    // Don't animate if the bounding box values haven't changed
+    // First rerender will trigger this useEffect because refs changed, but this check will return false
+    if (isBoundingBoxDifferent(prevBoundingBoxes, boundingBoxes)) {
+      const scrollLeftDiff = currentScroll - prevScrollRef.current;
       refs.forEach((ref) => {
         if (ref?.current) {
           const domNode = ref.current;
-          const firstBox = prevChildPositions.bounds[domNode.id];
-          const lastBox = childPositions.bounds[domNode.id];
+          const firstBox = prevBoundingBoxes[domNode.id];
+          const lastBox = boundingBoxes[domNode.id];
           // firstBox will be undefined for new filters
           const changeInX = firstBox
             ? firstBox.left - (lastBox.left + scrollLeftDiff)
@@ -115,26 +126,28 @@ const SortWrapper = ({
               domNode.style.transform = `translateX(${changeInX}px)`;
               domNode.style.transition = 'transform 0s';
 
-              setTimeout(
-                () =>
-                  requestAnimationFrame(() => {
-                    // After the previous frame, remove
-                    // the transistion to play the animation
-                    domNode.style.transform = '';
-                    domNode.style.transition = 'transform 5s';
-                  }),
-                2000
-              );
+              requestAnimationFrame(() => {
+                // After the previous frame, remove
+                // the transistion to play the animation
+                domNode.style.transform = '';
+                domNode.style.transition = 'transform 500ms';
+              });
             });
           }
         }
       });
     }
-  }, [childPositions, prevChildPositions, refs]);
+  }, [boundingBoxes, refs, wrapperRef]);
 
   useEffect(() => {
-    prevChildrenRef.current = refs;
-  }, [refs]);
+    // Update previous children position information on second rerender
+    prevBoundingBoxesRef.current = boundingBoxes;
+  }, [boundingBoxes]);
+
+  useEffect(() => {
+    // Update previous scroll position information on second rerender
+    prevScrollRef.current = scrollLeft;
+  }, [scrollLeft]);
 
   return <>{children}</>;
 };
