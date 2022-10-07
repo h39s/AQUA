@@ -5,6 +5,8 @@
   cursor: pointer;
   gap: $spacing-m;
   padding: 0 $spacing-s;
+  position: absolute;
+  transition: left 0.5s;
 
   .divider {
     width: 2px;

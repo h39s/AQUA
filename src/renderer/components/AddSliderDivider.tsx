@@ -8,11 +8,13 @@ import '../styles/AddSliderDivider.scss';
 interface IAddSliderDividerProps {
   sliderIndex: number;
   isMaxSliderCount: boolean;
+  style: any;
 }
 
 const AddSliderDivider = ({
   sliderIndex,
   isMaxSliderCount,
+  style,
 }: IAddSliderDividerProps) => {
   const { dispatchFilter, setGlobalError } = useAquaContext();
   const ref = useRef<HTMLDivElement>(null);
@@ -61,6 +63,7 @@ const AddSliderDivider = ({
       onKeyUp={(e) => handleKeyUp(e, sliderIndex + 1)}
       tabIndex={0}
       aria-disabled={isAddDisabled}
+      style={style}
     >
       <div className="divider" />
       <PlusIcon />

@@ -3,6 +3,13 @@
 @import 'spacing';
 
 .bandWrapper {
+  position: absolute;
+  transition: left 0.5s;
+
+  element {
+    position: relative;
+  }
+
   &:hover {
     .removeFilter {
       opacity: 1;

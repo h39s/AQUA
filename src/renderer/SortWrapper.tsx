@@ -80,22 +80,24 @@ const SortWrapper = ({
 
   const prevChildrenRef = useRef<any[]>();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    console.log('refchange');
+    console.log(refs);
     const newPositions = calculateChildPositions(refs, wrapperRef);
     if (Object.keys(newPositions.bounds).length) {
       setChildPositions(newPositions);
+      const prev = calculateChildPositions(
+        prevChildrenRef.current || [],
+        wrapperRef
+      );
+      setPrevChildPositions(prev);
     }
-
-    const prev = calculateChildPositions(
-      prevChildrenRef.current || [],
-      wrapperRef
-    );
-    setPrevChildPositions(prev);
   }, [refs, wrapperRef]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const hasPrevBoundingBox = Object.keys(prevChildPositions.bounds).length;
-
+    console.log('animate');
+    console.log(hasPrevBoundingBox);
     if (hasPrevBoundingBox) {
       const scrollLeftDiff =
         childPositions.scrollLeft - prevChildPositions.scrollLeft;
@@ -132,7 +134,7 @@ const SortWrapper = ({
     }
   }, [childPositions, prevChildPositions, refs]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     prevChildrenRef.current = refs;
   }, [refs]);
 
