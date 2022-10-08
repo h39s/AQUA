@@ -82,7 +82,10 @@ const SortWrapper = ({
   const prevBoundingBoxesRef = useRef<IBoundingBoxMap>({});
 
   const [scrollLeft, setScrollLeft] = useState<number>(0);
-  const prevScrollRef = useRef<number>(0);
+  const prevScrollLeftRef = useRef<number>(0);
+
+  const [scrollWidth, setScrollWidth] = useState<number>(0);
+  const prevScrollWidthRef = useRef<number>(0);
 
   const refs: RefObject<HTMLDivElement | null>[] = useMemo(
     () => children.flatMap((child) => getRefs(child)),
@@ -103,22 +106,37 @@ const SortWrapper = ({
     // Can only do this in a useEffect and not a useLayoutEffect because the wrapper element needs to have rendered first
     const currentScroll = wrapperRef.current?.scrollLeft || 0;
     setScrollLeft(currentScroll);
+    setScrollWidth(wrapperRef.current?.scrollWidth || 650);
 
     const prevBoundingBoxes = prevBoundingBoxesRef?.current || {};
+
+    const sliderDeleted =
+      Object.keys(boundingBoxes).length -
+        Object.keys(prevBoundingBoxes).length <
+      0;
+
+    const rightSideOverflow = wrapperRef.current
+      ? prevScrollWidthRef.current -
+        (wrapperRef.current.scrollLeft + wrapperRef.current.clientWidth)
+      : 0;
 
     // Don't animate if the bounding box values haven't changed
     // First rerender will trigger this useEffect because refs changed, but this check will return false
     if (isBoundingBoxDifferent(prevBoundingBoxes, boundingBoxes)) {
-      const scrollLeftDiff = currentScroll - prevScrollRef.current;
+      const scrollLeftDiff = currentScroll - prevScrollLeftRef.current;
       refs.forEach((ref) => {
         if (ref?.current) {
           const domNode = ref.current;
           const firstBox = prevBoundingBoxes[domNode.id];
           const lastBox = boundingBoxes[domNode.id];
           // firstBox will be undefined for new filters
-          const changeInX = firstBox
+          let changeInX = firstBox
             ? firstBox.left - (lastBox.left + scrollLeftDiff)
             : 0;
+
+          if (sliderDeleted && rightSideOverflow < 120) {
+            changeInX = changeInX === 0 ? -100 : 0;
+          }
 
           if (changeInX) {
             requestAnimationFrame(() => {
@@ -145,9 +163,14 @@ const SortWrapper = ({
   }, [boundingBoxes]);
 
   useEffect(() => {
-    // Update previous scroll position information on second rerender
-    prevScrollRef.current = scrollLeft;
+    // Update previous scrollLeft information on second rerender
+    prevScrollLeftRef.current = scrollLeft;
   }, [scrollLeft]);
+
+  useEffect(() => {
+    // Update previous scroll width information on second rerender
+    prevScrollWidthRef.current = scrollWidth;
+  }, [scrollWidth]);
 
   return <>{children}</>;
 };
