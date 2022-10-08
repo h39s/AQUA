@@ -32,27 +32,23 @@ const MainContent = () => {
           style={{ left: 0 }}
         />
         {filters.map((filter, sliderIndex) => (
-          <Fragment key={`slider-${filter.id}`}>
-            <FrequencyBand
-              sliderIndex={sliderIndex}
-              filter={filter}
-              isMinSliderCount={filters.length <= MIN_NUM_FILTERS}
-              ref={createRef()}
-              style={{
-                left:
-                  (FREQUENCY_BAND_WIDTH + ADD_FILTER_WIDTH) * sliderIndex +
-                  ADD_FILTER_WIDTH,
-              }}
-            />
-            <AddSliderDivider
-              sliderIndex={sliderIndex}
-              isMaxSliderCount={filters.length >= MAX_NUM_FILTERS}
-              style={{
-                left:
-                  (FREQUENCY_BAND_WIDTH + ADD_FILTER_WIDTH) * (sliderIndex + 1),
-              }}
-            />
-          </Fragment>
+          <FrequencyBand
+            key={`slider-${filter.id}`}
+            sliderIndex={sliderIndex}
+            filter={filter}
+            isMinSliderCount={filters.length <= MIN_NUM_FILTERS}
+          />
+        ))}
+        {filters.map((filter, sliderIndex) => (
+          <AddSliderDivider
+            key={`add-slider-${filter.id}`}
+            sliderIndex={sliderIndex}
+            isMaxSliderCount={filters.length >= MAX_NUM_FILTERS}
+            style={{
+              left:
+                (FREQUENCY_BAND_WIDTH + ADD_FILTER_WIDTH) * (sliderIndex + 1),
+            }}
+          />
         ))}
       </div>
     </div>
