@@ -81,16 +81,35 @@ const SortWrapper = ({
   const [boundingBoxes, setBoundingBoxes] = useState<IBoundingBoxMap>({});
   const prevBoundingBoxesRef = useRef<IBoundingBoxMap>({});
 
+  // Latest scrollLeft snapshot. Snapshots are taken everytime children changes.
   const [scrollLeft, setScrollLeft] = useState<number>(0);
+  // The current scrollLeft value. This is NOT a snapshot. This updates everytime the user scrolls.
+  const interScrollLeft = useRef<number>(0);
+  // The previous scrollLeft snapshot.
   const prevScrollLeftRef = useRef<number>(0);
-
-  const [scrollWidth, setScrollWidth] = useState<number>(0);
-  const prevScrollWidthRef = useRef<number>(0);
 
   const refs: RefObject<HTMLDivElement | null>[] = useMemo(
     () => children.flatMap((child) => getRefs(child)),
     [children]
   );
+
+  useEffect(() => {
+    let handler: NodeJS.Timeout;
+    const onScroll = () => {
+      if (handler) {
+        clearTimeout(handler);
+      }
+      handler = setTimeout(() => {
+        interScrollLeft.current = wrapperRef.current?.scrollLeft || 0;
+      }, 100);
+    };
+
+    const element = wrapperRef.current;
+    element?.addEventListener('scroll', onScroll);
+    return () => {
+      element?.removeEventListener('scroll', onScroll);
+    };
+  }, [wrapperRef]);
 
   useLayoutEffect(() => {
     // Update current children position information on first rerender thus triggering a second rerender
@@ -102,41 +121,31 @@ const SortWrapper = ({
   }, [refs, wrapperRef]);
 
   useEffect(() => {
-    // Compute and update the scrollLeft value of the wrapperRef
+    // Take a snapshot of the scrollLeft value of the wrapperRef
     // Can only do this in a useEffect and not a useLayoutEffect because the wrapper element needs to have rendered first
-    const currentScroll = wrapperRef.current?.scrollLeft || 0;
-    setScrollLeft(currentScroll);
-    setScrollWidth(wrapperRef.current?.scrollWidth || 650);
+    setScrollLeft(wrapperRef.current?.scrollLeft || 0);
 
     const prevBoundingBoxes = prevBoundingBoxesRef?.current || {};
-
-    const sliderDeleted =
-      Object.keys(boundingBoxes).length -
-        Object.keys(prevBoundingBoxes).length <
-      0;
-
-    const rightSideOverflow = wrapperRef.current
-      ? prevScrollWidthRef.current -
-        (wrapperRef.current.scrollLeft + wrapperRef.current.clientWidth)
-      : 0;
 
     // Don't animate if the bounding box values haven't changed
     // First rerender will trigger this useEffect because refs changed, but this check will return false
     if (isBoundingBoxDifferent(prevBoundingBoxes, boundingBoxes)) {
-      const scrollLeftDiff = currentScroll - prevScrollLeftRef.current;
+      // Most of the time, wrapperRef.scrollLeft is equal to interScrollLeft, but in the special case
+      // where the user scrolls all the way to the right and deletes a slider, wrapperRef.scrollLeft
+      // will have been reduced because wrapperRef.scrollWidth was reduced.
+      // Since we have no way of knowing if wrapperRef.scrollLeft was reduced from a
+      // reduced scrollWidth without tracking interScrollLeft, we will use interScrollLeft.
+      const scrollLeftDiff =
+        interScrollLeft.current - prevScrollLeftRef.current;
       refs.forEach((ref) => {
         if (ref?.current) {
           const domNode = ref.current;
           const firstBox = prevBoundingBoxes[domNode.id];
           const lastBox = boundingBoxes[domNode.id];
           // firstBox will be undefined for new filters
-          let changeInX = firstBox
+          const changeInX = firstBox
             ? firstBox.left - (lastBox.left + scrollLeftDiff)
             : 0;
-
-          if (sliderDeleted && rightSideOverflow < 120) {
-            changeInX = changeInX === 0 ? -100 : 0;
-          }
 
           if (changeInX) {
             requestAnimationFrame(() => {
@@ -166,11 +175,6 @@ const SortWrapper = ({
     // Update previous scrollLeft information on second rerender
     prevScrollLeftRef.current = scrollLeft;
   }, [scrollLeft]);
-
-  useEffect(() => {
-    // Update previous scroll width information on second rerender
-    prevScrollWidthRef.current = scrollWidth;
-  }, [scrollWidth]);
 
   return <>{children}</>;
 };

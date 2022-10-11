@@ -91,13 +91,13 @@ const filterReducer: IFilterReducer = (
       );
     case FilterActionEnum.ADD:
       return [
-        ...filters.slice(0, action.index + 1),
+        ...filters.slice(0, action.index),
         {
           ...getDefaultFilter(),
           id: action.id,
           frequency: computeAvgFreq(filters, action.index),
         },
-        ...filters.slice(action.index + 1),
+        ...filters.slice(action.index),
       ].sort(sortHelper);
     case FilterActionEnum.REMOVE:
       return filters.filter(({ id }) => id !== action.id);
