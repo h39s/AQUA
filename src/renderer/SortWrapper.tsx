@@ -62,7 +62,7 @@ const isBoundingBoxDifferent = (
 
   for (let i = 0; i < keys1.length; i += 1) {
     if (
-      keys1[i] !== keys2[i] ||
+      !boundMap2[keys1[i]] ||
       boundMap1[keys1[i]].left !== boundMap2[keys1[i]].left
     ) {
       return true;
@@ -71,13 +71,16 @@ const isBoundingBoxDifferent = (
   return false;
 };
 
+interface ISortWrapper {
+  children: CustomElement[];
+  // This ref should refer to the parent html element that contains children
+  wrapperRef: RefObject<HTMLDivElement>;
+}
+
 const SortWrapper = ({
   children = [],
   wrapperRef,
-}: {
-  children: CustomElement[];
-  wrapperRef: RefObject<HTMLDivElement>;
-}): JSX.Element => {
+}: ISortWrapper): JSX.Element => {
   const [boundingBoxes, setBoundingBoxes] = useState<IBoundingBoxMap>({});
   const prevBoundingBoxesRef = useRef<IBoundingBoxMap>({});
 

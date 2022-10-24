@@ -55,14 +55,11 @@ export interface IFilter {
   quality: number;
 }
 
-export interface IBasicState {
+export interface IState {
   isEnabled: boolean;
   isAutoPreAmpOn: boolean;
   isGraphViewOn: boolean;
   preAmp: number;
-}
-
-export interface IState extends IBasicState {
   filters: IFilter[];
 }
 
