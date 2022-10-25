@@ -1,3 +1,4 @@
+import { IFilter } from 'common/constants';
 import { RefObject, useEffect, useMemo, useRef } from 'react';
 
 export const getMaxIntegerDigitCount = (num: number) => {
@@ -8,6 +9,8 @@ export const getMaxIntegerDigitCount = (num: number) => {
 export const clamp = (num: number, min: number, max: number) => {
   return Math.min(Math.max(num, min), max);
 };
+
+export const sortHelper = (a: IFilter, b: IFilter) => a.frequency - b.frequency;
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from#sequence_generator_range
 export const range = (start: number, stop: number, step: number) =>
@@ -91,4 +94,15 @@ export const useFocusOutside = <T extends HTMLElement = HTMLElement>(
 
     return () => document.removeEventListener('focusin', handleFocus, true);
   }, [handleFocus]);
+};
+
+// https://reactjs.org/docs/hooks-faq.html#how-to-get-the-previous-props-or-state
+export const usePrevious = <T>(value: T): T | undefined => {
+  const prevChildrenRef = useRef<T | undefined>();
+
+  useEffect(() => {
+    prevChildrenRef.current = value;
+  }, [value]);
+
+  return prevChildrenRef.current;
 };

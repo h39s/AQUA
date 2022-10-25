@@ -40,7 +40,7 @@
 
   .bands {
     position: relative;
-    justify-content: space-between;
+    justify-content: flex-start;
     padding: 0 2px; // add some horizontal padding so the outline isn't cut off at either end
     width: 100%;
     overflow-x: auto;

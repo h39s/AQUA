@@ -7,15 +7,18 @@ import {
   useReducer,
   useState,
 } from 'react';
+import { uid } from 'uid';
 import {
-  DEFAULT_STATE,
   FilterTypeEnum,
+  getDefaultFilter,
+  getDefaultState,
   IFilter,
   IState,
 } from '../../common/constants';
 import { ErrorDescription } from '../../common/errors';
 import { computeAvgFreq } from '../../common/utils';
 import { getEqualizerState } from './equalizerApi';
+import { sortHelper } from './utils';
 
 export enum FilterActionEnum {
   INIT,
@@ -34,10 +37,10 @@ type NumericalFilterAction =
 
 export type FilterAction =
   | { type: FilterActionEnum.INIT; filters: IFilter[] }
-  | { type: NumericalFilterAction; index: number; newValue: number }
-  | { type: FilterActionEnum.TYPE; index: number; newValue: FilterTypeEnum }
-  | { type: FilterActionEnum.ADD; index: number }
-  | { type: FilterActionEnum.REMOVE; index: number };
+  | { type: NumericalFilterAction; id: string; newValue: number }
+  | { type: FilterActionEnum.TYPE; id: string; newValue: FilterTypeEnum }
+  | { type: FilterActionEnum.ADD; id: string; index: number }
+  | { type: FilterActionEnum.REMOVE; id: string };
 
 type FilterDispatch = (action: FilterAction) => void;
 
@@ -63,36 +66,41 @@ const filterReducer: IFilterReducer = (
 ) => {
   switch (action.type) {
     case FilterActionEnum.INIT:
-      return action.filters;
+      // Keeping the check for the id for backwards compatibility
+      // TODO: Remove the id check once this is no longer a concern
+      return action.filters
+        .map((filter) => (filter.id ? filter : { ...filter, id: uid(8) }))
+        .sort(sortHelper);
     case FilterActionEnum.FREQUENCY:
-      return filters.map((f, index) =>
-        index === action.index ? { ...f, frequency: action.newValue } : f
-      );
+      return filters
+        .map((f) =>
+          f.id === action.id ? { ...f, frequency: action.newValue } : f
+        )
+        .sort(sortHelper);
     case FilterActionEnum.GAIN:
-      return filters.map((f, index) =>
-        index === action.index ? { ...f, gain: action.newValue } : f
+      return filters.map((f) =>
+        f.id === action.id ? { ...f, gain: action.newValue } : f
       );
     case FilterActionEnum.QUALITY:
-      return filters.map((f, index) =>
-        index === action.index ? { ...f, quality: action.newValue } : f
+      return filters.map((f) =>
+        f.id === action.id ? { ...f, quality: action.newValue } : f
       );
     case FilterActionEnum.TYPE:
-      return filters.map((f, index) =>
-        index === action.index ? { ...f, type: action.newValue } : f
+      return filters.map((f) =>
+        f.id === action.id ? { ...f, type: action.newValue } : f
       );
     case FilterActionEnum.ADD:
       return [
         ...filters.slice(0, action.index),
         {
+          ...getDefaultFilter(),
+          id: action.id,
           frequency: computeAvgFreq(filters, action.index),
-          gain: 0,
-          quality: 1,
-          type: FilterTypeEnum.PK,
         },
         ...filters.slice(action.index),
-      ];
+      ].sort(sortHelper);
     case FilterActionEnum.REMOVE:
-      return filters.filter((_, index) => index !== action.index);
+      return filters.filter(({ id }) => id !== action.id);
     default:
       // This throw does not actually do anything because
       // we are in a reducer
@@ -120,6 +128,9 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
   const [globalError, setGlobalError] = useState<
     ErrorDescription | undefined
   >();
+
+  const DEFAULT_STATE = getDefaultState();
+
   const [isEnabled, setIsEnabled] = useState<boolean>(DEFAULT_STATE.isEnabled);
   const [isAutoPreAmpOn, setAutoPreAmpOn] = useState<boolean>(
     DEFAULT_STATE.isAutoPreAmpOn

@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { DEFAULT_STATE } from 'common/constants';
+import { getDefaultState } from 'common/constants';
 import { ErrorDescription } from 'common/errors';
 import { FilterAction, IAquaContext } from 'renderer/utils/AquaContext';
+
+const DEFAULT_STATE = getDefaultState();
 
 const defaultAquaContext: IAquaContext = {
   isLoading: false,

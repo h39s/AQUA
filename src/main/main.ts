@@ -12,6 +12,7 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
+import { uid } from 'uid';
 import {
   checkConfigFile,
   fetchSettings,
@@ -41,6 +42,7 @@ import {
 import { ErrorCode } from '../common/errors';
 import { computeAvgFreq } from '../common/utils';
 import { TSuccess, TError } from '../renderer/utils/equalizerApi';
+import { sortHelper } from '../renderer/utils/utils';
 
 export default class AppUpdater {
   constructor() {
@@ -103,9 +105,10 @@ const updateConfigPath = async (
   return true;
 };
 
-const handleUpdate = async (
+const handleUpdateHelper = async <T>(
   event: Electron.IpcMainEvent,
-  channel: ChannelEnum | string
+  channel: ChannelEnum | string,
+  response: T
 ) => {
   // Check whether EqualizerAPO is installed every time a change is made
   const isInstalled = await isEqualizerAPOInstalled();
@@ -123,11 +126,18 @@ const handleUpdate = async (
   }
 
   // Return a success message of undefined
-  const reply: TSuccess<void> = { result: undefined };
+  const reply: TSuccess<T> = { result: response };
   event.reply(channel, reply);
 
   // Flush changes to our local state file after informing UI that the changes have been applied
   save(state);
+};
+
+const handleUpdate = async (
+  event: Electron.IpcMainEvent,
+  channel: ChannelEnum | string
+) => {
+  return handleUpdateHelper<void>(event, channel, undefined);
 };
 
 ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
@@ -352,13 +362,17 @@ ipcMain.on(ChannelEnum.ADD_FILTER, async (event, arg) => {
   }
 
   const frequency = computeAvgFreq(state.filters, insertIndex);
-  state.filters.splice(insertIndex, 0, {
-    frequency,
-    gain: 0,
-    quality: 1,
-    type: FilterTypeEnum.PK,
-  });
-  await handleUpdate(event, channel);
+  const filterId = uid(8);
+  state.filters
+    .splice(insertIndex, 0, {
+      id: filterId,
+      frequency,
+      gain: 0,
+      quality: 1,
+      type: FilterTypeEnum.PK,
+    })
+    .sort(sortHelper);
+  await handleUpdateHelper(event, channel, filterId);
 });
 
 ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
