@@ -1,8 +1,18 @@
 # AQUA
 
-AQUA is planned to be a modern platform for audio equalization on Windows that integrates automatic equalization capabilities among other features. Stay tuned for more!
+Welcome to the AQUA repository! AQUA is a modern platform for audio equalization on Windows. Our goal is to provide a clean user experience and to support many features such as parametric equalization, graphical UIs, and, in the future, saving/loading presets and integrating automatic equalization. We welcome your feedback, so please join our [discord](TODO) server to share your thoughts with us! Stay tuned for more!
 
-## Prerequisites
+## Getting Started
+
+To get started using AQUA, it only takes two easy steps:
+1. Install [EqualizerAPO](https://sourceforge.net/projects/equalizerapo/) if you don't have it currently installed.
+2. Download and run the executable `AQUA.Setup.x.x.x.exe` from the latest release.
+
+## Get In Touch
+
+If you find any bugs, have any feature requests, or want to give us any kind of feedback, we'd love to hear it! Please join us in our [discord](TODO) to reach out and to keep up to date with new release information!
+
+## Development Prerequisites
 
 1. Install [EqualizerAPO](https://sourceforge.net/projects/equalizerapo/)
 2. Install Visual Studio 2022. Check "Desktop Development with C++"
@@ -14,10 +24,3 @@ AQUA is planned to be a modern platform for audio equalization on Windows that i
 ## License
 
 MIT © [Electron React Boilerplate](https://github.com/electron-react-boilerplate)
-
-[github-actions-status]: https://github.com/electron-react-boilerplate/electron-react-boilerplate/workflows/Test/badge.svg
-[github-actions-url]: https://github.com/electron-react-boilerplate/electron-react-boilerplate/actions
-[github-tag-image]: https://img.shields.io/github/tag/electron-react-boilerplate/electron-react-boilerplate.svg?label=version
-[github-tag-url]: https://github.com/electron-react-boilerplate/electron-react-boilerplate/releases/latest
-[stackoverflow-img]: https://img.shields.io/badge/stackoverflow-electron_react_boilerplate-blue.svg
-[stackoverflow-url]: https://stackoverflow.com/questions/tagged/electron-react-boilerplate
