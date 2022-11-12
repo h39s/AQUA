@@ -10,6 +10,7 @@ import {
 import ArrowIcon from '../icons/ArrowIcon';
 import '../styles/Dropdown.scss';
 import { useClickOutside, useFocusOutside } from '../utils/utils';
+import List from './List';
 
 interface IOptionEntry {
   value: string;
@@ -102,25 +103,6 @@ const Dropdown = ({
     setIsOpen(false);
   };
 
-  const handleItemKeyPress = (
-    e: KeyboardEvent,
-    entry: IOptionEntry,
-    index: number
-  ) => {
-    if (isDisabled) {
-      return;
-    }
-    if (e.code === 'Enter') {
-      onChange(entry.value);
-    } else if (e.code === 'ArrowDown') {
-      const next = Math.min(index + 1, options.length - 1);
-      inputRefs[next].current?.focus();
-    } else if (e.code === 'ArrowUp') {
-      const prev = Math.max(index - 1, 0);
-      inputRefs[prev].current?.focus();
-    }
-  };
-
   return (
     <div ref={dropdownRef} className="dropdown">
       <div
@@ -136,26 +118,13 @@ const Dropdown = ({
         <ArrowIcon type="down" className="arrow" />
       </div>
       {isOpen && (
-        <ul aria-label={`${name}-items`}>
-          {options.map((entry: IOptionEntry, index: number) => {
-            return (
-              <li
-                role="menuitem"
-                ref={inputRefs[index]}
-                className="row"
-                key={entry.value}
-                value={entry.value}
-                aria-label={entry.label}
-                onClick={() => onChange(entry.value)}
-                onKeyDown={(e) => handleItemKeyPress(e, entry, index)}
-                onMouseEnter={() => inputRefs[index].current?.focus()}
-                tabIndex={0}
-              >
-                {entry.display}
-              </li>
-            );
-          })}
-        </ul>
+        <List
+          name={name}
+          value={value}
+          options={options}
+          isDisabled={isDisabled}
+          handleChange={onChange}
+        />
       )}
     </div>
   );

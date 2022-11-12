@@ -56,40 +56,18 @@
     }
   }
 
-  ul {
+  .list {
     // Position the drop down menu
     position: absolute;
     margin-block-start: -4px;
 
-    // Remove default styles
-    list-style-type: none;
-    padding-inline-start: 0px;
-
-    // Apply custom styles
-    background: $primary-dark;
-    color: $white;
-    border: solid 2px $secondary-default;
-    border-radius: 4px;
+    // Assign fixed width to dropdown menu
     width: 60px;
-    text-align: start;
     z-index: 1;
 
-    li {
-      cursor: pointer;
-      padding: $spacing-xs;
-      align-content: center;
-      font-size: small;
-
-      &:focus,
-      &:focus-visible {
-        background: $secondary-darker;
-        outline: none;
-      }
-
-      svg {
-        width: 36px;
-        height: auto;
-      }
+    svg {
+      width: 36px;
+      height: auto;
     }
   }
 }

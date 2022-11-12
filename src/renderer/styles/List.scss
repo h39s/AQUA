@@ -1,0 +1,28 @@
+@import 'color';
+@import 'spacing';
+
+.list {
+  // Remove default styles
+  list-style-type: none;
+  padding-inline-start: 0px;
+
+  // Apply custom styles
+  background: $primary-dark;
+  color: $white;
+  border: solid 2px $secondary-default;
+  border-radius: 4px;
+  text-align: start;
+
+  li {
+    cursor: pointer;
+    padding: $spacing-xs;
+    align-content: center;
+    font-size: small;
+
+    &:focus,
+    &:focus-visible {
+      background: $secondary-darker;
+      outline: none;
+    }
+  }
+}

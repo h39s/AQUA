@@ -1,0 +1,15 @@
+@import 'constant';
+@import 'color';
+@import 'spacing';
+
+.presetsBar {
+  min-width: $presetbar-width;
+  padding: $spacing-s;
+
+  border-radius: $spacing-m;
+  background: $primary-default;
+
+  h4 {
+    margin: 1em 0 1em 0;
+  }
+}
