@@ -5,6 +5,7 @@ import { AquaProvider, useAquaContext } from './utils/AquaContext';
 import PrereqMissingModal from './PrereqMissingModal';
 import SideBar from './SideBar';
 import FrequencyResponseChart from './graph/FrequencyResponseChart';
+import PresetsBar from './PresetsBar';
 
 const AppContent = () => {
   const { isLoading, globalError, performHealthCheck } = useAquaContext();
@@ -20,6 +21,7 @@ const AppContent = () => {
           <div className="parameteric-wrapper row">
             <SideBar />
             <MainContent />
+            <PresetsBar />
           </div>
           <FrequencyResponseChart />
         </>
