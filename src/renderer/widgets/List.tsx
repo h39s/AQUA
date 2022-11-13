@@ -1,7 +1,7 @@
 import { createRef, KeyboardEvent, useEffect, useMemo } from 'react';
 import '../styles/List.scss';
 
-interface IOptionEntry {
+export interface IOptionEntry {
   value: string;
   label: string;
   display: JSX.Element | string;
@@ -14,6 +14,7 @@ interface IListProps {
   isDisabled: boolean;
   handleChange: (newValue: string) => void;
   className?: string;
+  focusOnRender?: boolean;
 }
 
 const List = ({
@@ -23,6 +24,7 @@ const List = ({
   isDisabled,
   handleChange,
   className,
+  focusOnRender = false,
 }: IListProps) => {
   const inputRefs = useMemo(
     () =>
@@ -33,14 +35,16 @@ const List = ({
   );
 
   useEffect(() => {
-    // Focus on the selected dropdown item when opened
-    const index = Math.max(
-      options.findIndex((entry) => entry.value === value),
-      // Default to the first option if the value isn't valid
-      0
-    );
-    inputRefs[index].current?.focus();
-  }, [inputRefs, options, value]);
+    if (!focusOnRender) {
+      return;
+    }
+
+    // Focus on the selected item when initially rendered
+    const index = options.findIndex((entry) => entry.value === value);
+    if (index >= 0) {
+      inputRefs[index].current?.focus();
+    }
+  }, [focusOnRender, inputRefs, options, value]);
 
   const onChange = (newValue: string) => {
     handleChange(newValue);
@@ -72,7 +76,7 @@ const List = ({
           <li
             role="menuitem"
             ref={inputRefs[index]}
-            className="row"
+            className={`row ${entry.value === value ? 'selected' : ''}`}
             key={entry.value}
             value={entry.value}
             aria-label={entry.label}

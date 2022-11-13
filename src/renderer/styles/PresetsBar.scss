@@ -4,12 +4,31 @@
 
 .presetsBar {
   min-width: $presetbar-width;
-  padding: $spacing-s;
-
+  padding: $spacing-m;
   border-radius: $spacing-m;
   background: $primary-default;
+  gap: $spacing-s;
 
   h4 {
     margin: 1em 0 1em 0;
+  }
+
+  .presetListItem {
+    width: 100%;
+    justify-content: space-between;
+
+    .icons {
+      gap: 4px;
+
+      .iconButton {
+        outline: none;
+
+        &:focus-visible:not([aria-disabled='true']) {
+          path {
+            fill: $primary-lighter;
+          }
+        }
+      }
+    }
   }
 }

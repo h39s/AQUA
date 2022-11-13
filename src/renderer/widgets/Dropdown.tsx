@@ -124,6 +124,7 @@ const Dropdown = ({
           options={options}
           isDisabled={isDisabled}
           handleChange={onChange}
+          focusOnRender
         />
       )}
     </div>
