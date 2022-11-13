@@ -5,6 +5,8 @@
   // Remove default styles
   list-style-type: none;
   padding-inline-start: 0px;
+  margin-block-start: 0px;
+  margin-block-end: 0px;
 
   // Apply custom styles
   background: $primary-dark;
@@ -19,9 +21,14 @@
     align-content: center;
     font-size: small;
 
+    &.selected {
+      background: $primary-light;
+    }
+
     &:focus,
-    &:focus-visible {
-      background: $secondary-darker;
+    &:focus-visible,
+    &:focus-within {
+      background: $secondary-dark;
       outline: none;
     }
   }
