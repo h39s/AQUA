@@ -41,7 +41,7 @@ export const FilterTypeToLabelMap: Record<FilterTypeEnum, string> = {
   // [FilterTypeEnum.NO]: 'Notch Filter',
 };
 
-export const WINDOW_WIDTH = 1024;
+export const WINDOW_WIDTH = 1428;
 export const WINDOW_HEIGHT = 626;
 export const WINDOW_HEIGHT_EXPANDED = 1036;
 
