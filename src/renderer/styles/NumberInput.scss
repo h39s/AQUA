@@ -8,7 +8,7 @@ $input-height: 24px;
 
   .inputWrapper {
     position: relative; // necessary so that the absolutely positioned asterisks will scroll with the input
-    border: 2px solid $secondary-default;
+    border: $spacing-xxs solid $secondary-default;
     border-radius: 4px;
     justify-content: start;
     background: $primary-dark;
@@ -21,11 +21,11 @@ $input-height: 24px;
 
     // add outline whenever the input or arrow buttons are focused
     &:focus-within {
-      outline: 2px solid $white;
+      outline: $spacing-xxs solid $white;
     }
 
     &:disabled {
-      border: 2px solid $primary-lighter;
+      border: $spacing-xxs solid $primary-lighter;
       color: $primary-lighter;
     }
   }
@@ -56,8 +56,8 @@ $input-height: 24px;
     display: flex;
     visibility: hidden;
     flex-direction: column;
-    gap: 2px;
-    padding: 2px;
+    gap: $spacing-xxs;
+    padding: $spacing-xxs;
 
     svg {
       width: 12px;

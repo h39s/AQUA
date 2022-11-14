@@ -1,11 +1,11 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './styles/PresetsBar.scss';
 import { useAquaContext } from './utils/AquaContext';
 import TextInput from './widgets/TextInput';
 import Button from './widgets/Button';
 import List, { IOptionEntry } from './widgets/List';
 import IconButton, { IconName } from './widgets/IconButton';
-import { useClickOutside, useFocusOutside } from './utils/utils';
+import { useClickOutside, useFocusOut } from './utils/utils';
 
 interface IListItemProps {
   value: string;
@@ -16,23 +16,22 @@ interface IListItemProps {
 
 // TODO: move this component to a new file
 // TODO: add logic to show icons on hover
-// TODO: figure out why the button clicks aren't working for the icons
 const PresetListItem = ({
   value,
   handleChange,
   handleDelete,
   isDisabled,
 }: IListItemProps) => {
-  const editModeRef = useRef<HTMLDivElement>(null);
+  const editModeRef = useRef<HTMLInputElement>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   // Close edit mode if the user clicks outside of the input
-  useClickOutside<HTMLDivElement>(editModeRef, () => {
+  useClickOutside<HTMLInputElement>(editModeRef, () => {
     setIsEditMode(false);
   });
 
   // Close edit mode if the user tabs outside of the input
-  useFocusOutside<HTMLDivElement>(editModeRef, () => {
+  useFocusOut<HTMLInputElement>(editModeRef, () => {
     setIsEditMode(false);
   });
 
@@ -53,6 +52,7 @@ const PresetListItem = ({
     <div className="row presetListItem">
       {isEditMode ? (
         <TextInput
+          ref={editModeRef}
           value={value}
           ariaLabel="Edit Preset Name"
           isDisabled={false}
@@ -96,7 +96,7 @@ const PresetsBar = () => {
     // TODO: add code for loading a preset
   };
 
-  const handleChangePresetName = (newValue: string) => {
+  const handleChangeNewPresetName = (newValue: string) => {
     setPresetName(newValue);
 
     // TODO: If the preset name is an existing one, we should set the selected one to be that so we can load it
@@ -156,7 +156,7 @@ const PresetsBar = () => {
           value={presetName}
           ariaLabel="Preset Name"
           isDisabled={!!globalError}
-          handleChange={handleChangePresetName}
+          handleChange={handleChangeNewPresetName}
         />
       </div>
       <Button

@@ -1,4 +1,5 @@
 @import 'color';
+@import 'spacing';
 @import 'button-state';
 
 %arrow {
@@ -42,7 +43,7 @@
 
     path {
       stroke: white;
-      stroke-width: 2px;
+      stroke-width: $spacing-xxs;
     }
   }
 }

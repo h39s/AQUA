@@ -9,7 +9,7 @@
     cursor: pointer;
     background: $primary-dark;
     color: $white;
-    border: solid 2px $secondary-default;
+    border: solid $spacing-xxs $secondary-default;
     border-radius: 4px;
     padding: $spacing-xs;
     font-size: small;
@@ -20,11 +20,11 @@
     align-items: center;
 
     &:focus-visible {
-      outline: 2px solid $white;
+      outline: $spacing-xxs solid $white;
     }
 
     &[aria-disabled='true'] {
-      border: 2px solid $primary-lighter;
+      border: $spacing-xxs solid $primary-lighter;
       color: $primary-lighter;
       cursor: default;
 

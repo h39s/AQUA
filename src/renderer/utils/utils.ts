@@ -77,7 +77,7 @@ export const useClickOutside = <T extends HTMLElement = HTMLElement>(
 
 export const useFocusOutside = <T extends HTMLElement = HTMLElement>(
   ref: RefObject<T>,
-  callback: () => void
+  callback: (test?: any, test2?: any) => void
 ) => {
   const handleFocus = useMemo(() => {
     return (e: globalThis.FocusEvent) => {
@@ -85,7 +85,7 @@ export const useFocusOutside = <T extends HTMLElement = HTMLElement>(
         return;
       }
 
-      callback();
+      callback(ref, e);
     };
   }, [callback, ref]);
 
@@ -93,6 +93,29 @@ export const useFocusOutside = <T extends HTMLElement = HTMLElement>(
     document.addEventListener('focusin', handleFocus, true);
 
     return () => document.removeEventListener('focusin', handleFocus, true);
+  }, [handleFocus]);
+};
+
+export const useFocusOut = <T extends HTMLElement = HTMLElement>(
+  ref: RefObject<T>,
+  callback: () => void
+) => {
+  const handleFocus = useMemo(() => {
+    return (e: globalThis.FocusEvent) => {
+      if (
+        ref.current &&
+        ref.current.contains(e.target as Node) &&
+        !ref.current.contains(e.relatedTarget as Node)
+      ) {
+        callback();
+      }
+    };
+  }, [callback, ref]);
+
+  useEffect(() => {
+    document.addEventListener('focusout', handleFocus, true);
+
+    return () => document.removeEventListener('focusout', handleFocus, true);
   }, [handleFocus]);
 };
 

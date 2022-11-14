@@ -7,18 +7,28 @@
   padding: $spacing-m;
   border-radius: $spacing-m;
   background: $primary-default;
-  gap: $spacing-s;
 
   h4 {
     margin: 1em 0 1em 0;
   }
 
+  button {
+    width: calc(100% - $spacing-s - $spacing-xs);
+  }
+
   .presetListItem {
     width: 100%;
+    height: $spacing-l;
+    padding: $spacing-xxs $spacing-xs;
     justify-content: space-between;
+    align-items: center;
+
+    input[type='text'] {
+      width: 100%;
+    }
 
     .icons {
-      gap: 4px;
+      gap: $spacing-s;
 
       .iconButton {
         outline: none;

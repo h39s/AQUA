@@ -39,6 +39,7 @@ const IconButton = ({ icon, isDisabled, handleClick }: IIconButtonProps) => {
       aria-label={icon}
       className="iconButton center"
       onKeyDown={onKeyDown}
+      onClick={handleClick}
       tabIndex={isDisabled ? -1 : 0}
       aria-disabled={isDisabled}
     >
