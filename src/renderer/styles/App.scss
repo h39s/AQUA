@@ -54,7 +54,7 @@ body {
 .graph-wrapper {
   flex: 1;
   border-radius: $spacing-m;
-  border: 2px solid $secondary-default;
+  border: $spacing-xxs solid $secondary-default;
 }
 
 .row {
