@@ -49,6 +49,7 @@ body {
 .parameteric-wrapper {
   flex: 0;
   gap: $spacing-s;
+  height: $equalizer-height;
 }
 
 .graph-wrapper {
@@ -82,6 +83,7 @@ body {
 /** Scrollbar styles */
 ::-webkit-scrollbar {
   height: 8px;
+  width: 8px;
 }
 
 // Scrollbar track

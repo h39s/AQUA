@@ -14,6 +14,7 @@ interface IListProps {
   isDisabled: boolean;
   handleChange: (newValue: string) => void;
   className?: string;
+  itemClassName?: string;
   focusOnRender?: boolean;
 }
 
@@ -24,6 +25,7 @@ const List = ({
   isDisabled,
   handleChange,
   className,
+  itemClassName,
   focusOnRender = false,
 }: IListProps) => {
   const inputRefs = useMemo(
@@ -70,13 +72,15 @@ const List = ({
   };
 
   return (
-    <ul className={`list ${className}`} aria-label={`${name}-items`}>
+    <ul className={`list ${className || ''}`} aria-label={`${name}-items`}>
       {options.map((entry: IOptionEntry, index: number) => {
         return (
           <li
             role="menuitem"
             ref={inputRefs[index]}
-            className={`row ${entry.value === value ? 'selected' : ''}`}
+            className={`row ${itemClassName || ''} ${
+              entry.value === value ? 'selected' : ''
+            }`}
             key={entry.value}
             value={entry.value}
             aria-label={entry.label}
