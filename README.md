@@ -2,6 +2,8 @@
 
 Quick link to releases: <https://github.com/h39s/AQUA/releases>
 
+Discord Server: <https://discord.gg/44WDeRrr2d>
+
 Welcome to AQUA, a modern platform for audio equalization on Windows. Our goal is to provide a clean user experience and to support many features such as parametric equalization, user friendly graph interfaces, and, in the future, saving/loading presets and AutoEQ integration. Please note that EqualizerAPO is a prerequisite for our application. We would love to get your feedback, address any bugs you encounter, and take any feature requests into consideration as we develop AQUA further, so please join our [discord server](https://discord.gg/44WDeRrr2d)  to share your thoughts with us and stay tuned for more!
 
 ![AQUA](https://user-images.githubusercontent.com/20293445/201550335-1963cd93-e0ed-44a7-8a7a-bf328371c204.png)
