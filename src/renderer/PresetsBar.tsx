@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import './styles/PresetsBar.scss';
 import { useAquaContext } from './utils/AquaContext';
 import TextInput from './widgets/TextInput';
@@ -14,8 +14,6 @@ interface IListItemProps {
   isDisabled: boolean;
 }
 
-// TODO: move this component to a new file
-// TODO: add logic to show icons on hover
 const PresetListItem = ({
   value,
   handleChange,
@@ -49,7 +47,7 @@ const PresetListItem = ({
   };
 
   return (
-    <div className="row presetListItem">
+    <>
       {isEditMode ? (
         <TextInput
           ref={editModeRef}
@@ -75,7 +73,7 @@ const PresetListItem = ({
           </div>
         </>
       )}
-    </div>
+    </>
   );
 };
 
@@ -109,9 +107,24 @@ const PresetsBar = () => {
   };
 
   const [presetNames, setPresetNames] = useState<string[]>([
+    'Airpods Pro to IEF Neutral AutoEQ',
+    'Airpods to Harman AE OE 2018 AutoEQ',
+    '7-1 Surround Sound Speaker Setup',
     'Bass Boost',
+    'Bass and Treble Boost',
     'Classic',
     'Dance',
+    'Rock',
+    'Vocal Boost',
+    'Microphone Compensation',
+    'MORE BASS',
+    'Surround effect',
+    'Indie playlist',
+    'Pop',
+    'Hip-hop',
+    'R&B',
+    'Equalize for shrill noise',
+    'Jazz',
   ]);
 
   const options: IOptionEntry[] = useMemo(() => {
@@ -119,13 +132,11 @@ const PresetsBar = () => {
       oldValue: string,
       newValue: string
     ) => {
-      console.log('edit');
-      // TODO: improve DS to help check if the newValue is an existing preset
+      // TODO: improve DS to help check if the newValue is an existing preset or not
       setPresetNames(presetNames.map((n) => (n === oldValue ? newValue : n)));
     };
 
     const handleDeletePreset = (deletedValue: string) => {
-      console.log('delete');
       setPresetNames(presetNames.filter((n) => n !== deletedValue));
     };
 
@@ -148,9 +159,9 @@ const PresetsBar = () => {
   }, [globalError, presetNames]);
 
   return (
-    <div className="col presetsBar center">
+    <div className="presetsBar">
       <h4>Preset Menu</h4>
-      <div className="row center">
+      <div className="row center presetName">
         Name:&nbsp;
         <TextInput
           value={presetName}
@@ -171,6 +182,7 @@ const PresetsBar = () => {
         name="preset"
         options={options}
         className="full"
+        itemClassName="presetListItem"
         value={presetName}
         handleChange={handleChangeSelectedPreset}
         isDisabled={!!globalError}

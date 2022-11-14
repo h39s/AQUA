@@ -3,8 +3,18 @@
 @import 'spacing';
 
 .presetsBar {
-  min-width: $presetbar-width;
+  // Spacing of the contents
+  display: grid;
+  grid-template-rows: repeat(3, min-content) auto min-content;
   padding: $spacing-m;
+  gap: $spacing-s;
+  justify-items: center;
+
+  // Sizing of the wraooer
+  height: calc(100% - 2 * $spacing-m);
+  min-width: $presetbar-width;
+
+  // Styling of the background wrapper
   border-radius: $spacing-m;
   background: $primary-default;
 
@@ -12,14 +22,23 @@
     margin: 1em 0 1em 0;
   }
 
-  button {
+  .button {
+    // Ensure button width matches the list width
     width: calc(100% - $spacing-s - $spacing-xs);
   }
 
-  .presetListItem {
+  // Adjust spacing for preset name input field
+  .presetName {
     width: 100%;
+
+    input[type='text'] {
+      width: 100%;
+    }
+  }
+
+  .presetListItem {
     height: $spacing-l;
-    padding: $spacing-xxs $spacing-xs;
+    padding: $spacing-xs $spacing-s;
     justify-content: space-between;
     align-items: center;
 
@@ -28,6 +47,7 @@
     }
 
     .icons {
+      display: none;
       gap: $spacing-s;
 
       .iconButton {
@@ -38,6 +58,15 @@
             fill: $primary-lighter;
           }
         }
+      }
+    }
+
+    &:focus,
+    &:focus-visible,
+    &:focus-within,
+    &:hover {
+      .icons {
+        display: flex;
       }
     }
   }
