@@ -13,11 +13,18 @@ interface ITextInputProps {
   ariaLabel: string;
   isDisabled: boolean;
   handleChange: (newValue: string) => void;
+  updateOnSubmitOnly?: boolean;
 }
 
 const TextInput = forwardRef(
   (
-    { value, ariaLabel, isDisabled, handleChange }: ITextInputProps,
+    {
+      value,
+      ariaLabel,
+      isDisabled,
+      handleChange,
+      updateOnSubmitOnly,
+    }: ITextInputProps,
     ref: ForwardedRef<HTMLInputElement>
   ) => {
     const [storedValue, setStoredValue] = useState<string>(value);
@@ -28,7 +35,7 @@ const TextInput = forwardRef(
 
     // Helper for detecting use of the ENTER key
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Enter') {
+      if (updateOnSubmitOnly && e.code === 'Enter') {
         handleChange(storedValue);
       }
     };
@@ -36,6 +43,9 @@ const TextInput = forwardRef(
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
       const { value: input } = e.target;
       setStoredValue(input);
+      if (!updateOnSubmitOnly) {
+        handleChange(input);
+      }
     };
 
     return (
