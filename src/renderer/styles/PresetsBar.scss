@@ -13,6 +13,7 @@
   // Sizing of the wraooer
   height: calc(100% - 2 * $spacing-m);
   min-width: $presetbar-width;
+  max-width: $presetbar-width;
 
   // Styling of the background wrapper
   border-radius: $spacing-m;
@@ -37,7 +38,7 @@
   }
 
   .presetListItem {
-    height: $spacing-l;
+    min-height: $spacing-l;
     padding: $spacing-xs $spacing-s;
     justify-content: space-between;
     align-items: center;

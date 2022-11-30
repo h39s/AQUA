@@ -55,6 +55,7 @@ const PresetListItem = ({
           ariaLabel="Edit Preset Name"
           isDisabled={false}
           handleChange={handleInputChange}
+          updateOnSubmitOnly
         />
       ) : (
         <>
@@ -85,27 +86,6 @@ const PresetsBar = () => {
     string | undefined
   >(undefined);
 
-  const handleCreatePreset = () => {
-    // TODO: add code for creating a preset
-    setSelectedPresetName(presetName);
-  };
-
-  const handleLoadPreset = () => {
-    // TODO: add code for loading a preset
-  };
-
-  const handleChangeNewPresetName = (newValue: string) => {
-    setPresetName(newValue);
-
-    // TODO: If the preset name is an existing one, we should set the selected one to be that so we can load it
-    setSelectedPresetName(undefined);
-  };
-
-  const handleChangeSelectedPreset = (newValue: string) => {
-    setPresetName(newValue);
-    setSelectedPresetName(newValue);
-  };
-
   const [presetNames, setPresetNames] = useState<string[]>([
     'Airpods Pro to IEF Neutral AutoEQ',
     'Airpods to Harman AE OE 2018 AutoEQ',
@@ -126,6 +106,33 @@ const PresetsBar = () => {
     'Equalize for shrill noise',
     'Jazz',
   ]);
+
+  const handleCreatePreset = (prev: string[]) => {
+    if (prev.indexOf(presetName) !== -1) {
+      // TODO: overwrite preset values for the existing preset
+    } else {
+      // TODO: add code for creating a preset
+      setSelectedPresetName(presetName);
+      const newPresets = [...prev, presetName].sort();
+      setPresetNames(newPresets);
+    }
+  };
+
+  const handleLoadPreset = () => {
+    // TODO: add code for loading a preset
+  };
+
+  const handleChangeNewPresetName = (newValue: string) => {
+    setPresetName(newValue);
+
+    // TODO: If the preset name is an existing one, we should set the selected one to be that so we can load it
+    setSelectedPresetName(undefined);
+  };
+
+  const handleChangeSelectedPreset = (newValue: string) => {
+    setPresetName(newValue);
+    setSelectedPresetName(newValue);
+  };
 
   const options: IOptionEntry[] = useMemo(() => {
     const handleEditExistingPresetName = (
@@ -174,7 +181,7 @@ const PresetsBar = () => {
         ariaLabel="Save settings to preset"
         className="small full"
         isDisabled={!!globalError}
-        handleChange={handleCreatePreset}
+        handleChange={() => handleCreatePreset(presetNames)}
       >
         Save current settings to preset
       </Button>
