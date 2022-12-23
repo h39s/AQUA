@@ -46,6 +46,10 @@ const PresetListItem = ({
     setIsEditMode(false);
   };
 
+  const handleEscape = () => {
+    setIsEditMode(false);
+  };
+
   return (
     <>
       {isEditMode ? (
@@ -55,6 +59,7 @@ const PresetListItem = ({
           ariaLabel="Edit Preset Name"
           isDisabled={false}
           handleChange={handleInputChange}
+          handleEscape={handleEscape}
           updateOnSubmitOnly
         />
       ) : (
@@ -86,6 +91,7 @@ const PresetsBar = () => {
     string | undefined
   >(undefined);
 
+  // TODO: Fetch default presets and custom presets from storage
   const [presetNames, setPresetNames] = useState<string[]>([
     'Airpods Pro to IEF Neutral AutoEQ',
     'Airpods to Harman AE OE 2018 AutoEQ',
