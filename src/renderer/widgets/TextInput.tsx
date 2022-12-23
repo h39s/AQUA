@@ -13,6 +13,7 @@ interface ITextInputProps {
   ariaLabel: string;
   isDisabled: boolean;
   handleChange: (newValue: string) => void;
+  handleEscape?: () => void;
   updateOnSubmitOnly?: boolean;
 }
 
@@ -23,6 +24,7 @@ const TextInput = forwardRef(
       ariaLabel,
       isDisabled,
       handleChange,
+      handleEscape,
       updateOnSubmitOnly,
     }: ITextInputProps,
     ref: ForwardedRef<HTMLInputElement>
@@ -35,6 +37,9 @@ const TextInput = forwardRef(
 
     // Helper for detecting use of the ENTER key
     const onKeyDown = (e: KeyboardEvent) => {
+      if (handleEscape && e.code === 'Escape') {
+        handleEscape();
+      }
       if (updateOnSubmitOnly && e.code === 'Enter') {
         handleChange(storedValue);
       }

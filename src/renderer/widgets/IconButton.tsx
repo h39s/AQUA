@@ -1,22 +1,29 @@
 import { KeyboardEvent, useMemo } from 'react';
 import DeleteIcon from 'renderer/icons/DeleteIcon';
 import EditIcon from 'renderer/icons/EditIcon';
-// import '../styles/IconButton.scss';
+import TrashIcon from 'renderer/icons/TrashIcon';
 
 export enum IconName {
   EDIT = 'Edit Icon',
   DELETE = 'Delete Icon',
+  TRASH = 'Trash Icon',
 }
 
 interface IIconButtonProps {
   icon: IconName;
   isDisabled: boolean;
+  className?: string;
   handleClick: () => void;
 }
 
-const IconButton = ({ icon, isDisabled, handleClick }: IIconButtonProps) => {
+const IconButton = ({
+  icon,
+  isDisabled,
+  className,
+  handleClick,
+}: IIconButtonProps) => {
   // Helper for detecting use of the ENTER key
-  const onKeyDown = (e: KeyboardEvent) => {
+  const onKeyUp = (e: KeyboardEvent) => {
     if (e.code === 'Enter') {
       handleClick();
     }
@@ -28,6 +35,8 @@ const IconButton = ({ icon, isDisabled, handleClick }: IIconButtonProps) => {
         return <EditIcon />;
       case IconName.DELETE:
         return <DeleteIcon />;
+      case IconName.TRASH:
+        return <TrashIcon />;
       default:
         return null;
     }
@@ -37,8 +46,8 @@ const IconButton = ({ icon, isDisabled, handleClick }: IIconButtonProps) => {
     <div
       role="button"
       aria-label={icon}
-      className="iconButton center"
-      onKeyDown={onKeyDown}
+      className={`iconButton center ${className}`}
+      onKeyUp={onKeyUp}
       onClick={handleClick}
       tabIndex={isDisabled ? -1 : 0}
       aria-disabled={isDisabled}
