@@ -1,9 +1,9 @@
 import * as d3 from 'd3';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useIsNotFirstRender } from 'renderer/utils/utils';
 import { ChartDataPoint, ChartDataPointWithId } from './ChartController';
 
 export enum AnimationOptionsEnum {
-  LEFT = 'left',
   FADE_IN = 'fadeIn',
   NONE = 'none',
 }
@@ -28,21 +28,9 @@ const Points = ({
   transform,
 }: IPointsProps) => {
   const refs = useRef<SVGPathElement[]>([]);
-  // Define different types of animation that we can use
-  const animateLeft = useCallback(() => {
-    // const totalLength = refs.current ? refs.current.getTotalLength() : 100;
-    refs.current?.forEach((r) =>
-      d3
-        .select(r)
-        .attr('opacity', 1)
-        // .attr('stroke-dasharray', `${totalLength},${totalLength}`)
-        // .attr('stroke-dashoffset', totalLength)
-        .transition()
-        .duration(750)
-        .ease(d3.easeLinear)
-    );
-    // .attr('stroke-dashoffset', 0);
-  }, []);
+  useEffect(() => {
+    refs.current = refs.current.slice(0, data.length);
+  }, [data]);
 
   const animateFadeIn = useCallback(() => {
     refs.current?.forEach((r) =>
@@ -61,9 +49,6 @@ const Points = ({
 
   useEffect(() => {
     switch (animation) {
-      case AnimationOptionsEnum.LEFT:
-        animateLeft();
-        break;
       case AnimationOptionsEnum.FADE_IN:
         animateFadeIn();
         break;
@@ -72,7 +57,7 @@ const Points = ({
         noneAnimation();
         break;
     }
-  }, [animateLeft, animateFadeIn, noneAnimation, animation]);
+  }, [animateFadeIn, noneAnimation, animation]);
 
   const scaledPoints = useMemo(
     () =>
@@ -94,31 +79,44 @@ const Points = ({
     return map;
   }, [scaledPoints]);
 
+  const isNotFirstRender = useIsNotFirstRender();
+
+  // TODO: figure out how to best customize when to animate
+  //    - either none or fade animate when adding a new point
+  //    - no animation when a frequency is changed
+  const animatePoints = useMemo(() => isNotFirstRender, [isNotFirstRender]);
+
   useEffect(() => {
     if (refs.current) {
       refs.current
         ?.filter(({ id }) => id in scaledPointsMap)
         .forEach((r) =>
-          d3
-            .select(r)
-            .transition()
-            .duration(500)
-            .attr('cx', scaledPointsMap[r.id].x)
-            .attr('cy', scaledPointsMap[r.id].y)
+          // Only animate for subsequent renders
+          animatePoints
+            ? d3
+                .select(r)
+                .transition()
+                .duration(500)
+                .attr('cx', scaledPointsMap[r.id].x)
+                .attr('cy', scaledPointsMap[r.id].y)
+            : d3
+                .select(r)
+                .attr('cx', scaledPointsMap[r.id].x)
+                .attr('cy', scaledPointsMap[r.id].y)
         );
     }
-  }, [scaledPointsMap]);
+  }, [animatePoints, scaledPointsMap]);
 
   return (
     <>
-      {scaledPoints.map(({ id }) => (
+      {scaledPoints.map(({ id }, i) => (
         <circle
           key={id}
           id={id}
           name={name}
           ref={(element) => {
             if (element) {
-              refs.current.push(element);
+              refs.current[i] = element;
             }
           }}
           r={4}

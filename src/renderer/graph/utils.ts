@@ -220,6 +220,7 @@ export const getTotalPoints = (
   const logEnd = Math.log10(GRAPH_END);
   const step = (logEnd - logStart) / NUM_STEPS;
 
+  // Get sampling frequencies for rendering the line
   const sampleFrequencies = range(logStart, logEnd + step, step).map(
     (p) => 10 ** p
   );
@@ -229,8 +230,10 @@ export const getTotalPoints = (
   });
 
   for (let i = 0; i < sampleFrequencies.length; i += 1) {
+    // Add fixed preamp gain for each sample point
     data[i].y = preAmp;
     for (let j = 0; j < filterLines.length; j += 1) {
+      // Add frequency gain obtained from each filter
       data[i].y += filterLines[j][i].y;
     }
   }
@@ -239,7 +242,8 @@ export const getTotalPoints = (
     return { x: f, y: 0, id: '' };
   });
 
-  for (let i = 0; i < freqPoints.length; i += 1) {
+  for (let i = 0; i < freqPoints[0].length; i += 1) {
+    // Add fixed preamp gain for each sample point
     points[i].id = freqPoints[0][i].id;
     points[i].y = preAmp;
     for (let j = 0; j < freqPoints.length; j += 1) {

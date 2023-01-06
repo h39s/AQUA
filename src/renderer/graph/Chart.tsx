@@ -1,13 +1,17 @@
 import { useMemo } from 'react';
 import Axis from './Axis';
-import Curve, { AnimationOptionsEnum } from './Curve';
+import Curve, {
+  AnimationOptionsEnum as CurveAnimationOptionsEnum,
+} from './Curve';
 import GridLine from './GridLine';
 import useController, {
   ChartCurveData,
   ChartPointsData,
   MarginLike,
 } from './ChartController';
-import Points from './Points';
+import Points, {
+  AnimationOptionsEnum as PointsAnimationOptionsEnum,
+} from './Points';
 
 export interface ChartDimensions {
   height: number;
@@ -94,7 +98,7 @@ const Chart = ({ data = [], dimensions, points = [] }: IChartProps) => {
           xScale={xScaleFreq}
           yScale={yScaleGain}
           color={e.color}
-          animation={AnimationOptionsEnum.LEFT}
+          animation={CurveAnimationOptionsEnum.LEFT}
         />
       ))}
       {points.map((e: ChartPointsData) => (
@@ -105,7 +109,7 @@ const Chart = ({ data = [], dimensions, points = [] }: IChartProps) => {
           xScale={xScaleFreq}
           yScale={yScaleGain}
           color={e.color}
-          animation={AnimationOptionsEnum.NONE}
+          animation={PointsAnimationOptionsEnum.FADE_IN}
         />
       ))}
       <Axis

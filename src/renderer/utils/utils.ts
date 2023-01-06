@@ -106,3 +106,19 @@ export const usePrevious = <T>(value: T): T | undefined => {
 
   return prevChildrenRef.current;
 };
+
+export const useIsNotFirstRender = () => {
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isFirstRender.current = true;
+    };
+  }, []);
+
+  if (isFirstRender.current) {
+    isFirstRender.current = false;
+    return false;
+  }
+  return true;
+};
