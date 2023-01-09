@@ -1,6 +1,5 @@
 import * as d3 from 'd3';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useIsNotFirstRender } from 'renderer/utils/utils';
 import { ChartDataPoint, ChartDataPointWithId } from './ChartController';
 
 export enum AnimationOptionsEnum {
@@ -71,6 +70,7 @@ const Points = ({
     [data, xScale, yScale]
   );
 
+  // Map points from filter id to coordinate
   const scaledPointsMap = useMemo(() => {
     const map: { [id: string]: ChartDataPoint } = {};
     scaledPoints.forEach((point) => {
@@ -79,33 +79,20 @@ const Points = ({
     return map;
   }, [scaledPoints]);
 
-  const isNotFirstRender = useIsNotFirstRender();
-
-  // TODO: figure out how to best customize when to animate
-  //    - either none or fade animate when adding a new point
-  //    - no animation when a frequency is changed
-  const animatePoints = useMemo(() => isNotFirstRender, [isNotFirstRender]);
-
+  // Update point location when changes are made
   useEffect(() => {
     if (refs.current) {
       refs.current
+        // filter out refs for which we don't have coordinates
         ?.filter(({ id }) => id in scaledPointsMap)
         .forEach((r) =>
-          // Only animate for subsequent renders
-          animatePoints
-            ? d3
-                .select(r)
-                .transition()
-                .duration(500)
-                .attr('cx', scaledPointsMap[r.id].x)
-                .attr('cy', scaledPointsMap[r.id].y)
-            : d3
-                .select(r)
-                .attr('cx', scaledPointsMap[r.id].x)
-                .attr('cy', scaledPointsMap[r.id].y)
+          d3
+            .select(r)
+            .attr('cx', scaledPointsMap[r.id].x)
+            .attr('cy', scaledPointsMap[r.id].y)
         );
     }
-  }, [animatePoints, scaledPointsMap]);
+  }, [scaledPointsMap]);
 
   return (
     <>
@@ -122,6 +109,7 @@ const Points = ({
           r={4}
           fill={color}
           stroke="#ffffff"
+          transform={transform}
         />
       ))}
     </>

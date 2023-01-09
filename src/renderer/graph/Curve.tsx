@@ -1,6 +1,5 @@
 import * as d3 from 'd3';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useIsNotFirstRender } from 'renderer/utils/utils';
 import { ChartDataPoint } from './ChartController';
 
 export enum AnimationOptionsEnum {
@@ -69,16 +68,14 @@ const Curve = ({
     }
   }, [animateLeft, animateFadeIn, noneAnimation, animation]);
 
-  // Recalculate line length if scale has changed
+  // Recalculate line length if scale or data has changed
   useEffect(() => {
-    if (animation === AnimationOptionsEnum.LEFT) {
-      const totalLength = ref.current ? ref.current.getTotalLength() : 100;
-      d3.select(ref.current).attr(
-        'stroke-dasharray',
-        `${totalLength} ${totalLength}`
-      );
-    }
-  }, [xScale, yScale, animation]);
+    const totalLength = ref.current ? ref.current.getTotalLength() : 100;
+    d3.select(ref.current).attr(
+      'stroke-dasharray',
+      `${totalLength} ${totalLength}`
+    );
+  }, [xScale, yScale, data]);
 
   const line = useMemo(
     () =>
@@ -90,20 +87,6 @@ const Curve = ({
   );
 
   const d = useMemo(() => line(data), [data, line]);
-  const isNotFirstRender = useIsNotFirstRender();
-
-  useEffect(() => {
-    // Animate changes to the curve on subsequent renders
-    if (ref.current && isNotFirstRender) {
-      const totalLength = ref.current ? ref.current.getTotalLength() : 100;
-      d3.select(ref.current)
-        // Adjust line length to match new curve
-        .attr('stroke-dasharray', `${totalLength} ${totalLength}`)
-        .transition()
-        .duration(500)
-        .attr('d', d);
-    }
-  }, [d, isNotFirstRender]);
 
   return (
     <path
