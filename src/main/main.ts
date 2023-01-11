@@ -13,12 +13,15 @@ import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import { uid } from 'uid';
+import fs from 'fs';
+import { filter, json } from 'd3';
 import {
   checkConfigFile,
   fetchSettings,
   flush,
   save,
   updateConfig,
+  savePreset,
 } from './flush';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -38,6 +41,8 @@ import {
   WINDOW_HEIGHT,
   WINDOW_HEIGHT_EXPANDED,
   WINDOW_WIDTH,
+  PRESETS_DIR,
+  IFilter,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
 import { computeAvgFreq } from '../common/utils';
@@ -160,6 +165,35 @@ ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
   if (res) {
     await handleUpdate(event, channel);
   }
+});
+
+ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, preset_name: string) => {
+  const channel = ChannelEnum.LOAD_PRESET;
+  console.log(`Loading preset: ${preset_name}`);
+
+  // TODO: should we do some str checking here?
+  // might have to make the preset folder too?
+
+  try {
+    const content = fs.readFileSync(PRESETS_DIR + preset_name, {
+      encoding: 'utf8',
+    });
+    const presetFileAsIFilters: IFilter[] = JSON.parse(content) as IFilter[];
+    state.filters = presetFileAsIFilters;
+    const reply: TSuccess<string> = { result: content };
+    event.reply(channel, reply);
+    await handleUpdate(event, channel);
+  } catch (ex) {
+    console.log('Failed to read preset: ', preset_name);
+    throw ex;
+  }
+});
+
+ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, preset_name: string) => {
+  const channel = ChannelEnum.SAVE_PRESET;
+  console.log(`Saving preset: ${preset_name}`);
+  savePreset(preset_name, state.filters);
+  await handleUpdate(event, channel);
 });
 
 ipcMain.on(ChannelEnum.GET_STATE, async (event) => {

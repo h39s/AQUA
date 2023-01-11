@@ -98,6 +98,26 @@ export const healthCheck = (): Promise<void> => {
 };
 
 /**
+ * Load preset into the current equalizer sliders
+ * @returns { Promise<string> } stringified filter values of the preset.
+ */
+export const loadPreset = (preset_name: string): Promise<string> => {
+  const channel = ChannelEnum.LOAD_PRESET;
+  window.electron.ipcRenderer.sendMessage(channel, [preset_name]);
+  return promisifyResult(simpleResponseHandler<string>(), channel);
+};
+
+/**
+ * Save preset into preset file
+ * @returns { Promise<void> } if save was succesfull
+ */
+export const savePreset = (preset_name: string): Promise<void> => {
+  const channel = ChannelEnum.SAVE_PRESET;
+  window.electron.ipcRenderer.sendMessage(channel, [preset_name]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
  * Get the full equalizer state
  * @returns { Promise<IState> } return the state, exception if failed.
  */

@@ -1,5 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import './styles/PresetsBar.scss';
+import { select } from 'd3';
+import { healthCheck, loadPreset, savePreset } from './utils/equalizerApi';
 import { useAquaContext } from './utils/AquaContext';
 import TextInput from './widgets/TextInput';
 import Button from './widgets/Button';
@@ -20,16 +22,16 @@ const PresetListItem = ({
   handleDelete,
   isDisabled,
 }: IListItemProps) => {
-  const editValueRef = useRef<HTMLInputElement>(null);
+  const editModeRef = useRef<HTMLInputElement>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   // Close edit mode if the user clicks outside of the input
-  useClickOutside<HTMLInputElement>(editValueRef, () => {
+  useClickOutside<HTMLInputElement>(editModeRef, () => {
     setIsEditMode(false);
   });
 
   // Close edit mode if the user tabs outside of the input
-  useFocusOut<HTMLInputElement>(editValueRef, () => {
+  useFocusOut<HTMLInputElement>(editModeRef, () => {
     setIsEditMode(false);
   });
 
@@ -54,7 +56,7 @@ const PresetListItem = ({
     <>
       {isEditMode ? (
         <TextInput
-          ref={editValueRef}
+          ref={editModeRef}
           value={value}
           ariaLabel="Edit Preset Name"
           isDisabled={false}
@@ -84,7 +86,7 @@ const PresetListItem = ({
 };
 
 const PresetsBar = () => {
-  const { globalError } = useAquaContext();
+  const { globalError, performHealthCheck } = useAquaContext();
 
   const [presetName, setPresetName] = useState<string>('');
   const [selectedPresetName, setSelectedPresetName] = useState<
@@ -114,28 +116,41 @@ const PresetsBar = () => {
   ]);
 
   const handleCreatePreset = (prev: string[]) => {
-    if (prev.indexOf(presetName) !== -1) {
-      // TODO: overwrite preset values for the existing preset
-    } else {
-      // TODO: add code for creating a preset
+    savePreset(presetName);
+
+    // If we are creating a new preset and not just updating an existing one
+    if (prev.indexOf(presetName) === -1) {
       setSelectedPresetName(presetName);
       const newPresets = [...prev, presetName].sort();
       setPresetNames(newPresets);
     }
+
+    console.log('Finished Handling Create Preset!');
   };
 
   const handleLoadPreset = () => {
-    // TODO: add code for loading a preset
+    if (selectedPresetName) {
+      loadPreset(selectedPresetName)
+        .then((json_string) => {
+          performHealthCheck();
+          const jsonContent = JSON.parse(json_string);
+          console.log('result');
+          console.log(jsonContent);
+          return jsonContent;
+        })
+        .catch((error) => {
+          console.log(`failed to get preset ${selectedPresetName}`);
+          console.log(error);
+        });
+    }
+    console.log('done loading preset!');
   };
 
   const handleChangeNewPresetName = (newValue: string) => {
     setPresetName(newValue);
 
-    // Update selectedPresetName if the input value matches an existing preset name
-    const newSelectedName = presetNames.some((n) => n === newValue)
-      ? newValue
-      : undefined;
-    setSelectedPresetName(newSelectedName);
+    // TODO: If the preset name is an existing one, we should set the selected one to be that so we can load it
+    setSelectedPresetName(undefined);
   };
 
   const handleChangeSelectedPreset = (newValue: string) => {
