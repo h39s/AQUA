@@ -13,6 +13,7 @@ interface ICurveProps {
   xScale: d3.AxisScale<d3.NumberValue>;
   yScale: d3.AxisScale<d3.NumberValue>;
   color: string;
+  width: number;
   data: ChartDataPoint[];
   animation?: AnimationOptionsEnum;
   transform?: string;
@@ -23,6 +24,7 @@ const Curve = ({
   xScale,
   yScale,
   color = 'white',
+  width = 3,
   data = [],
   animation = AnimationOptionsEnum.NONE,
   transform,
@@ -93,7 +95,7 @@ const Curve = ({
       name={name}
       ref={ref}
       stroke={color}
-      strokeWidth={3}
+      strokeWidth={width}
       fill="none"
       opacity={0}
       d={d || ''}

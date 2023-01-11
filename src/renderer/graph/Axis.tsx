@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { useEffect, useRef } from 'react';
+import { GrayScaleEnum } from '../styles/color';
 
 interface IAxisProps {
   type: 'bottom' | 'left';
@@ -37,7 +38,7 @@ const Axis = ({
       axisGroup
         .selectAll('text')
         .attr('opacity', 1)
-        .attr('color', 'white')
+        .attr('color', GrayScaleEnum.WHITE)
         .attr('font-size', '0.75rem');
     }
   }, [scale, tickValues, tickFormat, disableAnimation, type]);

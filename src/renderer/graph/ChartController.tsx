@@ -22,13 +22,14 @@ export interface MarginLike {
 
 export interface ChartCurveData {
   name: string;
-  color: string; // #ffffff, white, rgba(255, 255, 255, 0.5)
+  color: string;
+  width: number;
   items: ChartDataPoint[];
 }
 
 export interface ChartPointsData {
   name: string;
-  color: string; // #ffffff, white, rgba(255, 255, 255, 0.5)
+  color: string;
   items: ChartDataPointWithId[];
 }
 

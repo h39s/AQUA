@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { ColorEnum } from '../styles/color';
 import Axis from './Axis';
 import Curve, {
   AnimationOptionsEnum as CurveAnimationOptionsEnum,
@@ -87,7 +88,7 @@ const Chart = ({ data = [], dimensions, points = [] }: IChartProps) => {
         scale={yScaleGain}
         tickValues={[0]}
         size={width - margins.left - margins.right}
-        color="#F7844F"
+        color={ColorEnum.COMPLEMENTARY}
         transform={`translate(${padding.left}, 0)`}
       />
       {data.map((e: ChartCurveData) => (
@@ -98,6 +99,7 @@ const Chart = ({ data = [], dimensions, points = [] }: IChartProps) => {
           xScale={xScaleFreq}
           yScale={yScaleGain}
           color={e.color}
+          width={e.width}
           animation={CurveAnimationOptionsEnum.LEFT}
         />
       ))}

@@ -10,7 +10,19 @@ import {
   ChartDataPoint,
   ChartDataPointWithId,
 } from './ChartController';
-import { getFilterPoints, getSpecificPoints, getTotalPoints } from './utils';
+import {
+  getFilterAdjustmentPoints,
+  getFilterGraphData,
+  getPreAmpLine,
+  getSpecificPoints,
+  getTotalCurveInfo,
+} from './utils';
+import {
+  ColorEnum,
+  getColor,
+  GrayScaleEnum,
+  SecondaryColorEnum,
+} from '../styles/color';
 
 const isFilterEqual = (f1: IFilter, f2: IFilter) => {
   if (!f1 || !f2) {
@@ -65,7 +77,7 @@ const FrequencyResponseChart = () => {
         const prevIndex = prevIndices[f.id];
         // New filters have no previous data
         if (!prevIndex) {
-          return getFilterPoints(f, freqData);
+          return getFilterGraphData(f, freqData);
         }
 
         // Filter changes can impact both the curve and the points so update both
@@ -75,7 +87,7 @@ const FrequencyResponseChart = () => {
         );
 
         if (hasFilterChanges) {
-          return getFilterPoints(f, freqData);
+          return getFilterGraphData(f, freqData);
         }
 
         return {
@@ -104,34 +116,57 @@ const FrequencyResponseChart = () => {
     prevFilters.current = filters;
 
     // Compute and return new chart data
-    const { data, points } = getTotalPoints(
+    const { data: totalCurveData } = getTotalCurveInfo(
       preAmp,
       updatedFilterLines,
       updatedFreqPoints
     );
 
-    const highestPoint = data.reduce((previousValue, currentValue) => {
-      if (previousValue) {
-        return previousValue.y < currentValue.y ? currentValue : previousValue;
+    const preAmpLine = getPreAmpLine(preAmp);
+
+    const adjustmentPoints = getFilterAdjustmentPoints(filters);
+
+    const highestPoint = totalCurveData.reduce(
+      (previousValue, currentValue) => {
+        if (previousValue) {
+          return previousValue.y < currentValue.y
+            ? currentValue
+            : previousValue;
+        }
+        return currentValue;
       }
-      return currentValue;
-    });
+    );
 
     return {
       chartData: [
+        ...updatedFilterLines.map((lineData, index) => {
+          return {
+            name: `Filter ${index}`,
+            color: getColor(index),
+            width: 2,
+            items: lineData,
+          };
+        }),
         {
-          name: 'Response',
-          color: '#ffffff',
-          items: data,
+          name: 'PreAmp',
+          color: ColorEnum.ANALOGOUS2,
+          width: 2,
+          items: preAmpLine,
+        },
+        {
+          name: 'Total Response',
+          color: GrayScaleEnum.WHITE,
+          width: 3,
+          items: totalCurveData,
         },
       ],
-      pointData: [
-        {
-          name: 'Points',
-          color: '#4fc3f7',
-          items: points,
-        },
-      ],
+      pointData: adjustmentPoints.map((p, index) => {
+        return {
+          name: `Point for filter ${index}`,
+          color: SecondaryColorEnum.DEFAULT,
+          items: [p],
+        };
+      }),
       // Rounding to two decimals
       autoPreAmpValue:
         Math.round(clamp(-1 * (highestPoint.y - preAmp), -30, 30) * 100) / 100,
