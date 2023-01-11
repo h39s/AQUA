@@ -1,5 +1,4 @@
 import {
-  createRef,
   KeyboardEvent,
   useEffect,
   useMemo,
@@ -34,13 +33,6 @@ const Dropdown = ({
   handleChange,
 }: IDropdownProps) => {
   const nullElement = createElement('div');
-  const inputRefs = useMemo(
-    () =>
-      Array(options.length)
-        .fill(0)
-        .map(() => createRef<HTMLLIElement>()),
-    [options]
-  );
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -49,18 +41,6 @@ const Dropdown = ({
       setIsOpen(false);
     }
   }, [isDisabled]);
-
-  useEffect(() => {
-    if (isOpen) {
-      // Focus on the selected dropdown item when opened
-      const index = Math.max(
-        options.findIndex((entry) => entry.value === value),
-        // Default to the first option if the value isn't valid
-        0
-      );
-      inputRefs[index].current?.focus();
-    }
-  }, [inputRefs, isOpen, options, value]);
 
   // Close the dropdown if the user clicks outside of the dropdown
   useClickOutside<HTMLDivElement>(dropdownRef, () => {
