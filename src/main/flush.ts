@@ -1,6 +1,11 @@
 import fs from 'fs';
 import path from 'path';
-import { getDefaultState, IState } from '../common/constants';
+import {
+  getDefaultState,
+  IFilter,
+  IState,
+  PRESETS_DIR,
+} from '../common/constants';
 
 export const stateToString = (state: IState) => {
   if (!state.isEnabled) {
@@ -30,6 +35,10 @@ export const stateToString = (state: IState) => {
 
 export const serializeState = (state: IState) => {
   return JSON.stringify(state);
+};
+
+export const serializeFilters = (filters: IFilter[]) => {
+  return JSON.stringify(filters);
 };
 
 const CONFIG_CONTENT = 'Include: aqua.txt';
@@ -62,6 +71,20 @@ export const save = (state: IState) => {
     console.log('Failed to save to %d', AQUA_LOCAL_CONFIG_FILENAME);
     throw ex;
   }
+};
+
+export const savePreset = (preset_name: string, filters: IFilter[]) => {
+  // need to create presets dir first...... should we do this in the install?
+  try {
+    fs.writeFileSync(PRESETS_DIR + preset_name, serializeFilters(filters), {
+      encoding: 'utf8',
+    });
+  } catch (ex) {
+    console.log('Failed to save to preset %d', preset_name);
+    throw ex;
+  }
+
+  console.log(`Wrote preset for: ${preset_name}`);
 };
 
 export const flush = (state: IState, configDirPath: string) => {
