@@ -77,7 +77,7 @@ export const useClickOutside = <T extends HTMLElement = HTMLElement>(
 
 export const useFocusOutside = <T extends HTMLElement = HTMLElement>(
   ref: RefObject<T>,
-  callback: (test?: any, test2?: any) => void
+  callback: () => void
 ) => {
   const handleFocus = useMemo(() => {
     return (e: globalThis.FocusEvent) => {
@@ -85,7 +85,7 @@ export const useFocusOutside = <T extends HTMLElement = HTMLElement>(
         return;
       }
 
-      callback(ref, e);
+      callback();
     };
   }, [callback, ref]);
 
