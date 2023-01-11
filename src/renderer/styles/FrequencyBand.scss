@@ -15,6 +15,11 @@
     .numberInput,
     .dropdown {
       align-self: center;
+
+      .list {
+        // Hide scroll bar for the filter type dropdown
+        overflow-y: hidden;
+      }
     }
 
     &::before,
