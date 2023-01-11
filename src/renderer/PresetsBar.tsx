@@ -20,16 +20,16 @@ const PresetListItem = ({
   handleDelete,
   isDisabled,
 }: IListItemProps) => {
-  const editModeRef = useRef<HTMLInputElement>(null);
+  const editValueRef = useRef<HTMLInputElement>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   // Close edit mode if the user clicks outside of the input
-  useClickOutside<HTMLInputElement>(editModeRef, () => {
+  useClickOutside<HTMLInputElement>(editValueRef, () => {
     setIsEditMode(false);
   });
 
   // Close edit mode if the user tabs outside of the input
-  useFocusOut<HTMLInputElement>(editModeRef, () => {
+  useFocusOut<HTMLInputElement>(editValueRef, () => {
     setIsEditMode(false);
   });
 
@@ -54,7 +54,7 @@ const PresetListItem = ({
     <>
       {isEditMode ? (
         <TextInput
-          ref={editModeRef}
+          ref={editValueRef}
           value={value}
           ariaLabel="Edit Preset Name"
           isDisabled={false}
@@ -131,8 +131,11 @@ const PresetsBar = () => {
   const handleChangeNewPresetName = (newValue: string) => {
     setPresetName(newValue);
 
-    // TODO: If the preset name is an existing one, we should set the selected one to be that so we can load it
-    setSelectedPresetName(undefined);
+    // Update selectedPresetName if the input value matches an existing preset name
+    const newSelectedName = presetNames.some((n) => n === newValue)
+      ? newValue
+      : undefined;
+    setSelectedPresetName(newSelectedName);
   };
 
   const handleChangeSelectedPreset = (newValue: string) => {
