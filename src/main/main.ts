@@ -54,6 +54,20 @@ export default class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
+const setWindowDimension = (isExpanded: boolean) => {
+  if (mainWindow) {
+    if (isExpanded) {
+      mainWindow.setMaximumSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
+      mainWindow.setSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
+      mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
+    } else {
+      mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+      mainWindow.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+      mainWindow.setMaximumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    }
+  }
+};
+
 /** ----- Equalizer APO Implementation ----- */
 
 // Load initial state from local state file
@@ -398,17 +412,7 @@ ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
 
 ipcMain.on(ChannelEnum.SET_WINDOW_SIZE, async (event, arg) => {
   const channel = ChannelEnum.SET_WINDOW_SIZE;
-  if (mainWindow) {
-    if (arg[0]) {
-      mainWindow.setMaximumSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
-      mainWindow.setSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
-      mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
-    } else {
-      mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-      mainWindow.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-      mainWindow.setMaximumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    }
-  }
+  setWindowDimension(arg[0]);
 
   const reply: TSuccess<void> = { result: undefined };
   event.reply(channel, reply);
@@ -458,12 +462,12 @@ const createMainWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    minWidth: 1024,
-    maxWidth: 1024,
-    height: 626,
-    minHeight: 626,
-    maxHeight: 1036,
+    width: WINDOW_WIDTH,
+    minWidth: WINDOW_WIDTH,
+    maxWidth: WINDOW_WIDTH,
+    height: WINDOW_HEIGHT,
+    minHeight: WINDOW_HEIGHT,
+    maxHeight: WINDOW_HEIGHT,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -477,6 +481,8 @@ const createMainWindow = async () => {
       height: 28,
     },
   });
+
+  setWindowDimension(state.isGraphViewOn);
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
