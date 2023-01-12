@@ -99,12 +99,12 @@ export const healthCheck = (): Promise<void> => {
 
 /**
  * Load preset into the current equalizer sliders
- * @returns { Promise<boolean> } stringified filter values of the preset.
+ * @returns { Promise<void> } stringified filter values of the preset.
  */
-export const loadPreset = (preset_name: string): Promise<boolean> => {
+export const loadPreset = (preset_name: string): Promise<void> => {
   const channel = ChannelEnum.LOAD_PRESET;
   window.electron.ipcRenderer.sendMessage(channel, [preset_name]);
-  return promisifyResult(simpleResponseHandler<boolean>(), channel);
+  return promisifyResult(setterResponseHandler, channel);
 };
 
 /**
