@@ -146,8 +146,8 @@ const FrequencyResponseChart = () => {
   }, [autoPreAmpValue, isAutoPreAmpOn, isLoading, setPreAmp]);
 
   const dimensions: ChartDimensions = {
-    width: 988,
-    height: 400,
+    width: 1396,
+    height: 380,
     margins: {
       top: 30,
       right: 30,
@@ -155,6 +155,7 @@ const FrequencyResponseChart = () => {
       left: 30,
     },
   };
+
   return (
     <>
       {isGraphViewOn && (
