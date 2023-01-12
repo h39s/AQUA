@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { ChartDataPointWithId } from './ChartController';
+import { IChartPointData } from './ChartController';
 
 export enum AnimationOptionsEnum {
   FADE_IN = 'fadeIn',
@@ -9,7 +9,9 @@ export enum AnimationOptionsEnum {
 
 interface IPointProps {
   name: string;
-  pointData: ChartDataPointWithId;
+  xScale: d3.AxisScale<d3.NumberValue>;
+  yScale: d3.AxisScale<d3.NumberValue>;
+  data: IChartPointData;
   radius: number;
   color: string;
   animation?: AnimationOptionsEnum;
@@ -18,14 +20,19 @@ interface IPointProps {
 
 const Point = ({
   name,
-  pointData,
+  xScale,
+  yScale,
+  data,
   radius,
   color,
   animation,
   transform,
 }: IPointProps) => {
   const ref = useRef<SVGCircleElement>(null);
-  const { id, x, y } = pointData;
+  const { x, y } = data;
+
+  const scaledX = useMemo(() => xScale(x) || 0, [x, xScale]);
+  const scaledY = useMemo(() => yScale(y) || 0, [y, yScale]);
 
   const animateFadeIn = useCallback(() => {
     if (ref.current) {
@@ -58,65 +65,15 @@ const Point = ({
   return (
     <circle
       ref={ref}
-      key={id}
-      id={id}
       name={name}
       r={radius}
       fill={color}
       stroke="#ffffff"
       transform={transform}
-      cx={x}
-      cy={y}
+      cx={scaledX}
+      cy={scaledY}
     />
   );
 };
 
-interface IPointsProps {
-  name: string;
-  xScale: d3.AxisScale<d3.NumberValue>;
-  yScale: d3.AxisScale<d3.NumberValue>;
-  color: string;
-  data: ChartDataPointWithId[];
-  animation?: AnimationOptionsEnum;
-  transform?: string;
-}
-
-const Points = ({
-  name,
-  xScale,
-  yScale,
-  color = 'white',
-  data = [],
-  animation = AnimationOptionsEnum.NONE,
-  transform,
-}: IPointsProps) => {
-  const scaledPoints = useMemo(
-    () =>
-      data.map(({ x, y, id }) => {
-        return {
-          x: xScale(x) || 0,
-          y: yScale(y) || 0,
-          id,
-        };
-      }),
-    [data, xScale, yScale]
-  );
-
-  return (
-    <>
-      {scaledPoints.map((point) => (
-        <Point
-          key={point.id}
-          name={name}
-          pointData={point}
-          radius={4}
-          color={color}
-          transform={transform}
-          animation={animation}
-        />
-      ))}
-    </>
-  );
-};
-
-export default Points;
+export default Point;

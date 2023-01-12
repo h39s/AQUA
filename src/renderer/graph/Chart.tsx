@@ -1,32 +1,22 @@
 import { useMemo } from 'react';
 import { ColorEnum } from '../styles/color';
 import Axis from './Axis';
-import Curve, {
-  AnimationOptionsEnum as CurveAnimationOptionsEnum,
-} from './Curve';
 import GridLine from './GridLine';
-import useController, {
-  ChartCurveData,
-  ChartPointsData,
-  MarginLike,
-} from './ChartController';
-import Points, {
-  AnimationOptionsEnum as PointsAnimationOptionsEnum,
-} from './Points';
+import useController, { IChartCurveData, IMarginLike } from './ChartController';
+import Curve from './Curve';
 
 export interface ChartDimensions {
   height: number;
   width: number;
-  margins: MarginLike;
+  margins: IMarginLike;
 }
 
 interface IChartProps {
-  data: ChartCurveData[];
+  data: IChartCurveData[];
   dimensions: ChartDimensions;
-  points: ChartPointsData[];
 }
 
-const Chart = ({ data = [], dimensions, points = [] }: IChartProps) => {
+const Chart = ({ data = [], dimensions }: IChartProps) => {
   const { width, height, margins } = dimensions;
   const svgWidth = useMemo(
     () => width - margins.left - margins.right,
@@ -91,28 +81,8 @@ const Chart = ({ data = [], dimensions, points = [] }: IChartProps) => {
         color={ColorEnum.COMPLEMENTARY}
         transform={`translate(${padding.left}, 0)`}
       />
-      {data.map((e: ChartCurveData) => (
-        <Curve
-          key={e.name}
-          name={e.name}
-          data={e.items}
-          xScale={xScaleFreq}
-          yScale={yScaleGain}
-          color={e.color}
-          width={e.width}
-          animation={CurveAnimationOptionsEnum.LEFT}
-        />
-      ))}
-      {points.map((e: ChartPointsData) => (
-        <Points
-          key={e.name}
-          name={e.name}
-          data={e.items}
-          xScale={xScaleFreq}
-          yScale={yScaleGain}
-          color={e.color}
-          animation={PointsAnimationOptionsEnum.FADE_IN}
-        />
+      {data.map((e: IChartCurveData) => (
+        <Curve key={e.id} data={e} xScale={xScaleFreq} yScale={yScaleGain} />
       ))}
       <Axis
         type="left"

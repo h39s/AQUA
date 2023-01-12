@@ -5,24 +5,12 @@ import { setMainPreAmp } from 'renderer/utils/equalizerApi';
 import { clamp } from 'renderer/utils/utils';
 import Chart, { ChartDimensions } from './Chart';
 import {
-  ChartCurveData,
-  ChartPointsData,
-  ChartDataPoint,
-  ChartDataPointWithId,
+  IChartCurveData,
+  IChartLineDataPointsById,
+  IChartPointData,
 } from './ChartController';
-import {
-  getFilterAdjustmentPoints,
-  getFilterGraphData,
-  getPreAmpLine,
-  getSpecificPoints,
-  getTotalCurveInfo,
-} from './utils';
-import {
-  ColorEnum,
-  getColor,
-  GrayScaleEnum,
-  SecondaryColorEnum,
-} from '../styles/color';
+import { getFilterLineData, getPreAmpLine, getCombinedLineData } from './utils';
+import { ColorEnum, getColor, GrayScaleEnum } from '../styles/color';
 
 const isFilterEqual = (f1: IFilter, f2: IFilter) => {
   if (!f1 || !f2) {
@@ -37,33 +25,19 @@ const isFilterEqual = (f1: IFilter, f2: IFilter) => {
   );
 };
 
+interface IGraphData {
+  chartData: IChartCurveData[];
+  autoPreAmpValue: number;
+}
+
 const FrequencyResponseChart = () => {
   const { filters, preAmp, isAutoPreAmpOn, setPreAmp, isGraphViewOn } =
     useAquaContext();
   const prevFilters = useRef<IFilter[]>([]);
-  const prevFilterLines = useRef<ChartDataPoint[][]>([]);
-  const prevFreqPoints = useRef<ChartDataPointWithId[][]>([]);
+  const prevFilterLines = useRef<IChartLineDataPointsById>({});
 
-  const {
-    chartData,
-    pointData,
-    autoPreAmpValue,
-  }: {
-    chartData: ChartCurveData[];
-    pointData: ChartPointsData[];
-    autoPreAmpValue: number;
-  } = useMemo(() => {
-    const freqData = filters.map(({ id, frequency }) => {
-      return { frequency, id };
-    });
-
-    const isFreqDiff =
-      prevFilters.current.length === freqData.length &&
-      !prevFilters.current.every(
-        ({ frequency }, i) => frequency === freqData[i].frequency
-      );
-
-    const hasNewFilter = prevFilters.current.length < freqData.length;
+  const { chartData, autoPreAmpValue }: IGraphData = useMemo(() => {
+    const pointById: { [id: string]: IChartPointData } = {};
 
     // Identify the index of each filter by id from previous render
     const prevIndices: { [id: string]: number } = {};
@@ -71,60 +45,38 @@ const FrequencyResponseChart = () => {
       prevIndices[f.id] = i;
     });
 
+    const updatedFilterLines: IChartLineDataPointsById = {};
+
     // Update filter lines that have changed
-    const { data: updatedFilterLines, points: updatedFreqPoints } = filters
-      .map((f) => {
-        const prevIndex = prevIndices[f.id];
-        // New filters have no previous data
-        if (!prevIndex) {
-          return getFilterGraphData(f, freqData);
-        }
+    filters.forEach((filter) => {
+      // Store control point info
+      pointById[filter.id] = { x: filter.frequency, y: filter.gain };
 
-        // Filter changes can impact both the curve and the points so update both
-        const hasFilterChanges = !isFilterEqual(
-          f,
-          prevFilters.current[prevIndex]
-        );
+      // New filters have no previous data
+      const prevIndex = prevIndices[filter.id];
+      if (!prevIndex) {
+        updatedFilterLines[filter.id] = getFilterLineData(filter);
+        return;
+      }
 
-        if (hasFilterChanges) {
-          return getFilterGraphData(f, freqData);
-        }
-
-        return {
-          data: prevFilterLines.current[prevIndex],
-          // Recompute specific points in 2 scenarios
-          //  1. to ensure a point for the new filter is added
-          //  2. to update point order when a filter's frequency has changed
-          points:
-            isFreqDiff || hasNewFilter
-              ? getSpecificPoints(f, freqData)
-              : prevFreqPoints.current[prevIndex],
-        };
-      })
-      .reduce<{ data: ChartDataPoint[][]; points: ChartDataPointWithId[][] }>(
-        (acc, curr) => {
-          acc.data.push(curr.data);
-          acc.points.push(curr.points);
-          return acc;
-        },
-        { data: [], points: [] }
-      );
+      // Recompute filter line if it has been adjusted
+      if (!isFilterEqual(filter, prevFilters.current[prevIndex])) {
+        updatedFilterLines[filter.id] = getFilterLineData(filter);
+      } else {
+        // Otherwise, reuse previous data
+        updatedFilterLines[filter.id] = prevFilterLines.current[filter.id];
+      }
+    });
 
     // Update past state
-    prevFreqPoints.current = updatedFreqPoints;
     prevFilterLines.current = updatedFilterLines;
     prevFilters.current = filters;
 
-    // Compute and return new chart data
-    const { data: totalCurveData } = getTotalCurveInfo(
-      preAmp,
-      updatedFilterLines,
-      updatedFreqPoints
-    );
+    // Compute combined line data
+    const totalCurveData = getCombinedLineData(preAmp, updatedFilterLines);
 
+    // Compute preAmp line data
     const preAmpLine = getPreAmpLine(preAmp);
-
-    const adjustmentPoints = getFilterAdjustmentPoints(filters);
 
     const highestPoint = totalCurveData.reduce(
       (previousValue, currentValue) => {
@@ -139,34 +91,37 @@ const FrequencyResponseChart = () => {
 
     return {
       chartData: [
-        ...updatedFilterLines.map((lineData, index) => {
-          return {
-            name: `Filter ${index}`,
-            color: getColor(index),
-            width: 2,
-            items: lineData,
-          };
-        }),
         {
+          id: 'PreAmp',
           name: 'PreAmp',
-          color: ColorEnum.ANALOGOUS2,
-          width: 2,
-          items: preAmpLine,
-        },
+          line: {
+            color: ColorEnum.ANALOGOUS2,
+            strokeWidth: 2,
+            points: preAmpLine,
+          },
+        } as IChartCurveData,
         {
+          id: 'Total Response',
           name: 'Total Response',
-          color: GrayScaleEnum.WHITE,
-          width: 3,
-          items: totalCurveData,
-        },
+          line: {
+            color: GrayScaleEnum.WHITE,
+            strokeWidth: 3,
+            points: totalCurveData,
+          },
+        } as IChartCurveData,
+        ...Object.keys(updatedFilterLines).map((id, index) => {
+          return {
+            id,
+            name: `Filter ${id}`,
+            line: {
+              color: getColor(index),
+              strokeWidth: 2,
+              points: updatedFilterLines[id],
+            },
+            point: pointById[id],
+          } as IChartCurveData;
+        }),
       ],
-      pointData: adjustmentPoints.map((p, index) => {
-        return {
-          name: `Point for filter ${index}`,
-          color: SecondaryColorEnum.DEFAULT,
-          items: [p],
-        };
-      }),
       // Rounding to two decimals
       autoPreAmpValue:
         Math.round(clamp(-1 * (highestPoint.y - preAmp), -30, 30) * 100) / 100,
@@ -194,7 +149,7 @@ const FrequencyResponseChart = () => {
     <>
       {isGraphViewOn && (
         <div className="graph-wrapper">
-          <Chart data={chartData} dimensions={dimensions} points={pointData} />
+          <Chart data={chartData} dimensions={dimensions} />
         </div>
       )}
     </>

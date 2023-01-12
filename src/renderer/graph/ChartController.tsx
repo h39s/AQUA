@@ -4,40 +4,40 @@ import * as d3 from 'd3';
 export const GRAPH_START = 10;
 export const GRAPH_END = 25000;
 
-export interface ChartDataPoint {
-  x: number;
-  y: number;
-}
-
-export interface ChartDataPointWithId extends ChartDataPoint {
-  id: string;
-}
-
-export interface MarginLike {
+export interface IMarginLike {
   left: number;
   top: number;
   right: number;
   bottom: number;
 }
 
-export interface ChartCurveData {
-  name: string;
-  color: string;
-  width: number;
-  items: ChartDataPoint[];
+export interface IChartPointData {
+  x: number;
+  y: number;
 }
 
-export interface ChartPointsData {
-  name: string;
+export interface IChartLineDataPointsById {
+  [id: string]: IChartPointData[];
+}
+
+export interface IChartLineData {
   color: string;
-  items: ChartDataPointWithId[];
+  strokeWidth: number;
+  points: IChartPointData[];
+}
+
+export interface IChartCurveData {
+  id: string;
+  name: string;
+  line: IChartLineData;
+  point?: IChartPointData;
 }
 
 interface IChartControllerProps {
-  data: ChartCurveData[];
+  data: IChartCurveData[];
   width: number;
   height: number;
-  padding: MarginLike;
+  padding: IMarginLike;
 }
 
 const useController = ({
@@ -47,12 +47,12 @@ const useController = ({
   padding,
 }: IChartControllerProps) => {
   const xMin = useMemo(
-    () => d3.min(data, ({ items }) => d3.min(items, ({ x }) => x)) || 0,
+    () => d3.min(data, ({ line }) => d3.min(line.points, ({ x }) => x)) || 0,
     [data]
   );
 
   const xMax = useMemo(
-    () => d3.max(data, ({ items }) => d3.max(items, ({ x }) => x)) || 0,
+    () => d3.max(data, ({ line }) => d3.max(line.points, ({ x }) => x)) || 0,
     [data]
   );
 
@@ -66,12 +66,12 @@ const useController = ({
   );
 
   const yMin = useMemo(
-    () => d3.min(data, ({ items }) => d3.min(items, ({ y }) => y)) || 0,
+    () => d3.min(data, ({ line }) => d3.min(line.points, ({ y }) => y)) || 0,
     [data]
   );
 
   const yMax = useMemo(
-    () => d3.max(data, ({ items }) => d3.max(items, ({ y }) => y)) || 0,
+    () => d3.max(data, ({ line }) => d3.max(line.points, ({ y }) => y)) || 0,
     [data]
   );
 

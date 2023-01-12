@@ -1,8 +1,8 @@
 import { FilterTypeEnum, IFilter } from 'common/constants';
 import { range } from 'renderer/utils/utils';
 import {
-  ChartDataPoint,
-  ChartDataPointWithId,
+  IChartPointData,
+  IChartLineDataPointsById,
   GRAPH_START,
   GRAPH_END,
 } from './ChartController';
@@ -167,56 +167,17 @@ const gainAtFrequency = (f: number, c: ITransferFuncCoeffs) => {
   return 10 * Math.log10(numerator / denominator);
 };
 
-interface IFreqData {
-  id: string;
-  frequency: number;
-}
-
-// Get points corresponding to filter frequencies for a filter
-export const getSpecificPoints = (
-  filter: IFilter,
-  freqData: IFreqData[]
-): ChartDataPointWithId[] => {
-  const tf = getTFCoefficients(filter);
-
-  const points: ChartDataPointWithId[] = freqData.map(({ id, frequency }) => {
-    return { x: frequency, y: gainAtFrequency(frequency, tf), id };
-  });
-
-  return points;
-};
-
-// Get coordinates for the adjustment points corresponding to each filter
-export const getFilterAdjustmentPoints = (
-  filters: IFilter[]
-): ChartDataPointWithId[] => {
-  return filters.map((filter: IFilter) => {
-    const tf = getTFCoefficients(filter);
-    return {
-      x: filter.frequency,
-      y: gainAtFrequency(filter.frequency, tf),
-      id: filter.id,
-    };
-  });
-};
-
 // Get curve info for the preAmplification
-export const getPreAmpLine = (preAmp: number): ChartDataPoint[] =>
+export const getPreAmpLine = (preAmp: number): IChartPointData[] =>
   SAMPLE_FREQUENCIES.map((f) => {
     return { x: f, y: preAmp };
   });
 
 // Get curve and point info for individual filters
-export const getFilterGraphData = (
-  filter: IFilter,
-  freqData: IFreqData[]
-): {
-  data: ChartDataPoint[];
-  points: ChartDataPointWithId[];
-} => {
+export const getFilterLineData = (filter: IFilter): IChartPointData[] => {
   const tf = getTFCoefficients(filter);
 
-  const data: ChartDataPoint[] = SAMPLE_FREQUENCIES.map((f) => {
+  const data: IChartPointData[] = SAMPLE_FREQUENCIES.map((f) => {
     return { x: f, y: 0 };
   });
 
@@ -225,47 +186,28 @@ export const getFilterGraphData = (
     data[i].y = freqFilterGain;
   }
 
-  const points: ChartDataPointWithId[] = freqData.map(({ id, frequency }) => {
-    return { x: frequency, y: gainAtFrequency(frequency, tf), id };
-  });
-
-  return { data, points };
+  return data;
 };
 
 // Get total curve info from filter and point data
-export const getTotalCurveInfo = (
+export const getCombinedLineData = (
   preAmp: number,
-  filterLines: ChartDataPoint[][],
-  freqPoints: ChartDataPointWithId[][]
+  filterLines: IChartLineDataPointsById
 ) => {
-  const frequencies = freqPoints[0].map(({ x }) => x);
-  const data: ChartDataPoint[] = SAMPLE_FREQUENCIES.map((f) => {
+  const data: IChartPointData[] = SAMPLE_FREQUENCIES.map((f) => {
     return { x: f, y: 0 };
   });
 
   for (let i = 0; i < SAMPLE_FREQUENCIES.length; i += 1) {
     // Add fixed preamp gain for each sample point
     data[i].y = preAmp;
-    for (let j = 0; j < filterLines.length; j += 1) {
+    Object.values(filterLines).forEach((points) => {
       // Add frequency gain obtained from each filter
-      data[i].y += filterLines[j][i].y;
-    }
+      data[i].y += points[i].y;
+    });
   }
 
-  const points: ChartDataPointWithId[] = frequencies.map((f) => {
-    return { x: f, y: 0, id: '' };
-  });
-
-  for (let i = 0; i < freqPoints[0].length; i += 1) {
-    // Add fixed preamp gain for each sample point
-    points[i].id = freqPoints[0][i].id;
-    points[i].y = preAmp;
-    for (let j = 0; j < freqPoints.length; j += 1) {
-      points[i].y += freqPoints[j][i].y;
-    }
-  }
-
-  return { data, points };
+  return data;
 };
 
 // Get total curve data points from state directly
@@ -276,7 +218,7 @@ export const getDataPoints = (preAmp: number, filters: IFilter[]) => {
   );
   const totalGains: number[] = Array(NUM_STEPS + 1).fill(0);
 
-  const data: ChartDataPoint[] = SAMPLE_FREQUENCIES.map((f) => {
+  const data: IChartPointData[] = SAMPLE_FREQUENCIES.map((f) => {
     return { x: f, y: 0 };
   });
 
