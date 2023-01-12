@@ -99,17 +99,6 @@ const PresetsBar = () => {
   >(undefined);
 
   // TODO: Fetch default presets and custom presets from storage
-
-  // getPresetListFromFiles()
-  // .then((res) => {
-  //   console.log('list of files is: ');
-  //   console.log(res);
-  //   return res;
-  // })
-  // .catch((error) => {
-  //   console.log('Failed to get list of presets from file');
-  //   console.log(error);
-  // });
   const [presetNames, setPresetNames] = useState<string[]>([
     'Airpods Pro to IEF Neutral AutoEQ',
     'Airpods to Harman AE OE 2018 AutoEQ',
@@ -131,30 +120,28 @@ const PresetsBar = () => {
     'Jazz',
   ]);
 
-  const handleCreatePreset = (prev: string[]) => {
-    savePreset(presetName);
+  const handleCreatePreset = async (prev: string[]) => {
+    await savePreset(presetName);
 
     // If we are creating a new preset and not just updating an existing one
     if (prev.indexOf(presetName) === -1) {
-      setSelectedPresetName(presetName);
+      await setSelectedPresetName(presetName);
       const newPresets = [...prev, presetName].sort();
-      setPresetNames(newPresets);
+      await setPresetNames(newPresets);
     }
 
     console.log('Finished Handling Create Preset!');
   };
 
-  const handleLoadPreset = () => {
+  const handleLoadPreset = async () => {
     if (selectedPresetName) {
-      loadPreset(selectedPresetName)
-        .then(() => {
-          performHealthCheck();
-          return true;
-        })
-        .catch((error) => {
-          console.log(`failed to get preset ${selectedPresetName}`);
-          console.log(error);
-        });
+      try {
+        await loadPreset(selectedPresetName);
+        await performHealthCheck();
+      } catch (error) {
+        console.log(`failed to get preset ${selectedPresetName}`);
+        console.log(error);
+      }
     }
     console.log('done loading preset!');
   };
