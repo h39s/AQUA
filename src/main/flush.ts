@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import {
   getDefaultState,
-  IFilter,
+  IPreset,
   IState,
   PRESETS_DIR,
 } from '../common/constants';
@@ -37,8 +37,8 @@ export const serializeState = (state: IState) => {
   return JSON.stringify(state);
 };
 
-export const serializeFilters = (filters: IFilter[]) => {
-  return JSON.stringify(filters);
+export const serializePreset = (preset: IPreset) => {
+  return JSON.stringify(preset);
 };
 
 const CONFIG_CONTENT = 'Include: aqua.txt';
@@ -73,10 +73,22 @@ export const save = (state: IState) => {
   }
 };
 
-export const savePreset = (preset_name: string, filters: IFilter[]) => {
+export const fetchPreset = (preset_name: string) => {
+  try {
+    const content = fs.readFileSync(PRESETS_DIR + preset_name, {
+      encoding: 'utf8',
+    });
+    return JSON.parse(content) as IPreset;
+  } catch (ex) {
+    console.log('Failed to get presets!!');
+    throw ex;
+  }
+};
+
+export const savePreset = (preset_name: string, preset_info: IPreset) => {
   // need to create presets dir first...... should we do this in the install?
   try {
-    fs.writeFileSync(PRESETS_DIR + preset_name, serializeFilters(filters), {
+    fs.writeFileSync(PRESETS_DIR + preset_name, serializePreset(preset_info), {
       encoding: 'utf8',
     });
   } catch (ex) {

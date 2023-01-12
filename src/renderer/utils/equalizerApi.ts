@@ -53,7 +53,7 @@ const promisifyResult = <Type>(
 };
 
 const buildResponseHandler = <
-  Type extends string | number | boolean | void | IState
+  Type extends string | number | boolean | void | IState | string[]
 >(
   resultEvaluator: (
     result: Type,
@@ -76,7 +76,7 @@ const buildResponseHandler = <
 };
 
 const simpleResponseHandler = <
-  Type extends string | number | boolean | void | IState
+  Type extends string | number | boolean | void | IState | string[]
 >() =>
   buildResponseHandler<Type>((result, resolve) => {
     resolve(result);
@@ -99,12 +99,12 @@ export const healthCheck = (): Promise<void> => {
 
 /**
  * Load preset into the current equalizer sliders
- * @returns { Promise<string> } stringified filter values of the preset.
+ * @returns { Promise<boolean> } stringified filter values of the preset.
  */
-export const loadPreset = (preset_name: string): Promise<string> => {
+export const loadPreset = (preset_name: string): Promise<boolean> => {
   const channel = ChannelEnum.LOAD_PRESET;
   window.electron.ipcRenderer.sendMessage(channel, [preset_name]);
-  return promisifyResult(simpleResponseHandler<string>(), channel);
+  return promisifyResult(simpleResponseHandler<boolean>(), channel);
 };
 
 /**
@@ -115,6 +115,16 @@ export const savePreset = (preset_name: string): Promise<void> => {
   const channel = ChannelEnum.SAVE_PRESET;
   window.electron.ipcRenderer.sendMessage(channel, [preset_name]);
   return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Get a list of preset file names in preset folder
+ * @returns { Promise<string[]> } if save was succesfull
+ */
+export const getPresetListFromFiles = (): Promise<string[]> => {
+  const channel = ChannelEnum.GET_PRESET_FILE_LIST;
+  window.electron.ipcRenderer.sendMessage(channel, []);
+  return promisifyResult(simpleResponseHandler<string[]>(), channel);
 };
 
 /**

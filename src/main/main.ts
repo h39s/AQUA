@@ -22,6 +22,7 @@ import {
   save,
   updateConfig,
   savePreset,
+  fetchPreset,
 } from './flush';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -30,6 +31,7 @@ import ChannelEnum from '../common/channels';
 import {
   FilterTypeEnum,
   IState,
+  IPreset,
   MAX_FREQUENCY,
   MAX_GAIN,
   MAX_NUM_FILTERS,
@@ -161,13 +163,9 @@ ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, preset_name: string) => {
   // might have to make the preset folder too?
 
   try {
-    const content = fs.readFileSync(PRESETS_DIR + preset_name, {
-      encoding: 'utf8',
-    });
-    const presetFileAsIFilters: IFilter[] = JSON.parse(content) as IFilter[];
-    state.filters = presetFileAsIFilters;
-    const reply: TSuccess<string> = { result: content };
-    event.reply(channel, reply);
+    const presetSettings: IPreset = fetchPreset(preset_name);
+    state.preAmp = presetSettings.preAmp;
+    state.filters = presetSettings.filters;
     await handleUpdate(event, channel);
   } catch (ex) {
     console.log('Failed to read preset: ', preset_name);
@@ -178,8 +176,26 @@ ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, preset_name: string) => {
 ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, preset_name: string) => {
   const channel = ChannelEnum.SAVE_PRESET;
   console.log(`Saving preset: ${preset_name}`);
-  savePreset(preset_name, state.filters);
+  savePreset(preset_name, {
+    preAmp: state.preAmp,
+    filters: state.filters,
+  });
   await handleUpdate(event, channel);
+});
+
+ipcMain.on(ChannelEnum.GET_PRESET_FILE_LIST, async (event) => {
+  const channel = ChannelEnum.GET_PRESET_FILE_LIST;
+  console.log(`Getting Preset List`);
+
+  // const fileNames: string[] = [];
+
+  const fileNames: string[] = fs.readdirSync(PRESETS_DIR);
+
+  console.log(fileNames);
+
+  const reply: TSuccess<string[]> = { result: fileNames };
+
+  event.reply(channel, reply);
 });
 
 ipcMain.on(ChannelEnum.GET_STATE, async (event) => {
