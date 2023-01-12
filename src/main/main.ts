@@ -269,6 +269,7 @@ ipcMain.on(ChannelEnum.SET_FILTER_FREQUENCY, async (event, arg) => {
   }
 
   state.filters[filterIndex].frequency = frequency;
+  state.filters.sort(sortHelper);
   await handleUpdate(event, channel + filterIndex);
 });
 
