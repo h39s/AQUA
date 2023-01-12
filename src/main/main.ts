@@ -44,7 +44,6 @@ import {
   WINDOW_HEIGHT_EXPANDED,
   WINDOW_WIDTH,
   PRESETS_DIR,
-  IFilter,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
 import { computeAvgFreq } from '../common/utils';
@@ -80,6 +79,11 @@ const setWindowDimension = (isExpanded: boolean) => {
 // Load initial state from local state file
 const state: IState = fetchSettings();
 let configPath = '';
+
+// create presets dir if it doesn't exist
+if (!fs.existsSync(PRESETS_DIR)) {
+  fs.mkdirSync(PRESETS_DIR);
+}
 
 const retryHelper = async (attempts: number, f: () => unknown) => {
   for (let i = 0; i < attempts; i += 1) {
