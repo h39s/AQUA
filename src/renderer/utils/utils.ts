@@ -113,10 +113,11 @@ export const useFocusOut = <T extends HTMLElement = HTMLElement>(
   }, [callback, ref]);
 
   useEffect(() => {
-    document.addEventListener('focusout', handleFocus, true);
+    const element = ref.current;
+    element?.addEventListener('focusout', handleFocus, true);
 
-    return () => document.removeEventListener('focusout', handleFocus, true);
-  }, [handleFocus]);
+    return () => element?.removeEventListener('focusout', handleFocus, true);
+  }, [ref, handleFocus]);
 };
 
 // https://reactjs.org/docs/hooks-faq.html#how-to-get-the-previous-props-or-state
