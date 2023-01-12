@@ -65,6 +65,11 @@ export interface IState {
   filters: IFilter[];
 }
 
+export interface IPreset {
+  preAmp: number;
+  filters: IFilter[];
+}
+
 /** ----- Default Values ----- */
 
 const FIXED_FREQUENCIES = [
