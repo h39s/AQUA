@@ -1,12 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import './styles/PresetsBar.scss';
-import { select } from 'd3';
-import {
-  healthCheck,
-  loadPreset,
-  savePreset,
-  getPresetListFromFiles,
-} from './utils/equalizerApi';
+import { loadPreset, savePreset } from './utils/equalizerApi';
 import { useAquaContext } from './utils/AquaContext';
 import TextInput from './widgets/TextInput';
 import Button from './widgets/Button';
