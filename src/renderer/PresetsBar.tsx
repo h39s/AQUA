@@ -1,7 +1,12 @@
 import { useMemo, useRef, useState } from 'react';
 import './styles/PresetsBar.scss';
 import { select } from 'd3';
-import { healthCheck, loadPreset, savePreset } from './utils/equalizerApi';
+import {
+  healthCheck,
+  loadPreset,
+  savePreset,
+  getPresetListFromFiles,
+} from './utils/equalizerApi';
 import { useAquaContext } from './utils/AquaContext';
 import TextInput from './widgets/TextInput';
 import Button from './widgets/Button';
@@ -94,6 +99,17 @@ const PresetsBar = () => {
   >(undefined);
 
   // TODO: Fetch default presets and custom presets from storage
+
+  // getPresetListFromFiles()
+  // .then((res) => {
+  //   console.log('list of files is: ');
+  //   console.log(res);
+  //   return res;
+  // })
+  // .catch((error) => {
+  //   console.log('Failed to get list of presets from file');
+  //   console.log(error);
+  // });
   const [presetNames, setPresetNames] = useState<string[]>([
     'Airpods Pro to IEF Neutral AutoEQ',
     'Airpods to Harman AE OE 2018 AutoEQ',
@@ -131,12 +147,9 @@ const PresetsBar = () => {
   const handleLoadPreset = () => {
     if (selectedPresetName) {
       loadPreset(selectedPresetName)
-        .then((json_string) => {
+        .then(() => {
           performHealthCheck();
-          const jsonContent = JSON.parse(json_string);
-          console.log('result');
-          console.log(jsonContent);
-          return jsonContent;
+          return true;
         })
         .catch((error) => {
           console.log(`failed to get preset ${selectedPresetName}`);

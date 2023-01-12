@@ -21,6 +21,7 @@ enum ChannelEnum {
   REMOVE_FILTER = 'removeFilter',
   LOAD_PRESET = 'loadPreset',
   SAVE_PRESET = 'savePreset',
+  GET_PRESET_FILE_LIST = 'getPresetFileList',
 }
 
 export default ChannelEnum;
