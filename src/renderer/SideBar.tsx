@@ -27,7 +27,7 @@ const SideBar = () => {
   };
 
   return (
-    <div className="col sideBar center">
+    <div className="col side-bar center">
       {isLoading ? (
         <div className="center full row">
           <Spinner />

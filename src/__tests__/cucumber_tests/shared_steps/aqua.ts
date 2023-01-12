@@ -43,7 +43,7 @@ export const givenEnabledState = (
     async (state: string) => {
       const desiredState = state === 'enabled';
       const equalizerSwitch = await webdriver.driver.$(
-        '.sideBar label[class="switch"][for="equalizerEnabler"]'
+        '.side-bar label[class="switch"][for="equalizerEnabler"]'
       );
 
       const switchOn = await equalizerSwitch
@@ -63,7 +63,7 @@ export const whenSetEnabledState = (
   webdriver: { driver: Driver | undefined }
 ) => {
   when(/^I toggle the equalizer state$/, async () => {
-    const equalizerSwitch = await webdriver.driver.$('.sideBar .switch');
+    const equalizerSwitch = await webdriver.driver.$('.side-bar .switch');
     equalizerSwitch.click();
     // wait 1000 ms for the action.
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -77,7 +77,7 @@ export const givenAutoPreAmpState = (
   given(/^auto pre-amp is (on|off)$/, async (state: string) => {
     const desiredState = state === 'on';
     const equalizerSwitch = await webdriver.driver.$(
-      '.sideBar label[class="switch"][for="autoPreAmpEnabler"]'
+      '.side-bar label[class="switch"][for="autoPreAmpEnabler"]'
     );
 
     const switchOn = await equalizerSwitch
