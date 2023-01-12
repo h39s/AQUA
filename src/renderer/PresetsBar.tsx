@@ -198,9 +198,9 @@ const PresetsBar = () => {
   }, [globalError, presetNames]);
 
   return (
-    <div className="presetsBar">
+    <div className="presets-bar">
       <h4>Preset Menu</h4>
-      <div className="row center presetName">
+      <div className="row center preset-name">
         Name:&nbsp;
         <TextInput
           value={presetName}
@@ -221,7 +221,7 @@ const PresetsBar = () => {
         name="preset"
         options={options}
         className="full"
-        itemClassName="presetListItem"
+        itemClassName="preset-list-item"
         value={presetName}
         handleChange={handleChangeSelectedPreset}
         isDisabled={!!globalError}

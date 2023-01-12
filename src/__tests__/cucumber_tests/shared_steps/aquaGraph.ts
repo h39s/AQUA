@@ -8,7 +8,7 @@ export const givenChartViewEnabledState = (
   when(/^ChartView is (enabled|disabled)$/, async (state: string) => {
     const desiredState = state === 'enabled';
     const graphViewSwitch = await webdriver.driver.$(
-      '.sideBar label[class="switch"][for="graphViewEnabler"]'
+      '.side-bar label[class="switch"][for="graphViewEnabler"]'
     );
 
     const switchOn = await graphViewSwitch

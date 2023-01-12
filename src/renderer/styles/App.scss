@@ -19,7 +19,7 @@ body {
     // Spacing and height
     padding: $spacing-m;
     padding-top: $spacing-s;
-    height: calc(100vh - $titlebar-height - $spacing-m - $spacing-s);
+    height: calc(100vh - $title-bar-height - $spacing-m - $spacing-s);
     width: calc(100vw - 2 * $spacing-m);
 
     // Add flex so we can split space bweteen parametric and graph views
@@ -29,9 +29,9 @@ body {
   }
 }
 
-.titlebar {
+.title-bar {
   background-color: $primary-dark;
-  height: $titlebar-height;
+  height: $title-bar-height;
   width: 100%;
   -webkit-app-region: drag; /* Allow user to drag the window using this titlebar */
   -webkit-user-select: none; /* Prevent user from selecting things */

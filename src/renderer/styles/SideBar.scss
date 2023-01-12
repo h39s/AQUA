@@ -2,8 +2,9 @@
 @import 'color';
 @import 'spacing';
 
-.sideBar {
-  min-width: $sidebar-width;
+.side-bar {
+  grid-area: side-bar;
+  min-width: $side-bar-width;
   padding: $spacing-s;
 
   border-radius: $spacing-m;

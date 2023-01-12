@@ -4,7 +4,7 @@
 
 // band width and height from constants file
 
-.mainContent {
+.main-content {
   width: $content-width;
   display: grid;
   grid-template-columns: 128px 1fr;
@@ -17,7 +17,7 @@
   border-radius: $spacing-m;
   border: $spacing-xxs solid $secondary-default;
 
-  .bandLabel {
+  .band-label {
     height: $band-height;
     justify-content: flex-start;
     gap: $spacing-s;
@@ -27,7 +27,7 @@
       height: 100%;
     }
 
-    .rowLabel {
+    .row-label {
       margin: $spacing-s 0;
     }
 

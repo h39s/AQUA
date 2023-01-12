@@ -56,7 +56,7 @@ const TextInput = forwardRef(
     return (
       <input
         ref={ref}
-        className="textInput"
+        className="text-input"
         type="text"
         value={storedValue}
         aria-label={ariaLabel}
