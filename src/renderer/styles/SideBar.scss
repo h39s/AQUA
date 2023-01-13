@@ -4,8 +4,7 @@
 
 .side-bar {
   grid-area: side-bar;
-  min-width: $side-bar-width;
-  padding: $spacing-s;
+  padding: $spacing-s $spacing-l;
 
   border-radius: $spacing-m;
   background: $primary-default;
