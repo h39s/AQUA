@@ -1,7 +1,6 @@
 @import 'color';
+@import 'constant';
 @import 'spacing';
-
-$input-height: 24px;
 
 .number-input {
   gap: $spacing-s;
