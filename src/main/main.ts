@@ -178,8 +178,6 @@ ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, preset_name: string) => {
   console.log(`Loading preset: ${preset_name}`);
 
   // TODO: should we do some str checking here?
-  // might have to make the preset folder too?
-
   try {
     const presetSettings: IPreset = fetchPreset(preset_name);
     state.preAmp = presetSettings.preAmp;
@@ -204,8 +202,6 @@ ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, preset_name: string) => {
 ipcMain.on(ChannelEnum.GET_PRESET_FILE_LIST, async (event) => {
   const channel = ChannelEnum.GET_PRESET_FILE_LIST;
   console.log(`Getting Preset List`);
-
-  // const fileNames: string[] = [];
 
   const fileNames: string[] = fs.readdirSync(PRESETS_DIR);
 

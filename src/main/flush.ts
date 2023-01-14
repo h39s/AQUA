@@ -86,7 +86,6 @@ export const fetchPreset = (preset_name: string) => {
 };
 
 export const savePreset = (preset_name: string, preset_info: IPreset) => {
-  // need to create presets dir first...... should we do this in the install?
   try {
     fs.writeFileSync(PRESETS_DIR + preset_name, serializePreset(preset_info), {
       encoding: 'utf8',

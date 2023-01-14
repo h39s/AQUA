@@ -16,7 +16,7 @@ const SideBar = () => {
 
   const setGain = async (newValue: number) => {
     try {
-      await setAutoPreAmpOn(false);
+      setAutoPreAmpOn(false);
       await setMainPreAmp(newValue);
       setPreAmp(newValue);
     } catch (e) {
