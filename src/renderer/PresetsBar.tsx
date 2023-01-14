@@ -1,6 +1,11 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './styles/PresetsBar.scss';
-import { loadPreset, savePreset } from './utils/equalizerApi';
+import { ErrorDescription } from 'common/errors';
+import {
+  getPresetListFromFiles,
+  loadPreset,
+  savePreset,
+} from './utils/equalizerApi';
 import { useAquaContext } from './utils/AquaContext';
 import TextInput from './widgets/TextInput';
 import Button from './widgets/Button';
@@ -21,16 +26,16 @@ const PresetListItem = ({
   handleDelete,
   isDisabled,
 }: IListItemProps) => {
-  const editModeRef = useRef<HTMLInputElement>(null);
+  const editValueRef = useRef<HTMLInputElement>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   // Close edit mode if the user clicks outside of the input
-  useClickOutside<HTMLInputElement>(editModeRef, () => {
+  useClickOutside<HTMLInputElement>(editValueRef, () => {
     setIsEditMode(false);
   });
 
   // Close edit mode if the user tabs outside of the input
-  useFocusOut<HTMLInputElement>(editModeRef, () => {
+  useFocusOut<HTMLInputElement>(editValueRef, () => {
     setIsEditMode(false);
   });
 
@@ -55,7 +60,7 @@ const PresetListItem = ({
     <>
       {isEditMode ? (
         <TextInput
-          ref={editModeRef}
+          ref={editValueRef}
           value={value}
           ariaLabel="Edit Preset Name"
           isDisabled={false}
@@ -85,43 +90,35 @@ const PresetListItem = ({
 };
 
 const PresetsBar = () => {
-  const { globalError, performHealthCheck } = useAquaContext();
+  const { globalError, performHealthCheck, setGlobalError } = useAquaContext();
 
   const [presetName, setPresetName] = useState<string>('');
   const [selectedPresetName, setSelectedPresetName] = useState<
     string | undefined
   >(undefined);
 
-  // TODO: Fetch default presets and custom presets from storage
-  const [presetNames, setPresetNames] = useState<string[]>([
-    'Airpods Pro to IEF Neutral AutoEQ',
-    'Airpods to Harman AE OE 2018 AutoEQ',
-    '7-1 Surround Sound Speaker Setup',
-    'Bass Boost',
-    'Bass and Treble Boost',
-    'Classic',
-    'Dance',
-    'Rock',
-    'Vocal Boost',
-    'Microphone Compensation',
-    'MORE BASS',
-    'Surround effect',
-    'Indie playlist',
-    'Pop',
-    'Hip-hop',
-    'R&B',
-    'Equalize for shrill noise',
-    'Jazz',
-  ]);
+  const [presetNames, setPresetNames] = useState<string[]>([]);
+
+  // Fetch default presets and custom presets from storage
+  useEffect(() => {
+    const fetchPresetNames = async () => {
+      const result = await getPresetListFromFiles();
+      // Sort preset names before updating state just in case
+      setPresetNames(result.sort());
+    };
+
+    fetchPresetNames();
+  }, []);
 
   const handleCreatePreset = async (prev: string[]) => {
     await savePreset(presetName);
 
     // If we are creating a new preset and not just updating an existing one
     if (prev.indexOf(presetName) === -1) {
-      await setSelectedPresetName(presetName);
+      setSelectedPresetName(presetName);
+      // Keep presets sorted
       const newPresets = [...prev, presetName].sort();
-      await setPresetNames(newPresets);
+      setPresetNames(newPresets);
     }
 
     console.log('Finished Handling Create Preset!');
@@ -131,10 +128,10 @@ const PresetsBar = () => {
     if (selectedPresetName) {
       try {
         await loadPreset(selectedPresetName);
-        await performHealthCheck();
-      } catch (error) {
+        performHealthCheck();
+      } catch (e) {
         console.log(`failed to get preset ${selectedPresetName}`);
-        console.log(error);
+        setGlobalError(e as ErrorDescription);
       }
     }
     console.log('done loading preset!');
@@ -143,8 +140,11 @@ const PresetsBar = () => {
   const handleChangeNewPresetName = (newValue: string) => {
     setPresetName(newValue);
 
-    // TODO: If the preset name is an existing one, we should set the selected one to be that so we can load it
-    setSelectedPresetName(undefined);
+    // Update selectedPresetName if the input value matches an existing preset name
+    const newSelectedName = presetNames.some((n) => n === newValue)
+      ? newValue
+      : undefined;
+    setSelectedPresetName(newSelectedName);
   };
 
   const handleChangeSelectedPreset = (newValue: string) => {
@@ -157,8 +157,12 @@ const PresetsBar = () => {
       oldValue: string,
       newValue: string
     ) => {
+      // TODO: Handle case where the new name already exists
       // TODO: improve DS to help check if the newValue is an existing preset or not
-      setPresetNames(presetNames.map((n) => (n === oldValue ? newValue : n)));
+      setPresetNames(
+        // Keep presets sorted
+        presetNames.map((n) => (n === oldValue ? newValue : n)).sort()
+      );
     };
 
     const handleDeletePreset = (deletedValue: string) => {
@@ -198,7 +202,7 @@ const PresetsBar = () => {
       <Button
         ariaLabel="Save settings to preset"
         className="small full"
-        isDisabled={!!globalError}
+        isDisabled={!!globalError || !presetName}
         handleChange={() => handleCreatePreset(presetNames)}
       >
         Save current settings to preset
