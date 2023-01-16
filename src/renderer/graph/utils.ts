@@ -209,28 +209,3 @@ export const getCombinedLineData = (
 
   return data;
 };
-
-// Get total curve data points from state directly
-export const getDataPoints = (preAmp: number, filters: IFilter[]) => {
-  const tfs = filters.map((f) => getTFCoefficients(f));
-  const filterGains: number[][] = Array(tfs.length).fill(
-    Array(NUM_STEPS + 1).fill(0)
-  );
-  const totalGains: number[] = Array(NUM_STEPS + 1).fill(0);
-
-  const data: IChartPointData[] = SAMPLE_FREQUENCIES.map((f) => {
-    return { x: f, y: 0 };
-  });
-
-  for (let i = 0; i < SAMPLE_FREQUENCIES.length; i += 1) {
-    totalGains[i] = preAmp;
-    for (let j = 0; j < tfs.length; j += 1) {
-      const freqFilterGain = gainAtFrequency(SAMPLE_FREQUENCIES[i], tfs[j]);
-      filterGains[j][i] = freqFilterGain;
-      totalGains[i] += freqFilterGain;
-    }
-    data[i].y = totalGains[i];
-  }
-
-  return data;
-};

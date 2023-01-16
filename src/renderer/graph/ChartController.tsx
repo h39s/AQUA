@@ -1,8 +1,12 @@
 import { useMemo } from 'react';
 import * as d3 from 'd3';
+import { Color } from 'renderer/styles/color';
 
 export const GRAPH_START = 10;
 export const GRAPH_END = 25000;
+
+export const INIT_ANIMATE_DURATION = 750;
+export const GRAPH_ANIMATE_DURATION = 100;
 
 export interface IMarginLike {
   left: number;
@@ -20,17 +24,15 @@ export interface IChartLineDataPointsById {
   [id: string]: IChartPointData[];
 }
 
-export interface IChartLineData {
-  color: string;
-  strokeWidth: number;
-  points: IChartPointData[];
-}
-
 export interface IChartCurveData {
   id: string;
   name: string;
-  line: IChartLineData;
-  point?: IChartPointData;
+  line: {
+    color: Color;
+    strokeWidth: number;
+    points: IChartPointData[];
+  };
+  controlPoint?: IChartPointData;
 }
 
 interface IChartControllerProps {

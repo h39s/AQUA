@@ -36,3 +36,9 @@ export const getColor = (index: number) => {
   const colors = Object.values(ColorEnum);
   return colors[index % colors.length];
 };
+
+export type Color =
+  | PrimaryColorEnum
+  | SecondaryColorEnum
+  | ColorEnum
+  | GrayScaleEnum;

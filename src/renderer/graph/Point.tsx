@@ -1,6 +1,11 @@
 import * as d3 from 'd3';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { IChartPointData } from './ChartController';
+import { useIsFirstRender } from 'renderer/utils/utils';
+import {
+  GRAPH_ANIMATE_DURATION,
+  IChartPointData,
+  INIT_ANIMATE_DURATION,
+} from './ChartController';
 
 export enum AnimationOptionsEnum {
   FADE_IN = 'fadeIn',
@@ -34,11 +39,13 @@ const Point = ({
   const scaledX = useMemo(() => xScale(x) || 0, [x, xScale]);
   const scaledY = useMemo(() => yScale(y) || 0, [y, yScale]);
 
+  const isFirstRender = useIsFirstRender();
+
   const animateFadeIn = useCallback(() => {
     if (ref.current) {
       d3.select(ref.current)
         .transition()
-        .duration(750)
+        .duration(INIT_ANIMATE_DURATION)
         .ease(d3.easeLinear)
         .attr('opacity', 1);
     }
@@ -50,17 +57,39 @@ const Point = ({
     }
   }, []);
 
-  useEffect(() => {
-    switch (animation) {
-      case AnimationOptionsEnum.FADE_IN:
-        animateFadeIn();
-        break;
-      case AnimationOptionsEnum.NONE:
-      default:
-        noneAnimation();
-        break;
+  // Set initial point location
+  const initRender = useCallback(() => {
+    if (ref.current) {
+      d3.select(ref.current).attr('cx', scaledX).attr('cy', scaledY);
     }
-  }, [animateFadeIn, noneAnimation, animation]);
+  }, [scaledX, scaledY]);
+
+  // Handle animation for the initial render
+  useEffect(() => {
+    if (isFirstRender) {
+      initRender();
+      switch (animation) {
+        case AnimationOptionsEnum.FADE_IN:
+          animateFadeIn();
+          break;
+        case AnimationOptionsEnum.NONE:
+        default:
+          noneAnimation();
+          break;
+      }
+    }
+  }, [animateFadeIn, noneAnimation, animation, isFirstRender, initRender]);
+
+  // Handle animation for subsequent renders
+  useEffect(() => {
+    if (ref.current && !isFirstRender) {
+      d3.select(ref.current)
+        .transition()
+        .duration(GRAPH_ANIMATE_DURATION)
+        .attr('cx', scaledX)
+        .attr('cy', scaledY);
+    }
+  }, [isFirstRender, scaledX, scaledY]);
 
   return (
     <circle
@@ -70,8 +99,6 @@ const Point = ({
       fill={color}
       stroke="#ffffff"
       transform={transform}
-      cx={scaledX}
-      cy={scaledY}
     />
   );
 };

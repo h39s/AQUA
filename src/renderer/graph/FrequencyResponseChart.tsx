@@ -37,7 +37,7 @@ const FrequencyResponseChart = () => {
   const prevFilterLines = useRef<IChartLineDataPointsById>({});
 
   const { chartData, autoPreAmpValue }: IGraphData = useMemo(() => {
-    const pointById: { [id: string]: IChartPointData } = {};
+    const controlPointByCurveId: { [id: string]: IChartPointData } = {};
 
     // Identify the index of each filter by id from previous render
     const prevIndices: { [id: string]: number } = {};
@@ -50,7 +50,10 @@ const FrequencyResponseChart = () => {
     // Update filter lines that have changed
     filters.forEach((filter) => {
       // Store control point info
-      pointById[filter.id] = { x: filter.frequency, y: filter.gain };
+      controlPointByCurveId[filter.id] = {
+        x: filter.frequency,
+        y: filter.gain,
+      };
 
       // New filters have no previous data
       const prevIndex = prevIndices[filter.id];
@@ -118,7 +121,7 @@ const FrequencyResponseChart = () => {
               strokeWidth: 2,
               points: updatedFilterLines[id],
             },
-            point: pointById[id],
+            controlPoint: controlPointByCurveId[id],
           } as IChartCurveData;
         }),
       ],

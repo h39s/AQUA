@@ -13,7 +13,7 @@ interface ICurveProps {
 }
 
 const Curve = ({ xScale, yScale, data }: ICurveProps) => {
-  const { name, line, point } = data;
+  const { name, line, controlPoint } = data;
 
   return (
     <>
@@ -26,10 +26,10 @@ const Curve = ({ xScale, yScale, data }: ICurveProps) => {
         strokeWidth={line.strokeWidth}
         animation={LineAnimationOptionsEnum.LEFT}
       />
-      {point && (
+      {controlPoint && (
         <Point
           name={name}
-          data={point}
+          data={controlPoint}
           xScale={xScale}
           yScale={yScale}
           color={SecondaryColorEnum.DEFAULT}
