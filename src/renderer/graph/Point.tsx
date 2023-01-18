@@ -85,6 +85,9 @@ const Point = ({
     if (ref.current && !isFirstRender) {
       d3.select(ref.current)
         .transition()
+        // Make sure initial animation is overwritten
+        .attr('opacity', 1)
+        // Add new animation
         .duration(GRAPH_ANIMATE_DURATION)
         .attr('cx', scaledX)
         .attr('cy', scaledY);

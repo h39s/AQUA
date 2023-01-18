@@ -113,6 +113,10 @@ const Line = ({
         // Adjust line length to match new curve
         .attr('stroke-dasharray', `${totalLength} ${totalLength}`)
         .transition()
+        // Make sure initial animation is overwritten
+        .attr('opacity', 1)
+        .attr('stroke-dashoffset', 0)
+        // Add new animation
         .duration(GRAPH_ANIMATE_DURATION)
         .attr('d', d);
     }
