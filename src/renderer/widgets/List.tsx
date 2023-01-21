@@ -1,4 +1,10 @@
-import { createRef, KeyboardEvent, useEffect, useMemo } from 'react';
+import {
+  createRef,
+  KeyboardEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+} from 'react';
 import '../styles/List.scss';
 
 export interface IOptionEntry {
@@ -48,28 +54,40 @@ const List = ({
     }
   }, [focusOnRender, inputRefs, options, value]);
 
-  const onChange = (newValue: string) => {
-    handleChange(newValue);
-  };
+  const onChange = useCallback(
+    (newValue: string) => {
+      handleChange(newValue);
+    },
+    [handleChange]
+  );
 
-  const handleItemKeyPress = (
-    e: KeyboardEvent,
-    entry: IOptionEntry,
-    index: number
-  ) => {
-    if (isDisabled) {
-      return;
-    }
-    if (e.code === 'Enter') {
-      onChange(entry.value);
-    } else if (e.code === 'ArrowDown') {
-      const next = Math.min(index + 1, options.length - 1);
-      inputRefs[next].current?.focus();
-    } else if (e.code === 'ArrowUp') {
-      const prev = Math.max(index - 1, 0);
-      inputRefs[prev].current?.focus();
-    }
-  };
+  const onMouseEnter = useCallback(
+    (index: number) => () => {
+      // Give focus on mouseenter if focus wasn't already within the element
+      if (!inputRefs[index].current?.contains(document.activeElement)) {
+        inputRefs[index].current?.focus();
+      }
+    },
+    [inputRefs]
+  );
+
+  const handleItemKeyPress = useCallback(
+    (entry: IOptionEntry, index: number) => (e: KeyboardEvent) => {
+      if (isDisabled) {
+        return;
+      }
+      if (e.code === 'Enter') {
+        onChange(entry.value);
+      } else if (e.code === 'ArrowDown') {
+        const next = Math.min(index + 1, options.length - 1);
+        inputRefs[next].current?.focus();
+      } else if (e.code === 'ArrowUp') {
+        const prev = Math.max(index - 1, 0);
+        inputRefs[prev].current?.focus();
+      }
+    },
+    [inputRefs, isDisabled, onChange, options.length]
+  );
 
   return (
     <ul className={`list ${className || ''}`} aria-label={`${name}-items`}>
@@ -85,8 +103,8 @@ const List = ({
             value={entry.value}
             aria-label={entry.label}
             onClick={() => onChange(entry.value)}
-            onKeyDown={(e) => handleItemKeyPress(e, entry, index)}
-            onMouseEnter={() => inputRefs[index].current?.focus()}
+            onKeyDown={handleItemKeyPress(entry, index)}
+            onMouseEnter={onMouseEnter(index)}
             tabIndex={0}
           >
             {entry.display}

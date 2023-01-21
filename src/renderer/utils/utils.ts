@@ -75,6 +75,28 @@ export const useClickOutside = <T extends HTMLElement = HTMLElement>(
   }, [handleClick]);
 };
 
+export const useMouseDownOutside = <T extends HTMLElement = HTMLElement>(
+  ref: RefObject<T>,
+  callback: () => void
+) => {
+  const handleMouseDown = useMemo(() => {
+    return (e: globalThis.MouseEvent) => {
+      if (!ref.current || ref.current.contains(e.target as Node)) {
+        return;
+      }
+
+      callback();
+    };
+  }, [callback, ref]);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleMouseDown, true);
+
+    return () =>
+      document.removeEventListener('mousedown', handleMouseDown, true);
+  }, [handleMouseDown]);
+};
+
 export const useFocusOutside = <T extends HTMLElement = HTMLElement>(
   ref: RefObject<T>,
   callback: () => void

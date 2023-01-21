@@ -549,6 +549,7 @@ const createMainWindow = async () => {
     minHeight: WINDOW_HEIGHT,
     maxHeight: WINDOW_HEIGHT,
     icon: getAssetPath('icon.png'),
+    resizable: false,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')

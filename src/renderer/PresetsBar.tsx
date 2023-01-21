@@ -12,7 +12,7 @@ import TextInput from './widgets/TextInput';
 import Button from './widgets/Button';
 import List, { IOptionEntry } from './widgets/List';
 import IconButton, { IconName } from './widgets/IconButton';
-import { useClickOutside, useFocusOut } from './utils/utils';
+import { useMouseDownOutside } from './utils/utils';
 
 interface IListItemProps {
   value: string;
@@ -31,12 +31,7 @@ const PresetListItem = ({
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   // Close edit mode if the user clicks outside of the input
-  useClickOutside<HTMLInputElement>(editValueRef, () => {
-    setIsEditMode(false);
-  });
-
-  // Close edit mode if the user tabs outside of the input
-  useFocusOut<HTMLInputElement>(editValueRef, () => {
+  useMouseDownOutside<HTMLInputElement>(editValueRef, () => {
     setIsEditMode(false);
   });
 
@@ -162,7 +157,6 @@ const PresetsBar = () => {
       oldValue: string,
       newValue: string
     ) => {
-      // TODO: Handle case where the new name already exists
       // TODO: improve DS to help check if the newValue is an existing preset or not
       setPresetNames(
         // Keep presets sorted
@@ -211,7 +205,7 @@ const PresetsBar = () => {
       </div>
       <Button
         ariaLabel="Save settings to preset"
-        className="small full"
+        className="small"
         isDisabled={!!globalError || !presetName}
         handleChange={() => handleCreatePreset(presetNames)}
       >
@@ -220,7 +214,6 @@ const PresetsBar = () => {
       <List
         name="preset"
         options={options}
-        className="full"
         itemClassName="preset-list-item"
         value={presetName}
         handleChange={handleChangeSelectedPreset}
@@ -228,7 +221,7 @@ const PresetsBar = () => {
       />
       <Button
         ariaLabel="Load selected preset"
-        className="small full"
+        className="small"
         isDisabled={!!globalError || !selectedPresetName}
         handleChange={handleLoadPreset}
       >
