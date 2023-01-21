@@ -10,7 +10,7 @@
   grid-template-rows: repeat(3, min-content) 1fr min-content;
   padding: $spacing-m;
   gap: $spacing-s;
-  justify-items: center;
+  justify-items: stretch;
 
   // Styling of the background wrapper
   border-radius: $spacing-m;
@@ -18,20 +18,16 @@
 
   h4 {
     margin: 1em 0 1em 0;
+    justify-self: center;
   }
 
   .button {
     // Ensure button width matches the list width
-    width: calc(100% - $spacing-s - $spacing-xs);
+    margin: $spacing-xs 0;
   }
 
-  // Adjust spacing for preset name input field
   .preset-name {
-    width: 100%;
-
-    input[type='text'] {
-      width: 100%;
-    }
+    padding-top: $spacing-xs;
   }
 
   .preset-list-item {
@@ -39,10 +35,6 @@
     padding: $spacing-xs $spacing-s;
     justify-content: space-between;
     align-items: center;
-
-    input[type='text'] {
-      width: 100%;
-    }
 
     .icons {
       display: none;

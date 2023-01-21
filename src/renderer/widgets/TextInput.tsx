@@ -15,6 +15,7 @@ interface ITextInputProps {
   handleChange: (newValue: string) => void;
   handleEscape?: () => void;
   updateOnSubmitOnly?: boolean;
+  errorMessage?: string;
 }
 
 const TextInput = forwardRef(
@@ -26,6 +27,7 @@ const TextInput = forwardRef(
       handleChange,
       handleEscape,
       updateOnSubmitOnly,
+      errorMessage,
     }: ITextInputProps,
     ref: ForwardedRef<HTMLInputElement>
   ) => {
@@ -37,7 +39,7 @@ const TextInput = forwardRef(
 
     // Helper for detecting use of the ENTER key
     const onKeyDown = (e: KeyboardEvent) => {
-      if (handleEscape && e.code === 'Escape') {
+      if (handleEscape && (e.code === 'Escape' || e.code === 'Tab')) {
         handleEscape();
       }
       if (updateOnSubmitOnly && e.code === 'Enter') {
@@ -54,17 +56,21 @@ const TextInput = forwardRef(
     };
 
     return (
-      <input
-        ref={ref}
-        className="text-input"
-        type="text"
-        value={storedValue}
-        aria-label={ariaLabel}
-        onChange={onChange}
-        onKeyDown={onKeyDown}
-        tabIndex={isDisabled ? -1 : 0}
-        aria-disabled={isDisabled}
-      />
+      <div className="col text-input">
+        <input
+          ref={ref}
+          type="text"
+          value={storedValue}
+          aria-label={ariaLabel}
+          aria-invalid={!!errorMessage}
+          aria-errormessage={errorMessage}
+          onChange={onChange}
+          onKeyDown={onKeyDown}
+          tabIndex={isDisabled ? -1 : 0}
+          aria-disabled={isDisabled}
+        />
+        <div>{errorMessage}</div>
+      </div>
     );
   }
 );
