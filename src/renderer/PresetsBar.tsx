@@ -5,6 +5,7 @@ import {
   deletePreset,
   getPresetListFromFiles,
   loadPreset,
+  renamePreset,
   savePreset,
 } from './utils/equalizerApi';
 import { useAquaContext } from './utils/AquaContext';
@@ -98,14 +99,18 @@ const PresetsBar = () => {
 
   // Renaming an existing preset
   const handleEditExistingPresetName = useCallback(
-    (oldValue: string) => (newValue: string) => {
-      // TODO: improve DS to help check if the newValue is an existing preset or not
-      setPresetNames(
-        // Keep presets sorted
-        presetNames.map((n) => (n === oldValue ? newValue : n)).sort()
-      );
+    (oldValue: string) => async (newValue: string) => {
+      try {
+        await renamePreset(oldValue, newValue);
+        setPresetNames(
+          // Keep presets sorted
+          presetNames.map((n) => (n === oldValue ? newValue : n)).sort()
+        );
+      } catch (e) {
+        setGlobalError(e as ErrorDescription);
+      }
     },
-    [presetNames]
+    [presetNames, setGlobalError]
   );
 
   // Validating a new preset name

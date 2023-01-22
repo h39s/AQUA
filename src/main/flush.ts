@@ -100,6 +100,17 @@ export const savePreset = (presetName: string, preset_info: IPreset) => {
   console.log(`Wrote preset for: ${presetName}`);
 };
 
+export const renamePreset = (oldName: string, newName: string) => {
+  const oldPath = addFileToPath(PRESETS_DIR, oldName);
+  const newPath = addFileToPath(PRESETS_DIR, newName);
+  try {
+    fs.renameSync(oldPath, newPath);
+  } catch (ex) {
+    console.log('Failed to rename preset %d to preset %d', oldName, newName);
+    throw ex;
+  }
+};
+
 export const flush = (state: IState, configDirPath: string) => {
   const configPath = addFileToPath(configDirPath, AQUA_CONFIG_FILENAME);
   try {
