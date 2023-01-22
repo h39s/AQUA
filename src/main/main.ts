@@ -22,6 +22,7 @@ import {
   updateConfig,
   savePreset,
   fetchPreset,
+  renamePreset,
 } from './flush';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -224,6 +225,13 @@ ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, arg) => {
     console.log(e);
     handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
   }
+});
+
+ipcMain.on(ChannelEnum.RENAME_PRESET, async (event, arg) => {
+  const channel = ChannelEnum.RENAME_PRESET;
+  const [oldName, newName]: string[] = arg;
+  renamePreset(oldName, newName);
+  await handleUpdate(event, channel);
 });
 
 ipcMain.on(ChannelEnum.GET_PRESET_FILE_LIST, async (event) => {

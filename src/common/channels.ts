@@ -22,6 +22,7 @@ enum ChannelEnum {
   LOAD_PRESET = 'loadPreset',
   SAVE_PRESET = 'savePreset',
   DELETE_PRESET = 'deletePreset',
+  RENAME_PRESET = 'renamePreset',
   GET_PRESET_FILE_LIST = 'getPresetFileList',
 }
 

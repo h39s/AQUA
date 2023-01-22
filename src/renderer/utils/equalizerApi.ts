@@ -127,6 +127,19 @@ export const deletePreset = (presetName: string): Promise<void> => {
   return promisifyResult(setterResponseHandler, channel);
 };
 
+/*
+ * Rename preset from an old name to a new one
+ * @returns { Promise<void> } if rename was succesfull
+ */
+export const renamePreset = (
+  oldName: string,
+  newName: string
+): Promise<void> => {
+  const channel = ChannelEnum.RENAME_PRESET;
+  window.electron.ipcRenderer.sendMessage(channel, [oldName, newName]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
 /**
  * Get a list of preset file names in preset folder
  * @returns { Promise<string[]> } if save was succesfull
