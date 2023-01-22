@@ -10,8 +10,6 @@
     border-radius: 4px;
     padding: $spacing-xs;
     font-size: small;
-    // width: 52px;
-    // height: 18px;
     justify-content: space-between;
     align-content: center;
     align-items: center;
@@ -24,5 +22,11 @@
       border: solid $spacing-xxs $red;
       outline: $spacing-xxs solid $red;
     }
+  }
+
+  .errorText {
+    font-size: smaller;
+    color: $white;
+    padding-top: $spacing-s;
   }
 }

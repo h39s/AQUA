@@ -98,7 +98,7 @@ const PresetsBar = () => {
   );
 
   // Renaming an existing preset
-  const handleEditExistingPresetName = useCallback(
+  const handleRenameExistingPresetName = useCallback(
     (oldValue: string) => async (newValue: string) => {
       try {
         await renamePreset(oldValue, newValue);
@@ -137,7 +137,7 @@ const PresetsBar = () => {
         display: (
           <PresetListItem
             value={n}
-            handleChange={handleEditExistingPresetName(n)}
+            handleChange={handleRenameExistingPresetName(n)}
             handleDelete={handleDeletePreset(n)}
             isDisabled={!!globalError}
             validate={validatePresetName}
@@ -149,7 +149,7 @@ const PresetsBar = () => {
     validatePresetName,
     globalError,
     handleDeletePreset,
-    handleEditExistingPresetName,
+    handleRenameExistingPresetName,
     presetNames,
   ]);
 
