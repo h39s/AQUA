@@ -3,7 +3,9 @@ import {
   ForwardedRef,
   forwardRef,
   KeyboardEvent,
+  useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import '../styles/TextInput.scss';
@@ -15,7 +17,7 @@ interface ITextInputProps {
   handleChange: (newValue: string) => void;
   handleEscape?: () => void;
   updateOnSubmitOnly?: boolean;
-  errorMessage?: string;
+  validate?: (newValue: string) => string | undefined;
 }
 
 const TextInput = forwardRef(
@@ -27,33 +29,67 @@ const TextInput = forwardRef(
       handleChange,
       handleEscape,
       updateOnSubmitOnly,
-      errorMessage,
+      validate,
     }: ITextInputProps,
     ref: ForwardedRef<HTMLInputElement>
   ) => {
     const [storedValue, setStoredValue] = useState<string>(value);
+    const prevValue = useRef<string>(value);
+    const [errorMessage, setErrorMessage] = useState<string | undefined>(
+      undefined
+    );
 
     useEffect(() => {
       setStoredValue(value);
     }, [value]);
 
-    // Helper for detecting use of the ENTER key
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (handleEscape && (e.code === 'Escape' || e.code === 'Tab')) {
-        handleEscape();
-      }
-      if (updateOnSubmitOnly && e.code === 'Enter') {
+    const validateAndSave = useCallback(() => {
+      // No need to validate if the value hasn't changed
+      if (prevValue.current === storedValue) {
         handleChange(storedValue);
+        return;
       }
-    };
 
-    const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-      const { value: input } = e.target;
-      setStoredValue(input);
-      if (!updateOnSubmitOnly) {
-        handleChange(input);
+      if (validate) {
+        // Perform validation
+        const msg = validate(storedValue);
+        setErrorMessage(msg);
+
+        // Save changes if validation has no errors
+        if (!msg) {
+          handleChange(storedValue);
+          prevValue.current = storedValue;
+        }
+      } else {
+        // Save changes directly
+        handleChange(storedValue);
+        prevValue.current = storedValue;
       }
-    };
+    }, [handleChange, storedValue, validate]);
+
+    // Helper for detecting use of the ENTER key
+    const onKeyDown = useCallback(
+      (e: KeyboardEvent) => {
+        if (handleEscape && (e.code === 'Escape' || e.code === 'Tab')) {
+          handleEscape();
+        }
+        if (updateOnSubmitOnly && e.code === 'Enter') {
+          validateAndSave();
+        }
+      },
+      [handleEscape, updateOnSubmitOnly, validateAndSave]
+    );
+
+    const onChange = useCallback(
+      (e: ChangeEvent<HTMLInputElement>) => {
+        const { value: input } = e.target;
+        setStoredValue(input);
+        if (!updateOnSubmitOnly) {
+          validateAndSave();
+        }
+      },
+      [updateOnSubmitOnly, validateAndSave]
+    );
 
     return (
       <div className="col text-input">
