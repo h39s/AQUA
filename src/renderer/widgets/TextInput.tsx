@@ -105,7 +105,7 @@ const TextInput = forwardRef(
           tabIndex={isDisabled ? -1 : 0}
           aria-disabled={isDisabled}
         />
-        <div>{errorMessage}</div>
+        <div className="errorText">{errorMessage}</div>
       </div>
     );
   }
