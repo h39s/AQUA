@@ -1,89 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import './styles/PresetsBar.scss';
 import { ErrorDescription } from 'common/errors';
 import {
+  deletePreset,
   getPresetListFromFiles,
   loadPreset,
   savePreset,
-  deletePreset,
 } from './utils/equalizerApi';
 import { useAquaContext } from './utils/AquaContext';
 import TextInput from './widgets/TextInput';
 import Button from './widgets/Button';
 import List, { IOptionEntry } from './widgets/List';
-import IconButton, { IconName } from './widgets/IconButton';
-import { useMouseDownOutside } from './utils/utils';
-
-interface IListItemProps {
-  value: string;
-  handleChange: (newValue: string) => void;
-  handleDelete: (value: string) => void;
-  isDisabled: boolean;
-}
-
-const PresetListItem = ({
-  value,
-  handleChange,
-  handleDelete,
-  isDisabled,
-}: IListItemProps) => {
-  const editValueRef = useRef<HTMLInputElement>(null);
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
-
-  // Close edit mode if the user clicks outside of the input
-  useMouseDownOutside<HTMLInputElement>(editValueRef, () => {
-    setIsEditMode(false);
-  });
-
-  const handleEditClicked = () => {
-    setIsEditMode(true);
-  };
-
-  const handleDeleteClicked = () => {
-    handleDelete(value);
-  };
-
-  const handleInputChange = (newValue: string) => {
-    handleChange(newValue);
-    setIsEditMode(false);
-  };
-
-  const handleEscape = () => {
-    setIsEditMode(false);
-  };
-
-  return (
-    <>
-      {isEditMode ? (
-        <TextInput
-          ref={editValueRef}
-          value={value}
-          ariaLabel="Edit Preset Name"
-          isDisabled={false}
-          handleChange={handleInputChange}
-          handleEscape={handleEscape}
-          updateOnSubmitOnly
-        />
-      ) : (
-        <>
-          {value}
-          <div className="row icons">
-            <IconButton
-              icon={IconName.EDIT}
-              handleClick={handleEditClicked}
-              isDisabled={isDisabled}
-            />
-            <IconButton
-              icon={IconName.DELETE}
-              handleClick={handleDeleteClicked}
-              isDisabled={isDisabled}
-            />
-          </div>
-        </>
-      )}
-    </>
-  );
-};
+import PresetListItem from './components/PresetListItem';
 
 const PresetsBar = () => {
   const { globalError, performHealthCheck, setGlobalError } = useAquaContext();
@@ -110,6 +38,7 @@ const PresetsBar = () => {
     fetchPresetNames();
   }, [setGlobalError]);
 
+  // Creating a new preset
   const handleCreatePreset = async (prev: string[]) => {
     try {
       await savePreset(presetName);
@@ -126,6 +55,7 @@ const PresetsBar = () => {
     }
   };
 
+  // Loading audio settings from an existing preset
   const handleLoadPreset = async () => {
     if (selectedPresetName) {
       try {
@@ -147,32 +77,54 @@ const PresetsBar = () => {
     setSelectedPresetName(newSelectedName);
   };
 
+  // Changing the selected preset in the UI
   const handleChangeSelectedPreset = (newValue: string) => {
     setPresetName(newValue);
     setSelectedPresetName(newValue);
   };
 
-  const options: IOptionEntry[] = useMemo(() => {
-    const handleEditExistingPresetName = (
-      oldValue: string,
-      newValue: string
-    ) => {
+  // Deleting a preset
+  const handleDeletePreset = useCallback(
+    (deletedValue: string) => async () => {
+      try {
+        await deletePreset(deletedValue);
+        setPresetNames(presetNames.filter((n) => n !== deletedValue));
+      } catch (e) {
+        // continue to run, the worst case is that the file still exists and that's all.
+      }
+    },
+    [presetNames]
+  );
+
+  // Renaming an existing preset
+  const handleEditExistingPresetName = useCallback(
+    (oldValue: string) => (newValue: string) => {
       // TODO: improve DS to help check if the newValue is an existing preset or not
       setPresetNames(
         // Keep presets sorted
         presetNames.map((n) => (n === oldValue ? newValue : n)).sort()
       );
-    };
+    },
+    [presetNames]
+  );
 
-    const handleDeletePreset = async (deletedValue: string) => {
-      setPresetNames(presetNames.filter((n) => n !== deletedValue));
-      try {
-        await deletePreset(deletedValue);
-      } catch (e) {
-        // continue to run, the worst case is that the file still exists and that's all.
+  // Validating a new preset name
+  const validatePresetName = useCallback(
+    (newValue: string) => {
+      if (
+        presetNames.some(
+          (oldValue) => newValue.toLowerCase() === oldValue.toLowerCase()
+        )
+      ) {
+        return 'Duplicate name found.';
       }
-    };
 
+      return undefined;
+    },
+    [presetNames]
+  );
+
+  const options: IOptionEntry[] = useMemo(() => {
     return presetNames.map((n) => {
       return {
         value: n,
@@ -180,16 +132,21 @@ const PresetsBar = () => {
         display: (
           <PresetListItem
             value={n}
-            handleChange={(newValue: string) =>
-              handleEditExistingPresetName(n, newValue)
-            }
-            handleDelete={handleDeletePreset}
+            handleChange={handleEditExistingPresetName(n)}
+            handleDelete={handleDeletePreset(n)}
             isDisabled={!!globalError}
+            validate={validatePresetName}
           />
         ),
       };
     });
-  }, [globalError, presetNames]);
+  }, [
+    validatePresetName,
+    globalError,
+    handleDeletePreset,
+    handleEditExistingPresetName,
+    presetNames,
+  ]);
 
   return (
     <div className="presets-bar">
