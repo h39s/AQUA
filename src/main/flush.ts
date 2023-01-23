@@ -75,7 +75,8 @@ export const save = (state: IState) => {
 
 export const fetchPreset = (preset_name: string) => {
   try {
-    const content = fs.readFileSync(PRESETS_DIR + preset_name, {
+    const presetPath = path.join(PRESETS_DIR, preset_name);
+    const content = fs.readFileSync(presetPath, {
       encoding: 'utf8',
     });
     return JSON.parse(content) as IPreset;
@@ -87,7 +88,8 @@ export const fetchPreset = (preset_name: string) => {
 
 export const savePreset = (preset_name: string, preset_info: IPreset) => {
   try {
-    fs.writeFileSync(PRESETS_DIR + preset_name, serializePreset(preset_info), {
+    const presetPath = path.join(PRESETS_DIR, preset_name);
+    fs.writeFileSync(presetPath, serializePreset(preset_info), {
       encoding: 'utf8',
     });
   } catch (ex) {

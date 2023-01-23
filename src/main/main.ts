@@ -80,9 +80,15 @@ const setWindowDimension = (isExpanded: boolean) => {
 const state: IState = fetchSettings();
 let configPath = '';
 
-// create presets dir if it doesn't exist
-if (!fs.existsSync(PRESETS_DIR)) {
-  fs.mkdirSync(PRESETS_DIR);
+try {
+  // create presets dir if it doesn't exist
+  if (!fs.existsSync(PRESETS_DIR)) {
+    fs.mkdirSync(PRESETS_DIR);
+  }
+} catch (e) {
+  console.error('Failed to make presets directory!!');
+  console.error(e);
+  throw e;
 }
 
 const retryHelper = async (attempts: number, f: () => unknown) => {
@@ -202,7 +208,7 @@ ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, preset_name: string) => {
 ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, preset_name: string) => {
   const channel = ChannelEnum.DELETE_PRESET;
   console.log(`Deleting preset: ${preset_name}`);
-  fs.unlinkSync(PRESETS_DIR + preset_name);
+  fs.unlinkSync(path.join(PRESETS_DIR, preset_name));
   await handleUpdate(event, channel);
 });
 
@@ -210,13 +216,17 @@ ipcMain.on(ChannelEnum.GET_PRESET_FILE_LIST, async (event) => {
   const channel = ChannelEnum.GET_PRESET_FILE_LIST;
   console.log(`Getting Preset List`);
 
-  const fileNames: string[] = fs.readdirSync(PRESETS_DIR);
-
-  console.log(fileNames);
-
-  const reply: TSuccess<string[]> = { result: fileNames };
-
-  event.reply(channel, reply);
+  try {
+    const fileNames: string[] = fs.readdirSync(PRESETS_DIR);
+    console.log(fileNames);
+    const reply: TSuccess<string[]> = { result: fileNames };
+    event.reply(channel, reply);
+  } catch (e) {
+    console.error('Failed to get filenames');
+    console.error(e);
+    const reply: TError = { errorCode: 500 };
+    event.reply(channel, reply);
+  }
 });
 
 ipcMain.on(ChannelEnum.GET_STATE, async (event) => {
