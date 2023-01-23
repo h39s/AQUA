@@ -199,6 +199,13 @@ ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, preset_name: string) => {
   await handleUpdate(event, channel);
 });
 
+ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, preset_name: string) => {
+  const channel = ChannelEnum.DELETE_PRESET;
+  console.log(`Deleting preset: ${preset_name}`);
+  fs.unlinkSync(PRESETS_DIR + preset_name);
+  await handleUpdate(event, channel);
+});
+
 ipcMain.on(ChannelEnum.GET_PRESET_FILE_LIST, async (event) => {
   const channel = ChannelEnum.GET_PRESET_FILE_LIST;
   console.log(`Getting Preset List`);

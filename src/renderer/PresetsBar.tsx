@@ -5,6 +5,7 @@ import {
   getPresetListFromFiles,
   loadPreset,
   savePreset,
+  deletePreset,
 } from './utils/equalizerApi';
 import { useAquaContext } from './utils/AquaContext';
 import TextInput from './widgets/TextInput';
@@ -44,6 +45,7 @@ const PresetListItem = ({
   };
 
   const handleDeleteClicked = () => {
+    deletePreset(value);
     handleDelete(value);
   };
 
