@@ -17,6 +17,7 @@ interface ITextInputProps {
   handleChange: (newValue: string) => void;
   handleEscape?: () => void;
   updateOnSubmitOnly?: boolean;
+  formatInput?: (value: string) => string;
   validate?: (newValue: string) => string | undefined;
 }
 
@@ -30,6 +31,7 @@ const TextInput = forwardRef(
       handleEscape,
       updateOnSubmitOnly,
       validate,
+      formatInput = (s) => s,
     }: ITextInputProps,
     ref: ForwardedRef<HTMLInputElement>
   ) => {
@@ -83,12 +85,12 @@ const TextInput = forwardRef(
     const onChange = useCallback(
       (e: ChangeEvent<HTMLInputElement>) => {
         const { value: input } = e.target;
-        setStoredValue(input);
+        setStoredValue(formatInput(input));
         if (!updateOnSubmitOnly) {
           validateAndSave();
         }
       },
-      [updateOnSubmitOnly, validateAndSave]
+      [formatInput, updateOnSubmitOnly, validateAndSave]
     );
 
     return (
