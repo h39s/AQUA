@@ -116,6 +116,9 @@ const PresetsBar = () => {
   // Validating a new preset name
   const validatePresetName = useCallback(
     (newValue: string) => {
+      if (!newValue) {
+        return 'Preset name cannot be emtpy.';
+      }
       if (
         presetNames.some(
           (oldValue) => newValue.toLowerCase() === oldValue.toLowerCase()

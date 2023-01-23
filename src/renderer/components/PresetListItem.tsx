@@ -3,6 +3,9 @@ import { useMouseDownOutside } from 'renderer/utils/utils';
 import IconButton, { IconName } from 'renderer/widgets/IconButton';
 import TextInput from 'renderer/widgets/TextInput';
 
+const formatPresetName = (s: string) =>
+  s.slice(0, 1).toUpperCase() + s.slice(1).toLowerCase();
+
 interface IPresetListItemProps {
   value: string;
   handleChange: (newValue: string) => void;
@@ -47,6 +50,7 @@ const PresetListItem = ({
           isDisabled={false}
           handleChange={handleInputChange}
           handleEscape={handleEscape}
+          formatInput={formatPresetName}
           validate={validate}
           updateOnSubmitOnly
         />
