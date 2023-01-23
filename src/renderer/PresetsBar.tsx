@@ -104,26 +104,35 @@ const PresetsBar = () => {
   // Fetch default presets and custom presets from storage
   useEffect(() => {
     const fetchPresetNames = async () => {
-      const result = await getPresetListFromFiles();
-      // Sort preset names before updating state just in case
-      setPresetNames(result.sort());
+      try {
+        const result = await getPresetListFromFiles();
+        // Sort preset names before updating state just in case
+        setPresetNames(result.sort());
+      } catch (e) {
+        console.error('Failed to get preset list of files');
+        console.error(e);
+        setPresetNames(['']);
+      }
     };
 
     fetchPresetNames();
   }, []);
 
   const handleCreatePreset = async (prev: string[]) => {
-    await savePreset(presetName);
+    try {
+      await savePreset(presetName);
 
-    // If we are creating a new preset and not just updating an existing one
-    if (prev.indexOf(presetName) === -1) {
-      setSelectedPresetName(presetName);
-      // Keep presets sorted
-      const newPresets = [...prev, presetName].sort();
-      setPresetNames(newPresets);
+      // If we are creating a new preset and not just updating an existing one
+      if (prev.indexOf(presetName) === -1) {
+        setSelectedPresetName(presetName);
+        // Keep presets sorted
+        const newPresets = [...prev, presetName].sort();
+        setPresetNames(newPresets);
+      }
+    } catch (e) {
+      console.error('Failed to save preset');
+      console.error(e);
     }
-
-    console.log('Finished Handling Create Preset!');
   };
 
   const handleLoadPreset = async () => {
@@ -132,11 +141,9 @@ const PresetsBar = () => {
         await loadPreset(selectedPresetName);
         performHealthCheck();
       } catch (e) {
-        console.log(`failed to get preset ${selectedPresetName}`);
         setGlobalError(e as ErrorDescription);
       }
     }
-    console.log('done loading preset!');
   };
 
   const handleChangeNewPresetName = (newValue: string) => {
