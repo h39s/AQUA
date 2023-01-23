@@ -29,4 +29,7 @@ npm-debug.log.*
 *.sass.d.ts
 *.scss.d.ts
 
+# App files
 state.txt
+aqua.txt
+presets
