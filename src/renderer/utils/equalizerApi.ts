@@ -118,6 +118,16 @@ export const savePreset = (preset_name: string): Promise<void> => {
 };
 
 /**
+ * Delete a preset file in preset folder
+ * @returns { Promise<void> } if delete was succesfull
+ */
+export const deletePreset = (preset_name: string): Promise<void> => {
+  const channel = ChannelEnum.DELETE_PRESET;
+  window.electron.ipcRenderer.sendMessage(channel, [preset_name]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
  * Get a list of preset file names in preset folder
  * @returns { Promise<string[]> } if save was succesfull
  */
