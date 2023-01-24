@@ -1,5 +1,5 @@
 import { ErrorDescription } from 'common/errors';
-import { setMainPreAmp } from './utils/equalizerApi';
+import { disableAutoPreAmp, setMainPreAmp } from './utils/equalizerApi';
 import EqualizerEnablerSwitch from './components/EqualizerEnablerSwitch';
 import Slider from './components/Slider';
 import './styles/SideBar.scss';
@@ -17,6 +17,7 @@ const SideBar = () => {
   const setGain = async (newValue: number) => {
     try {
       setAutoPreAmpOn(false);
+      await disableAutoPreAmp();
       await setMainPreAmp(newValue);
       setPreAmp(newValue);
     } catch (e) {

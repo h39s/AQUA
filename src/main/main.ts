@@ -179,36 +179,36 @@ ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
   }
 });
 
-ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, preset_name: string) => {
+ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, presetName: string) => {
   const channel = ChannelEnum.LOAD_PRESET;
-  console.log(`Loading preset: ${preset_name}`);
+  console.log(`Loading preset: ${presetName}`);
 
   // TODO: should we do some str checking here?
   try {
-    const presetSettings: IPreset = fetchPreset(preset_name);
+    const presetSettings: IPreset = fetchPreset(presetName);
     state.preAmp = presetSettings.preAmp;
     state.filters = presetSettings.filters;
     await handleUpdate(event, channel);
   } catch (ex) {
-    console.log('Failed to read preset: ', preset_name);
+    console.log('Failed to read preset: ', presetName);
     throw ex;
   }
 });
 
-ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, preset_name: string) => {
+ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, presetName: string) => {
   const channel = ChannelEnum.SAVE_PRESET;
-  console.log(`Saving preset: ${preset_name}`);
-  savePreset(preset_name, {
+  console.log(`Saving preset: ${presetName}`);
+  savePreset(presetName, {
     preAmp: state.preAmp,
     filters: state.filters,
   });
   await handleUpdate(event, channel);
 });
 
-ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, preset_name: string) => {
+ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, presetName: string) => {
   const channel = ChannelEnum.DELETE_PRESET;
-  console.log(`Deleting preset: ${preset_name}`);
-  fs.unlinkSync(path.join(PRESETS_DIR, preset_name));
+  console.log(`Deleting preset: ${presetName}`);
+  fs.unlinkSync(path.join(PRESETS_DIR, presetName));
   await handleUpdate(event, channel);
 });
 

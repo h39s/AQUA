@@ -45,7 +45,6 @@ const PresetListItem = ({
   };
 
   const handleDeleteClicked = () => {
-    deletePreset(value);
     handleDelete(value);
   };
 
@@ -111,12 +110,12 @@ const PresetsBar = () => {
       } catch (e) {
         console.error('Failed to get preset list of files');
         console.error(e);
-        setPresetNames(['']);
+        setGlobalError(e as ErrorDescription);
       }
     };
 
     fetchPresetNames();
-  }, []);
+  }, [setGlobalError]);
 
   const handleCreatePreset = async (prev: string[]) => {
     try {
@@ -174,8 +173,14 @@ const PresetsBar = () => {
       );
     };
 
-    const handleDeletePreset = (deletedValue: string) => {
+    const handleDeletePreset = async (deletedValue: string) => {
       setPresetNames(presetNames.filter((n) => n !== deletedValue));
+      try {
+        await deletePreset(deletedValue);
+      } catch (e) {
+        console.log('Failed to delete preset!');
+        // continue to run, the worst case is that the file still exists and that's all.
+      }
     };
 
     return presetNames.map((n) => {

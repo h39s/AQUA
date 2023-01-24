@@ -101,9 +101,9 @@ export const healthCheck = (): Promise<void> => {
  * Load preset into the current equalizer sliders
  * @returns { Promise<void> } stringified filter values of the preset.
  */
-export const loadPreset = (preset_name: string): Promise<void> => {
+export const loadPreset = (presetName: string): Promise<void> => {
   const channel = ChannelEnum.LOAD_PRESET;
-  window.electron.ipcRenderer.sendMessage(channel, [preset_name]);
+  window.electron.ipcRenderer.sendMessage(channel, [presetName]);
   return promisifyResult(setterResponseHandler, channel);
 };
 
@@ -111,9 +111,9 @@ export const loadPreset = (preset_name: string): Promise<void> => {
  * Save preset into preset file
  * @returns { Promise<void> } if save was succesfull
  */
-export const savePreset = (preset_name: string): Promise<void> => {
+export const savePreset = (presetName: string): Promise<void> => {
   const channel = ChannelEnum.SAVE_PRESET;
-  window.electron.ipcRenderer.sendMessage(channel, [preset_name]);
+  window.electron.ipcRenderer.sendMessage(channel, [presetName]);
   return promisifyResult(setterResponseHandler, channel);
 };
 
@@ -121,9 +121,9 @@ export const savePreset = (preset_name: string): Promise<void> => {
  * Delete a preset file in preset folder
  * @returns { Promise<void> } if delete was succesfull
  */
-export const deletePreset = (preset_name: string): Promise<void> => {
+export const deletePreset = (presetName: string): Promise<void> => {
   const channel = ChannelEnum.DELETE_PRESET;
-  window.electron.ipcRenderer.sendMessage(channel, [preset_name]);
+  window.electron.ipcRenderer.sendMessage(channel, [presetName]);
   return promisifyResult(setterResponseHandler, channel);
 };
 
