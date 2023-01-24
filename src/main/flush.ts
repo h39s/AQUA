@@ -73,9 +73,9 @@ export const save = (state: IState) => {
   }
 };
 
-export const fetchPreset = (preset_name: string) => {
+export const fetchPreset = (presetName: string) => {
   try {
-    const presetPath = path.join(PRESETS_DIR, preset_name);
+    const presetPath = path.join(PRESETS_DIR, presetName);
     const content = fs.readFileSync(presetPath, {
       encoding: 'utf8',
     });
@@ -86,18 +86,18 @@ export const fetchPreset = (preset_name: string) => {
   }
 };
 
-export const savePreset = (preset_name: string, preset_info: IPreset) => {
+export const savePreset = (presetName: string, preset_info: IPreset) => {
   try {
-    const presetPath = path.join(PRESETS_DIR, preset_name);
+    const presetPath = path.join(PRESETS_DIR, presetName);
     fs.writeFileSync(presetPath, serializePreset(preset_info), {
       encoding: 'utf8',
     });
   } catch (ex) {
-    console.log('Failed to save to preset %d', preset_name);
+    console.log('Failed to save to preset %d', presetName);
     throw ex;
   }
 
-  console.log(`Wrote preset for: ${preset_name}`);
+  console.log(`Wrote preset for: ${presetName}`);
 };
 
 export const flush = (state: IState, configDirPath: string) => {
