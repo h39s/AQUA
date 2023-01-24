@@ -179,8 +179,9 @@ ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
   }
 });
 
-ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, presetName: string) => {
+ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, arg) => {
   const channel = ChannelEnum.LOAD_PRESET;
+  const presetName = arg[0];
   console.log(`Loading preset: ${presetName}`);
 
   // TODO: should we do some str checking here?
@@ -195,8 +196,9 @@ ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, presetName: string) => {
   }
 });
 
-ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, presetName: string) => {
+ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, arg) => {
   const channel = ChannelEnum.SAVE_PRESET;
+  const presetName = arg[0];
   console.log(`Saving preset: ${presetName}`);
   savePreset(presetName, {
     preAmp: state.preAmp,
@@ -205,10 +207,12 @@ ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, presetName: string) => {
   await handleUpdate(event, channel);
 });
 
-ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, presetName: string) => {
+ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, arg) => {
   const channel = ChannelEnum.DELETE_PRESET;
-  console.log(`Deleting preset: ${presetName}`);
-  fs.unlinkSync(path.join(PRESETS_DIR, presetName));
+  const presetName = arg[0];
+  const pathToDelete = path.join(PRESETS_DIR, presetName);
+  console.log(`Deleting preset: ${presetName} at location ${pathToDelete}`);
+  fs.unlinkSync(pathToDelete);
   await handleUpdate(event, channel);
 });
 
