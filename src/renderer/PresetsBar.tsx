@@ -108,8 +108,6 @@ const PresetsBar = () => {
         // Sort preset names before updating state just in case
         setPresetNames(result.sort());
       } catch (e) {
-        console.error('Failed to get preset list of files');
-        console.error(e);
         setGlobalError(e as ErrorDescription);
       }
     };
@@ -129,8 +127,7 @@ const PresetsBar = () => {
         setPresetNames(newPresets);
       }
     } catch (e) {
-      console.error('Failed to save preset');
-      console.error(e);
+      setGlobalError(e as ErrorDescription);
     }
   };
 
@@ -178,7 +175,6 @@ const PresetsBar = () => {
       try {
         await deletePreset(deletedValue);
       } catch (e) {
-        console.log('Failed to delete preset!');
         // continue to run, the worst case is that the file still exists and that's all.
       }
     };

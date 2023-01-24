@@ -14,7 +14,6 @@ import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import { uid } from 'uid';
 import fs from 'fs';
-import { filter, json } from 'd3';
 import {
   checkConfigFile,
   fetchSettings,
@@ -179,8 +178,9 @@ ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
   }
 });
 
-ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, presetName: string) => {
+ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, arg) => {
   const channel = ChannelEnum.LOAD_PRESET;
+  const presetName = arg[0];
   console.log(`Loading preset: ${presetName}`);
 
   // TODO: should we do some str checking here?
@@ -191,24 +191,38 @@ ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, presetName: string) => {
     await handleUpdate(event, channel);
   } catch (ex) {
     console.log('Failed to read preset: ', presetName);
-    throw ex;
+    console.log(ex);
+    handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
   }
 });
 
-ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, presetName: string) => {
+ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, arg) => {
   const channel = ChannelEnum.SAVE_PRESET;
+  const presetName = arg[0];
   console.log(`Saving preset: ${presetName}`);
-  savePreset(presetName, {
-    preAmp: state.preAmp,
-    filters: state.filters,
-  });
+  try {
+    savePreset(presetName, {
+      preAmp: state.preAmp,
+      filters: state.filters,
+    });
+  } catch (e) {
+    handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
+  }
   await handleUpdate(event, channel);
 });
 
-ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, presetName: string) => {
+ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, arg) => {
   const channel = ChannelEnum.DELETE_PRESET;
-  console.log(`Deleting preset: ${presetName}`);
-  fs.unlinkSync(path.join(PRESETS_DIR, presetName));
+  const presetName = arg[0];
+  const pathToDelete = path.join(PRESETS_DIR, presetName);
+  console.log(`Deleting preset: ${presetName} at location ${pathToDelete}`);
+  try {
+    fs.unlinkSync(pathToDelete);
+  } catch (e) {
+    console.log('Failed to delete preset');
+    console.log(e);
+    handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
+  }
   await handleUpdate(event, channel);
 });
 
@@ -224,8 +238,7 @@ ipcMain.on(ChannelEnum.GET_PRESET_FILE_LIST, async (event) => {
   } catch (e) {
     console.error('Failed to get filenames');
     console.error(e);
-    const reply: TError = { errorCode: 500 };
-    event.reply(channel, reply);
+    handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
   }
 });
 
