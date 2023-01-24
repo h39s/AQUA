@@ -7,9 +7,13 @@ import AddSliderDivider from './components/AddSliderDivider';
 import SortWrapper from './SortWrapper';
 
 const MainContent = () => {
-  const { filters } = useAquaContext();
+  const { filters, isLoading } = useAquaContext();
   const wrapperRef = createRef<HTMLDivElement>();
-  return (
+  return isLoading ? (
+    <div className="center full row">
+      <h1>Loading...</h1>
+    </div>
+  ) : (
     <div className="center mainContent">
       <div className="col center bandLabel">
         <span className="rowLabel">Filter Type</span>

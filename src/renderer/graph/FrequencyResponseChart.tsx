@@ -17,8 +17,14 @@ const isFilterEqual = (f1: IFilter, f2: IFilter) => {
 };
 
 const FrequencyResponseChart = () => {
-  const { filters, preAmp, isAutoPreAmpOn, setPreAmp, isGraphViewOn } =
-    useAquaContext();
+  const {
+    filters,
+    isAutoPreAmpOn,
+    isGraphViewOn,
+    isLoading,
+    preAmp,
+    setPreAmp,
+  } = useAquaContext();
   const prevFilters = useRef<IFilter[]>([]);
   const prevFilterLines = useRef<ChartDataPoint[][]>([]);
 
@@ -84,7 +90,13 @@ const FrequencyResponseChart = () => {
     <>
       {isGraphViewOn && (
         <div className="graph-wrapper">
-          <Chart data={chartData} dimensions={dimensions} />
+          {isLoading ? (
+            <div className="center full row">
+              <h1>Loading...</h1>
+            </div>
+          ) : (
+            <Chart data={chartData} dimensions={dimensions} />
+          )}
         </div>
       )}
     </>
