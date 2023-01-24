@@ -218,12 +218,12 @@ ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, arg) => {
   console.log(`Deleting preset: ${presetName} at location ${pathToDelete}`);
   try {
     fs.unlinkSync(pathToDelete);
+    await handleUpdate(event, channel);
   } catch (e) {
     console.log('Failed to delete preset');
     console.log(e);
     handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
   }
-  await handleUpdate(event, channel);
 });
 
 ipcMain.on(ChannelEnum.GET_PRESET_FILE_LIST, async (event) => {
