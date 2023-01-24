@@ -107,15 +107,12 @@ const Line = ({
   // Handle animation for subsequent renders
   useEffect(() => {
     if (ref.current && !isFirstRender) {
-      // Recalculate line length if scale or data has changed
-      const totalLength = ref.current ? ref.current.getTotalLength() : 100;
       d3.select(ref.current)
-        // Adjust line length to match new curve
-        .attr('stroke-dasharray', `${totalLength} ${totalLength}`)
-        .transition()
         // Make sure initial animation is overwritten
+        .attr('stroke-dasharray', null)
+        .attr('stroke-offset', null)
         .attr('opacity', 1)
-        .attr('stroke-dashoffset', 0)
+        .transition()
         // Add new animation
         .duration(GRAPH_ANIMATE_DURATION)
         .attr('d', d);
