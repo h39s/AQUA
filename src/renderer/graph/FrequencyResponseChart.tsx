@@ -31,8 +31,14 @@ interface IGraphData {
 }
 
 const FrequencyResponseChart = () => {
-  const { filters, preAmp, isAutoPreAmpOn, setPreAmp, isGraphViewOn } =
-    useAquaContext();
+  const {
+    filters,
+    isAutoPreAmpOn,
+    isLoading,
+    preAmp,
+    setPreAmp,
+    isGraphViewOn,
+  } = useAquaContext();
   const prevFilters = useRef<IFilter[]>([]);
   const prevFilterLines = useRef<IChartLineDataPointsById>({});
 
@@ -132,11 +138,12 @@ const FrequencyResponseChart = () => {
   }, [filters, preAmp]);
 
   useEffect(() => {
-    if (isAutoPreAmpOn) {
+    // Don't automatically adjust preamp if state hasn't been fetched yet
+    if (!isLoading && isAutoPreAmpOn) {
       setMainPreAmp(autoPreAmpValue);
       setPreAmp(autoPreAmpValue);
     }
-  }, [autoPreAmpValue, isAutoPreAmpOn, setPreAmp]);
+  }, [autoPreAmpValue, isAutoPreAmpOn, isLoading, setPreAmp]);
 
   const dimensions: ChartDimensions = {
     width: 988,
