@@ -205,10 +205,10 @@ ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, arg) => {
       preAmp: state.preAmp,
       filters: state.filters,
     });
+    await handleUpdate(event, channel);
   } catch (e) {
     handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
   }
-  await handleUpdate(event, channel);
 });
 
 ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, arg) => {
