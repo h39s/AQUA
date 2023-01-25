@@ -3,8 +3,10 @@ import { useMouseDownOutside } from 'renderer/utils/utils';
 import IconButton, { IconName } from 'renderer/widgets/IconButton';
 import TextInput from 'renderer/widgets/TextInput';
 
-export const formatPresetName = (s: string) =>
-  s.slice(0, 1).toUpperCase() + s.slice(1).toLowerCase();
+export const formatPresetName = (s: string) => {
+  const filteredS = s.replace(/[^a-zA-Z0-9|_|\-| ]+/, '');
+  return filteredS.slice(0, 1).toUpperCase() + filteredS.slice(1).toLowerCase();
+};
 
 interface IPresetListItemProps {
   value: string;
