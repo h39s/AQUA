@@ -12,18 +12,10 @@ const AppContent = () => {
 
   return (
     <>
-      {isLoading ? (
-        <div className="center full row">
-          <h1>Loading...</h1>
-        </div>
-      ) : (
-        <>
-          <SideBar />
-          <MainContent />
-          <PresetsBar />
-          <FrequencyResponseChart />
-        </>
-      )}
+      <SideBar />
+      <MainContent />
+      <PresetsBar />
+      <FrequencyResponseChart />
       {globalError && (
         <PrereqMissingModal
           isLoading={isLoading}
