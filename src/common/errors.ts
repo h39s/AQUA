@@ -46,7 +46,7 @@ export const errors: Record<ErrorCode, ErrorDescription> = {
     shortError: 'Internal Error: Failed to read or modify preset files.',
     action:
       'Please check that the preset name is saveable as a file and that the installation directory is in a writeable place. In addition, check that you have available storage space. If the error persists, try reaching out to the developers to resolve the issue.',
-    code: ErrorCode.FAILURE,
+    code: ErrorCode.PRESET_FILE_ERROR,
   },
 };
 
