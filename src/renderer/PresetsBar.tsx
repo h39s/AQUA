@@ -14,6 +14,33 @@ import Button from './widgets/Button';
 import List, { IOptionEntry } from './widgets/List';
 import PresetListItem, { formatPresetName } from './components/PresetListItem';
 
+const RESERVED_FILE_NAMES_SET = new Set([
+  'CON',
+  'PRN',
+  'AUX',
+  'NUL',
+  'COM1',
+  'COM2',
+  'COM3',
+  'COM4',
+  'COM5',
+  'COM6',
+  'COM7',
+  'COM8',
+  'COM9',
+  'COM0',
+  'LPT1',
+  'LPT2',
+  'LPT3',
+  'LPT4',
+  'LPT5',
+  'LPT6',
+  'LPT7',
+  'LPT8',
+  'LPT9',
+  'LPT0',
+]);
+
 const PresetsBar = () => {
   const { globalError, performHealthCheck, setGlobalError } = useAquaContext();
 
@@ -114,7 +141,16 @@ const PresetsBar = () => {
   );
 
   // Validating a new preset name
-  const validatePresetName = useCallback(
+  const validatePresetName = useCallback((newValue: string) => {
+    if (RESERVED_FILE_NAMES_SET.has(newValue.toUpperCase())) {
+      return 'Invalid preset name, please use another.';
+    }
+
+    return undefined;
+  }, []);
+
+  // Validating a preset rename
+  const validatePresetRename = useCallback(
     (newValue: string) => {
       if (!newValue) {
         return 'Preset name cannot be empty.';
@@ -127,9 +163,9 @@ const PresetsBar = () => {
         return 'Duplicate name found.';
       }
 
-      return undefined;
+      return validatePresetName(newValue);
     },
-    [presetNames]
+    [validatePresetName, presetNames]
   );
 
   const options: IOptionEntry[] = useMemo(() => {
@@ -143,13 +179,13 @@ const PresetsBar = () => {
             handleChange={handleRenameExistingPresetName(n)}
             handleDelete={handleDeletePreset(n)}
             isDisabled={!!globalError}
-            validate={validatePresetName}
+            validate={validatePresetRename}
           />
         ),
       };
     });
   }, [
-    validatePresetName,
+    validatePresetRename,
     globalError,
     handleDeletePreset,
     handleRenameExistingPresetName,
@@ -159,14 +195,15 @@ const PresetsBar = () => {
   return (
     <div className="presets-bar">
       <h4>Preset Menu</h4>
-      <div className="row center preset-name">
-        Name:&nbsp;
+      <div className="row">
+        <div className="preset-name">Name:&nbsp;</div>
         <TextInput
           value={presetName}
           ariaLabel="Preset Name"
           isDisabled={!!globalError}
           handleChange={handleChangeNewPresetName}
           formatInput={formatPresetName}
+          validate={validatePresetName}
         />
       </div>
       <Button

@@ -43,6 +43,7 @@ const TextInput = forwardRef(
 
     useEffect(() => {
       setStoredValue(value);
+      setErrorMessage(undefined);
     }, [value]);
 
     const validateAndSave = useCallback(
@@ -50,6 +51,7 @@ const TextInput = forwardRef(
         // No need to validate if the value hasn't changed
         if (prevValue.current === newValue) {
           handleChange(newValue);
+          setErrorMessage(undefined);
           return;
         }
 
@@ -112,7 +114,7 @@ const TextInput = forwardRef(
           tabIndex={isDisabled ? -1 : 0}
           aria-disabled={isDisabled}
         />
-        <div className="errorText">{errorMessage}</div>
+        {errorMessage && <div className="errorText">{errorMessage}</div>}
       </div>
     );
   }
