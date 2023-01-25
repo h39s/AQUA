@@ -12,7 +12,7 @@ import { useAquaContext } from './utils/AquaContext';
 import TextInput from './widgets/TextInput';
 import Button from './widgets/Button';
 import List, { IOptionEntry } from './widgets/List';
-import PresetListItem from './components/PresetListItem';
+import PresetListItem, { formatPresetName } from './components/PresetListItem';
 
 const PresetsBar = () => {
   const { globalError, performHealthCheck, setGlobalError } = useAquaContext();
@@ -166,6 +166,7 @@ const PresetsBar = () => {
           ariaLabel="Preset Name"
           isDisabled={!!globalError}
           handleChange={handleChangeNewPresetName}
+          formatInput={formatPresetName}
         />
       </div>
       <Button
