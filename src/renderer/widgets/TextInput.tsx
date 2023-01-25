@@ -45,29 +45,32 @@ const TextInput = forwardRef(
       setStoredValue(value);
     }, [value]);
 
-    const validateAndSave = useCallback(() => {
-      // No need to validate if the value hasn't changed
-      if (prevValue.current === storedValue) {
-        handleChange(storedValue);
-        return;
-      }
-
-      if (validate) {
-        // Perform validation
-        const msg = validate(storedValue);
-        setErrorMessage(msg);
-
-        // Save changes if validation has no errors
-        if (!msg) {
-          handleChange(storedValue);
-          prevValue.current = storedValue;
+    const validateAndSave = useCallback(
+      (newValue: string) => {
+        // No need to validate if the value hasn't changed
+        if (prevValue.current === newValue) {
+          handleChange(newValue);
+          return;
         }
-      } else {
-        // Save changes directly
-        handleChange(storedValue);
-        prevValue.current = storedValue;
-      }
-    }, [handleChange, storedValue, validate]);
+
+        if (validate) {
+          // Perform validation
+          const msg = validate(newValue);
+          setErrorMessage(msg);
+
+          // Save changes if validation has no errors
+          if (!msg) {
+            handleChange(newValue);
+            prevValue.current = newValue;
+          }
+        } else {
+          // Save changes directly
+          handleChange(newValue);
+          prevValue.current = newValue;
+        }
+      },
+      [handleChange, validate]
+    );
 
     // Helper for detecting use of the ENTER key
     const onKeyDown = useCallback(
@@ -76,18 +79,19 @@ const TextInput = forwardRef(
           handleEscape();
         }
         if (updateOnSubmitOnly && e.code === 'Enter') {
-          validateAndSave();
+          validateAndSave(storedValue);
         }
       },
-      [handleEscape, updateOnSubmitOnly, validateAndSave]
+      [handleEscape, storedValue, updateOnSubmitOnly, validateAndSave]
     );
 
     const onChange = useCallback(
       (e: ChangeEvent<HTMLInputElement>) => {
         const { value: input } = e.target;
-        setStoredValue(formatInput(input));
+        const formattedValue = formatInput(input);
+        setStoredValue(formattedValue);
         if (!updateOnSubmitOnly) {
-          validateAndSave();
+          validateAndSave(formattedValue);
         }
       },
       [formatInput, updateOnSubmitOnly, validateAndSave]
@@ -99,6 +103,7 @@ const TextInput = forwardRef(
           ref={ref}
           type="text"
           value={storedValue}
+          name={ariaLabel}
           aria-label={ariaLabel}
           aria-invalid={!!errorMessage}
           aria-errormessage={errorMessage}
