@@ -1,17 +1,18 @@
 import { useMemo } from 'react';
+import { ColorEnum } from '../styles/color';
 import Axis from './Axis';
-import Curve, { AnimationOptionsEnum } from './Curve';
 import GridLine from './GridLine';
-import useController, { ChartData, MarginLike } from './ChartController';
+import useController, { IChartCurveData, IMarginLike } from './ChartController';
+import Curve from './Curve';
 
 export interface ChartDimensions {
   height: number;
   width: number;
-  margins: MarginLike;
+  margins: IMarginLike;
 }
 
 interface IChartProps {
-  data: ChartData[];
+  data: IChartCurveData[];
   dimensions: ChartDimensions;
 }
 
@@ -77,19 +78,11 @@ const Chart = ({ data = [], dimensions }: IChartProps) => {
         scale={yScaleGain}
         tickValues={[0]}
         size={width - margins.left - margins.right}
-        color="#F7844F"
+        color={ColorEnum.COMPLEMENTARY}
         transform={`translate(${padding.left}, 0)`}
       />
-      {data.map((e: ChartData) => (
-        <Curve
-          key={e.name}
-          name={e.name}
-          data={e.items}
-          xScale={xScaleFreq}
-          yScale={yScaleGain}
-          color={e.color}
-          animation={AnimationOptionsEnum.LEFT}
-        />
+      {data.map((e: IChartCurveData) => (
+        <Curve key={e.id} data={e} xScale={xScaleFreq} yScale={yScaleGain} />
       ))}
       <Axis
         type="left"

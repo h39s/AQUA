@@ -1,9 +1,21 @@
 import { FilterTypeEnum, IFilter } from 'common/constants';
 import { range } from 'renderer/utils/utils';
-import { ChartDataPoint, GRAPH_START, GRAPH_END } from './ChartController';
+import {
+  IChartPointData,
+  IChartLineDataPointsById,
+  GRAPH_START,
+  GRAPH_END,
+} from './ChartController';
 
 const SAMPLE_FREQUENCY = 96000;
 const NUM_STEPS = 1000;
+
+const logStart = Math.log10(GRAPH_START);
+const logEnd = Math.log10(GRAPH_END);
+const step = (logEnd - logStart) / NUM_STEPS;
+const SAMPLE_FREQUENCIES = range(logStart, logEnd + step, step).map(
+  (p) => 10 ** p
+);
 
 interface ITransferFuncCoeffs {
   b0: number;
@@ -155,73 +167,44 @@ const gainAtFrequency = (f: number, c: ITransferFuncCoeffs) => {
   return 10 * Math.log10(numerator / denominator);
 };
 
-export const getFilterPoints = (filter: IFilter) => {
+// Get curve info for the preAmplification
+export const getPreAmpLine = (preAmp: number): IChartPointData[] =>
+  SAMPLE_FREQUENCIES.map((f) => {
+    return { x: f, y: preAmp };
+  });
+
+// Get curve and point info for individual filters
+export const getFilterLineData = (filter: IFilter): IChartPointData[] => {
   const tf = getTFCoefficients(filter);
 
-  const logStart = Math.log10(GRAPH_START);
-  const logEnd = Math.log10(GRAPH_END);
-  const step = (logEnd - logStart) / NUM_STEPS;
-
-  // TODO: consider hard coding frequencies maybe
-  const frequencies = range(logStart, logEnd + step, step).map((p) => 10 ** p);
-  const data: ChartDataPoint[] = frequencies.map((f) => {
+  const data: IChartPointData[] = SAMPLE_FREQUENCIES.map((f) => {
     return { x: f, y: 0 };
   });
 
-  for (let i = 0; i < frequencies.length; i += 1) {
-    const freqFilterGain = gainAtFrequency(frequencies[i], tf);
+  for (let i = 0; i < SAMPLE_FREQUENCIES.length; i += 1) {
+    const freqFilterGain = gainAtFrequency(SAMPLE_FREQUENCIES[i], tf);
     data[i].y = freqFilterGain;
   }
 
   return data;
 };
 
-export const getTotalPoints = (
+// Get total curve info from filter and point data
+export const getCombinedLineData = (
   preAmp: number,
-  filterLines: ChartDataPoint[][]
+  filterLines: IChartLineDataPointsById
 ) => {
-  const logStart = Math.log10(GRAPH_START);
-  const logEnd = Math.log10(GRAPH_END);
-  const step = (logEnd - logStart) / NUM_STEPS;
-
-  const frequencies = range(logStart, logEnd + step, step).map((p) => 10 ** p);
-  const data: ChartDataPoint[] = frequencies.map((f) => {
+  const data: IChartPointData[] = SAMPLE_FREQUENCIES.map((f) => {
     return { x: f, y: 0 };
   });
 
-  for (let i = 0; i < frequencies.length; i += 1) {
+  for (let i = 0; i < SAMPLE_FREQUENCIES.length; i += 1) {
+    // Add fixed preamp gain for each sample point
     data[i].y = preAmp;
-    for (let j = 0; j < filterLines.length; j += 1) {
-      data[i].y += filterLines[j][i].y;
-    }
-  }
-
-  return data;
-};
-
-export const getDataPoints = (preAmp: number, filters: IFilter[]) => {
-  const tfs = filters.map((f) => getTFCoefficients(f));
-  const filterGains: number[][] = Array(tfs.length).fill(
-    Array(NUM_STEPS + 1).fill(0)
-  );
-  const totalGains: number[] = Array(NUM_STEPS + 1).fill(0);
-
-  const logStart = Math.log10(GRAPH_START);
-  const logEnd = Math.log10(GRAPH_END);
-  const step = (logEnd - logStart) / NUM_STEPS;
-  const frequencies = range(logStart, logEnd + step, step).map((p) => 10 ** p);
-  const data: ChartDataPoint[] = frequencies.map((f) => {
-    return { x: f, y: 0 };
-  });
-
-  for (let i = 0; i < frequencies.length; i += 1) {
-    totalGains[i] = preAmp;
-    for (let j = 0; j < tfs.length; j += 1) {
-      const freqFilterGain = gainAtFrequency(frequencies[i], tfs[j]);
-      filterGains[j][i] = freqFilterGain;
-      totalGains[i] += freqFilterGain;
-    }
-    data[i].y = totalGains[i];
+    Object.values(filterLines).forEach((points) => {
+      // Add frequency gain obtained from each filter
+      data[i].y += points[i].y;
+    });
   }
 
   return data;

@@ -1,32 +1,45 @@
 import { useMemo } from 'react';
 import * as d3 from 'd3';
+import { Color } from 'renderer/styles/color';
 
 export const GRAPH_START = 10;
 export const GRAPH_END = 25000;
 
-export interface ChartDataPoint {
-  x: number;
-  y: number;
-}
+export const INIT_ANIMATE_DURATION = 750;
+export const GRAPH_ANIMATE_DURATION = 100;
 
-export interface MarginLike {
+export interface IMarginLike {
   left: number;
   top: number;
   right: number;
   bottom: number;
 }
 
-export interface ChartData {
+export interface IChartPointData {
+  x: number;
+  y: number;
+}
+
+export interface IChartLineDataPointsById {
+  [id: string]: IChartPointData[];
+}
+
+export interface IChartCurveData {
+  id: string;
   name: string;
-  color: string; // #ffffff, white, rgba(255, 255, 255, 0.5)
-  items: ChartDataPoint[];
+  line: {
+    color: Color;
+    strokeWidth: number;
+    points: IChartPointData[];
+  };
+  controlPoint?: IChartPointData;
 }
 
 interface IChartControllerProps {
-  data: ChartData[];
+  data: IChartCurveData[];
   width: number;
   height: number;
-  padding: MarginLike;
+  padding: IMarginLike;
 }
 
 const useController = ({
@@ -36,12 +49,12 @@ const useController = ({
   padding,
 }: IChartControllerProps) => {
   const xMin = useMemo(
-    () => d3.min(data, ({ items }) => d3.min(items, ({ x }) => x)) || 0,
+    () => d3.min(data, ({ line }) => d3.min(line.points, ({ x }) => x)) || 0,
     [data]
   );
 
   const xMax = useMemo(
-    () => d3.max(data, ({ items }) => d3.max(items, ({ x }) => x)) || 0,
+    () => d3.max(data, ({ line }) => d3.max(line.points, ({ x }) => x)) || 0,
     [data]
   );
 
@@ -55,12 +68,12 @@ const useController = ({
   );
 
   const yMin = useMemo(
-    () => d3.min(data, ({ items }) => d3.min(items, ({ y }) => y)) || 0,
+    () => d3.min(data, ({ line }) => d3.min(line.points, ({ y }) => y)) || 0,
     [data]
   );
 
   const yMax = useMemo(
-    () => d3.max(data, ({ items }) => d3.max(items, ({ y }) => y)) || 0,
+    () => d3.max(data, ({ line }) => d3.max(line.points, ({ y }) => y)) || 0,
     [data]
   );
 
