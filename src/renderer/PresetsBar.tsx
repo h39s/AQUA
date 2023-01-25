@@ -117,7 +117,7 @@ const PresetsBar = () => {
   const validatePresetName = useCallback(
     (newValue: string) => {
       if (!newValue) {
-        return 'Preset name cannot be emtpy.';
+        return 'Preset name cannot be empty.';
       }
       if (
         presetNames.some(
