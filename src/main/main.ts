@@ -230,8 +230,12 @@ ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, arg) => {
 ipcMain.on(ChannelEnum.RENAME_PRESET, async (event, arg) => {
   const channel = ChannelEnum.RENAME_PRESET;
   const [oldName, newName]: string[] = arg;
-  renamePreset(oldName, newName);
-  await handleUpdate(event, channel);
+  try {
+    renamePreset(oldName, newName);
+    await handleUpdate(event, channel);
+  } catch (e) {
+    handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
+  }
 });
 
 ipcMain.on(ChannelEnum.GET_PRESET_FILE_LIST, async (event) => {
