@@ -4,6 +4,7 @@ export enum ErrorCode {
   TIMEOUT,
   INVALID_PARAMETER,
   FAILURE,
+  PRESET_FILE_ERROR,
 }
 
 export type ErrorDescription = {
@@ -40,6 +41,12 @@ export const errors: Record<ErrorCode, ErrorDescription> = {
     action:
       'Please restart the application. If the error persists, try reaching out to the developers to resolve the issue.',
     code: ErrorCode.FAILURE,
+  },
+  [ErrorCode.PRESET_FILE_ERROR]: {
+    shortError: 'Internal Error: Failed to read or modify preset files.',
+    action:
+      'Please check that the preset name is saveable as a file and that the installation directory is in a writeable place. In addition, check that you have available storage space. If the error persists, try reaching out to the developers to resolve the issue.',
+    code: ErrorCode.PRESET_FILE_ERROR,
   },
 };
 

@@ -1,5 +1,12 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './styles/PresetsBar.scss';
+import { ErrorDescription } from 'common/errors';
+import {
+  getPresetListFromFiles,
+  loadPreset,
+  savePreset,
+  deletePreset,
+} from './utils/equalizerApi';
 import { useAquaContext } from './utils/AquaContext';
 import TextInput from './widgets/TextInput';
 import Button from './widgets/Button';
@@ -84,48 +91,55 @@ const PresetListItem = ({
 };
 
 const PresetsBar = () => {
-  const { globalError } = useAquaContext();
+  const { globalError, performHealthCheck, setGlobalError } = useAquaContext();
 
   const [presetName, setPresetName] = useState<string>('');
   const [selectedPresetName, setSelectedPresetName] = useState<
     string | undefined
   >(undefined);
 
-  // TODO: Fetch default presets and custom presets from storage
-  const [presetNames, setPresetNames] = useState<string[]>([
-    'Airpods Pro to IEF Neutral AutoEQ',
-    'Airpods to Harman AE OE 2018 AutoEQ',
-    '7-1 Surround Sound Speaker Setup',
-    'Bass Boost',
-    'Bass and Treble Boost',
-    'Classic',
-    'Dance',
-    'Rock',
-    'Vocal Boost',
-    'Microphone Compensation',
-    'MORE BASS',
-    'Surround effect',
-    'Indie playlist',
-    'Pop',
-    'Hip-hop',
-    'R&B',
-    'Equalize for shrill noise',
-    'Jazz',
-  ]);
+  const [presetNames, setPresetNames] = useState<string[]>([]);
 
-  const handleCreatePreset = (prev: string[]) => {
-    if (prev.indexOf(presetName) !== -1) {
-      // TODO: overwrite preset values for the existing preset
-    } else {
-      // TODO: add code for creating a preset
-      setSelectedPresetName(presetName);
-      const newPresets = [...prev, presetName].sort();
-      setPresetNames(newPresets);
+  // Fetch default presets and custom presets from storage
+  useEffect(() => {
+    const fetchPresetNames = async () => {
+      try {
+        const result = await getPresetListFromFiles();
+        // Sort preset names before updating state just in case
+        setPresetNames(result.sort());
+      } catch (e) {
+        setGlobalError(e as ErrorDescription);
+      }
+    };
+
+    fetchPresetNames();
+  }, [setGlobalError]);
+
+  const handleCreatePreset = async (prev: string[]) => {
+    try {
+      await savePreset(presetName);
+
+      // If we are creating a new preset and not just updating an existing one
+      if (prev.indexOf(presetName) === -1) {
+        setSelectedPresetName(presetName);
+        // Keep presets sorted
+        const newPresets = [...prev, presetName].sort();
+        setPresetNames(newPresets);
+      }
+    } catch (e) {
+      setGlobalError(e as ErrorDescription);
     }
   };
 
-  const handleLoadPreset = () => {
-    // TODO: add code for loading a preset
+  const handleLoadPreset = async () => {
+    if (selectedPresetName) {
+      try {
+        await loadPreset(selectedPresetName);
+        performHealthCheck();
+      } catch (e) {
+        setGlobalError(e as ErrorDescription);
+      }
+    }
   };
 
   const handleChangeNewPresetName = (newValue: string) => {
@@ -148,12 +162,21 @@ const PresetsBar = () => {
       oldValue: string,
       newValue: string
     ) => {
+      // TODO: Handle case where the new name already exists
       // TODO: improve DS to help check if the newValue is an existing preset or not
-      setPresetNames(presetNames.map((n) => (n === oldValue ? newValue : n)));
+      setPresetNames(
+        // Keep presets sorted
+        presetNames.map((n) => (n === oldValue ? newValue : n)).sort()
+      );
     };
 
-    const handleDeletePreset = (deletedValue: string) => {
+    const handleDeletePreset = async (deletedValue: string) => {
       setPresetNames(presetNames.filter((n) => n !== deletedValue));
+      try {
+        await deletePreset(deletedValue);
+      } catch (e) {
+        // continue to run, the worst case is that the file still exists and that's all.
+      }
     };
 
     return presetNames.map((n) => {
@@ -189,7 +212,7 @@ const PresetsBar = () => {
       <Button
         ariaLabel="Save settings to preset"
         className="small full"
-        isDisabled={!!globalError}
+        isDisabled={!!globalError || !presetName}
         handleChange={() => handleCreatePreset(presetNames)}
       >
         Save current settings to preset
