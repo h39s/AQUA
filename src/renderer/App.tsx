@@ -6,6 +6,7 @@ import PrereqMissingModal from './PrereqMissingModal';
 import SideBar from './SideBar';
 import FrequencyResponseChart from './graph/FrequencyResponseChart';
 import PresetsBar from './PresetsBar';
+import AutoEQ from './AutoEQ';
 
 const AppContent = () => {
   const { isLoading, globalError, performHealthCheck } = useAquaContext();
@@ -13,7 +14,10 @@ const AppContent = () => {
   return (
     <>
       <SideBar />
-      <MainContent />
+      <div className="middle-content">
+        <AutoEQ />
+        <MainContent />
+      </div>
       <PresetsBar />
       <FrequencyResponseChart />
       {globalError && (

@@ -5,7 +5,6 @@
 // band width and height from constants file
 
 .main-content {
-  grid-area: main-content;
   display: grid;
   grid-template-columns: 128px 1fr;
   gap: $spacing-s;
