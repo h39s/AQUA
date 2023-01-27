@@ -25,21 +25,19 @@ body {
     // Add grid for layout
     display: grid;
     grid-template-areas:
-      'side-bar main-content presets-bar'
+      'side-bar middle-content presets-bar'
       'graph-wrapper graph-wrapper graph-wrapper';
-    grid-template-columns: $sidebar-width 1fr $preset-bar-width;
-
-    // Keep fixed height for equalizer when graph view is on
-    grid-template-rows: $equalizer-height 1fr;
-
-    &.minimized {
-      // Forcibly allow equalizer content to grow when graph view is off
-      grid-template-rows: 1fr;
-      row-gap: 0px;
-    }
-
-    gap: $spacing-m $spacing-s;
+    grid-template-columns: minmax($sidebar-width, max-content) 1fr $preset-bar-width;
+    grid-template-rows: $equalizer-height repeat(1fr, 2);
+    gap: $spacing-s;
   }
+}
+
+.middle-content {
+  grid-area: middle-content;
+  display: grid;
+  grid-template-rows: max-content 1fr;
+  gap: $spacing-s;
 }
 
 .title-bar {
