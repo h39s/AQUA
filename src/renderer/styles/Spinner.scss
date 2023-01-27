@@ -20,11 +20,11 @@ $spinner-dot-height: 6px;
   -ms-transform: rotate(225deg);
   -webkit-transform: rotate(225deg);
   -moz-transform: rotate(225deg);
-  animation: orbit 6.96s infinite;
-  -o-animation: orbit 6.96s infinite;
-  -ms-animation: orbit 6.96s infinite;
-  -webkit-animation: orbit 6.96s infinite;
-  -moz-animation: orbit 6.96s infinite;
+  animation: orbit 3.48s infinite;
+  -o-animation: orbit 3.48s infinite;
+  -ms-animation: orbit 3.48s infinite;
+  -webkit-animation: orbit 3.48s infinite;
+  -moz-animation: orbit 3.48s infinite;
 }
 
 .windows8 .wBall .wInnerBall {
@@ -38,43 +38,43 @@ $spinner-dot-height: 6px;
 }
 
 .windows8 #wBall_1 {
-  animation-delay: 1.52s;
-  -o-animation-delay: 1.52s;
-  -ms-animation-delay: 1.52s;
-  -webkit-animation-delay: 1.52s;
-  -moz-animation-delay: 1.52s;
+  animation-delay: 0.76s;
+  -o-animation-delay: 0.76s;
+  -ms-animation-delay: 0.76s;
+  -webkit-animation-delay: 0.76s;
+  -moz-animation-delay: 0.76s;
 }
 
 .windows8 #wBall_2 {
-  animation-delay: 0.3s;
-  -o-animation-delay: 0.3s;
-  -ms-animation-delay: 0.3s;
-  -webkit-animation-delay: 0.3s;
-  -moz-animation-delay: 0.3s;
+  animation-delay: 0.15s;
+  -o-animation-delay: 0.15s;
+  -ms-animation-delay: 0.15s;
+  -webkit-animation-delay: 0.15s;
+  -moz-animation-delay: 0.15s;
 }
 
 .windows8 #wBall_3 {
+  animation-delay: 0.305s;
+  -o-animation-delay: 0.305s;
+  -ms-animation-delay: 0.305s;
+  -webkit-animation-delay: 0.305s;
+  -moz-animation-delay: 0.305s;
+}
+
+.windows8 #wBall_4 {
+  animation-delay: 0.455s;
+  -o-animation-delay: 0.455s;
+  -ms-animation-delay: 0.455s;
+  -webkit-animation-delay: 0.455s;
+  -moz-animation-delay: 0.455s;
+}
+
+.windows8 #wBall_5 {
   animation-delay: 0.61s;
   -o-animation-delay: 0.61s;
   -ms-animation-delay: 0.61s;
   -webkit-animation-delay: 0.61s;
   -moz-animation-delay: 0.61s;
-}
-
-.windows8 #wBall_4 {
-  animation-delay: 0.91s;
-  -o-animation-delay: 0.91s;
-  -ms-animation-delay: 0.91s;
-  -webkit-animation-delay: 0.91s;
-  -moz-animation-delay: 0.91s;
-}
-
-.windows8 #wBall_5 {
-  animation-delay: 1.22s;
-  -o-animation-delay: 1.22s;
-  -ms-animation-delay: 1.22s;
-  -webkit-animation-delay: 1.22s;
-  -moz-animation-delay: 1.22s;
 }
 
 @keyframes orbit {

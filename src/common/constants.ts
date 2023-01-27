@@ -99,7 +99,7 @@ export const getDefaultState = (): IState => {
   return {
     isEnabled: true,
     isAutoPreAmpOn: true,
-    isGraphViewOn: false,
+    isGraphViewOn: true,
     preAmp: 0,
     filters: getDefaultFilters(),
   };

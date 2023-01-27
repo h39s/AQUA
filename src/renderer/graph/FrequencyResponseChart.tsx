@@ -1,5 +1,6 @@
 import { IFilter } from 'common/constants';
 import { useEffect, useMemo, useRef } from 'react';
+import Spinner from 'renderer/icons/Spinner';
 import { useAquaContext } from 'renderer/utils/AquaContext';
 import { setMainPreAmp } from 'renderer/utils/equalizerApi';
 import { clamp } from 'renderer/utils/utils';
@@ -92,7 +93,7 @@ const FrequencyResponseChart = () => {
         <div className="graph-wrapper">
           {isLoading ? (
             <div className="center full row">
-              <h1>Loading...</h1>
+              <Spinner />
             </div>
           ) : (
             <Chart data={chartData} dimensions={dimensions} />
