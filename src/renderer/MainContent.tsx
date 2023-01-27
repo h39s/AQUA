@@ -5,13 +5,14 @@ import { useAquaContext } from './utils/AquaContext';
 import './styles/MainContent.scss';
 import AddSliderDivider from './components/AddSliderDivider';
 import SortWrapper from './SortWrapper';
+import Spinner from './icons/Spinner';
 
 const MainContent = () => {
   const { filters, isLoading } = useAquaContext();
   const wrapperRef = createRef<HTMLDivElement>();
   return isLoading ? (
     <div className="center full row">
-      <h1>Loading...</h1>
+      <Spinner />
     </div>
   ) : (
     <div className="center main-content">
