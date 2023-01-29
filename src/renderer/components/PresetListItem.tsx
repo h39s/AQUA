@@ -10,21 +10,22 @@ export const formatPresetName = (s: string) => {
 
 interface IPresetListItemProps {
   value: string;
-  handleChange: (newValue: string) => void;
+  handleRename: (newValue: string) => void;
   handleDelete: () => void;
   isDisabled: boolean;
-  validate: (newValue: string) => string | undefined;
+  validate: (newValue: string) => string;
 }
 
 const PresetListItem = ({
   value,
-  handleChange,
+  handleRename,
   handleDelete,
   isDisabled,
   validate,
 }: IPresetListItemProps) => {
   const editValueRef = useRef<HTMLInputElement>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const handleEditClicked = () => {
     setIsEditMode(true);
@@ -32,11 +33,18 @@ const PresetListItem = ({
 
   const handleEscape = () => {
     setIsEditMode(false);
+    setErrorMessage('');
   };
 
   const handleInputChange = (newValue: string) => {
-    handleChange(newValue);
-    setIsEditMode(false);
+    const msg = validate(newValue);
+    setErrorMessage(msg);
+
+    if (!msg) {
+      // Rename preset if validation passes
+      handleRename(newValue);
+      setIsEditMode(false);
+    }
   };
 
   // Close edit mode if the user clicks outside of the input
@@ -50,10 +58,10 @@ const PresetListItem = ({
           value={value}
           ariaLabel="Edit Preset Name"
           isDisabled={false}
+          errorMessage={errorMessage}
           handleChange={handleInputChange}
           handleEscape={handleEscape}
           formatInput={formatPresetName}
-          validate={validate}
           updateOnSubmitOnly
         />
       ) : (

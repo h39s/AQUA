@@ -24,6 +24,7 @@ describe('TextInput', () => {
         handleChange={handleChange}
         handleEscape={handleEscape}
         isDisabled={false}
+        errorMessage=""
       />
     );
 
@@ -45,6 +46,7 @@ describe('TextInput', () => {
         handleChange={handleChange}
         handleEscape={handleEscape}
         isDisabled={false}
+        errorMessage=""
         updateOnSubmitOnly
       />
     );
@@ -59,104 +61,23 @@ describe('TextInput', () => {
     expect(handleChange).toHaveBeenCalledTimes(1);
   });
 
-  it('should handle change with validation', async () => {
-    const testValue = 'Standard';
-    const { user } = setup(
-      <TextInput
-        value={testValue}
-        ariaLabel={name}
-        handleChange={handleChange}
-        handleEscape={handleEscape}
-        validate={validate}
-        isDisabled={false}
-      />
-    );
-
-    const editInput = screen.getByLabelText(name);
-    expect(editInput).toHaveValue(testValue);
-
-    await user.type(editInput, 'ab');
-    expect(validate).toHaveBeenCalledTimes(2);
-    expect(handleChange).toHaveBeenCalledTimes(2);
-    await user.keyboard('{Enter}');
-    expect(validate).toHaveBeenCalledTimes(2);
-    expect(handleChange).toHaveBeenCalledTimes(2);
-  });
-
-  it('should handle change with validation on submit only', async () => {
-    const testValue = 'Standard';
-    const { user } = setup(
-      <TextInput
-        value={testValue}
-        ariaLabel={name}
-        handleChange={handleChange}
-        handleEscape={handleEscape}
-        isDisabled={false}
-        validate={validate}
-        updateOnSubmitOnly
-      />
-    );
-
-    const editInput = screen.getByLabelText(name);
-    expect(editInput).toHaveValue(testValue);
-
-    await user.type(editInput, 'ab');
-    expect(validate).toHaveBeenCalledTimes(0);
-    expect(handleChange).toHaveBeenCalledTimes(0);
-
-    await user.keyboard('{Enter}');
-    expect(validate).toHaveBeenCalledTimes(1);
-    expect(handleChange).toHaveBeenCalledTimes(1);
-  });
-
-  it('should handle failed validation', async () => {
+  it('should display error message', async () => {
     const testValue = 'Standard';
     const errorMsg = 'ERROR';
     validate.mockReturnValue(errorMsg);
-    const { user } = setup(
+    setup(
       <TextInput
         value={testValue}
         ariaLabel={name}
         handleChange={handleChange}
         handleEscape={handleEscape}
         isDisabled={false}
-        validate={validate}
+        errorMessage={errorMsg}
       />
     );
 
     const editInput = screen.getByLabelText(name);
     expect(editInput).toHaveValue(testValue);
-
-    await user.type(editInput, 'ab');
-    expect(validate).toHaveBeenCalledTimes(2);
-    expect(handleChange).toHaveBeenCalledTimes(0);
-    expect(screen.getByText(errorMsg)).toBeInTheDocument();
-  });
-
-  it('should handle failed validation on submit only', async () => {
-    const testValue = 'Standard';
-    const errorMsg = 'ERROR';
-    validate.mockReturnValue(errorMsg);
-    const { user } = setup(
-      <TextInput
-        value={testValue}
-        ariaLabel={name}
-        handleChange={handleChange}
-        handleEscape={handleEscape}
-        isDisabled={false}
-        validate={validate}
-        updateOnSubmitOnly
-      />
-    );
-
-    const editInput = screen.getByLabelText(name);
-    expect(editInput).toHaveValue(testValue);
-
-    await user.type(editInput, 'ab');
-    expect(validate).toHaveBeenCalledTimes(0);
-    await user.keyboard('{Enter}');
-    expect(validate).toHaveBeenCalledTimes(1);
-    expect(handleChange).toHaveBeenCalledTimes(0);
     expect(screen.getByText(errorMsg)).toBeInTheDocument();
   });
 
@@ -169,7 +90,7 @@ describe('TextInput', () => {
         handleChange={handleChange}
         handleEscape={handleEscape}
         isDisabled
-        validate={validate}
+        errorMessage=""
       />
     );
 

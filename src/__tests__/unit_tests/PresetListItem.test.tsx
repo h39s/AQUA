@@ -7,12 +7,12 @@ describe('PresetListItem', () => {
   const editModeLabel = 'Edit Preset Name';
   const editIconLabel = 'Edit Icon';
   const deleteIconLabel = 'Delete Icon';
-  const handleChange = jest.fn();
+  const handleRename = jest.fn();
   const handleDelete = jest.fn();
   const validate = jest.fn();
 
   beforeEach(() => {
-    handleChange.mockClear();
+    handleRename.mockClear();
     handleDelete.mockClear();
     validate.mockClear();
   });
@@ -22,7 +22,7 @@ describe('PresetListItem', () => {
     setup(
       <PresetListItem
         value={testValue}
-        handleChange={handleChange}
+        handleRename={handleRename}
         handleDelete={handleDelete}
         isDisabled={false}
         validate={validate}
@@ -39,7 +39,7 @@ describe('PresetListItem', () => {
     const { user } = setup(
       <PresetListItem
         value={testValue}
-        handleChange={handleChange}
+        handleRename={handleRename}
         handleDelete={handleDelete}
         isDisabled={false}
         validate={validate}
@@ -61,7 +61,7 @@ describe('PresetListItem', () => {
     const { user } = setup(
       <PresetListItem
         value={testValue}
-        handleChange={handleChange}
+        handleRename={handleRename}
         handleDelete={handleDelete}
         isDisabled={false}
         validate={validate}
@@ -79,7 +79,7 @@ describe('PresetListItem', () => {
     const { user } = setup(
       <PresetListItem
         value={testValue}
-        handleChange={handleChange}
+        handleRename={handleRename}
         handleDelete={handleDelete}
         isDisabled={false}
         validate={validate}
@@ -95,8 +95,8 @@ describe('PresetListItem', () => {
     await user.keyboard('{Enter}');
     expect(screen.getByLabelText(editIconLabel)).toBeInTheDocument();
     expect(validate).toHaveBeenCalledTimes(1);
-    expect(handleChange).toHaveBeenCalledTimes(1);
-    expect(handleChange).toHaveBeenCalledWith(newValue);
+    expect(handleRename).toHaveBeenCalledTimes(1);
+    expect(handleRename).toHaveBeenCalledWith(newValue);
   });
 
   it('should handle change with format change', async () => {
@@ -106,7 +106,7 @@ describe('PresetListItem', () => {
     const { user } = setup(
       <PresetListItem
         value={testValue}
-        handleChange={handleChange}
+        handleRename={handleRename}
         handleDelete={handleDelete}
         isDisabled={false}
         validate={validate}
@@ -122,8 +122,8 @@ describe('PresetListItem', () => {
     await user.keyboard('{Enter}');
     expect(screen.getByLabelText(editIconLabel)).toBeInTheDocument();
     expect(validate).toHaveBeenCalledTimes(1);
-    expect(handleChange).toHaveBeenCalledTimes(1);
-    expect(handleChange).toHaveBeenCalledWith(expectedNewValue);
+    expect(handleRename).toHaveBeenCalledTimes(1);
+    expect(handleRename).toHaveBeenCalledWith(expectedNewValue);
   });
 
   it('should handle change with validation error', async () => {
@@ -135,7 +135,7 @@ describe('PresetListItem', () => {
     const { user } = setup(
       <PresetListItem
         value={testValue}
-        handleChange={handleChange}
+        handleRename={handleRename}
         handleDelete={handleDelete}
         isDisabled={false}
         validate={validate}
@@ -151,7 +151,7 @@ describe('PresetListItem', () => {
     await user.keyboard('{Enter}');
 
     expect(validate).toHaveBeenCalledTimes(1);
-    expect(handleChange).toHaveBeenCalledTimes(0);
+    expect(handleRename).toHaveBeenCalledTimes(0);
     expect(screen.queryByLabelText(editIconLabel)).not.toBeInTheDocument();
     expect(screen.getByText(errorMsg)).toBeInTheDocument();
   });
@@ -162,7 +162,7 @@ describe('PresetListItem', () => {
     setup(
       <PresetListItem
         value={testValue}
-        handleChange={handleChange}
+        handleRename={handleRename}
         handleDelete={handleDelete}
         isDisabled
         validate={validate}
