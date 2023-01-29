@@ -1,4 +1,9 @@
-import { IFilter, MAX_FREQUENCY, MIN_FREQUENCY } from './constants';
+import {
+  IFilter,
+  MAX_FREQUENCY,
+  MIN_FREQUENCY,
+  RESERVED_FILE_NAMES_SET,
+} from './constants';
 
 export const roundToPrecision = (value: number, precision: number) => {
   const precisionFactor = 10 ** precision;
@@ -12,3 +17,14 @@ export const computeAvgFreq = (filters: IFilter[], index: number) => {
   const exponent = (Math.log10(lo) + Math.log10(hi)) / 2;
   return roundToPrecision(10 ** exponent, 0);
 };
+
+export const isRestrictedPresetName = (newName: string) =>
+  RESERVED_FILE_NAMES_SET.has(newName.toUpperCase());
+
+export const isDuplicatePresetName = (
+  newName: string,
+  existingNames: string[]
+) =>
+  existingNames.some(
+    (oldValue) => newName.toLowerCase() === oldValue.toLowerCase()
+  );

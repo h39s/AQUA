@@ -50,8 +50,12 @@ const TextInput = forwardRef(
       (newValue: string) => {
         // No need to validate if the value hasn't changed
         if (prevValue.current === newValue) {
-          handleChange(newValue);
           setErrorMessage(undefined);
+
+          // Treat this as an option for cancelling out of the input
+          if (handleEscape) {
+            handleEscape();
+          }
           return;
         }
 
@@ -71,7 +75,7 @@ const TextInput = forwardRef(
           prevValue.current = newValue;
         }
       },
-      [handleChange, validate]
+      [handleChange, handleEscape, validate]
     );
 
     // Helper for detecting use of the ENTER key

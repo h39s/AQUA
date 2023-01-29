@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import './styles/PresetsBar.scss';
 import { ErrorDescription } from 'common/errors';
+import { isDuplicatePresetName, isRestrictedPresetName } from 'common/utils';
 import {
   deletePreset,
   getPresetListFromFiles,
@@ -13,33 +14,6 @@ import TextInput from './widgets/TextInput';
 import Button from './widgets/Button';
 import List, { IOptionEntry } from './widgets/List';
 import PresetListItem, { formatPresetName } from './components/PresetListItem';
-
-const RESERVED_FILE_NAMES_SET = new Set([
-  'CON',
-  'PRN',
-  'AUX',
-  'NUL',
-  'COM1',
-  'COM2',
-  'COM3',
-  'COM4',
-  'COM5',
-  'COM6',
-  'COM7',
-  'COM8',
-  'COM9',
-  'COM0',
-  'LPT1',
-  'LPT2',
-  'LPT3',
-  'LPT4',
-  'LPT5',
-  'LPT6',
-  'LPT7',
-  'LPT8',
-  'LPT9',
-  'LPT0',
-]);
 
 const PresetsBar = () => {
   const { globalError, performHealthCheck, setGlobalError } = useAquaContext();
@@ -113,15 +87,15 @@ const PresetsBar = () => {
 
   // Deleting a preset
   const handleDeletePreset = useCallback(
-    (deletedValue: string) => async () => {
+    (deletedValue: string, prevNames: string[]) => async () => {
       try {
         await deletePreset(deletedValue);
-        setPresetNames(presetNames.filter((n) => n !== deletedValue));
+        setPresetNames(prevNames.filter((n) => n !== deletedValue));
       } catch (e) {
         // continue to run, the worst case is that the file still exists and that's all.
       }
     },
-    [presetNames]
+    []
   );
 
   // Renaming an existing preset
@@ -142,7 +116,7 @@ const PresetsBar = () => {
 
   // Validating a new preset name
   const validatePresetName = useCallback((newValue: string) => {
-    if (RESERVED_FILE_NAMES_SET.has(newValue.toUpperCase())) {
+    if (isRestrictedPresetName(newValue)) {
       return 'Invalid preset name, please use another.';
     }
 
@@ -155,11 +129,7 @@ const PresetsBar = () => {
       if (!newValue) {
         return 'Preset name cannot be empty.';
       }
-      if (
-        presetNames.some(
-          (oldValue) => newValue.toLowerCase() === oldValue.toLowerCase()
-        )
-      ) {
+      if (isDuplicatePresetName(newValue, presetNames)) {
         return 'Duplicate name found.';
       }
 
@@ -177,7 +147,7 @@ const PresetsBar = () => {
           <PresetListItem
             value={n}
             handleChange={handleRenameExistingPresetName(n)}
-            handleDelete={handleDeletePreset(n)}
+            handleDelete={handleDeletePreset(n, presetNames)}
             isDisabled={!!globalError}
             validate={validatePresetRename}
           />
