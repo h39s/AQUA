@@ -100,6 +100,16 @@ export const savePreset = (presetName: string, preset_info: IPreset) => {
   console.log(`Wrote preset for: ${presetName}`);
 };
 
+export const doesPresetExist = (presetName: string) => {
+  const testPath = addFileToPath(PRESETS_DIR, presetName);
+  try {
+    return fs.existsSync(testPath);
+  } catch (ex) {
+    console.log('Failed to check whether preset %d exists', presetName);
+    throw ex;
+  }
+};
+
 export const renamePreset = (oldName: string, newName: string) => {
   const oldPath = addFileToPath(PRESETS_DIR, oldName);
   const newPath = addFileToPath(PRESETS_DIR, newName);

@@ -23,6 +23,7 @@ import {
   savePreset,
   fetchPreset,
   renamePreset,
+  doesPresetExist,
 } from './flush';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -46,7 +47,7 @@ import {
   PRESETS_DIR,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
-import { computeAvgFreq } from '../common/utils';
+import { computeAvgFreq, isRestrictedPresetName } from '../common/utils';
 import { TSuccess, TError } from '../renderer/utils/equalizerApi';
 import { sortHelper } from '../renderer/utils/utils';
 
@@ -230,7 +231,20 @@ ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, arg) => {
 ipcMain.on(ChannelEnum.RENAME_PRESET, async (event, arg) => {
   const channel = ChannelEnum.RENAME_PRESET;
   const [oldName, newName]: string[] = arg;
+
+  // No name change - the UI should handle this scenario and should not reach the BE
+  if (oldName === newName) {
+    const reply: TSuccess<void> = { result: undefined };
+    event.reply(channel, reply);
+  }
+
   try {
+    // Validate the provided name
+    if (isRestrictedPresetName(newName) || doesPresetExist(newName)) {
+      handleError(event, channel, ErrorCode.INVALID_PRESET_NAME);
+      return;
+    }
+
     renamePreset(oldName, newName);
     await handleUpdate(event, channel);
   } catch (e) {

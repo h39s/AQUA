@@ -5,6 +5,7 @@ export enum ErrorCode {
   INVALID_PARAMETER,
   FAILURE,
   PRESET_FILE_ERROR,
+  INVALID_PRESET_NAME,
 }
 
 export type ErrorDescription = {
@@ -47,6 +48,12 @@ export const errors: Record<ErrorCode, ErrorDescription> = {
     action:
       'Please check that the preset name is saveable as a file and that the installation directory is in a writeable place. In addition, check that you have available storage space. If the error persists, try reaching out to the developers to resolve the issue.',
     code: ErrorCode.PRESET_FILE_ERROR,
+  },
+  [ErrorCode.INVALID_PRESET_NAME]: {
+    shortError: 'Internal Error: Invalid preset name provided.',
+    action:
+      'Please provide a different preset name. If the error persists, try reaching out to the developers to resolve the issue.',
+    code: ErrorCode.INVALID_PRESET_NAME,
   },
 };
 

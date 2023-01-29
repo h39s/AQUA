@@ -54,8 +54,8 @@ const List = ({
     }
   }, [focusOnRender, inputRefs, options, value]);
 
-  const onChange = useCallback(
-    (newValue: string) => {
+  const onClick = useCallback(
+    (newValue: string) => () => {
       handleChange(newValue);
     },
     [handleChange]
@@ -77,7 +77,7 @@ const List = ({
         return;
       }
       if (e.code === 'Enter') {
-        onChange(entry.value);
+        handleChange(entry.value);
       } else if (e.code === 'ArrowDown') {
         const next = Math.min(index + 1, options.length - 1);
         inputRefs[next].current?.focus();
@@ -86,7 +86,7 @@ const List = ({
         inputRefs[prev].current?.focus();
       }
     },
-    [inputRefs, isDisabled, onChange, options.length]
+    [inputRefs, isDisabled, handleChange, options.length]
   );
 
   return (
@@ -102,7 +102,7 @@ const List = ({
             key={entry.value}
             value={entry.value}
             aria-label={entry.label}
-            onClick={() => onChange(entry.value)}
+            onClick={onClick(entry.value)}
             onKeyDown={handleItemKeyPress(entry, index)}
             onMouseEnter={onMouseEnter(index)}
             tabIndex={0}
