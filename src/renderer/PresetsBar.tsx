@@ -15,6 +15,12 @@ import Button from './widgets/Button';
 import List, { IOptionEntry } from './widgets/List';
 import PresetListItem, { formatPresetName } from './components/PresetListItem';
 
+enum PresetErrorEnum {
+  EMPTY = 'Preset name cannot be empty.',
+  RESTRICTED = 'Invalid preset name, please use another.',
+  DUPLICATE = 'Duplicate name found, please use another.',
+}
+
 const PresetsBar = () => {
   const { globalError, performHealthCheck, setGlobalError } = useAquaContext();
 
@@ -22,7 +28,7 @@ const PresetsBar = () => {
   const [selectedPresetName, setSelectedPresetName] = useState<
     string | undefined
   >(undefined);
-
+  const [presetNameError, setPresetNameError] = useState<string>('');
   const [presetNames, setPresetNames] = useState<string[]>([]);
 
   // Fetch default presets and custom presets from storage
@@ -69,6 +75,30 @@ const PresetsBar = () => {
     }
   };
 
+  // Validating a new preset name
+  const validatePresetName = useCallback((newValue: string) => {
+    if (isRestrictedPresetName(newValue)) {
+      return PresetErrorEnum.RESTRICTED;
+    }
+
+    return '';
+  }, []);
+
+  // Validating a preset rename
+  const validatePresetRename = useCallback(
+    (newValue: string) => {
+      if (!newValue) {
+        return PresetErrorEnum.EMPTY;
+      }
+      if (isDuplicatePresetName(newValue, presetNames)) {
+        return PresetErrorEnum.DUPLICATE;
+      }
+
+      return validatePresetName(newValue);
+    },
+    [presetNames, validatePresetName]
+  );
+
   const handleChangeNewPresetName = (newValue: string) => {
     setPresetName(newValue);
 
@@ -77,6 +107,10 @@ const PresetsBar = () => {
       ? newValue
       : undefined;
     setSelectedPresetName(newSelectedName);
+
+    // Validate new preset name and update error message accordingly
+    const msg = validatePresetName(newValue);
+    setPresetNameError(msg);
   };
 
   // Changing the selected preset in the UI
@@ -114,30 +148,6 @@ const PresetsBar = () => {
     [presetNames, setGlobalError]
   );
 
-  // Validating a new preset name
-  const validatePresetName = useCallback((newValue: string) => {
-    if (isRestrictedPresetName(newValue)) {
-      return 'Invalid preset name, please use another.';
-    }
-
-    return undefined;
-  }, []);
-
-  // Validating a preset rename
-  const validatePresetRename = useCallback(
-    (newValue: string) => {
-      if (!newValue) {
-        return 'Preset name cannot be empty.';
-      }
-      if (isDuplicatePresetName(newValue, presetNames)) {
-        return 'Duplicate name found.';
-      }
-
-      return validatePresetName(newValue);
-    },
-    [validatePresetName, presetNames]
-  );
-
   const options: IOptionEntry[] = useMemo(() => {
     return presetNames.map((n) => {
       return {
@@ -146,7 +156,7 @@ const PresetsBar = () => {
         display: (
           <PresetListItem
             value={n}
-            handleChange={handleRenameExistingPresetName(n)}
+            handleRename={handleRenameExistingPresetName(n)}
             handleDelete={handleDeletePreset(n, presetNames)}
             isDisabled={!!globalError}
             validate={validatePresetRename}
@@ -171,15 +181,15 @@ const PresetsBar = () => {
           value={presetName}
           ariaLabel="Preset Name"
           isDisabled={!!globalError}
+          errorMessage={presetNameError}
           handleChange={handleChangeNewPresetName}
           formatInput={formatPresetName}
-          validate={validatePresetName}
         />
       </div>
       <Button
         ariaLabel="Save settings to preset"
         className="small"
-        isDisabled={!!globalError || !presetName}
+        isDisabled={!!globalError || !presetName || !!presetNameError}
         handleChange={() => handleCreatePreset(presetNames)}
       >
         Save current settings to preset

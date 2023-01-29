@@ -14,11 +14,11 @@ interface ITextInputProps {
   value: string;
   ariaLabel: string;
   isDisabled: boolean;
+  errorMessage: string;
   handleChange: (newValue: string) => void;
   handleEscape?: () => void;
   updateOnSubmitOnly?: boolean;
   formatInput?: (value: string) => string;
-  validate?: (newValue: string) => string | undefined;
 }
 
 const TextInput = forwardRef(
@@ -27,55 +27,36 @@ const TextInput = forwardRef(
       value,
       ariaLabel,
       isDisabled,
+      errorMessage,
       handleChange,
       handleEscape,
       updateOnSubmitOnly,
-      validate,
       formatInput = (s) => s,
     }: ITextInputProps,
     ref: ForwardedRef<HTMLInputElement>
   ) => {
     const [storedValue, setStoredValue] = useState<string>(value);
     const prevValue = useRef<string>(value);
-    const [errorMessage, setErrorMessage] = useState<string | undefined>(
-      undefined
-    );
 
     useEffect(() => {
       setStoredValue(value);
-      setErrorMessage(undefined);
+      prevValue.current = value;
     }, [value]);
 
-    const validateAndSave = useCallback(
+    const updateValue = useCallback(
       (newValue: string) => {
         // No need to validate if the value hasn't changed
         if (prevValue.current === newValue) {
-          setErrorMessage(undefined);
-
           // Treat this as an option for cancelling out of the input
           if (handleEscape) {
             handleEscape();
           }
-          return;
-        }
-
-        if (validate) {
-          // Perform validation
-          const msg = validate(newValue);
-          setErrorMessage(msg);
-
-          // Save changes if validation has no errors
-          if (!msg) {
-            handleChange(newValue);
-            prevValue.current = newValue;
-          }
         } else {
           // Save changes directly
           handleChange(newValue);
-          prevValue.current = newValue;
         }
       },
-      [handleChange, handleEscape, validate]
+      [handleChange, handleEscape]
     );
 
     // Helper for detecting use of the ENTER key
@@ -84,11 +65,13 @@ const TextInput = forwardRef(
         if (handleEscape && (e.code === 'Escape' || e.code === 'Tab')) {
           handleEscape();
         }
+
+        // Update value when the Enter key is pressed
         if (updateOnSubmitOnly && e.code === 'Enter') {
-          validateAndSave(storedValue);
+          updateValue(storedValue);
         }
       },
-      [handleEscape, storedValue, updateOnSubmitOnly, validateAndSave]
+      [handleEscape, storedValue, updateOnSubmitOnly, updateValue]
     );
 
     const onChange = useCallback(
@@ -96,11 +79,13 @@ const TextInput = forwardRef(
         const { value: input } = e.target;
         const formattedValue = formatInput(input);
         setStoredValue(formattedValue);
+
+        // Update value whenever the value changes
         if (!updateOnSubmitOnly) {
-          validateAndSave(formattedValue);
+          updateValue(formattedValue);
         }
       },
-      [formatInput, updateOnSubmitOnly, validateAndSave]
+      [formatInput, updateOnSubmitOnly, updateValue]
     );
 
     return (
