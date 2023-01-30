@@ -45,7 +45,7 @@ export const WINDOW_WIDTH = 1428;
 export const WINDOW_HEIGHT = 625;
 export const WINDOW_HEIGHT_EXPANDED = 1036;
 
-export const PRESETS_DIR = 'presets/';
+export const PRESETS_DIR = 'presets';
 
 /** ----- Application Interfaces ----- */
 

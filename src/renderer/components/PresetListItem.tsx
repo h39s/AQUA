@@ -56,7 +56,6 @@ const PresetListItem = ({
           errorMessage={errorMessage}
           handleChange={handleInputChange}
           handleEscape={handleEscape}
-          formatInput={formatPresetName}
           updateOnSubmitOnly
         />
       ) : (
