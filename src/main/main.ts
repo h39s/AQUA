@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import { uid } from 'uid';
 import fs from 'fs';
+import { exec } from 'child_process';
 import {
   checkConfigFile,
   fetchSettings,
@@ -88,6 +89,24 @@ try {
   }
 } catch (e) {
   console.error('Failed to make presets directory!!');
+  console.error(e);
+  throw e;
+}
+
+try {
+  // update presets folder to support case-sensitive files
+  const presetPath = path.join(process.cwd(), PRESETS_DIR);
+
+  exec(
+    `fsutil.exe file SetCaseSensitiveInfo "${presetPath}"`,
+    (err, stdout) => {
+      if (err) {
+        throw err;
+      }
+      console.log(stdout);
+    }
+  );
+} catch (e) {
   console.error(e);
   throw e;
 }
