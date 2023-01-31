@@ -1,6 +1,6 @@
 # AQUA
 
-Quick link to releases: <https://github.com/h39s/AQUA/releases>
+Quick link to download latest release: <https://github.com/h39s/AQUA/releases/latest/download/AQUAsetup.exe>
 
 Discord Server: <https://discord.gg/44WDeRrr2d>
 
