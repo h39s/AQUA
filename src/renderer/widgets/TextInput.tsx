@@ -5,7 +5,6 @@ import {
   KeyboardEvent,
   useCallback,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 import '../styles/TextInput.scss';
@@ -36,17 +35,15 @@ const TextInput = forwardRef(
     ref: ForwardedRef<HTMLInputElement>
   ) => {
     const [storedValue, setStoredValue] = useState<string>(value);
-    const prevValue = useRef<string>(value);
 
     useEffect(() => {
       setStoredValue(value);
-      prevValue.current = value;
     }, [value]);
 
     const updateValue = useCallback(
       (newValue: string) => {
         // No need to validate if the value hasn't changed
-        if (prevValue.current === newValue) {
+        if (value === newValue) {
           // Treat this as an option for cancelling out of the input
           if (handleEscape) {
             handleEscape();
@@ -56,7 +53,7 @@ const TextInput = forwardRef(
           handleChange(newValue);
         }
       },
-      [handleChange, handleEscape]
+      [handleChange, handleEscape, value]
     );
 
     // Helper for detecting use of the ENTER key

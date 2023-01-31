@@ -13,7 +13,8 @@ import { useAquaContext } from './utils/AquaContext';
 import TextInput from './widgets/TextInput';
 import Button from './widgets/Button';
 import List, { IOptionEntry } from './widgets/List';
-import PresetListItem, { formatPresetName } from './components/PresetListItem';
+import PresetListItem from './components/PresetListItem';
+import { formatPresetName } from './utils/utils';
 
 enum PresetErrorEnum {
   EMPTY = 'Preset name cannot be empty.',
@@ -28,7 +29,7 @@ const PresetsBar = () => {
   const [selectedPresetName, setSelectedPresetName] = useState<
     string | undefined
   >(undefined);
-  const [presetNameError, setPresetNameError] = useState<string>('');
+  const [newPresetNameError, setNewPresetNameError] = useState<string>('');
   const [presetNames, setPresetNames] = useState<string[]>([]);
 
   // Fetch default presets and custom presets from storage
@@ -110,7 +111,7 @@ const PresetsBar = () => {
 
     // Validate new preset name and update error message accordingly
     const msg = validatePresetName(newValue);
-    setPresetNameError(msg);
+    setNewPresetNameError(msg);
   };
 
   // Changing the selected preset in the UI
@@ -181,7 +182,7 @@ const PresetsBar = () => {
           value={presetName}
           ariaLabel="Preset Name"
           isDisabled={!!globalError}
-          errorMessage={presetNameError}
+          errorMessage={newPresetNameError}
           handleChange={handleChangeNewPresetName}
           formatInput={formatPresetName}
         />
@@ -189,7 +190,7 @@ const PresetsBar = () => {
       <Button
         ariaLabel="Save settings to preset"
         className="small"
-        isDisabled={!!globalError || !presetName || !!presetNameError}
+        isDisabled={!!globalError || !presetName || !!newPresetNameError}
         handleChange={() => handleCreatePreset(presetNames)}
       >
         Save current settings to preset

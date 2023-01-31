@@ -16,6 +16,13 @@ export const sortHelper = (a: IFilter, b: IFilter) => a.frequency - b.frequency;
 export const range = (start: number, stop: number, step: number) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
 
+export const formatPresetName = (s: string) => {
+  const filteredS = s.replace(/[^a-zA-Z0-9|_|\-| ]+/, '');
+  return filteredS.slice(0, 1).toUpperCase() + filteredS.slice(1).toLowerCase();
+};
+
+// *** CUSTOM HOOKS ***
+
 // https://overreacted.io/making-setinterval-declarative-with-react-hooks/
 export const useInterval = (callback: () => void, delay?: number) => {
   const savedCallback = useRef<() => void>();
