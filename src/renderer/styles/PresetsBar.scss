@@ -43,6 +43,14 @@
       .iconButton {
         outline: none;
 
+        &:hover svg path {
+          fill: $primary-lighter;
+        }
+
+        &:active svg path {
+          fill: $primary-light;
+        }
+
         &:focus-visible:not([aria-disabled='true']) {
           path {
             fill: $primary-lighter;

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import './styles/PresetsBar.scss';
 import { ErrorDescription } from 'common/errors';
 import { isDuplicatePresetName, isRestrictedPresetName } from 'common/utils';
@@ -22,6 +22,43 @@ enum PresetErrorEnum {
   DUPLICATE = 'Duplicate name found, please use another.',
 }
 
+export enum PresetActionEnum {
+  INIT,
+  CREATE,
+  DELETE,
+  RENAME,
+}
+
+export type PresetAction =
+  | { type: PresetActionEnum.INIT; presetNames: string[] }
+  | { type: PresetActionEnum.CREATE; presetName: string }
+  | { type: PresetActionEnum.DELETE; presetName: string }
+  | { type: PresetActionEnum.RENAME; oldName: string; newName: string };
+
+type IPresetReducer = (presetNames: string[], action: PresetAction) => string[];
+
+const presetReducer: IPresetReducer = (
+  presetNames: string[],
+  action: PresetAction
+) => {
+  switch (action.type) {
+    case PresetActionEnum.INIT:
+      return action.presetNames.sort();
+    case PresetActionEnum.CREATE:
+      return [...presetNames, action.presetName].sort();
+    case PresetActionEnum.DELETE:
+      return presetNames.filter((name) => name !== action.presetName);
+    case PresetActionEnum.RENAME:
+      return presetNames.map((name) =>
+        name === action.oldName ? action.newName : name
+      );
+    default:
+      // This throw does not actually do anything because
+      // we are in a reducer
+      throw new Error('Unhandled action type should not occur');
+  }
+};
+
 const PresetsBar = () => {
   const { globalError, performHealthCheck, setGlobalError } = useAquaContext();
 
@@ -30,15 +67,20 @@ const PresetsBar = () => {
     string | undefined
   >(undefined);
   const [newPresetNameError, setNewPresetNameError] = useState<string>('');
-  const [presetNames, setPresetNames] = useState<string[]>([]);
+  const [presetNames, dispatchPresetNames] = useReducer<IPresetReducer>(
+    presetReducer,
+    []
+  );
 
   // Fetch default presets and custom presets from storage
   useEffect(() => {
     const fetchPresetNames = async () => {
       try {
         const result = await getPresetListFromFiles();
-        // Sort preset names before updating state just in case
-        setPresetNames(result.sort());
+        dispatchPresetNames({
+          type: PresetActionEnum.INIT,
+          presetNames: result,
+        });
       } catch (e) {
         setGlobalError(e as ErrorDescription);
       }
@@ -55,9 +97,10 @@ const PresetsBar = () => {
       // If we are creating a new preset and not just updating an existing one
       if (prev.indexOf(presetName) === -1) {
         setSelectedPresetName(presetName);
-        // Keep presets sorted
-        const newPresets = [...prev, presetName].sort();
-        setPresetNames(newPresets);
+        dispatchPresetNames({
+          type: PresetActionEnum.CREATE,
+          presetName,
+        });
       }
     } catch (e) {
       setGlobalError(e as ErrorDescription);
@@ -122,10 +165,13 @@ const PresetsBar = () => {
 
   // Deleting a preset
   const handleDeletePreset = useCallback(
-    (deletedValue: string, prevNames: string[]) => async () => {
+    (deletedValue: string) => async () => {
       try {
         await deletePreset(deletedValue);
-        setPresetNames(prevNames.filter((n) => n !== deletedValue));
+        dispatchPresetNames({
+          type: PresetActionEnum.DELETE,
+          presetName: deletedValue,
+        });
       } catch (e) {
         // continue to run, the worst case is that the file still exists and that's all.
       }
@@ -135,18 +181,19 @@ const PresetsBar = () => {
 
   // Renaming an existing preset
   const handleRenameExistingPresetName = useCallback(
-    (oldValue: string) => async (newValue: string) => {
+    (oldName: string) => async (newName: string) => {
       try {
-        await renamePreset(oldValue, newValue);
-        setPresetNames(
-          // Keep presets sorted
-          presetNames.map((n) => (n === oldValue ? newValue : n)).sort()
-        );
+        await renamePreset(oldName, newName);
+        dispatchPresetNames({
+          type: PresetActionEnum.RENAME,
+          oldName,
+          newName,
+        });
       } catch (e) {
         setGlobalError(e as ErrorDescription);
       }
     },
-    [presetNames, setGlobalError]
+    [setGlobalError]
   );
 
   const options: IOptionEntry[] = useMemo(() => {
@@ -158,7 +205,7 @@ const PresetsBar = () => {
           <PresetListItem
             value={n}
             handleRename={handleRenameExistingPresetName(n)}
-            handleDelete={handleDeletePreset(n, presetNames)}
+            handleDelete={handleDeletePreset(n)}
             isDisabled={!!globalError}
             validate={validatePresetRename}
           />
