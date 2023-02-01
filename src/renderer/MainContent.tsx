@@ -5,22 +5,27 @@ import { useAquaContext } from './utils/AquaContext';
 import './styles/MainContent.scss';
 import AddSliderDivider from './components/AddSliderDivider';
 import SortWrapper from './SortWrapper';
+import Spinner from './icons/Spinner';
 
 const MainContent = () => {
-  const { filters } = useAquaContext();
+  const { filters, isLoading } = useAquaContext();
   const wrapperRef = createRef<HTMLDivElement>();
-  return (
-    <div className="center mainContent">
-      <div className="col center bandLabel">
-        <span className="rowLabel">Filter Type</span>
-        <span className="rowLabel">Frequency (Hz)</span>
+  return isLoading ? (
+    <div className="center full row">
+      <Spinner />
+    </div>
+  ) : (
+    <div className="center main-content">
+      <div className="col center band-label">
+        <span className="row-label">Filter Type</span>
+        <span className="row-label">Frequency (Hz)</span>
         <div className="col">
           <span>+30dB</span>
           <span>0dB</span>
           <span>-30dB</span>
         </div>
-        <span className="rowLabel">Gain (dB)</span>
-        <span className="rowLabel">Quality</span>
+        <span className="row-label">Gain (dB)</span>
+        <span className="row-label">Quality</span>
       </div>
       <div ref={wrapperRef} className="bands row center">
         <AddSliderDivider

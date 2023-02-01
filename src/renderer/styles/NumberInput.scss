@@ -1,12 +1,11 @@
 @import 'color';
+@import 'constant';
 @import 'spacing';
 
-$input-height: 24px;
-
-.numberInput {
+.number-input {
   gap: $spacing-s;
 
-  .inputWrapper {
+  .input-wrapper {
     position: relative; // necessary so that the absolutely positioned asterisks will scroll with the input
     border: $spacing-xxs solid $secondary-default;
     border-radius: 4px;

@@ -19,19 +19,23 @@ body {
     // Spacing and height
     padding: $spacing-m;
     padding-top: $spacing-s;
-    height: calc(100vh - $titlebar-height - $spacing-m - $spacing-s);
+    height: calc(100vh - $title-bar-height - $spacing-m - $spacing-s);
     width: calc(100vw - 2 * $spacing-m);
 
-    // Add flex so we can split space bweteen parametric and graph views
-    display: flex;
-    flex-direction: column;
+    // Add grid for layout
+    display: grid;
+    grid-template-areas:
+      'side-bar main-content presets-bar'
+      'graph-wrapper graph-wrapper graph-wrapper';
+    grid-template-columns: minmax($sidebar-width, max-content) 1fr $preset-bar-width;
+    grid-template-rows: $equalizer-height 1fr;
     gap: $spacing-s;
   }
 }
 
-.titlebar {
+.title-bar {
   background-color: $primary-dark;
-  height: $titlebar-height;
+  height: $title-bar-height;
   width: 100%;
   -webkit-app-region: drag; /* Allow user to drag the window using this titlebar */
   -webkit-user-select: none; /* Prevent user from selecting things */
@@ -46,14 +50,8 @@ body {
   }
 }
 
-.parameteric-wrapper {
-  flex: 0;
-  gap: $spacing-s;
-  height: $equalizer-height;
-}
-
 .graph-wrapper {
-  flex: 1;
+  grid-area: graph-wrapper;
   border-radius: $spacing-m;
   border: $spacing-xxs solid $secondary-default;
 }

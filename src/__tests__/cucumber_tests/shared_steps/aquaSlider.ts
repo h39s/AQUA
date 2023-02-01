@@ -8,21 +8,21 @@ export const givenBandCount = (
 ) => {
   given(/^there are (\d+) frequency bands$/, async (count: number) => {
     let sliderElems = await webdriver.driver
-      .$('.mainContent')
+      .$('.main-content')
       .$$('.bandWrapper');
     let sliderLength = sliderElems.length;
 
     while (sliderLength > count) {
       // Find any delete button
       const removeButton = await webdriver.driver
-        .$('.mainContent')
+        .$('.main-content')
         .$('.removeFilter');
       removeButton.click();
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       do {
         sliderElems = await webdriver.driver
-          .$('.mainContent')
+          .$('.main-content')
           .$$('.bandWrapper');
       } while (sliderElems.length === sliderLength);
       sliderLength = sliderElems.length;
@@ -31,14 +31,14 @@ export const givenBandCount = (
     while (sliderLength < count) {
       // Find any add button
       const addButton = await webdriver.driver
-        .$('.mainContent')
+        .$('.main-content')
         .$('.addFilter');
       addButton.click();
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       do {
         sliderElems = await webdriver.driver
-          .$('.mainContent')
+          .$('.main-content')
           .$$('.bandWrapper');
       } while (sliderElems.length === sliderLength);
       sliderLength = sliderElems.length;
@@ -55,12 +55,12 @@ export const whenChangeBandCount = (
 
     if (isAdd) {
       const addButton = await webdriver.driver
-        .$('.mainContent')
+        .$('.main-content')
         .$('.addFilter');
       addButton.click();
     } else {
       const removeButton = await webdriver.driver
-        .$('.mainContent')
+        .$('.main-content')
         .$('.removeFilter');
       removeButton.click();
     }
@@ -78,7 +78,7 @@ const setFrequencyGain = async (
   position: string
 ) => {
   const element = await webdriver.driver.$(
-    `.mainContent input[name="${frequency}-gain-range"]`
+    `.main-content input[name="${frequency}-gain-range"]`
   );
   const coord = { x: 0, y: 0 };
   if (position === 'top') {
@@ -111,7 +111,7 @@ export const whenSetFrequencyGainWithText = (
     /^I set gain of slider of frequency (\d+)Hz to (\d+(?:.\d+)?)db$/,
     async (frequency: number, gain: string) => {
       const inputElement = await webdriver.driver.$(
-        `.mainContent label[for="${frequency}-gain-number"] input`
+        `.main-content label[for="${frequency}-gain-number"] input`
       );
       await inputElement.setValue(parseFloat(gain));
       await inputElement.keys('Tab');
@@ -129,7 +129,7 @@ const setFrequencyQuality = async (
   quality: string
 ) => {
   const inputElement = await webdriver.driver.$(
-    `.mainContent label[for="${frequency}-quality"] input`
+    `.main-content label[for="${frequency}-quality"] input`
   );
   await inputElement.setValue(parseFloat(quality));
   await inputElement.keys('Tab');
@@ -169,7 +169,7 @@ export const whenSetFrequencyQualityUsingArrows = (
     /^I click on the (up|down) arrow for the quality for frequency (\d+)Hz (\d+) times$/,
     async (direction: string, frequency: number, times: number) => {
       const label = await webdriver.driver.$(
-        `.mainContent label[for="${frequency}-quality"]`
+        `.main-content label[for="${frequency}-quality"]`
       );
       const hiddenButton = await label.$(`.arrow-${direction}`);
       expect(await hiddenButton.isDisplayed()).toBeFalsy();
@@ -198,7 +198,7 @@ const setFrequencyFilterType = async (
   }
   const filterTypeAsEnum = filterType as FilterTypeEnum;
   const dropdownElem = await webdriver.driver
-    .$('.mainContent')
+    .$('.main-content')
     .$(`.dropdown [aria-label="${frequency}-filter-type"]`);
 
   expect(dropdownElem).not.toBeNull();
@@ -315,7 +315,7 @@ const setPreAmpGain = async (
   position: string
 ) => {
   const element = await webdriver.driver.$(
-    '.sideBar input[name="Pre-Amplification Gain (dB)-range"]'
+    '.side-bar input[name="Pre-Amplification Gain (dB)-range"]'
   );
   const coord = { x: 0, y: 0 };
   if (position === 'top') {
@@ -333,7 +333,7 @@ const setPreAmpGainNumber = async (
   gain: number
 ) => {
   const inputElement = await webdriver.driver.$(
-    '.sideBar input[name="Pre-Amplification Gain (dB)-number"]'
+    '.side-bar input[name="Pre-Amplification Gain (dB)-number"]'
   );
   await inputElement.setValue(gain);
   await inputElement.keys('Tab');
@@ -370,7 +370,7 @@ export const whenSetPreAmpGainUsingArrows = (
     /^I click on the (up|down) arrow for the preamp gain (\d+) times$/,
     async (direction: string, times: number) => {
       const button = await webdriver.driver
-        .$('.sideBar')
+        .$('.side-bar')
         .$(`.arrow-${direction}`);
 
       for (let i = 0; i < times; i += 1) {

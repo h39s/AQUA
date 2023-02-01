@@ -144,7 +144,9 @@ export const thenFrequencyGain = (
   then(
     /^Aqua config file should show gain of (-?\d+)dB for frequency (\d+)Hz$/,
     async (gain: string, frequency: string) => {
-      const sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
+      const sliderElems = await webdriver.driver
+        .$('.main-content')
+        .$$('.range');
       for (let i = 0; i < sliderElems.length; i += 1) {
         const element = await sliderElems[i].$('input');
         const name = await element.getAttribute('name');
@@ -167,7 +169,9 @@ export const thenFrequencyQuality = (
   then(
     /^Aqua config file should show a quality of (\d+.?\d+) for the band with frequency (\d+)Hz$/,
     async (quality: string, frequency: string) => {
-      const sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
+      const sliderElems = await webdriver.driver
+        .$('.main-content')
+        .$$('.range');
       for (let i = 0; i < sliderElems.length; i += 1) {
         const element = await sliderElems[i].$('input');
         const name = await element.getAttribute('name');
@@ -190,7 +194,9 @@ export const thenFrequencyFilterType = (
   then(
     /^Aqua config file should show the (\w+) filter type for the band with frequency (\d+)Hz$/,
     async (filterType: string, frequency: string) => {
-      const sliderElems = await webdriver.driver.$('.mainContent').$$('.range');
+      const sliderElems = await webdriver.driver
+        .$('.main-content')
+        .$$('.range');
       for (let i = 0; i < sliderElems.length; i += 1) {
         const element = await sliderElems[i].$('input');
         const name = await element.getAttribute('name');

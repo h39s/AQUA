@@ -4,12 +4,12 @@
 
 // band width and height from constants file
 
-.mainContent {
-  width: $content-width;
+.main-content {
+  grid-area: main-content;
   display: grid;
   grid-template-columns: 128px 1fr;
-  grid-template-rows: 100%;
   gap: $spacing-s;
+
   // Add additional space to the right to balance the spacing better
   padding: $spacing-s $spacing-l $spacing-s $spacing-s;
   justify-items: center;
@@ -17,7 +17,7 @@
   border-radius: $spacing-m;
   border: $spacing-xxs solid $secondary-default;
 
-  .bandLabel {
+  .band-label {
     height: $band-height;
     justify-content: flex-start;
     gap: $spacing-s;
@@ -27,7 +27,7 @@
       height: 100%;
     }
 
-    .rowLabel {
+    .row-label {
       margin: $spacing-s 0;
     }
 

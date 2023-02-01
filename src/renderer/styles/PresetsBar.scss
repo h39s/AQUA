@@ -2,18 +2,15 @@
 @import 'color';
 @import 'spacing';
 
-.presetsBar {
+.presets-bar {
+  grid-area: presets-bar;
+
   // Spacing of the contents
   display: grid;
-  grid-template-rows: repeat(3, min-content) auto min-content;
+  grid-template-rows: repeat(3, min-content) 1fr min-content;
   padding: $spacing-m;
   gap: $spacing-s;
   justify-items: center;
-
-  // Sizing of the wraooer
-  height: calc(100% - 2 * $spacing-m);
-  min-width: $presetbar-width;
-  max-width: $presetbar-width;
 
   // Styling of the background wrapper
   border-radius: $spacing-m;
@@ -29,7 +26,7 @@
   }
 
   // Adjust spacing for preset name input field
-  .presetName {
+  .preset-name {
     width: 100%;
 
     input[type='text'] {
@@ -37,7 +34,7 @@
     }
   }
 
-  .presetListItem {
+  .preset-list-item {
     min-height: $spacing-l;
     padding: $spacing-xs $spacing-s;
     justify-content: space-between;
