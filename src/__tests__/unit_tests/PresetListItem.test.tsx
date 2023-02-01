@@ -102,7 +102,7 @@ describe('PresetListItem', () => {
   it('should handle change with format change', async () => {
     const testValue = 'Standard';
     const newValue = 'tO p$RoPeR /cAsInG -_';
-    const expectedNewValue = 'To proper casing -_';
+    const expectedNewValue = 'tO pRoPeR cAsInG -_';
     const { user } = setup(
       <PresetListItem
         value={testValue}

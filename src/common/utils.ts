@@ -23,11 +23,3 @@ export const computeAvgFreq = (filters: IFilter[], index: number) => {
 // have manually confirmed this.
 export const isRestrictedPresetName = (newName: string) =>
   RESERVED_FILE_NAMES_SET.has(newName.toUpperCase());
-
-export const isDuplicatePresetName = (
-  newName: string,
-  existingNames: string[]
-) =>
-  existingNames.some(
-    (oldValue) => newName.toLowerCase() === oldValue.toLowerCase()
-  );

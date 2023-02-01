@@ -235,6 +235,7 @@ const PresetsBar = () => {
           isDisabled={!!globalError}
           errorMessage={newPresetNameError}
           handleChange={handleChangeNewPresetName}
+          formatInput={formatPresetName}
         />
       </div>
       <Button
