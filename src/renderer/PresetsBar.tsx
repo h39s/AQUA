@@ -189,6 +189,10 @@ const PresetsBar = () => {
           oldName,
           newName,
         });
+
+        // Update selected preset and new preset name to reflect updated value
+        setPresetName(newName);
+        setSelectedPresetName(newName);
       } catch (e) {
         setGlobalError(e as ErrorDescription);
       }
