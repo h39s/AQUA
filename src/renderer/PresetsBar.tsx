@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import './styles/PresetsBar.scss';
 import { ErrorDescription } from 'common/errors';
-import { isDuplicatePresetName, isRestrictedPresetName } from 'common/utils';
+import { isRestrictedPresetName } from 'common/utils';
 import {
   deletePreset,
   getPresetListFromFiles,
@@ -134,7 +134,7 @@ const PresetsBar = () => {
       if (!newValue) {
         return PresetErrorEnum.EMPTY;
       }
-      if (isDuplicatePresetName(newValue, presetNames)) {
+      if (presetNames.some((value) => value === newValue)) {
         return PresetErrorEnum.DUPLICATE;
       }
 

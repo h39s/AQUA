@@ -18,13 +18,8 @@ export const computeAvgFreq = (filters: IFilter[], index: number) => {
   return roundToPrecision(10 ** exponent, 0);
 };
 
+// Even with the case sensitivity setting set on a folder, Windows will not support
+// files of any case with a name equal to one in the reserved file names set. I
+// have manually confirmed this.
 export const isRestrictedPresetName = (newName: string) =>
   RESERVED_FILE_NAMES_SET.has(newName.toUpperCase());
-
-export const isDuplicatePresetName = (
-  newName: string,
-  existingNames: string[]
-) =>
-  existingNames.some(
-    (oldValue) => newName.toLowerCase() === oldValue.toLowerCase()
-  );
