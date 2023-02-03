@@ -1,6 +1,7 @@
 import {
   createRef,
   KeyboardEvent,
+  MouseEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -18,7 +19,7 @@ interface IListProps {
   options: IOptionEntry[];
   value: string;
   isDisabled: boolean;
-  handleChange: (newValue: string) => void;
+  handleChange: (newValue: string, e?: MouseEvent) => void;
   className?: string;
   itemClassName?: string;
   focusOnRender?: boolean;
@@ -55,8 +56,8 @@ const List = ({
   }, [focusOnRender, inputRefs, options, value]);
 
   const onClick = useCallback(
-    (newValue: string) => () => {
-      handleChange(newValue);
+    (newValue: string) => (e: MouseEvent) => {
+      handleChange(newValue, e);
     },
     [handleChange]
   );

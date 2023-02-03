@@ -6,11 +6,13 @@ import TextInput from '../../renderer/widgets/TextInput';
 describe('TextInput', () => {
   const name = 'Text Input';
   const handleChange = jest.fn();
+  const handleSubmit = jest.fn();
   const handleEscape = jest.fn();
   const validate = jest.fn();
 
   beforeEach(() => {
     handleChange.mockClear();
+    handleSubmit.mockClear();
     handleEscape.mockClear();
     validate.mockClear();
   });
@@ -33,21 +35,22 @@ describe('TextInput', () => {
 
     await user.type(editInput, 'ab');
     expect(handleChange).toHaveBeenCalledTimes(2);
+    expect(handleSubmit).toHaveBeenCalledTimes(0);
     await user.keyboard('{Enter}');
     expect(handleChange).toHaveBeenCalledTimes(2);
+    expect(handleSubmit).toHaveBeenCalledTimes(0);
   });
 
-  it('should handle change on submit only', async () => {
+  it('should handle change on enter only', async () => {
     const testValue = 'Standard';
     const { user } = setup(
       <TextInput
         value={testValue}
         ariaLabel={name}
-        handleChange={handleChange}
+        handleSubmit={handleSubmit}
         handleEscape={handleEscape}
         isDisabled={false}
         errorMessage=""
-        updateOnSubmitOnly
       />
     );
 
@@ -56,9 +59,37 @@ describe('TextInput', () => {
 
     await user.type(editInput, 'ab');
     expect(handleChange).toHaveBeenCalledTimes(0);
+    expect(handleSubmit).toHaveBeenCalledTimes(0);
 
     await user.keyboard('{Enter}');
-    expect(handleChange).toHaveBeenCalledTimes(1);
+    expect(handleChange).toHaveBeenCalledTimes(0);
+    expect(handleSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  it('should handle change on change and on enter', async () => {
+    const testValue = 'Standard';
+    const { user } = setup(
+      <TextInput
+        value={testValue}
+        ariaLabel={name}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+        handleEscape={handleEscape}
+        isDisabled={false}
+        errorMessage=""
+      />
+    );
+
+    const editInput = screen.getByLabelText(name);
+    expect(editInput).toHaveValue(testValue);
+
+    await user.type(editInput, 'ab');
+    expect(handleChange).toHaveBeenCalledTimes(2);
+    expect(handleSubmit).toHaveBeenCalledTimes(0);
+
+    await user.keyboard('{Enter}');
+    expect(handleChange).toHaveBeenCalledTimes(2);
+    expect(handleSubmit).toHaveBeenCalledTimes(1);
   });
 
   it('should display error message', async () => {

@@ -1,4 +1,4 @@
-import { KeyboardEvent, useMemo } from 'react';
+import { KeyboardEvent, MouseEvent, useMemo } from 'react';
 import DeleteIcon from 'renderer/icons/DeleteIcon';
 import EditIcon from 'renderer/icons/EditIcon';
 import TrashIcon from 'renderer/icons/TrashIcon';
@@ -13,7 +13,7 @@ interface IIconButtonProps {
   icon: IconName;
   isDisabled: boolean;
   className?: string;
-  handleClick: () => void;
+  handleClick: (e?: MouseEvent) => void;
 }
 
 const IconButton = ({

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { MouseEvent, useRef, useState } from 'react';
 import { formatPresetName, useMouseDownOutside } from 'renderer/utils/utils';
 import IconButton, { IconName } from 'renderer/widgets/IconButton';
 import TextInput from 'renderer/widgets/TextInput';
@@ -24,6 +24,12 @@ const PresetListItem = ({
 
   const handleEditClicked = () => {
     setIsEditMode(true);
+  };
+
+  const handleDeleteClicked = (e?: MouseEvent) => {
+    // Prevent list item from receiving the click event when the delete icon is clicked
+    e?.stopPropagation();
+    handleDelete();
   };
 
   const handleEscape = () => {
@@ -54,10 +60,9 @@ const PresetListItem = ({
           ariaLabel="Edit Preset Name"
           isDisabled={false}
           errorMessage={errorMessage}
-          handleChange={handleInputChange}
+          handleSubmit={handleInputChange}
           handleEscape={handleEscape}
           formatInput={formatPresetName}
-          updateOnSubmitOnly
         />
       ) : (
         <>
@@ -70,7 +75,7 @@ const PresetListItem = ({
             />
             <IconButton
               icon={IconName.DELETE}
-              handleClick={handleDelete}
+              handleClick={handleDeleteClicked}
               isDisabled={isDisabled}
             />
           </div>

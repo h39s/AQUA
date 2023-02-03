@@ -14,9 +14,9 @@ interface ITextInputProps {
   ariaLabel: string;
   isDisabled: boolean;
   errorMessage: string;
-  handleChange: (newValue: string) => void;
+  handleChange?: (newValue: string) => void;
+  handleSubmit?: (newValue: string) => void;
   handleEscape?: () => void;
-  updateOnSubmitOnly?: boolean;
   formatInput?: (value: string) => string;
 }
 
@@ -28,8 +28,8 @@ const TextInput = forwardRef(
       isDisabled,
       errorMessage,
       handleChange,
+      handleSubmit,
       handleEscape,
-      updateOnSubmitOnly,
       formatInput = (s) => s,
     }: ITextInputProps,
     ref: ForwardedRef<HTMLInputElement>
@@ -42,33 +42,59 @@ const TextInput = forwardRef(
 
     const updateValue = useCallback(
       (newValue: string) => {
-        // No need to validate if the value hasn't changed
+        if (!handleChange) {
+          // Do nothing if handleChange is not defined
+          return;
+        }
+
+        // No need to update if the value hasn't changed
         if (value === newValue) {
           // Treat this as an option for cancelling out of the input
           if (handleEscape) {
             handleEscape();
           }
         } else {
-          // Save changes directly
+          // Update with changes
           handleChange(newValue);
         }
       },
       [handleChange, handleEscape, value]
     );
 
+    const submitValue = useCallback(
+      (newValue: string) => {
+        if (!handleSubmit) {
+          // Do nothing if handleSubmit is not defined
+          return;
+        }
+
+        // If value isn't updated on change, then ignore submits that result in no changes
+        if (!handleChange && value === newValue) {
+          // Treat this as an option for cancelling out of the input
+          if (handleEscape) {
+            handleEscape();
+          }
+        } else if (handleSubmit) {
+          // Submit changes
+          handleSubmit(newValue);
+        }
+      },
+      [handleChange, handleSubmit, handleEscape, value]
+    );
+
     // Helper for detecting use of the ENTER key
-    const onKeyDown = useCallback(
+    const onKeyUp = useCallback(
       (e: KeyboardEvent) => {
         if (handleEscape && (e.code === 'Escape' || e.code === 'Tab')) {
           handleEscape();
         }
 
-        // Update value when the Enter key is pressed
-        if (updateOnSubmitOnly && e.code === 'Enter') {
-          updateValue(storedValue);
+        // Submit changes when the Enter key is pressed
+        if (e.code === 'Enter') {
+          submitValue(storedValue);
         }
       },
-      [handleEscape, storedValue, updateOnSubmitOnly, updateValue]
+      [handleEscape, submitValue, storedValue]
     );
 
     const onChange = useCallback(
@@ -77,12 +103,10 @@ const TextInput = forwardRef(
         const formattedValue = formatInput(input);
         setStoredValue(formattedValue);
 
-        // Update value whenever the value changes
-        if (!updateOnSubmitOnly) {
-          updateValue(formattedValue);
-        }
+        // Update value whenever the input changes
+        updateValue(formattedValue);
       },
-      [formatInput, updateOnSubmitOnly, updateValue]
+      [formatInput, updateValue]
     );
 
     return (
@@ -96,7 +120,7 @@ const TextInput = forwardRef(
           aria-invalid={!!errorMessage}
           aria-errormessage={errorMessage}
           onChange={onChange}
-          onKeyDown={onKeyDown}
+          onKeyUp={onKeyUp}
           tabIndex={isDisabled ? -1 : 0}
           aria-disabled={isDisabled}
         />
