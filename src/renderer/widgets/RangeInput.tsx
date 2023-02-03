@@ -65,6 +65,16 @@ const RangeInput = ({
     }
   };
 
+  const onWheel = (e: React.WheelEvent) => {
+    if (e.deltaY >= 0) {
+      // scroll down
+      onArrowInput(false);
+    } else {
+      // scroll up
+      onArrowInput(true);
+    }
+  };
+
   return (
     <div className="col center range">
       <ArrowButton
@@ -83,6 +93,7 @@ const RangeInput = ({
         aria-label={name}
         onChange={onRangeInput}
         onMouseUp={onMouseUp}
+        onWheel={onWheel}
         disabled={isDisabled}
         style={
           // Set css variables for determining upper/lower track
