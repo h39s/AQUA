@@ -64,6 +64,15 @@ const FrequencyBand = forwardRef(
       await setGain(sliderIndex, newValue);
     }, INTERVAL);
 
+    const throttleSetQuality = useThrottleFuture(async (newValue: number) => {
+      dispatchFilter({
+        type: FilterActionEnum.QUALITY,
+        id: filter.id,
+        newValue,
+      });
+      await setQuality(sliderIndex, newValue);
+    }, INTERVAL);
+
     const handleGainSubmit = async (newValue: number) => {
       try {
         await throttleSetGain(newValue);
@@ -87,12 +96,7 @@ const FrequencyBand = forwardRef(
 
     const handleQualitySubmit = async (newValue: number) => {
       try {
-        await setQuality(sliderIndex, newValue);
-        dispatchFilter({
-          type: FilterActionEnum.QUALITY,
-          id: filter.id,
-          newValue,
-        });
+        await throttleSetQuality(newValue);
       } catch (e) {
         setGlobalError(e as ErrorDescription);
       }

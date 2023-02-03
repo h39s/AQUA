@@ -231,6 +231,16 @@ const NumberInput = ({
     handleSubmit(newValue);
   };
 
+  const onWheel = (e: React.WheelEvent) => {
+    if (e.deltaY >= 0) {
+      // scroll down
+      onArrow(false);
+    } else {
+      // scroll up
+      onArrow(true);
+    }
+  };
+
   // Helper for detecting use of the ENTER or TAB keys
   const listenForEnter = async (e: KeyboardEvent) => {
     if (e.code === 'Enter' || e.code === 'Tab') {
@@ -259,6 +269,7 @@ const NumberInput = ({
           onInput={onInput}
           onBlur={onSubmit}
           onKeyDown={listenForEnter}
+          onWheel={showArrows ? onWheel : undefined}
           disabled={isDisabled}
           style={{ textAlign: showArrows ? 'left' : 'center' }}
         />

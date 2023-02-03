@@ -116,6 +116,44 @@ describe('RangeInput', () => {
     expect(handleChange).toBeCalledWith(-1);
   });
 
+  it('should increase value when scrolling up', async () => {
+    const testValue = 0;
+    setup(
+      <RangeInput
+        name={name}
+        min={-5}
+        max={5}
+        handleChange={handleChange}
+        handleMouseUp={handleMouseUp}
+        width={150}
+        value={testValue}
+        isDisabled={false}
+      />
+    );
+    const slider = screen.getByLabelText(`${name}`);
+    fireEvent.wheel(slider, { deltaY: -100 });
+    expect(handleChange).toBeCalledWith(1);
+  });
+
+  it('should increase value when scrolling down', async () => {
+    const testValue = 0;
+    setup(
+      <RangeInput
+        name={name}
+        min={-5}
+        max={5}
+        handleChange={handleChange}
+        handleMouseUp={handleMouseUp}
+        width={150}
+        value={testValue}
+        isDisabled={false}
+      />
+    );
+    const slider = screen.getByLabelText(`${name}`);
+    fireEvent.wheel(slider, { deltaY: 43 });
+    expect(handleChange).toBeCalledWith(-1);
+  });
+
   it('should increment value using up arrow for non-zero precision', async () => {
     const testValue = 0;
     const { user } = setup(
