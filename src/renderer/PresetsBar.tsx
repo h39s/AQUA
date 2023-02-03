@@ -70,13 +70,15 @@ const PresetsBar = () => {
   const { globalError, performHealthCheck, setGlobalError } = useAquaContext();
 
   const [presetName, setPresetName] = useState<string>('');
-  const [selectedPresetName, setSelectedPresetName] = useState<
-    string | undefined
-  >(undefined);
   const [newPresetNameError, setNewPresetNameError] = useState<string>('');
   const [presetNames, dispatchPresetNames] = useReducer<IPresetReducer>(
     presetReducer,
     []
+  );
+
+  const isExistingPresetSelected = useMemo(
+    () => presetNames.some((n) => n === presetName),
+    [presetName, presetNames]
   );
 
   // Fetch default presets and custom presets from storage
@@ -97,31 +99,27 @@ const PresetsBar = () => {
   }, [setGlobalError]);
 
   // Creating a new preset
-  const handleCreatePreset = useCallback(
-    (prev: string[]) => async () => {
-      try {
-        await savePreset(presetName);
+  const handleCreatePreset = useCallback(async () => {
+    try {
+      await savePreset(presetName);
 
-        // If we are creating a new preset and not just updating an existing one
-        if (prev.indexOf(presetName) === -1) {
-          setSelectedPresetName(presetName);
-          dispatchPresetNames({
-            type: PresetActionEnum.CREATE,
-            presetName,
-          });
-        }
-      } catch (e) {
-        setGlobalError(e as ErrorDescription);
+      // If we are creating a new preset and not just updating an existing one, update the list of preset names
+      if (!isExistingPresetSelected) {
+        dispatchPresetNames({
+          type: PresetActionEnum.CREATE,
+          presetName,
+        });
       }
-    },
-    [presetName, setGlobalError]
-  );
+    } catch (e) {
+      setGlobalError(e as ErrorDescription);
+    }
+  }, [isExistingPresetSelected, presetName, setGlobalError]);
 
   // Loading audio settings from an existing preset
   const handleLoadPreset = async () => {
-    if (selectedPresetName) {
+    if (isExistingPresetSelected) {
       try {
-        await loadPreset(selectedPresetName);
+        await loadPreset(presetName);
         performHealthCheck();
       } catch (e) {
         setGlobalError(e as ErrorDescription);
@@ -156,12 +154,6 @@ const PresetsBar = () => {
   const handleChangeNewPresetName = (newValue: string) => {
     setPresetName(newValue);
 
-    // Update selectedPresetName if the input value matches an existing preset name
-    const newSelectedName = presetNames.some((n) => n === newValue)
-      ? newValue
-      : undefined;
-    setSelectedPresetName(newSelectedName);
-
     // Validate new preset name and update error message accordingly
     const msg = validatePresetName(newValue);
     setNewPresetNameError(msg);
@@ -170,7 +162,6 @@ const PresetsBar = () => {
   // Changing the selected preset in the UI
   const handleChangeSelectedPreset = (newValue: string, e?: MouseEvent) => {
     setPresetName(newValue);
-    setSelectedPresetName(newValue);
 
     // Load preset when it is double clicked
     if (e?.detail === 2) {
@@ -189,7 +180,6 @@ const PresetsBar = () => {
         });
 
         // Deselect preset name info since the preset no longer exists
-        setSelectedPresetName(undefined);
         setPresetName('');
       } catch (e) {
         // continue to run, the worst case is that the file still exists and that's all.
@@ -209,9 +199,8 @@ const PresetsBar = () => {
           newName,
         });
 
-        // Update selected preset and new preset name to reflect updated value
+        // Update preset name to reflect updated value
         setPresetName(newName);
-        setSelectedPresetName(newName);
       } catch (e) {
         setGlobalError(e as ErrorDescription);
       }
@@ -254,7 +243,7 @@ const PresetsBar = () => {
           isDisabled={!!globalError}
           errorMessage={newPresetNameError}
           handleChange={handleChangeNewPresetName}
-          handleSubmit={handleCreatePreset(presetNames)}
+          handleSubmit={handleCreatePreset}
           formatInput={formatPresetName}
         />
       </div>
@@ -262,7 +251,7 @@ const PresetsBar = () => {
         ariaLabel="Save settings to preset"
         className="small"
         isDisabled={!!globalError || !presetName || !!newPresetNameError}
-        handleChange={handleCreatePreset(presetNames)}
+        handleChange={handleCreatePreset}
       >
         Save current settings to preset
       </Button>
@@ -277,7 +266,7 @@ const PresetsBar = () => {
       <Button
         ariaLabel="Load selected preset"
         className="small"
-        isDisabled={!!globalError || !selectedPresetName}
+        isDisabled={!!globalError || !isExistingPresetSelected}
         handleChange={handleLoadPreset}
       >
         Load selected preset
