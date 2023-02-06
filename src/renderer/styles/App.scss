@@ -54,6 +54,9 @@ body {
   grid-area: graph-wrapper;
   border-radius: $spacing-m;
   border: $spacing-xxs solid $secondary-default;
+
+  // Prevent graph from overflowing out of the wrapper's available space
+  overflow: hidden;
 }
 
 .row {

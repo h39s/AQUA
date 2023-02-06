@@ -1,5 +1,5 @@
 import { IFilter } from 'common/constants';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Spinner from 'renderer/icons/Spinner';
 import { useAquaContext } from 'renderer/utils/AquaContext';
 import { setMainPreAmp } from 'renderer/utils/equalizerApi';
@@ -143,9 +143,31 @@ const FrequencyResponseChart = () => {
     }
   }, [autoPreAmpValue, isAutoPreAmpOn, isLoading, setPreAmp]);
 
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState<number>(1396);
+  const [height, setHeight] = useState<number>(380);
+
+  useLayoutEffect(() => {
+    const updateDimensions = () => {
+      const newWidth = ref.current?.clientWidth;
+      if (newWidth && newWidth > 0) {
+        setWidth(newWidth);
+      }
+      const newHeight = ref.current?.clientHeight;
+      if (newHeight && newHeight > 0) {
+        setHeight(newHeight);
+      }
+    };
+
+    // Compute dimensions on initial render
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
   const dimensions: ChartDimensions = {
-    width: 1396,
-    height: 380,
+    width,
+    height,
     margins: {
       top: 30,
       right: 30,
@@ -157,7 +179,7 @@ const FrequencyResponseChart = () => {
   return (
     <>
       {isGraphViewOn && (
-        <div className="graph-wrapper">
+        <div className="graph-wrapper" ref={ref}>
           {isLoading ? (
             <div className="center full row">
               <Spinner />
