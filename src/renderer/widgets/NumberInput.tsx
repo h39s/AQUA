@@ -1,5 +1,6 @@
 import {
   ChangeEvent,
+  WheelEvent,
   CSSProperties,
   KeyboardEvent,
   useEffect,
@@ -219,10 +220,7 @@ const NumberInput = ({
     await handleSubmit(newValue);
   };
 
-  const onArrow = async (isIncrement: boolean) => {
-    const offset = isIncrement
-      ? 1 / precisionFactor
-      : (1 / precisionFactor) * -1;
+  const updateValue = async (offset: number) => {
     // Need to round the value because of floating addition imprecision
     let newValue = clamp(offset + value, min, max);
     newValue = Math.round(newValue * precisionFactor) / precisionFactor;
@@ -231,14 +229,20 @@ const NumberInput = ({
     handleSubmit(newValue);
   };
 
-  const onWheel = (e: React.WheelEvent) => {
-    if (e.deltaY >= 0) {
-      // scroll down
-      onArrow(false);
-    } else {
-      // scroll up
-      onArrow(true);
-    }
+  const onArrow = async (isIncrement: boolean) => {
+    const offset = isIncrement
+      ? 1 / precisionFactor
+      : (1 / precisionFactor) * -1;
+    updateValue(offset);
+  };
+
+  const onWheel = (e: WheelEvent) => {
+    // Wheel has a higher granularity than the arrows
+    const offset =
+      e.deltaY < 0
+        ? (1 / precisionFactor) * 10 // scroll up
+        : (1 / precisionFactor) * -10; // scroll down
+    updateValue(offset);
   };
 
   // Helper for detecting use of the ENTER or TAB keys

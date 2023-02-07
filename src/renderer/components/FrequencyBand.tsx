@@ -11,7 +11,7 @@ import {
 } from 'common/constants';
 import IconButton, { IconName } from 'renderer/widgets/IconButton';
 import { ForwardedRef, forwardRef, useMemo, useState } from 'react';
-import { useThrottleFuture } from 'renderer/utils/utils';
+import { useThrottleAndExecuteLatest } from 'renderer/utils/utils';
 import { FILTER_OPTIONS } from '../icons/FilterTypeIcon';
 import Dropdown from '../widgets/Dropdown';
 import {
@@ -45,33 +45,41 @@ const FrequencyBand = forwardRef(
       [isLoading, isMinSliderCount]
     );
 
-    const throttleSetGain = useThrottleFuture(async (newValue: number) => {
-      // Always dispatch first so that we don't see jitter in the sliders.
-      // This is because dispatch will trigger the ui rerender and ensure user inputs do not get
-      // out of order. This means that the backend will be "behind" what the frontend shows, but
-      // thats okay. In case of a backend error, we will rollback to the last backend snapshot.
-      // Consider the following case where the user increases the gain twice when we setGain first.
-      // On the first increase input, slider updates but we are stuck on setGain.
-      // On the second increase input, slider updates and the 2nd setGain is delayed by this hook.
-      // Then first setGain finishes and we dispatch. This results in the jitter.
-      // 2nd setGain finishes and we dispatch again. Another jitter occurs.
-      // Note that the final UI state is correct, but the ui changes are strange.
-      dispatchFilter({
-        type: FilterActionEnum.GAIN,
-        id: filter.id,
-        newValue,
-      });
-      await setGain(sliderIndex, newValue);
-    }, INTERVAL);
+    const throttleSetGain = useThrottleAndExecuteLatest(
+      async (newValue: number) => {
+        /*
+        Always dispatch first so that we don't see jitter in the sliders.
+        This is because dispatch will trigger the ui rerender and ensure user inputs do not get
+        out of order. This means that the backend will be "behind" what the frontend shows, but
+        thats okay. In case of a backend error, we will rollback to the last backend snapshot.
+        Consider the following case where the user increases the gain twice when we setGain first.
+        On the first increase input, slider updates but we are stuck on setGain.
+        On the second increase input, slider updates and the 2nd setGain is delayed by this hook.
+        Then first setGain finishes and we dispatch. This results in the jitter.
+        2nd setGain finishes and we dispatch again. Another jitter occurs.
+        Note that the final UI state is correct, but the ui changes are strange.
+      */
+        dispatchFilter({
+          type: FilterActionEnum.GAIN,
+          id: filter.id,
+          newValue,
+        });
+        await setGain(sliderIndex, newValue);
+      },
+      INTERVAL
+    );
 
-    const throttleSetQuality = useThrottleFuture(async (newValue: number) => {
-      dispatchFilter({
-        type: FilterActionEnum.QUALITY,
-        id: filter.id,
-        newValue,
-      });
-      await setQuality(sliderIndex, newValue);
-    }, INTERVAL);
+    const throttleSetQuality = useThrottleAndExecuteLatest(
+      async (newValue: number) => {
+        dispatchFilter({
+          type: FilterActionEnum.QUALITY,
+          id: filter.id,
+          newValue,
+        });
+        await setQuality(sliderIndex, newValue);
+      },
+      INTERVAL
+    );
 
     const handleGainSubmit = async (newValue: number) => {
       try {

@@ -10,8 +10,8 @@ import {
   IChartLineDataPointsById,
   IChartPointData,
 } from './ChartController';
-import { getFilterLineData, getPreAmpLine, getCombinedLineData } from './utils';
-import { ColorEnum, getColor, GrayScaleEnum } from '../styles/color';
+import { getFilterLineData, getCombinedLineData } from './utils';
+import { GrayScaleEnum } from '../styles/color';
 
 const isFilterEqual = (f1: IFilter, f2: IFilter) => {
   if (!f1 || !f2) {

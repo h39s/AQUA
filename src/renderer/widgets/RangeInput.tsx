@@ -1,4 +1,4 @@
-import { ChangeEvent, CSSProperties, useMemo, useRef } from 'react';
+import { ChangeEvent, WheelEvent, CSSProperties, useMemo, useRef } from 'react';
 import ArrowButton from './ArrowButton';
 import '../styles/RangeInput.scss';
 import { clamp } from '../utils/utils';
@@ -65,7 +65,7 @@ const RangeInput = ({
     }
   };
 
-  const onWheel = (e: React.WheelEvent) => {
+  const onWheel = (e: WheelEvent) => {
     if (e.deltaY >= 0) {
       // scroll down
       onArrowInput(false);

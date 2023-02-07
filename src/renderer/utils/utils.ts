@@ -63,7 +63,7 @@ export const useThrottle = <T extends (...args: any[]) => unknown>(
 // This hook throttles any call to function fn. It will also rmb
 // the latest call so in the event that subsequent calls to fn stop,
 // a node interval will execute the latest call.
-export const useThrottleFuture = <T extends (...args: any[]) => any>(
+export const useThrottleAndExecuteLatest = <T extends (...args: any[]) => any>(
   fn: T,
   delay: number
 ) => {
@@ -77,8 +77,7 @@ export const useThrottleFuture = <T extends (...args: any[]) => any>(
       clearTimeout(timeoutId.current);
       timeoutId.current = undefined;
     } else {
-      // remember latest input and setup timer to
-      // execute fn
+      // remember latest input and setup timer to execute fn
       if (!timeoutId.current) {
         timeoutId.current = setTimeout(async () => {
           if (lastCalledValues.current) {
