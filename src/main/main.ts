@@ -222,6 +222,12 @@ ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, arg) => {
   const presetName = arg[0];
   console.log(`Saving preset: ${presetName}`);
   try {
+    // Validate that the preset name is not restricted
+    if (isRestrictedPresetName(presetName)) {
+      handleError(event, channel, ErrorCode.INVALID_PRESET_NAME);
+      return;
+    }
+
     savePreset(presetName, {
       preAmp: state.preAmp,
       filters: state.filters,
