@@ -16,6 +16,12 @@ export const sortHelper = (a: IFilter, b: IFilter) => a.frequency - b.frequency;
 export const range = (start: number, stop: number, step: number) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
 
+export const formatPresetName = (s: string) => {
+  return s.replace(/[^a-zA-Z0-9|_|\-| ]+/, '');
+};
+
+// *** CUSTOM HOOKS ***
+
 // https://overreacted.io/making-setinterval-declarative-with-react-hooks/
 export const useInterval = (callback: () => void, delay?: number) => {
   const savedCallback = useRef<() => void>();
@@ -75,6 +81,28 @@ export const useClickOutside = <T extends HTMLElement = HTMLElement>(
   }, [handleClick]);
 };
 
+export const useMouseDownOutside = <T extends HTMLElement = HTMLElement>(
+  ref: RefObject<T>,
+  callback: () => void
+) => {
+  const handleMouseDown = useMemo(() => {
+    return (e: globalThis.MouseEvent) => {
+      if (!ref.current || ref.current.contains(e.target as Node)) {
+        return;
+      }
+
+      callback();
+    };
+  }, [callback, ref]);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleMouseDown, true);
+
+    return () =>
+      document.removeEventListener('mousedown', handleMouseDown, true);
+  }, [handleMouseDown]);
+};
+
 export const useFocusOutside = <T extends HTMLElement = HTMLElement>(
   ref: RefObject<T>,
   callback: () => void
@@ -94,6 +122,30 @@ export const useFocusOutside = <T extends HTMLElement = HTMLElement>(
 
     return () => document.removeEventListener('focusin', handleFocus, true);
   }, [handleFocus]);
+};
+
+export const useFocusOut = <T extends HTMLElement = HTMLElement>(
+  ref: RefObject<T>,
+  callback: () => void
+) => {
+  const handleFocus = useMemo(() => {
+    return (e: globalThis.FocusEvent) => {
+      if (
+        ref.current &&
+        ref.current.contains(e.target as Node) &&
+        !ref.current.contains(e.relatedTarget as Node)
+      ) {
+        callback();
+      }
+    };
+  }, [callback, ref]);
+
+  useEffect(() => {
+    const element = ref.current;
+    element?.addEventListener('focusout', handleFocus, true);
+
+    return () => element?.removeEventListener('focusout', handleFocus, true);
+  }, [ref, handleFocus]);
 };
 
 // https://reactjs.org/docs/hooks-faq.html#how-to-get-the-previous-props-or-state

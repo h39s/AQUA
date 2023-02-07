@@ -4,20 +4,20 @@
 
 // band width and height from constants file
 
-.mainContent {
-  width: $content-width;
+.main-content {
+  grid-area: main-content;
   display: grid;
   grid-template-columns: 128px 1fr;
-  grid-template-rows: 100%;
   gap: $spacing-s;
+
   // Add additional space to the right to balance the spacing better
   padding: $spacing-s $spacing-l $spacing-s $spacing-s;
   justify-items: center;
 
   border-radius: $spacing-m;
-  border: 2px solid $secondary-default;
+  border: $spacing-xxs solid $secondary-default;
 
-  .bandLabel {
+  .band-label {
     height: $band-height;
     justify-content: flex-start;
     gap: $spacing-s;
@@ -27,7 +27,7 @@
       height: 100%;
     }
 
-    .rowLabel {
+    .row-label {
       margin: $spacing-s 0;
     }
 
@@ -41,7 +41,7 @@
   .bands {
     position: relative;
     justify-content: flex-start;
-    padding: 0 2px; // add some horizontal padding so the outline isn't cut off at either end
+    padding: 0 $spacing-xxs; // add some horizontal padding so the outline isn't cut off at either end
     width: 100%;
     overflow-x: auto;
     overflow-y: hidden;

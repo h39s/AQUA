@@ -1,5 +1,6 @@
 import { IFilter } from 'common/constants';
 import { useEffect, useMemo, useRef } from 'react';
+import Spinner from 'renderer/icons/Spinner';
 import { useAquaContext } from 'renderer/utils/AquaContext';
 import { setMainPreAmp } from 'renderer/utils/equalizerApi';
 import { clamp } from 'renderer/utils/utils';
@@ -34,10 +35,10 @@ const FrequencyResponseChart = () => {
   const {
     filters,
     isAutoPreAmpOn,
+    isGraphViewOn,
     isLoading,
     preAmp,
     setPreAmp,
-    isGraphViewOn,
   } = useAquaContext();
   const prevFilters = useRef<IFilter[]>([]);
   const prevFilterLines = useRef<IChartLineDataPointsById>({});
@@ -146,8 +147,8 @@ const FrequencyResponseChart = () => {
   }, [autoPreAmpValue, isAutoPreAmpOn, isLoading, setPreAmp]);
 
   const dimensions: ChartDimensions = {
-    width: 988,
-    height: 400,
+    width: 1396,
+    height: 380,
     margins: {
       top: 30,
       right: 30,
@@ -155,11 +156,18 @@ const FrequencyResponseChart = () => {
       left: 30,
     },
   };
+
   return (
     <>
       {isGraphViewOn && (
         <div className="graph-wrapper">
-          <Chart data={chartData} dimensions={dimensions} />
+          {isLoading ? (
+            <div className="center full row">
+              <Spinner />
+            </div>
+          ) : (
+            <Chart data={chartData} dimensions={dimensions} />
+          )}
         </div>
       )}
     </>

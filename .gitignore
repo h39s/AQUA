@@ -32,4 +32,4 @@ npm-debug.log.*
 # App files
 state.txt
 aqua.txt
-presets
+presets/**

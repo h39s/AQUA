@@ -41,9 +41,11 @@ export const FilterTypeToLabelMap: Record<FilterTypeEnum, string> = {
   // [FilterTypeEnum.NO]: 'Notch Filter',
 };
 
-export const WINDOW_WIDTH = 1024;
-export const WINDOW_HEIGHT = 626;
+export const WINDOW_WIDTH = 1428;
+export const WINDOW_HEIGHT = 625;
 export const WINDOW_HEIGHT_EXPANDED = 1036;
+
+export const PRESETS_DIR = 'presets';
 
 /** ----- Application Interfaces ----- */
 
@@ -59,6 +61,11 @@ export interface IState {
   isEnabled: boolean;
   isAutoPreAmpOn: boolean;
   isGraphViewOn: boolean;
+  preAmp: number;
+  filters: IFilter[];
+}
+
+export interface IPreset {
   preAmp: number;
   filters: IFilter[];
 }
@@ -92,8 +99,35 @@ export const getDefaultState = (): IState => {
   return {
     isEnabled: true,
     isAutoPreAmpOn: true,
-    isGraphViewOn: false,
+    isGraphViewOn: true,
     preAmp: 0,
     filters: getDefaultFilters(),
   };
 };
+
+export const RESERVED_FILE_NAMES_SET = new Set([
+  'CON',
+  'PRN',
+  'AUX',
+  'NUL',
+  'COM1',
+  'COM2',
+  'COM3',
+  'COM4',
+  'COM5',
+  'COM6',
+  'COM7',
+  'COM8',
+  'COM9',
+  'COM0',
+  'LPT1',
+  'LPT2',
+  'LPT3',
+  'LPT4',
+  'LPT5',
+  'LPT6',
+  'LPT7',
+  'LPT8',
+  'LPT9',
+  'LPT0',
+]);

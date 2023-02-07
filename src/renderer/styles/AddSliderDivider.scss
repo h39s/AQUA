@@ -7,7 +7,7 @@
   padding: 0 $spacing-s;
 
   .divider {
-    width: 2px;
+    width: $spacing-xxs;
     height: calc(250px / 2 - 12px - $spacing-m);
     background: $secondary-default;
   }

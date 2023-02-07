@@ -9,15 +9,9 @@ import {
   MIN_GAIN,
   MIN_QUALITY,
 } from 'common/constants';
-import {
-  ForwardedRef,
-  forwardRef,
-  KeyboardEvent,
-  useMemo,
-  useState,
-} from 'react';
+import { ForwardedRef, forwardRef, useMemo, useState } from 'react';
+import IconButton, { IconName } from 'renderer/widgets/IconButton';
 import { FILTER_OPTIONS } from '../icons/FilterTypeIcon';
-import TrashIcon from '../icons/TrashIcon';
 import Dropdown from '../widgets/Dropdown';
 import {
   removeEqualizerSlider,
@@ -116,25 +110,15 @@ const FrequencyBand = forwardRef(
       setIsLoading(false);
     };
 
-    const handleKeyUp = (e: KeyboardEvent<HTMLDivElement>) => {
-      if (e.code === 'Enter') {
-        onRemoveEqualizerSlider();
-      }
-    };
-
     return (
       // Need to specify the id here for the sorting to work
       <div ref={ref} id={filter.id} className="col bandWrapper">
-        <div
-          role="button"
+        <IconButton
+          icon={IconName.TRASH}
           className="removeFilter"
-          onClick={onRemoveEqualizerSlider}
-          onKeyUp={handleKeyUp}
-          tabIndex={0}
-          aria-disabled={isRemoveDisabled}
-        >
-          <TrashIcon />
-        </div>
+          handleClick={onRemoveEqualizerSlider}
+          isDisabled={isRemoveDisabled}
+        />
         <div className="col band">
           <Dropdown
             name={`${filter.frequency}-filter-type`}

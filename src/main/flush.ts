@@ -1,6 +1,11 @@
 import fs from 'fs';
 import path from 'path';
-import { getDefaultState, IState } from '../common/constants';
+import {
+  getDefaultState,
+  IPreset,
+  IState,
+  PRESETS_DIR,
+} from '../common/constants';
 
 export const stateToString = (state: IState) => {
   if (!state.isEnabled) {
@@ -32,6 +37,10 @@ export const serializeState = (state: IState) => {
   return JSON.stringify(state);
 };
 
+export const serializePreset = (preset: IPreset) => {
+  return JSON.stringify(preset);
+};
+
 const CONFIG_CONTENT = 'Include: aqua.txt';
 export const AQUA_LOCAL_CONFIG_FILENAME = 'state.txt';
 export const AQUA_CONFIG_FILENAME = 'aqua.txt';
@@ -60,6 +69,54 @@ export const save = (state: IState) => {
     });
   } catch (ex) {
     console.log('Failed to save to %d', AQUA_LOCAL_CONFIG_FILENAME);
+    throw ex;
+  }
+};
+
+export const fetchPreset = (presetName: string) => {
+  try {
+    const presetPath = path.join(PRESETS_DIR, presetName);
+    const content = fs.readFileSync(presetPath, {
+      encoding: 'utf8',
+    });
+    return JSON.parse(content) as IPreset;
+  } catch (ex) {
+    console.log('Failed to get presets!!');
+    throw ex;
+  }
+};
+
+export const savePreset = (presetName: string, preset_info: IPreset) => {
+  try {
+    const presetPath = path.join(PRESETS_DIR, presetName);
+    fs.writeFileSync(presetPath, serializePreset(preset_info), {
+      encoding: 'utf8',
+    });
+  } catch (ex) {
+    console.log('Failed to save to preset %d', presetName);
+    throw ex;
+  }
+
+  console.log(`Wrote preset for: ${presetName}`);
+};
+
+export const doesPresetExist = (presetName: string) => {
+  const testPath = addFileToPath(PRESETS_DIR, presetName);
+  try {
+    return fs.existsSync(testPath);
+  } catch (ex) {
+    console.log('Failed to check whether preset %d exists', presetName);
+    throw ex;
+  }
+};
+
+export const renamePreset = (oldName: string, newName: string) => {
+  const oldPath = addFileToPath(PRESETS_DIR, oldName);
+  const newPath = addFileToPath(PRESETS_DIR, newName);
+  try {
+    fs.renameSync(oldPath, newPath);
+  } catch (ex) {
+    console.log('Failed to rename preset %d to preset %d', oldName, newName);
     throw ex;
   }
 };

@@ -12,9 +12,14 @@
   .band {
     // width: $band-width;
     gap: $spacing-s;
-    .numberInput,
+    .number-input,
     .dropdown {
       align-self: center;
+
+      .list {
+        // Hide scroll bar for the filter type dropdown
+        overflow-y: hidden;
+      }
     }
 
     &::before,

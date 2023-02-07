@@ -1,0 +1,32 @@
+@import 'color';
+@import 'spacing';
+.text-input {
+  flex: 1;
+
+  input[type='text'] {
+    background: $primary-dark;
+    color: $white;
+    border: solid $spacing-xxs $secondary-default;
+    border-radius: 4px;
+    padding: $spacing-xs;
+    font-size: small;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+
+    &:focus-visible {
+      outline: $spacing-xxs solid $white;
+    }
+
+    &[aria-invalid='true'] {
+      border: solid $spacing-xxs $red;
+      outline: $spacing-xxs solid $red;
+    }
+  }
+
+  .errorText {
+    font-size: smaller;
+    color: $white;
+    padding-top: $spacing-s;
+  }
+}

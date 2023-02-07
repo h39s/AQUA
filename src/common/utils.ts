@@ -1,4 +1,9 @@
-import { IFilter, MAX_FREQUENCY, MIN_FREQUENCY } from './constants';
+import {
+  IFilter,
+  MAX_FREQUENCY,
+  MIN_FREQUENCY,
+  RESERVED_FILE_NAMES_SET,
+} from './constants';
 
 export const roundToPrecision = (value: number, precision: number) => {
   const precisionFactor = 10 ** precision;
@@ -12,3 +17,9 @@ export const computeAvgFreq = (filters: IFilter[], index: number) => {
   const exponent = (Math.log10(lo) + Math.log10(hi)) / 2;
   return roundToPrecision(10 ** exponent, 0);
 };
+
+// Even with the case sensitivity setting set on a folder, Windows will not support
+// files of any case with a name equal to one in the reserved file names set. I
+// have manually confirmed this.
+export const isRestrictedPresetName = (newName: string) =>
+  RESERVED_FILE_NAMES_SET.has(newName.toUpperCase());

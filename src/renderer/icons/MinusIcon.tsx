@@ -1,4 +1,4 @@
-const PlusIcon = () => {
+const MinusIcon = () => {
   return (
     <svg
       width="12"
@@ -12,4 +12,4 @@ const PlusIcon = () => {
   );
 };
 
-export default PlusIcon;
+export default MinusIcon;

@@ -1,0 +1,71 @@
+@import 'constant';
+@import 'color';
+@import 'spacing';
+
+.presets-bar {
+  grid-area: presets-bar;
+
+  // Spacing of the contents
+  display: grid;
+  grid-template-rows: repeat(3, min-content) 1fr min-content;
+  padding: $spacing-m;
+  gap: $spacing-s;
+  justify-items: stretch;
+
+  // Styling of the background wrapper
+  border-radius: $spacing-m;
+  background: $primary-default;
+
+  h4 {
+    margin: 1em 0 1em 0;
+    justify-self: center;
+  }
+
+  .button {
+    // Ensure button width matches the list width
+    margin: $spacing-xs 0;
+  }
+
+  .preset-name {
+    padding-top: $spacing-xs;
+  }
+
+  .preset-list-item {
+    min-height: $spacing-l;
+    padding: $spacing-xs $spacing-s;
+    justify-content: space-between;
+    align-items: center;
+
+    .icons {
+      display: none;
+      gap: $spacing-s;
+
+      .iconButton {
+        outline: none;
+
+        &:hover svg path {
+          fill: $primary-lighter;
+        }
+
+        &:active svg path {
+          fill: $primary-light;
+        }
+
+        &:focus-visible:not([aria-disabled='true']) {
+          path {
+            fill: $primary-lighter;
+          }
+        }
+      }
+    }
+
+    &:focus,
+    &:focus-visible,
+    &:focus-within,
+    &:hover {
+      .icons {
+        display: flex;
+      }
+    }
+  }
+}

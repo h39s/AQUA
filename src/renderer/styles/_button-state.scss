@@ -5,7 +5,7 @@
   color: $black;
 
   &:focus-visible {
-    outline: 2px solid $white;
+    outline: $spacing-xxs solid $white;
   }
 
   &:hover {

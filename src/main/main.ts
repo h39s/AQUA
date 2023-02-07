@@ -13,12 +13,18 @@ import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import { uid } from 'uid';
+import fs from 'fs';
+import { exec } from 'child_process';
 import {
   checkConfigFile,
   fetchSettings,
   flush,
   save,
   updateConfig,
+  savePreset,
+  fetchPreset,
+  renamePreset,
+  doesPresetExist,
 } from './flush';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -27,6 +33,7 @@ import ChannelEnum from '../common/channels';
 import {
   FilterTypeEnum,
   IState,
+  IPreset,
   MAX_FREQUENCY,
   MAX_GAIN,
   MAX_NUM_FILTERS,
@@ -38,9 +45,10 @@ import {
   WINDOW_HEIGHT,
   WINDOW_HEIGHT_EXPANDED,
   WINDOW_WIDTH,
+  PRESETS_DIR,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
-import { computeAvgFreq } from '../common/utils';
+import { computeAvgFreq, isRestrictedPresetName } from '../common/utils';
 import { TSuccess, TError } from '../renderer/utils/equalizerApi';
 import { sortHelper } from '../renderer/utils/utils';
 
@@ -73,6 +81,35 @@ const setWindowDimension = (isExpanded: boolean) => {
 // Load initial state from local state file
 const state: IState = fetchSettings();
 let configPath = '';
+
+try {
+  // create presets dir if it doesn't exist
+  if (!fs.existsSync(PRESETS_DIR)) {
+    fs.mkdirSync(PRESETS_DIR);
+  }
+} catch (e) {
+  console.error('Failed to make presets directory!!');
+  console.error(e);
+  throw e;
+}
+
+try {
+  // update presets folder to support case-sensitive files
+  const presetPath = path.join(process.cwd(), PRESETS_DIR);
+
+  exec(
+    `fsutil.exe file SetCaseSensitiveInfo "${presetPath}"`,
+    (err, stdout) => {
+      if (err) {
+        throw err;
+      }
+      console.log(stdout);
+    }
+  );
+} catch (e) {
+  console.error(e);
+  throw e;
+}
 
 const retryHelper = async (attempts: number, f: () => unknown) => {
   for (let i = 0; i < attempts; i += 1) {
@@ -159,6 +196,100 @@ ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
   const res = await updateConfigPath(event, channel);
   if (res) {
     await handleUpdate(event, channel);
+  }
+});
+
+ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, arg) => {
+  const channel = ChannelEnum.LOAD_PRESET;
+  const presetName = arg[0];
+  console.log(`Loading preset: ${presetName}`);
+
+  // TODO: should we do some str checking here?
+  try {
+    const presetSettings: IPreset = fetchPreset(presetName);
+    state.preAmp = presetSettings.preAmp;
+    state.filters = presetSettings.filters;
+    await handleUpdate(event, channel);
+  } catch (ex) {
+    console.log('Failed to read preset: ', presetName);
+    console.log(ex);
+    handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
+  }
+});
+
+ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, arg) => {
+  const channel = ChannelEnum.SAVE_PRESET;
+  const presetName = arg[0];
+  console.log(`Saving preset: ${presetName}`);
+  try {
+    // Validate that the preset name is not restricted
+    if (isRestrictedPresetName(presetName)) {
+      handleError(event, channel, ErrorCode.INVALID_PRESET_NAME);
+      return;
+    }
+
+    savePreset(presetName, {
+      preAmp: state.preAmp,
+      filters: state.filters,
+    });
+    await handleUpdate(event, channel);
+  } catch (e) {
+    handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
+  }
+});
+
+ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, arg) => {
+  const channel = ChannelEnum.DELETE_PRESET;
+  const presetName = arg[0];
+  const pathToDelete = path.join(PRESETS_DIR, presetName);
+  console.log(`Deleting preset: ${presetName} at location ${pathToDelete}`);
+  try {
+    fs.unlinkSync(pathToDelete);
+    await handleUpdate(event, channel);
+  } catch (e) {
+    console.log('Failed to delete preset');
+    console.log(e);
+    handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
+  }
+});
+
+ipcMain.on(ChannelEnum.RENAME_PRESET, async (event, arg) => {
+  const channel = ChannelEnum.RENAME_PRESET;
+  const [oldName, newName]: string[] = arg;
+
+  // No name change - the UI should handle this scenario and should not reach the BE
+  if (oldName === newName) {
+    const reply: TSuccess<void> = { result: undefined };
+    event.reply(channel, reply);
+  }
+
+  try {
+    // Validate the provided name
+    if (isRestrictedPresetName(newName) || doesPresetExist(newName)) {
+      handleError(event, channel, ErrorCode.INVALID_PRESET_NAME);
+      return;
+    }
+
+    renamePreset(oldName, newName);
+    await handleUpdate(event, channel);
+  } catch (e) {
+    handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
+  }
+});
+
+ipcMain.on(ChannelEnum.GET_PRESET_FILE_LIST, async (event) => {
+  const channel = ChannelEnum.GET_PRESET_FILE_LIST;
+  console.log(`Getting Preset List`);
+
+  try {
+    const fileNames: string[] = fs.readdirSync(PRESETS_DIR);
+    console.log(fileNames);
+    const reply: TSuccess<string[]> = { result: fileNames };
+    event.reply(channel, reply);
+  } catch (e) {
+    console.error('Failed to get filenames');
+    console.error(e);
+    handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
   }
 });
 
@@ -469,6 +600,7 @@ const createMainWindow = async () => {
     minHeight: WINDOW_HEIGHT,
     maxHeight: WINDOW_HEIGHT,
     icon: getAssetPath('icon.png'),
+    resizable: false,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
