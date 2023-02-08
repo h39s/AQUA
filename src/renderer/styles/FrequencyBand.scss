@@ -2,6 +2,8 @@
 @import 'constant';
 @import 'spacing';
 
+$filter-dropdown-width: 52px;
+
 .bandWrapper {
   &:hover {
     .removeFilter {
@@ -16,9 +18,16 @@
     .dropdown {
       align-self: center;
 
+      [role='menu'] {
+        width: $filter-dropdown-width;
+      }
+
       .list {
         // Hide scroll bar for the filter type dropdown
         overflow-y: hidden;
+
+        // Assign fixed width to dropdown menu
+        width: $filter-dropdown-width + $spacing-s;
       }
     }
 
