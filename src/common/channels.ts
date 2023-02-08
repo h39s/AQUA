@@ -24,6 +24,9 @@ enum ChannelEnum {
   DELETE_PRESET = 'deletePreset',
   RENAME_PRESET = 'renamePreset',
   GET_PRESET_FILE_LIST = 'getPresetFileList',
+  GET_AUTO_EQ_DEVICE_LIST = 'getAutoEqDeviceList',
+  GET_AUTO_EQ_RESPONSE_LIST = 'getAutoEqResponseList',
+  LOAD_AUTO_EQ_PRESET = 'loadAutoEqPreset',
 }
 
 export default ChannelEnum;
