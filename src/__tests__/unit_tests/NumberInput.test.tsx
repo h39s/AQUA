@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { act, screen } from '@testing-library/react';
+import { act, fireEvent, screen } from '@testing-library/react';
 import { clearAndType, setup } from '../utils/userEventUtils';
 import NumberInput from '../../renderer/widgets/NumberInput';
 
@@ -590,6 +590,64 @@ describe('NumberInput', () => {
       expect(downArrow).toBeInTheDocument();
       await user.click(downArrow);
       expect(handleSubmit).toBeCalledWith(0);
+    });
+
+    it('should increase value when scrolling up', async () => {
+      const testValue = 1;
+      setup(
+        <NumberInput
+          name={id}
+          min={-20}
+          max={20}
+          handleSubmit={handleSubmit}
+          value={testValue}
+          isDisabled={false}
+          floatPrecision={0}
+          showArrows
+        />
+      );
+      const input = screen.getByLabelText(`${id}`);
+      fireEvent.wheel(input, { deltaY: -100 });
+      expect(handleSubmit).toBeCalledWith(11);
+    });
+
+    it('should increase value when scrolling down', async () => {
+      const testValue = 1;
+      setup(
+        <NumberInput
+          name={id}
+          min={-20}
+          max={20}
+          handleSubmit={handleSubmit}
+          value={testValue}
+          isDisabled={false}
+          floatPrecision={0}
+          showArrows
+        />
+      );
+      const input = screen.getByLabelText(`${id}`);
+      fireEvent.wheel(input, { deltaY: 100 });
+      expect(handleSubmit).toBeCalledWith(-9);
+    });
+
+    it('should support custom onwheel value change', async () => {
+      const testValue = 1;
+      setup(
+        <NumberInput
+          name={id}
+          min={-5}
+          max={5}
+          handleSubmit={handleSubmit}
+          value={testValue}
+          isDisabled={false}
+          floatPrecision={0}
+          onWheelValueChange={() => 2}
+          showArrows
+        />
+      );
+      const input = screen.getByLabelText(`${id}`);
+      fireEvent.wheel(input, { deltaY: 100 });
+      expect(handleSubmit).toBeCalledWith(3);
     });
   });
 });

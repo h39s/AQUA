@@ -25,6 +25,7 @@ interface INumberInputProps {
   shouldRoundToHalf?: boolean;
   shouldAutoGrow?: boolean;
   handleSubmit: (newValue: number) => Promise<void>;
+  onWheelValueChange?: (e: WheelEvent) => number;
 }
 
 const NumberInput = ({
@@ -39,6 +40,7 @@ const NumberInput = ({
   showLabel = false,
   shouldAutoGrow = false,
   handleSubmit,
+  onWheelValueChange,
 }: INumberInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [internalValue, setInternalValue] = useState<string>(
@@ -236,13 +238,17 @@ const NumberInput = ({
     updateValue(offset);
   };
 
-  const onWheel = (e: WheelEvent) => {
+  const onWheelDefaultValueChange = (e: WheelEvent) => {
     // Wheel has a higher granularity than the arrows
-    const offset =
-      e.deltaY < 0
-        ? (1 / precisionFactor) * 10 // scroll up
-        : (1 / precisionFactor) * -10; // scroll down
-    updateValue(offset);
+    return e.deltaY < 0
+      ? (1 / precisionFactor) * 10 // scroll up
+      : (1 / precisionFactor) * -10; // scroll down
+  };
+
+  const onWheel = (e: WheelEvent) => {
+    updateValue(
+      onWheelValueChange ? onWheelValueChange(e) : onWheelDefaultValueChange(e)
+    );
   };
 
   // Helper for detecting use of the ENTER or TAB keys
@@ -273,7 +279,7 @@ const NumberInput = ({
           onInput={onInput}
           onBlur={onSubmit}
           onKeyDown={listenForEnter}
-          onWheel={showArrows ? onWheel : undefined}
+          onWheel={onWheel}
           disabled={isDisabled}
           style={{ textAlign: showArrows ? 'left' : 'center' }}
         />

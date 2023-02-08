@@ -10,7 +10,7 @@ import {
   MIN_QUALITY,
 } from 'common/constants';
 import IconButton, { IconName } from 'renderer/widgets/IconButton';
-import { ForwardedRef, forwardRef, useMemo, useState } from 'react';
+import { ForwardedRef, forwardRef, useMemo, useState, WheelEvent } from 'react';
 import { useThrottleAndExecuteLatest } from 'renderer/utils/utils';
 import { FILTER_OPTIONS } from '../icons/FilterTypeIcon';
 import Dropdown from '../widgets/Dropdown';
@@ -138,6 +138,15 @@ const FrequencyBand = forwardRef(
       setIsLoading(false);
     };
 
+    const onWheelFrequency = (e: WheelEvent) => {
+      const ranges = [10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 1];
+      const range = ranges.find((bound) => bound <= filter.frequency);
+      const offset = range ? range / 10 : 1;
+      return e.deltaY < 0
+        ? offset // scroll up
+        : offset * -1; // scroll down
+    };
+
     return (
       // Need to specify the id here for the sorting to work
       <div ref={ref} id={filter.id} className="col bandWrapper">
@@ -163,6 +172,7 @@ const FrequencyBand = forwardRef(
             isDisabled={!!globalError}
             showArrows
             handleSubmit={handleFrequencySubmit}
+            onWheelValueChange={onWheelFrequency}
           />
           <div className="col center slider">
             <Slider
