@@ -221,4 +221,43 @@ describe('Dropdown', () => {
     });
     expect(item).not.toBeInTheDocument();
   });
+
+  it('should show user set placeholder text when value matches no existing option', async () => {
+    setup(
+      <div>
+        <Dropdown
+          name={name}
+          value=""
+          options={FILTER_OPTIONS}
+          isDisabled={false}
+          handleChange={handleChange}
+          noSelectionValue="NO SELECTION"
+        />
+        <button type="button">Outside</button>
+      </div>
+    );
+
+    const dropdown = screen.getByLabelText(name);
+    expect(dropdown.textContent).toBe('NO SELECTION');
+  });
+
+  it('should show user set placeholder text when there are no options', async () => {
+    const filterType = FilterTypeEnum.PK;
+    setup(
+      <div>
+        <Dropdown
+          name={name}
+          value={filterType}
+          options={[]}
+          isDisabled={false}
+          handleChange={handleChange}
+          noOptionValue="NO OPTIONS"
+        />
+        <button type="button">Outside</button>
+      </div>
+    );
+
+    const dropdown = screen.getByLabelText(name);
+    expect(dropdown.textContent).toBe('NO OPTIONS');
+  });
 });

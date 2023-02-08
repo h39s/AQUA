@@ -12,7 +12,6 @@ import {
 } from './utils/equalizerApi';
 
 const AutoEQ = () => {
-  const PICK_A_DEVICE_FIRST = 'Pick a device first!';
   const NO_RESPONSES = 'No supported responses :(';
 
   const { globalError, setGlobalError, performHealthCheck } = useAquaContext();
