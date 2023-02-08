@@ -99,7 +99,7 @@ export const healthCheck = (): Promise<void> => {
 
 /**
  * Load preset into the current equalizer sliders
- * @returns { Promise<void> } stringified filter values of the preset.
+ * @returns { Promise<void> } exception if failed
  */
 export const loadPreset = (presetName: string): Promise<void> => {
   const channel = ChannelEnum.LOAD_PRESET;
@@ -109,7 +109,7 @@ export const loadPreset = (presetName: string): Promise<void> => {
 
 /**
  * Save preset into preset file
- * @returns { Promise<void> } if save was succesfull
+ * @returns { Promise<void> } if save was successful
  */
 export const savePreset = (presetName: string): Promise<void> => {
   const channel = ChannelEnum.SAVE_PRESET;
@@ -119,7 +119,7 @@ export const savePreset = (presetName: string): Promise<void> => {
 
 /**
  * Delete a preset file in preset folder
- * @returns { Promise<void> } if delete was succesfull
+ * @returns { Promise<void> } if delete was successful
  */
 export const deletePreset = (presetName: string): Promise<void> => {
   const channel = ChannelEnum.DELETE_PRESET;
@@ -129,7 +129,7 @@ export const deletePreset = (presetName: string): Promise<void> => {
 
 /*
  * Rename preset from an old name to a new one
- * @returns { Promise<void> } if rename was succesfull
+ * @returns { Promise<void> } if rename was successful
  */
 export const renamePreset = (
   oldName: string,
@@ -142,12 +142,47 @@ export const renamePreset = (
 
 /**
  * Get a list of preset file names in preset folder
- * @returns { Promise<string[]> } if save was succesfull
+ * @returns { Promise<string[]> } exception if failed.
  */
 export const getPresetListFromFiles = (): Promise<string[]> => {
   const channel = ChannelEnum.GET_PRESET_FILE_LIST;
   window.electron.ipcRenderer.sendMessage(channel, []);
   return promisifyResult(simpleResponseHandler<string[]>(), channel);
+};
+
+/**
+ * Get a list of supported auto eq device names
+ * @returns { Promise<string[]> } exception if failed.
+ */
+export const getAutoEqDeviceList = (): Promise<string[]> => {
+  const channel = ChannelEnum.GET_AUTO_EQ_DEVICE_LIST;
+  window.electron.ipcRenderer.sendMessage(channel, []);
+  return promisifyResult(simpleResponseHandler<string[]>(), channel);
+};
+
+/**
+ * Get a list of supported auto eq responses for the given device
+ * @returns { Promise<string[]> } exception if failed.
+ */
+export const getAutoEqResponseList = (
+  deviceName: string
+): Promise<string[]> => {
+  const channel = ChannelEnum.GET_AUTO_EQ_RESPONSE_LIST;
+  window.electron.ipcRenderer.sendMessage(channel, [deviceName]);
+  return promisifyResult(simpleResponseHandler<string[]>(), channel);
+};
+
+/**
+ * Load autoeq preset for given device name and response into the current equalizer sliders
+ * @returns { Promise<void> } exception if failed
+ */
+export const loadAutoEqPreset = (
+  deviceName: string,
+  responseName: string
+): Promise<void> => {
+  const channel = ChannelEnum.LOAD_AUTO_EQ_PRESET;
+  window.electron.ipcRenderer.sendMessage(channel, [deviceName, responseName]);
+  return promisifyResult(setterResponseHandler, channel);
 };
 
 /**

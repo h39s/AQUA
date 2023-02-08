@@ -51,6 +51,11 @@ import { ErrorCode } from '../common/errors';
 import { computeAvgFreq, isRestrictedPresetName } from '../common/utils';
 import { TSuccess, TError } from '../renderer/utils/equalizerApi';
 import { sortHelper } from '../renderer/utils/utils';
+import {
+  getAutoEqDeviceList,
+  getAutoEqPreset,
+  getAutoEqResponseList,
+} from './autoeq';
 
 export default class AppUpdater {
   constructor() {
@@ -289,6 +294,57 @@ ipcMain.on(ChannelEnum.GET_PRESET_FILE_LIST, async (event) => {
   } catch (e) {
     console.error('Failed to get filenames');
     console.error(e);
+    handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
+  }
+});
+
+ipcMain.on(ChannelEnum.GET_AUTO_EQ_DEVICE_LIST, async (event) => {
+  const channel = ChannelEnum.GET_AUTO_EQ_DEVICE_LIST;
+  console.log(`Getting AutoEQ Device List`);
+
+  try {
+    const fileNames: string[] = getAutoEqDeviceList();
+    console.log(fileNames);
+    const reply: TSuccess<string[]> = { result: fileNames };
+    event.reply(channel, reply);
+  } catch (e) {
+    console.error('Failed to get devices');
+    console.error(e);
+    handleError(event, channel, ErrorCode.AUTO_EQ_READ_ERROR);
+  }
+});
+
+ipcMain.on(ChannelEnum.GET_AUTO_EQ_RESPONSE_LIST, async (event, arg) => {
+  const channel = ChannelEnum.GET_AUTO_EQ_RESPONSE_LIST;
+  const deviceName: string = arg[0];
+  console.log(`Getting AutoEQ supported response list for ${deviceName}`);
+
+  try {
+    const fileNames: string[] = getAutoEqResponseList(deviceName);
+    console.log(fileNames);
+    const reply: TSuccess<string[]> = { result: fileNames };
+    event.reply(channel, reply);
+  } catch (e) {
+    console.error(`Failed to get supported responses for ${deviceName}`);
+    console.error(e);
+    handleError(event, channel, ErrorCode.AUTO_EQ_READ_ERROR);
+  }
+});
+
+ipcMain.on(ChannelEnum.LOAD_AUTO_EQ_PRESET, async (event, arg) => {
+  const channel = ChannelEnum.LOAD_AUTO_EQ_PRESET;
+  const [deviceName, responseName] = arg;
+
+  try {
+    const presetSettings: IPreset = getAutoEqPreset(deviceName, responseName);
+    state.preAmp = presetSettings.preAmp;
+    state.filters = presetSettings.filters;
+    await handleUpdate(event, channel);
+  } catch (ex) {
+    console.log(
+      `Failed to load autoeq preset from ${deviceName} to ${responseName}`
+    );
+    console.log(ex);
     handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
   }
 });

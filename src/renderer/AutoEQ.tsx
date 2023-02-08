@@ -1,75 +1,112 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { ErrorDescription } from 'common/errors';
 import { useAquaContext } from './utils/AquaContext';
 import Button from './widgets/Button';
 import Dropdown from './widgets/Dropdown';
 import { IOptionEntry } from './widgets/List';
 import './styles/AutoEQ.scss';
-
-const AUDIO_DEVICES = ['Apple Airpods', 'Apple Airpods Pro', 'Bose Headphones'];
-
-const TARGET_FREQUENCY_RESPONSE = [
-  'IEF Neutral',
-  'Diffuse Field',
-  'Free Field',
-  'Harman AE OE 2018',
-  'Harman without Bass Shelf',
-];
+import {
+  getAutoEqDeviceList,
+  getAutoEqResponseList,
+  loadAutoEqPreset,
+} from './utils/equalizerApi';
 
 const AutoEQ = () => {
-  const { globalError } = useAquaContext();
-  const [device, setDevice] = useState<string>(AUDIO_DEVICES[0]);
-  const [response, setResponse] = useState<string>(
-    TARGET_FREQUENCY_RESPONSE[0]
-  );
+  const PICK_A_DEVICE_FIRST = 'Pick a device first!';
+  const NO_RESPONSES = 'No supported responses :(';
 
-  const applyAutoEQ = () => {
-    console.log('clicked');
+  const { globalError, setGlobalError, performHealthCheck } = useAquaContext();
+  const [devices, setDevices] = useState<string[]>([]);
+  const [responses, setResponses] = useState<string[]>([]);
+  const [currentDevice, setCurrentDevice] = useState<string>('');
+  const [currentResponse, setCurrentResponse] = useState<string>('');
+
+  // Fetch supported devices from storage
+  useEffect(() => {
+    const fetchDeviceNames = async () => {
+      try {
+        setDevices(await getAutoEqDeviceList());
+      } catch (e) {
+        setGlobalError(e as ErrorDescription);
+      }
+    };
+
+    fetchDeviceNames();
+  }, [setGlobalError]);
+
+  // When user changes the current selected device, fetch the supported responses
+  useEffect(() => {
+    const fetchResponses = async () => {
+      try {
+        setResponses(await getAutoEqResponseList(currentDevice));
+      } catch (e) {
+        setGlobalError(e as ErrorDescription);
+      }
+    };
+    // Skip checking for responses when we don't have a selected current device
+    if (currentDevice !== '') {
+      fetchResponses();
+    }
+  }, [currentDevice, setGlobalError]);
+
+  const applyAutoEQ = async () => {
+    try {
+      await loadAutoEqPreset(currentDevice, currentResponse);
+      performHealthCheck();
+    } catch (e) {
+      setGlobalError(e as ErrorDescription);
+    }
   };
 
   const deviceOptions: IOptionEntry[] = useMemo(
     () =>
-      AUDIO_DEVICES.map((s) => {
+      devices.map((s) => {
         return {
           value: s,
           label: s,
           display: <div>{s}</div>,
         };
       }),
-    []
+    [devices]
   );
+
   const responseOptions: IOptionEntry[] = useMemo(
     () =>
-      TARGET_FREQUENCY_RESPONSE.map((s) => {
+      responses.map((s) => {
         return {
           value: s,
           label: s,
           display: <div>{s}</div>,
         };
       }),
-    []
+    [responses]
   );
+
   return (
     <div className="auto-eq">
       Audio Device:
       <Dropdown
         name="Audio Device"
         options={deviceOptions}
-        value={device}
-        handleChange={(newValue) => setDevice(newValue)}
+        value={currentDevice}
+        handleChange={(newValue) => setCurrentDevice(newValue)}
         isDisabled={!!globalError}
       />
       Target Frequency Response:
       <Dropdown
         name="Target Frequency Response"
         options={responseOptions}
-        value={response}
-        handleChange={(newValue) => setResponse(newValue)}
-        isDisabled={!!globalError}
+        value={currentResponse}
+        handleChange={(newValue) => setCurrentResponse(newValue)}
+        isDisabled={!!globalError || responses.length === 0}
+        noOptionValue={NO_RESPONSES}
       />
       <Button
         className="small"
         ariaLabel="Apply Auto EQ"
-        isDisabled={!!globalError}
+        isDisabled={
+          !!globalError || currentDevice === '' || currentResponse === ''
+        }
         handleChange={applyAutoEQ}
       >
         Apply

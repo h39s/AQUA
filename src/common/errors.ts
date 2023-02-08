@@ -6,6 +6,7 @@ export enum ErrorCode {
   FAILURE,
   PRESET_FILE_ERROR,
   INVALID_PRESET_NAME,
+  AUTO_EQ_READ_ERROR,
 }
 
 export type ErrorDescription = {
@@ -54,6 +55,11 @@ export const errors: Record<ErrorCode, ErrorDescription> = {
     action:
       'Please provide a different preset name. If the error persists, try reaching out to the developers to resolve the issue.',
     code: ErrorCode.INVALID_PRESET_NAME,
+  },
+  [ErrorCode.AUTO_EQ_READ_ERROR]: {
+    shortError: 'Internal Error: Failed to get supported AutoEQ devices.',
+    action: 'Please reach out to the developers to resolve the issue.',
+    code: ErrorCode.AUTO_EQ_READ_ERROR,
   },
 };
 

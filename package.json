@@ -251,7 +251,8 @@
         "filter": [
           "**/*"
         ]
-      }
+      },
+      "./auto_eq/**"
     ],
     "publish": {
       "provider": "github",
