@@ -66,12 +66,20 @@ const setWindowDimension = (isExpanded: boolean) => {
   if (mainWindow) {
     // The "-2" is necessary because otherwise the width will progressively keep increasing by 2
     const currWidth = mainWindow.getSize()[0] - 2;
+    const currHeight = mainWindow.getSize()[1] - 2;
     if (isExpanded) {
       mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
-      mainWindow.setSize(currWidth, WINDOW_HEIGHT_EXPANDED);
+      // TODO: decide if this change is worth it or not
+      mainWindow.setSize(
+        currWidth,
+        Math.min(currHeight, WINDOW_HEIGHT_EXPANDED)
+      );
     } else {
       mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-      mainWindow.setSize(currWidth, WINDOW_HEIGHT);
+      mainWindow.setSize(
+        currWidth,
+        Math.min(currHeight, WINDOW_HEIGHT_EXPANDED)
+      );
     }
   }
 };

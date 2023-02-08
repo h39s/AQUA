@@ -38,11 +38,18 @@ interface IFrequencyBandProps {
   filter: IFilter;
   isMinSliderCount: boolean;
   style?: CSSProperties;
+  sliderHeight: number;
 }
 
 const FrequencyBand = forwardRef(
   (
-    { sliderIndex, filter, isMinSliderCount, style }: IFrequencyBandProps,
+    {
+      sliderIndex,
+      filter,
+      isMinSliderCount,
+      sliderHeight,
+      style,
+    }: IFrequencyBandProps,
     ref: ForwardedRef<HTMLDivElement>
   ) => {
     const INTERVAL = 100;
@@ -188,7 +195,7 @@ const FrequencyBand = forwardRef(
               min={MIN_GAIN}
               max={MAX_GAIN}
               value={filter.gain}
-              sliderHeight={250}
+              sliderHeight={sliderHeight}
               setValue={handleGainSubmit}
             />
           </div>

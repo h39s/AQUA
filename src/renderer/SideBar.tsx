@@ -1,4 +1,5 @@
 import { ErrorDescription } from 'common/errors';
+import { useMemo } from 'react';
 import { disableAutoPreAmp, setMainPreAmp } from './utils/equalizerApi';
 import EqualizerEnablerSwitch from './components/EqualizerEnablerSwitch';
 import Slider from './components/Slider';
@@ -8,7 +9,7 @@ import AutoPreAmpEnablerSwitch from './components/AutoPreAmpEnablerSwitch';
 import GraphViewSwitch from './components/GraphViewSwitch';
 import Spinner from './icons/Spinner';
 
-const SideBar = () => {
+const SideBar = ({ height }: { height: number }) => {
   const MIN = -30;
   const MAX = 30;
 
@@ -25,6 +26,12 @@ const SideBar = () => {
       setGlobalError(e as ErrorDescription);
     }
   };
+
+  const sliderHeight = useMemo(
+    // TODO: improve comments here
+    () => height - 100 - 2 * 80 - 3 * 20 - 3 * 16 - 2 * 23 - 2 * 4 - 2 * 8 - 36,
+    [height]
+  );
 
   return (
     <div className="col side-bar center">
@@ -46,7 +53,7 @@ const SideBar = () => {
               min={MIN}
               max={MAX}
               value={preAmp}
-              sliderHeight={110}
+              sliderHeight={sliderHeight}
               setValue={setGain}
               label="-30 dB"
             />

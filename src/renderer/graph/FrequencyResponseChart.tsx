@@ -147,23 +147,27 @@ const FrequencyResponseChart = () => {
   const [width, setWidth] = useState<number>(1396);
   const [height, setHeight] = useState<number>(380);
 
-  useLayoutEffect(() => {
-    const updateDimensions = () => {
-      const newWidth = ref.current?.clientWidth;
-      if (newWidth && newWidth > 0) {
-        setWidth(newWidth);
-      }
-      const newHeight = ref.current?.clientHeight;
-      if (newHeight && newHeight > 0) {
-        setHeight(newHeight);
-      }
-    };
+  const updateDimensions = () => {
+    const newWidth = ref.current?.clientWidth;
+    if (newWidth && newWidth > 0) {
+      setWidth(newWidth);
+    }
+    const newHeight = ref.current?.clientHeight;
+    if (newHeight && newHeight > 0) {
+      setHeight(newHeight);
+    }
+  };
 
+  useLayoutEffect(() => {
     // Compute dimensions on initial render
     updateDimensions();
     window.addEventListener('resize', updateDimensions);
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
+
+  useLayoutEffect(() => {
+    updateDimensions();
+  }, [isGraphViewOn]);
 
   const dimensions: ChartDimensions = {
     width,
