@@ -1,5 +1,5 @@
 import { IFilter } from 'common/constants';
-import { RefObject, useEffect, useMemo, useRef } from 'react';
+import { RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
 
 export const getMaxIntegerDigitCount = (num: number) => {
   const absNum = Math.round(Math.abs(num));
@@ -43,21 +43,24 @@ export const useInterval = (callback: () => void, delay?: number) => {
   }, [delay]);
 };
 
-// Based on https://codeforgeek.com/throttle-function-javascript/
 export const useThrottle = <T extends (...args: any[]) => unknown>(
   fn: T,
   delay: number
 ) => {
   const lastCalled = useRef<number>(0);
-  return (...args: Parameters<T>) => {
-    const now = new Date().getTime();
-    if (now - lastCalled.current < delay) {
-      return false;
-    }
-    lastCalled.current = now;
-    fn(...args);
-    return true;
-  };
+  const throttledFunction = useCallback(
+    (...args: Parameters<T>) => {
+      const now = new Date().getTime();
+      if (now - lastCalled.current < delay) {
+        return false;
+      }
+      lastCalled.current = now;
+      fn(...args);
+      return true;
+    },
+    [delay, fn]
+  );
+  return throttledFunction;
 };
 
 // This hook throttles any call to function fn. It will also rmb
@@ -71,24 +74,27 @@ export const useThrottleAndExecuteLatest = <T extends (...args: any[]) => any>(
   const lastCalledValues = useRef<unknown[]>();
   const timeoutId = useRef<NodeJS.Timer>();
 
-  return async (...args: Parameters<T>) => {
-    if (throttleFunction(...args)) {
-      // fn was called, remove future call
-      clearTimeout(timeoutId.current);
-      timeoutId.current = undefined;
-    } else {
-      // remember latest input and setup timer to execute fn
-      if (!timeoutId.current) {
-        timeoutId.current = setTimeout(async () => {
-          if (lastCalledValues.current) {
-            await fn(...lastCalledValues.current);
-          }
-          timeoutId.current = undefined;
-        }, delay);
+  return useCallback(
+    async (...args: Parameters<T>) => {
+      if (throttleFunction(...args)) {
+        // fn was called, remove future call
+        clearTimeout(timeoutId.current);
+        timeoutId.current = undefined;
+      } else {
+        // remember latest input and setup timer to execute fn
+        if (!timeoutId.current) {
+          timeoutId.current = setTimeout(async () => {
+            if (lastCalledValues.current) {
+              await fn(...lastCalledValues.current);
+            }
+            timeoutId.current = undefined;
+          }, delay);
+        }
+        lastCalledValues.current = args;
       }
-      lastCalledValues.current = args;
-    }
-  };
+    },
+    [delay, fn, throttleFunction]
+  );
 };
 
 // https://github.com/teetotum/react-attached-properties/blob/master/examples/useClickOutside.js

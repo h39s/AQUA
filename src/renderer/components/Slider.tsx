@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import NumberInput from '../widgets/NumberInput';
 import RangeInput from '../widgets/RangeInput';
 import { useAquaContext } from '../utils/AquaContext';
+import { useThrottle } from '../utils/utils';
 import '../styles/Slider.scss';
 
 interface ISliderProps {
@@ -9,7 +10,7 @@ interface ISliderProps {
   min: number;
   max: number;
   value: number;
-  sliderHeight?: number;
+  sliderHeight?: string;
   label?: string;
   setValue: (newValue: number) => Promise<void>;
 }
@@ -19,10 +20,11 @@ const Slider = ({
   min,
   max,
   value,
-  sliderHeight = 150,
+  sliderHeight = '150px',
   label,
   setValue,
 }: ISliderProps) => {
+  const INTERVAL = 100;
   const { globalError } = useAquaContext();
 
   // Local copy of slider value used so that the number input increases smoothly while throttling EQ APO writes
@@ -33,11 +35,26 @@ const Slider = ({
     setSliderValue(value);
   }, [value]);
 
-  const handleChangeValue = async (newValue: number) => {
-    await setValue(newValue);
-  };
+  const handleChangeValue = useCallback(
+    async (newValue: number) => {
+      await setValue(newValue);
+    },
+    [setValue]
+  );
 
   const handleInput = async (newValue: number) => {
+    setSliderValue(newValue);
+    handleChangeValue(newValue);
+  };
+
+  const throttledSetValue = useThrottle(handleChangeValue, INTERVAL);
+
+  // Helpers for adjusting the preAmp gain value
+  const handleChangeValueWithThrottle = async (newValue: number) => {
+    setSliderValue(newValue);
+    throttledSetValue(newValue);
+  };
+  const handleChangeValueWithoutThrottle = async (newValue: number) => {
     setSliderValue(newValue);
     handleChangeValue(newValue);
   };
@@ -49,9 +66,9 @@ const Slider = ({
         value={sliderValue}
         min={min}
         max={max}
-        width={sliderHeight}
-        handleChange={handleInput}
-        handleMouseUp={handleInput}
+        height={sliderHeight}
+        handleChange={handleChangeValueWithThrottle}
+        handleMouseUp={handleChangeValueWithoutThrottle}
         isDisabled={!!globalError}
         incrementPrecision={0}
         displayPrecision={2}

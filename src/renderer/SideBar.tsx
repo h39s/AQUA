@@ -1,5 +1,5 @@
 import { ErrorDescription } from 'common/errors';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { disableAutoPreAmp, setMainPreAmp } from './utils/equalizerApi';
 import EqualizerEnablerSwitch from './components/EqualizerEnablerSwitch';
 import Slider from './components/Slider';
@@ -9,28 +9,38 @@ import AutoPreAmpEnablerSwitch from './components/AutoPreAmpEnablerSwitch';
 import GraphViewSwitch from './components/GraphViewSwitch';
 import Spinner from './icons/Spinner';
 
-const SideBar = ({ height }: { height: number }) => {
+const SideBar = () => {
   const MIN = -30;
   const MAX = 30;
 
-  const { isLoading, preAmp, setGlobalError, setPreAmp, setAutoPreAmpOn } =
-    useAquaContext();
+  const {
+    isGraphViewOn,
+    isLoading,
+    preAmp,
+    setGlobalError,
+    setPreAmp,
+    setAutoPreAmpOn,
+  } = useAquaContext();
 
-  const setGain = async (newValue: number) => {
-    try {
-      setAutoPreAmpOn(false);
-      await disableAutoPreAmp();
-      await setMainPreAmp(newValue);
-      setPreAmp(newValue);
-    } catch (e) {
-      setGlobalError(e as ErrorDescription);
-    }
-  };
+  const setGain = useCallback(
+    async (newValue: number) => {
+      try {
+        setAutoPreAmpOn(false);
+        await disableAutoPreAmp();
+        await setMainPreAmp(newValue);
+        setPreAmp(newValue);
+      } catch (e) {
+        setGlobalError(e as ErrorDescription);
+      }
+    },
+    [setAutoPreAmpOn, setGlobalError, setPreAmp]
+  );
 
   const sliderHeight = useMemo(
     // TODO: improve comments here
-    () => height - 100 - 2 * 80 - 3 * 20 - 3 * 16 - 2 * 23 - 2 * 4 - 2 * 8 - 36,
-    [height]
+    // () => height - 100 - 2 * 80 - 3 * 20 - 3 * 16 - 2 * 23 - 2 * 4 - 2 * 8 - 36,
+    () => (isGraphViewOn ? '102px' : 'calc(100vh - 524px)'),
+    [isGraphViewOn]
   );
 
   return (

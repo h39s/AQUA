@@ -8,6 +8,7 @@
   grid-area: main-content;
   display: grid;
   grid-template-columns: 128px 1fr;
+  grid-template-rows: 1fr;
   gap: $spacing-s;
 
   // Add additional space to the right to balance the spacing better
@@ -37,9 +38,7 @@
   .bands {
     position: relative;
     justify-content: flex-start;
-    padding: $spacing-xs $spacing-xxs; // add some horizontal padding so the outline isn't cut off at either end
-    // Add vertical padding so that having absolute positioning of the sliders does not result in the main content
-    // div cutting off the trash can icon
+    padding: 0 $spacing-xxs; // add some horizontal padding so the outline isn't cut off at either end
     height: 100%;
     width: 100%;
     overflow-x: auto;

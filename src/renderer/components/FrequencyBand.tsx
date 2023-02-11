@@ -17,6 +17,7 @@ import {
   useState,
   WheelEvent,
   CSSProperties,
+  useCallback,
 } from 'react';
 import { useThrottleAndExecuteLatest } from 'renderer/utils/utils';
 import { FILTER_OPTIONS } from '../icons/FilterTypeIcon';
@@ -38,22 +39,16 @@ interface IFrequencyBandProps {
   filter: IFilter;
   isMinSliderCount: boolean;
   style?: CSSProperties;
-  sliderHeight: number;
 }
 
 const FrequencyBand = forwardRef(
   (
-    {
-      sliderIndex,
-      filter,
-      isMinSliderCount,
-      sliderHeight,
-      style,
-    }: IFrequencyBandProps,
+    { sliderIndex, filter, isMinSliderCount, style }: IFrequencyBandProps,
     ref: ForwardedRef<HTMLDivElement>
   ) => {
     const INTERVAL = 100;
-    const { globalError, setGlobalError, dispatchFilter } = useAquaContext();
+    const { isGraphViewOn, globalError, setGlobalError, dispatchFilter } =
+      useAquaContext();
     const [isLoading, setIsLoading] = useState(false);
     const isRemoveDisabled = useMemo(
       () => isMinSliderCount || isLoading,
@@ -96,13 +91,21 @@ const FrequencyBand = forwardRef(
       INTERVAL
     );
 
-    const handleGainSubmit = async (newValue: number) => {
-      try {
-        await throttleSetGain(newValue);
-      } catch (e) {
-        setGlobalError(e as ErrorDescription);
-      }
-    };
+    const handleGainSubmit = useCallback(
+      async (newValue: number) => {
+        try {
+          await throttleSetGain(newValue);
+          dispatchFilter({
+            type: FilterActionEnum.GAIN,
+            id: filter.id,
+            newValue,
+          });
+        } catch (e) {
+          setGlobalError(e as ErrorDescription);
+        }
+      },
+      [dispatchFilter, filter.id, setGlobalError, throttleSetGain]
+    );
 
     const handleFrequencySubmit = async (newValue: number) => {
       try {
@@ -161,6 +164,13 @@ const FrequencyBand = forwardRef(
         ? offset // scroll up
         : offset * -1; // scroll down
     };
+
+    const sliderHeight = useMemo(
+      // TODO: improve comments here
+      // () => height - 100 - 2 * 80 - 3 * 20 - 3 * 16 - 2 * 23 - 2 * 4 - 2 * 8 - 36,
+      () => (isGraphViewOn ? '286px' : 'calc(100vh - 340px)'),
+      [isGraphViewOn]
+    );
 
     return (
       // Need to specify the id here for the sorting to work

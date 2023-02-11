@@ -72,14 +72,11 @@ const setWindowDimension = (isExpanded: boolean) => {
       // TODO: decide if this change is worth it or not
       mainWindow.setSize(
         currWidth,
-        Math.min(currHeight, WINDOW_HEIGHT_EXPANDED)
+        Math.max(currHeight, WINDOW_HEIGHT_EXPANDED)
       );
     } else {
       mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-      mainWindow.setSize(
-        currWidth,
-        Math.min(currHeight, WINDOW_HEIGHT_EXPANDED)
-      );
+      mainWindow.setSize(currWidth, WINDOW_HEIGHT);
     }
   }
 };

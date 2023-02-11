@@ -22,7 +22,7 @@ describe('RangeInput', () => {
         max={5}
         handleChange={handleChange}
         handleMouseUp={handleMouseUp}
-        width={150}
+        height="150px"
         value={testValue}
         isDisabled={false}
       />
@@ -39,7 +39,7 @@ describe('RangeInput', () => {
         max={5}
         handleChange={handleChange}
         handleMouseUp={handleMouseUp}
-        width={150}
+        height="150px"
         value={testValue}
         isDisabled={false}
       />
@@ -63,7 +63,7 @@ describe('RangeInput', () => {
         max={5}
         handleChange={handleChange}
         handleMouseUp={handleMouseUp}
-        width={150}
+        height="150px"
         value={testValue}
         isDisabled={false}
       />
@@ -87,7 +87,7 @@ describe('RangeInput', () => {
         max={5}
         handleChange={handleChange}
         handleMouseUp={handleMouseUp}
-        width={150}
+        height="150px"
         value={testValue}
         isDisabled={false}
       />
@@ -106,7 +106,7 @@ describe('RangeInput', () => {
         max={5}
         handleChange={handleChange}
         handleMouseUp={handleMouseUp}
-        width={150}
+        height="150px"
         value={testValue}
         isDisabled={false}
       />
@@ -163,7 +163,7 @@ describe('RangeInput', () => {
         max={5}
         handleChange={handleChange}
         handleMouseUp={handleMouseUp}
-        width={150}
+        height="150px"
         value={testValue}
         isDisabled={false}
         incrementPrecision={1}
@@ -184,7 +184,7 @@ describe('RangeInput', () => {
         max={5}
         handleChange={handleChange}
         handleMouseUp={handleMouseUp}
-        width={150}
+        height="150px"
         value={testValue}
         isDisabled={false}
         incrementPrecision={0}
@@ -205,7 +205,7 @@ describe('RangeInput', () => {
         max={5}
         handleChange={handleChange}
         handleMouseUp={handleMouseUp}
-        width={150}
+        height="150px"
         value={testValue}
         isDisabled
       />

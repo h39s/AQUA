@@ -33,11 +33,12 @@ body {
     grid-template-rows: $equalizer-height 1fr;
 
     &.minimized {
-      grid-template-areas: 'side-bar main-content presets-bar';
       // Forcibly allow equalizer content to grow when graph view is off
       grid-template-rows: 1fr;
+      row-gap: 0px;
     }
-    gap: $spacing-s;
+
+    gap: $spacing-m $spacing-s;
   }
 }
 

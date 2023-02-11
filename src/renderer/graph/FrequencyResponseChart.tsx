@@ -1,9 +1,16 @@
 import { IFilter } from 'common/constants';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import Spinner from 'renderer/icons/Spinner';
 import { useAquaContext } from 'renderer/utils/AquaContext';
 import { setMainPreAmp } from 'renderer/utils/equalizerApi';
-import { clamp } from 'renderer/utils/utils';
+import { clamp, useThrottleAndExecuteLatest } from 'renderer/utils/utils';
 import Chart, { ChartDimensions } from './Chart';
 import {
   IChartCurveData,
@@ -147,7 +154,7 @@ const FrequencyResponseChart = () => {
   const [width, setWidth] = useState<number>(1396);
   const [height, setHeight] = useState<number>(380);
 
-  const updateDimensions = () => {
+  const updateDimensions = useCallback(() => {
     const newWidth = ref.current?.clientWidth;
     if (newWidth && newWidth > 0) {
       setWidth(newWidth);
@@ -156,18 +163,19 @@ const FrequencyResponseChart = () => {
     if (newHeight && newHeight > 0) {
       setHeight(newHeight);
     }
-  };
-
-  useLayoutEffect(() => {
-    // Compute dimensions on initial render
-    updateDimensions();
-    window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
+  const throttle = useThrottleAndExecuteLatest(updateDimensions, 100);
+
+  useEffect(() => {
+    window.addEventListener('resize', throttle);
+    return () => window.removeEventListener('resize', throttle);
+  }, [throttle]);
+
   useLayoutEffect(() => {
+    // Compute dimensions on initial render and when graph view is toggled
     updateDimensions();
-  }, [isGraphViewOn]);
+  }, [isGraphViewOn, updateDimensions]);
 
   const dimensions: ChartDimensions = {
     width,
