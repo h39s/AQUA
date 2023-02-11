@@ -8,15 +8,14 @@ import FrequencyResponseChart from './graph/FrequencyResponseChart';
 import PresetsBar from './PresetsBar';
 
 const AppContent = () => {
-  const { isGraphViewOn, isLoading, globalError, performHealthCheck } =
-    useAquaContext();
+  const { isLoading, globalError, performHealthCheck } = useAquaContext();
 
   return (
     <>
       <SideBar />
       <MainContent />
       <PresetsBar />
-      {isGraphViewOn && <FrequencyResponseChart />}
+      <FrequencyResponseChart />
       {globalError && (
         <PrereqMissingModal
           isLoading={isLoading}

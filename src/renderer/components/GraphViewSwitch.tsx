@@ -21,12 +21,17 @@ export default function GraphViewSwitch({ id }: IGraphViewSwitchProps) {
     try {
       if (isGraphViewOn) {
         await disableGraphView();
+
+        // Reduce window size before allowing parametric components to fill space
         await decreaseWindowSize();
+        setGraphViewOn(!isGraphViewOn);
       } else {
         await enableGraphView();
+
+        // Set parametric components to a fixed height before increasing window size
+        setGraphViewOn(!isGraphViewOn);
         await increaseWindowSize();
       }
-      setGraphViewOn(!isGraphViewOn);
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
