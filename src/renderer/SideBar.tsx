@@ -37,8 +37,7 @@ const SideBar = () => {
   );
 
   const sliderHeight = useMemo(
-    // TODO: improve comments here
-    // () => height - 100 - 2 * 80 - 3 * 20 - 3 * 16 - 2 * 23 - 2 * 4 - 2 * 8 - 36,
+    // Manually determine slider height
     () => (isGraphViewOn ? '102px' : 'calc(100vh - 524px)'),
     [isGraphViewOn]
   );

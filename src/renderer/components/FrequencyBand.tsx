@@ -55,20 +55,21 @@ const FrequencyBand = forwardRef(
       [isLoading, isMinSliderCount]
     );
 
-    const throttleSetGain = useThrottleAndExecuteLatest(
+    // *** Define functions for updating filter values and obtain throttled versions of them  ***
+    const normalSetGain = useCallback(
       async (newValue: number) => {
         /*
-        Always dispatch first so that we don't see jitter in the sliders.
-        This is because dispatch will trigger the ui rerender and ensure user inputs do not get
-        out of order. This means that the backend will be "behind" what the frontend shows, but
-        thats okay. In case of a backend error, we will rollback to the last backend snapshot.
-        Consider the following case where the user increases the gain twice when we setGain first.
-        On the first increase input, slider updates but we are stuck on setGain.
-        On the second increase input, slider updates and the 2nd setGain is delayed by this hook.
-        Then first setGain finishes and we dispatch. This results in the jitter.
-        2nd setGain finishes and we dispatch again. Another jitter occurs.
-        Note that the final UI state is correct, but the ui changes are strange.
-      */
+      Always dispatch first so that we don't see jitter in the sliders.
+      This is because dispatch will trigger the ui rerender and ensure user inputs do not get
+      out of order. This means that the backend will be "behind" what the frontend shows, but
+      thats okay. In case of a backend error, we will rollback to the last backend snapshot.
+      Consider the following case where the user increases the gain twice when we setGain first.
+      On the first increase input, slider updates but we are stuck on setGain.
+      On the second increase input, slider updates and the 2nd setGain is delayed by this hook.
+      Then first setGain finishes and we dispatch. This results in the jitter.
+      2nd setGain finishes and we dispatch again. Another jitter occurs.
+      Note that the final UI state is correct, but the ui changes are strange.
+    */
         dispatchFilter({
           type: FilterActionEnum.GAIN,
           id: filter.id,
@@ -76,10 +77,15 @@ const FrequencyBand = forwardRef(
         });
         await setGain(sliderIndex, newValue);
       },
+      [dispatchFilter, filter.id, sliderIndex]
+    );
+
+    const throttleSetGain = useThrottleAndExecuteLatest(
+      normalSetGain,
       INTERVAL
     );
 
-    const throttleSetQuality = useThrottleAndExecuteLatest(
+    const normalSetQuality = useCallback(
       async (newValue: number) => {
         dispatchFilter({
           type: FilterActionEnum.QUALITY,
@@ -88,23 +94,24 @@ const FrequencyBand = forwardRef(
         });
         await setQuality(sliderIndex, newValue);
       },
+      [dispatchFilter, filter.id, sliderIndex]
+    );
+
+    const throttleSetQuality = useThrottleAndExecuteLatest(
+      normalSetQuality,
       INTERVAL
     );
 
+    // *** Define handlers for handling changes in gain, frequency, quality and filter type ***
     const handleGainSubmit = useCallback(
       async (newValue: number) => {
         try {
           await throttleSetGain(newValue);
-          dispatchFilter({
-            type: FilterActionEnum.GAIN,
-            id: filter.id,
-            newValue,
-          });
         } catch (e) {
           setGlobalError(e as ErrorDescription);
         }
       },
-      [dispatchFilter, filter.id, setGlobalError, throttleSetGain]
+      [setGlobalError, throttleSetGain]
     );
 
     const handleFrequencySubmit = async (newValue: number) => {
@@ -166,8 +173,7 @@ const FrequencyBand = forwardRef(
     };
 
     const sliderHeight = useMemo(
-      // TODO: improve comments here
-      // () => height - 100 - 2 * 80 - 3 * 20 - 3 * 16 - 2 * 23 - 2 * 4 - 2 * 8 - 36,
+      // Manually determine slider height
       () => (isGraphViewOn ? '286px' : 'calc(100vh - 340px)'),
       [isGraphViewOn]
     );
