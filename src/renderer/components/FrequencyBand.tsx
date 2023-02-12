@@ -30,11 +30,12 @@ interface IFrequencyBandProps {
   sliderIndex: number;
   filter: IFilter;
   isMinSliderCount: boolean;
+  style?: object;
 }
 
 const FrequencyBand = forwardRef(
   (
-    { sliderIndex, filter, isMinSliderCount }: IFrequencyBandProps,
+    { sliderIndex, filter, isMinSliderCount, style }: IFrequencyBandProps,
     ref: ForwardedRef<HTMLDivElement>
   ) => {
     const INTERVAL = 100;
@@ -149,7 +150,7 @@ const FrequencyBand = forwardRef(
 
     return (
       // Need to specify the id here for the sorting to work
-      <div ref={ref} id={filter.id} className="col bandWrapper">
+      <div ref={ref} id={filter.id} className="col bandWrapper" style={style}>
         <IconButton
           icon={IconName.TRASH}
           className="removeFilter"
