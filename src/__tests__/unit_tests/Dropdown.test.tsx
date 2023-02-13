@@ -231,7 +231,7 @@ describe('Dropdown', () => {
           options={FILTER_OPTIONS}
           isDisabled={false}
           handleChange={handleChange}
-          noSelectionValue="NO SELECTION"
+          noSelectionPlaceholder="NO SELECTION"
         />
         <button type="button">Outside</button>
       </div>
@@ -251,7 +251,7 @@ describe('Dropdown', () => {
           options={[]}
           isDisabled={false}
           handleChange={handleChange}
-          noOptionValue="NO OPTIONS"
+          emptyOptionsPlaceholder="NO OPTIONS"
         />
         <button type="button">Outside</button>
       </div>

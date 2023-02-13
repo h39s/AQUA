@@ -22,8 +22,8 @@ interface IDropdownProps {
   options: IOptionEntry[];
   value: string;
   isDisabled: boolean;
-  noSelectionValue?: JSX.Element | string;
-  noOptionValue?: JSX.Element | string;
+  noSelectionPlaceholder?: JSX.Element | string;
+  emptyOptionsPlaceholder?: JSX.Element | string;
   handleChange: (newValue: string) => void;
 }
 
@@ -32,8 +32,8 @@ const Dropdown = ({
   options,
   value,
   isDisabled,
-  noSelectionValue,
-  noOptionValue,
+  noSelectionPlaceholder,
+  emptyOptionsPlaceholder,
   handleChange,
 }: IDropdownProps) => {
   const nullElement = createElement('div');
@@ -99,8 +99,8 @@ const Dropdown = ({
         tabIndex={isDisabled ? -1 : 0}
       >
         {options.length !== 0
-          ? selectedEntry || noSelectionValue || nullElement
-          : noOptionValue || nullElement}
+          ? selectedEntry || noSelectionPlaceholder || nullElement
+          : emptyOptionsPlaceholder || nullElement}
         <ArrowIcon type="down" className="arrow" />
       </div>
       {isOpen && (

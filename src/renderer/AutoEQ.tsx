@@ -14,6 +14,7 @@ import {
 const AutoEQ = () => {
   const NO_DEVICE_SELECTION = 'Pick a device first! 🎧';
   const NO_RESPONSES = 'No supported responses 😞';
+  const NO_RESPONSE_SELECTION = 'Pick a response! 🔊';
 
   const { globalError, setGlobalError, performHealthCheck } = useAquaContext();
   const [devices, setDevices] = useState<string[]>([]);
@@ -39,6 +40,8 @@ const AutoEQ = () => {
     const fetchResponses = async () => {
       try {
         setResponses(await getAutoEqResponseList(currentDevice));
+        // Reset currentReponse to blank whenever it changes.
+        setCurrentResponse('');
       } catch (e) {
         setGlobalError(e as ErrorDescription);
       }
@@ -48,11 +51,6 @@ const AutoEQ = () => {
       fetchResponses();
     }
   }, [currentDevice, setGlobalError]);
-
-  // Reset currentReponse to blank whenever it changes.
-  useEffect(() => {
-    setCurrentResponse('');
-  }, [responses]);
 
   const applyAutoEQ = async () => {
     try {
@@ -96,7 +94,7 @@ const AutoEQ = () => {
         value={currentDevice}
         handleChange={(newValue) => setCurrentDevice(newValue)}
         isDisabled={!!globalError}
-        noSelectionValue={NO_DEVICE_SELECTION}
+        noSelectionPlaceholder={NO_DEVICE_SELECTION}
       />
       Target Frequency Response:
       <Dropdown
@@ -105,7 +103,8 @@ const AutoEQ = () => {
         value={currentResponse}
         handleChange={(newValue) => setCurrentResponse(newValue)}
         isDisabled={!!globalError || responses.length === 0}
-        noOptionValue={NO_RESPONSES}
+        emptyOptionsPlaceholder={NO_RESPONSES}
+        noSelectionPlaceholder={NO_RESPONSE_SELECTION}
       />
       <Button
         className="small"
