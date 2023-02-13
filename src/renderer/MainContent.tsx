@@ -1,33 +1,28 @@
-import {
-  createRef,
-  Fragment,
-  RefObject,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { Fragment, useMemo } from 'react';
 import { MAX_NUM_FILTERS, MIN_NUM_FILTERS } from 'common/constants';
 import FrequencyBand from './components/FrequencyBand';
 import { useAquaContext } from './utils/AquaContext';
 import './styles/MainContent.scss';
 import AddSliderDivider from './components/AddSliderDivider';
-import SortWrapper from './SortWrapper';
 import Spinner from './icons/Spinner';
 
 const MainContent = () => {
-  const { filters, isLoading } = useAquaContext();
-  const wrapperRef = createRef<HTMLDivElement>();
-  const sliderRefs = useRef<Array<HTMLDivElement>>([]);
-  const dividerRefs = useRef<Array<HTMLDivElement>>([]);
+  const { filters: sortedFilters, isLoading } = useAquaContext();
+  const DIVIDER_WIDTH = 28;
+  const BAND_WIDTH = 72.94;
 
-  useEffect(() => {
-    sliderRefs.current = sliderRefs.current.slice(0, filters.length);
-    dividerRefs.current = dividerRefs.current.slice(0, filters.length + 1);
-  }, [filters]);
+  const [filters, sortIndexMap] = useMemo(() => {
+    const fixedSort = sortedFilters
+      .slice()
+      .sort((a, b) => a.id.localeCompare(b.id));
 
-  useEffect(() => {
-    sliderRefs.current?.forEach((r) => {});
-  }, [filters]);
+    const map: { [key: string]: number } = {};
+    sortedFilters.forEach((f, index) => {
+      map[f.id] = index;
+    });
+
+    return [fixedSort, map];
+  }, [sortedFilters]);
 
   return isLoading ? (
     <div className="center full row">
@@ -46,35 +41,37 @@ const MainContent = () => {
         <span className="row-label">Gain (dB)</span>
         <span className="row-label">Quality</span>
       </div>
-      <div ref={wrapperRef} className="bands row center">
+      <div className="bands row center">
         <AddSliderDivider
           sliderIndex={-1}
           isMaxSliderCount={filters.length >= MAX_NUM_FILTERS}
         />
-        {filters.map((filter, sliderIndex) => (
-          <Fragment key={`slider-${filter.id}`}>
-            <FrequencyBand
-              sliderIndex={sliderIndex}
-              filter={filter}
-              isMinSliderCount={filters.length <= MIN_NUM_FILTERS}
-              style={{
-                position: 'fixed',
-                transform: `translateX(${28 + sliderIndex * (28 + 72.47)}px)`,
-                'transition-duration': '500ms',
-              }}
-              key="Test"
-            />
-            <AddSliderDivider
-              sliderIndex={sliderIndex}
-              isMaxSliderCount={filters.length >= MAX_NUM_FILTERS}
-              style={{
-                position: 'fixed',
-                transform: `translateX(${(sliderIndex + 1) * (28 + 72.47)}px)`,
-                'transition-duration': '500ms',
-              }}
-            />
-          </Fragment>
-        ))}
+        {filters.map((filter) => {
+          const sliderIndex = sortIndexMap[filter.id];
+          return (
+            <Fragment key={`slider-${filter.id}`}>
+              <FrequencyBand
+                sliderIndex={sliderIndex}
+                filter={filter}
+                isMinSliderCount={filters.length <= MIN_NUM_FILTERS}
+                style={{
+                  transform: `translateX(${
+                    DIVIDER_WIDTH + sliderIndex * (DIVIDER_WIDTH + BAND_WIDTH)
+                  }px)`,
+                }}
+              />
+              <AddSliderDivider
+                sliderIndex={sliderIndex}
+                isMaxSliderCount={filters.length >= MAX_NUM_FILTERS}
+                style={{
+                  transform: `translateX(${
+                    (sliderIndex + 1) * (DIVIDER_WIDTH + BAND_WIDTH)
+                  }px)`,
+                }}
+              />
+            </Fragment>
+          );
+        })}
       </div>
     </div>
   );
