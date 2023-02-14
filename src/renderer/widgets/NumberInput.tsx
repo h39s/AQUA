@@ -1,5 +1,6 @@
 import {
   ChangeEvent,
+  WheelEvent,
   CSSProperties,
   KeyboardEvent,
   useEffect,
@@ -24,6 +25,7 @@ interface INumberInputProps {
   shouldRoundToHalf?: boolean;
   shouldAutoGrow?: boolean;
   handleSubmit: (newValue: number) => Promise<void>;
+  onWheelValueChange?: (e: WheelEvent) => number;
 }
 
 const NumberInput = ({
@@ -38,6 +40,7 @@ const NumberInput = ({
   showLabel = false,
   shouldAutoGrow = false,
   handleSubmit,
+  onWheelValueChange,
 }: INumberInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [internalValue, setInternalValue] = useState<string>(
@@ -219,16 +222,33 @@ const NumberInput = ({
     await handleSubmit(newValue);
   };
 
-  const onArrow = async (isIncrement: boolean) => {
-    const offset = isIncrement
-      ? 1 / precisionFactor
-      : (1 / precisionFactor) * -1;
+  const updateValue = async (offset: number) => {
     // Need to round the value because of floating addition imprecision
     let newValue = clamp(offset + value, min, max);
     newValue = Math.round(newValue * precisionFactor) / precisionFactor;
     setInternalValue(newValue.toFixed(floatPrecision));
     setHasChanges(false);
     handleSubmit(newValue);
+  };
+
+  const onArrow = async (isIncrement: boolean) => {
+    const offset = isIncrement
+      ? 1 / precisionFactor
+      : (1 / precisionFactor) * -1;
+    updateValue(offset);
+  };
+
+  const onWheelDefaultValueChange = (e: WheelEvent) => {
+    // Wheel has a higher granularity than the arrows
+    return e.deltaY < 0
+      ? (1 / precisionFactor) * 10 // scroll up
+      : (1 / precisionFactor) * -10; // scroll down
+  };
+
+  const onWheel = (e: WheelEvent) => {
+    updateValue(
+      onWheelValueChange ? onWheelValueChange(e) : onWheelDefaultValueChange(e)
+    );
   };
 
   // Helper for detecting use of the ENTER or TAB keys
@@ -259,6 +279,7 @@ const NumberInput = ({
           onInput={onInput}
           onBlur={onSubmit}
           onKeyDown={listenForEnter}
+          onWheel={onWheel}
           disabled={isDisabled}
           style={{ textAlign: showArrows ? 'left' : 'center' }}
         />

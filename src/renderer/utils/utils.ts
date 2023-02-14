@@ -44,18 +44,50 @@ export const useInterval = (callback: () => void, delay?: number) => {
 };
 
 // Based on https://codeforgeek.com/throttle-function-javascript/
-export const useThrottle = <Type>(
-  fn: (arg: Type) => unknown,
+export const useThrottle = <T extends (...args: any[]) => unknown>(
+  fn: T,
   delay: number
 ) => {
   const lastCalled = useRef<number>(0);
-  return (arg: Type) => {
+  return (...args: Parameters<T>) => {
     const now = new Date().getTime();
     if (now - lastCalled.current < delay) {
-      return;
+      return false;
     }
     lastCalled.current = now;
-    fn(arg);
+    fn(...args);
+    return true;
+  };
+};
+
+// This hook throttles any call to function fn. It will also rmb
+// the latest call so in the event that subsequent calls to fn stop,
+// a node interval will execute the latest call.
+export const useThrottleAndExecuteLatest = <T extends (...args: any[]) => any>(
+  fn: T,
+  delay: number
+) => {
+  const throttleFunction = useThrottle(fn, delay);
+  const lastCalledValues = useRef<unknown[]>();
+  const timeoutId = useRef<NodeJS.Timer>();
+
+  return async (...args: Parameters<T>) => {
+    if (throttleFunction(...args)) {
+      // fn was called, remove future call
+      clearTimeout(timeoutId.current);
+      timeoutId.current = undefined;
+    } else {
+      // remember latest input and setup timer to execute fn
+      if (!timeoutId.current) {
+        timeoutId.current = setTimeout(async () => {
+          if (lastCalledValues.current) {
+            await fn(...lastCalledValues.current);
+          }
+          timeoutId.current = undefined;
+        }, delay);
+      }
+      lastCalledValues.current = args;
+    }
   };
 };
 

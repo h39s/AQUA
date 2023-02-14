@@ -10,8 +10,8 @@ import {
   IChartLineDataPointsById,
   IChartPointData,
 } from './ChartController';
-import { getFilterLineData, getPreAmpLine, getCombinedLineData } from './utils';
-import { ColorEnum, getColor, GrayScaleEnum } from '../styles/color';
+import { getFilterLineData, getCombinedLineData } from './utils';
+import { GrayScaleEnum } from '../styles/color';
 
 const isFilterEqual = (f1: IFilter, f2: IFilter) => {
   if (!f1 || !f2) {
@@ -86,30 +86,26 @@ const FrequencyResponseChart = () => {
     const totalCurveData = getCombinedLineData(preAmp, updatedFilterLines);
 
     // Compute preAmp line data
-    const preAmpLine = getPreAmpLine(preAmp);
+    // const preAmpLine = getPreAmpLine(preAmp);
 
     const highestPoint = totalCurveData.reduce(
       (previousValue, currentValue) => {
-        if (previousValue) {
-          return previousValue.y < currentValue.y
-            ? currentValue
-            : previousValue;
-        }
-        return currentValue;
+        return previousValue.y < currentValue.y ? currentValue : previousValue;
       }
     );
 
     return {
       chartData: [
-        {
-          id: 'PreAmp',
-          name: 'PreAmp',
-          line: {
-            color: ColorEnum.ANALOGOUS2,
-            strokeWidth: 2,
-            points: preAmpLine,
-          },
-        } as IChartCurveData,
+        // Do not show preamp line for now
+        // {
+        //   id: 'PreAmp',
+        //   name: 'PreAmp',
+        //   line: {
+        //     color: ColorEnum.ANALOGOUS2,
+        //     strokeWidth: 2,
+        //     points: preAmpLine,
+        //   },
+        // } as IChartCurveData,
         {
           id: 'Total Response',
           name: 'Total Response',
@@ -119,18 +115,19 @@ const FrequencyResponseChart = () => {
             points: totalCurveData,
           },
         } as IChartCurveData,
-        ...Object.keys(updatedFilterLines).map((id, index) => {
-          return {
-            id,
-            name: `Filter ${id}`,
-            line: {
-              color: getColor(index),
-              strokeWidth: 2,
-              points: updatedFilterLines[id],
-            },
-            controlPoint: controlPointByCurveId[id],
-          } as IChartCurveData;
-        }),
+        // Do not show individual curves for now
+        // ...Object.keys(updatedFilterLines).map((id, index) => {
+        //   return {
+        //     id,
+        //     name: `Filter ${id}`,
+        //     line: {
+        //       color: getColor(index),
+        //       strokeWidth: 2,
+        //       points: updatedFilterLines[id],
+        //     },
+        //     controlPoint: controlPointByCurveId[id],
+        //   } as IChartCurveData;
+        // }),
       ],
       // Rounding to two decimals
       autoPreAmpValue:
