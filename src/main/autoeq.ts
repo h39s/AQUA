@@ -3,10 +3,10 @@ import path from 'path';
 import { app } from 'electron';
 import { FilterTypeEnum, IPreset } from '../common/constants';
 
-let AUTOEQ_DIR = './resources/auto_eq';
+let AUTOEQ_DIR = './resources/autoeq';
 if (!app.isPackaged) {
-  // dev mode means there is no resources folder and we must access our repo's auto_eq folder.
-  AUTOEQ_DIR = path.join(__dirname, '../../auto_eq');
+  // dev mode means there is no resources folder and we must access our repo's autoeq folder.
+  AUTOEQ_DIR = path.join(__dirname, '../../autoeq');
 }
 
 export const getAutoEqDeviceList = () => {
