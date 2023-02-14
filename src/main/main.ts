@@ -46,11 +46,11 @@ import {
   WINDOW_HEIGHT_EXPANDED,
   WINDOW_WIDTH,
   PRESETS_DIR,
+  getDefaultFilterWithId,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
-import { computeAvgFreq, isRestrictedPresetName } from '../common/utils';
+import { isRestrictedPresetName } from '../common/utils';
 import { TSuccess, TError } from '../renderer/utils/equalizerApi';
-import { sortHelper } from '../renderer/utils/utils';
 import {
   getAutoEqDeviceList,
   getAutoEqPreset,
@@ -197,6 +197,19 @@ const handleUpdate = async (
   channel: ChannelEnum | string
 ) => {
   return handleUpdateHelper<void>(event, channel, undefined);
+};
+
+const checkFilterIdExistence = (
+  event: Electron.IpcMainEvent,
+  channel: ChannelEnum,
+  filterId: string
+) => {
+  // Filter id must exist
+  if (!(filterId in state.filters)) {
+    handleError(event, channel + filterId, ErrorCode.INVALID_PARAMETER);
+    return false;
+  }
+  return true;
 };
 
 ipcMain.on(ChannelEnum.HEALTH_CHECK, async (event) => {
@@ -369,8 +382,8 @@ ipcMain.on(ChannelEnum.GET_ENABLE, async (event) => {
 });
 
 ipcMain.on(ChannelEnum.SET_ENABLE, async (event, arg) => {
-  const value = parseInt(arg[0], 10) || 0;
-  state.isEnabled = value !== 0;
+  // eslint-disable-next-line prefer-destructuring
+  state.isEnabled = arg[0];
   await handleUpdate(event, ChannelEnum.SET_ENABLE);
 });
 
@@ -406,197 +419,188 @@ ipcMain.on(ChannelEnum.SET_PREAMP, async (event, arg) => {
 
 ipcMain.on(ChannelEnum.GET_FILTER_GAIN, async (event, arg) => {
   const channel = ChannelEnum.GET_FILTER_GAIN;
-  const filterIndex = parseInt(arg[0], 10) || 0;
+  const filterId = arg[0];
 
-  // Filter index must be within the length of the filters array
-  if (filterIndex < 0 || filterIndex >= state.filters.length) {
-    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+  // Filter id must exist
+  if (!checkFilterIdExistence(event, channel, filterId)) {
     return;
   }
 
   const reply: TSuccess<number> = {
-    result: state.filters[filterIndex].gain || 0,
+    result: state.filters[filterId].gain || 0,
   };
-  event.reply(channel + filterIndex, reply);
+  event.reply(channel + filterId, reply);
 });
 
 ipcMain.on(ChannelEnum.SET_FILTER_GAIN, async (event, arg) => {
   const channel = ChannelEnum.SET_FILTER_GAIN;
-  const filterIndex = parseInt(arg[0], 10) || 0;
+  const filterId = arg[0];
   const gain = parseFloat(arg[1]) || 0;
 
-  // Filter index must be within the length of the filters array
-  if (filterIndex < 0 || filterIndex >= state.filters.length) {
-    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+  // Filter id must exist
+  if (!checkFilterIdExistence(event, channel, filterId)) {
     return;
   }
 
   if (gain < MIN_GAIN || gain > MAX_GAIN) {
-    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    handleError(event, channel + filterId, ErrorCode.INVALID_PARAMETER);
     return;
   }
 
-  state.filters[filterIndex].gain = gain;
-  await handleUpdate(event, channel + filterIndex);
+  state.filters[filterId].gain = gain;
+  await handleUpdate(event, channel + filterId);
 });
 
 ipcMain.on(ChannelEnum.GET_FILTER_FREQUENCY, async (event, arg) => {
   const channel = ChannelEnum.GET_FILTER_FREQUENCY;
-  const filterIndex = parseInt(arg[0], 10) || 0;
+  const filterId = arg[0];
 
-  // Filter index must be within the length of the filters array
-  if (filterIndex < 0 || filterIndex >= state.filters.length) {
-    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+  // Filter id must exist
+  if (!checkFilterIdExistence(event, channel, filterId)) {
     return;
   }
 
   const reply: TSuccess<number> = {
-    result: state.filters[filterIndex].frequency || 10,
+    result: state.filters[filterId].frequency || 10,
   };
-  event.reply(channel + filterIndex, reply);
+  event.reply(channel + filterId, reply);
 });
 
 ipcMain.on(ChannelEnum.SET_FILTER_FREQUENCY, async (event, arg) => {
   const channel = ChannelEnum.SET_FILTER_FREQUENCY;
-  const filterIndex = parseInt(arg[0], 10) || 0;
+  const filterId = arg[0];
   const frequency = parseInt(arg[1], 10) || 0;
 
-  // Filter index must be within the length of the filters array
-  if (filterIndex < 0 || filterIndex >= state.filters.length) {
-    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+  // Filter id must exist
+  if (!checkFilterIdExistence(event, channel, filterId)) {
     return;
   }
 
   if (frequency < MIN_FREQUENCY || frequency > MAX_FREQUENCY) {
-    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    handleError(event, channel + filterId, ErrorCode.INVALID_PARAMETER);
     return;
   }
 
-  state.filters[filterIndex].frequency = frequency;
-  state.filters.sort(sortHelper);
-  await handleUpdate(event, channel + filterIndex);
+  state.filters[filterId].frequency = frequency;
+  await handleUpdate(event, channel + filterId);
 });
 
 ipcMain.on(ChannelEnum.GET_FILTER_QUALITY, async (event, arg) => {
   const channel = ChannelEnum.GET_FILTER_QUALITY;
-  const filterIndex = parseInt(arg[0], 10) || 0;
+  const filterId = arg[0];
 
-  // Filter index must be within the length of the filters array
-  if (filterIndex < 0 || filterIndex >= state.filters.length) {
-    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+  // Filter id must exist
+  if (!checkFilterIdExistence(event, channel, filterId)) {
     return;
   }
 
   const reply: TSuccess<number> = {
-    result: state.filters[filterIndex].quality || 10,
+    result: state.filters[filterId].quality || 10,
   };
-  event.reply(channel + filterIndex, reply);
+  event.reply(channel + filterId, reply);
 });
 
 ipcMain.on(ChannelEnum.SET_FILTER_QUALITY, async (event, arg) => {
   const channel = ChannelEnum.SET_FILTER_QUALITY;
-  const filterIndex = parseInt(arg[0], 10) || 0;
+  const filterId = arg[0];
   const quality = parseFloat(arg[1]) || 0;
 
-  // Filter index must be within the length of the filters array
-  if (filterIndex < 0 || filterIndex >= state.filters.length) {
-    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+  // Filter id must exist
+  if (!checkFilterIdExistence(event, channel, filterId)) {
     return;
   }
 
   if (quality < MIN_QUALITY || quality > MAX_QUALITY) {
-    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    handleError(event, channel + filterId, ErrorCode.INVALID_PARAMETER);
     return;
   }
 
-  state.filters[filterIndex].quality = quality;
-  await handleUpdate(event, channel + filterIndex);
+  state.filters[filterId].quality = quality;
+  await handleUpdate(event, channel + filterId);
 });
 
 ipcMain.on(ChannelEnum.GET_FILTER_TYPE, async (event, arg) => {
   const channel = ChannelEnum.GET_FILTER_TYPE;
-  const filterIndex = parseInt(arg[0], 10) || 0;
+  const filterId = arg[0];
 
-  // Filter index must be within the length of the filters array
-  if (filterIndex < 0 || filterIndex >= state.filters.length) {
-    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+  // Filter id must exist
+  if (!checkFilterIdExistence(event, channel, filterId)) {
     return;
   }
 
   const reply: TSuccess<string> = {
-    result: state.filters[filterIndex].type,
+    result: state.filters[filterId].type,
   };
-  event.reply(channel + filterIndex, reply);
+  event.reply(channel + filterId, reply);
 });
 
 ipcMain.on(ChannelEnum.SET_FILTER_TYPE, async (event, arg) => {
   const channel = ChannelEnum.SET_FILTER_TYPE;
-  const filterIndex = parseInt(arg[0], 10) || 0;
+  const filterId = arg[0];
   const filterType = arg[1];
 
-  // Filter index must be within the length of the filters array
-  if (filterIndex < 0 || filterIndex >= state.filters.length) {
-    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+  // Filter id must exist
+  if (!checkFilterIdExistence(event, channel, filterId)) {
     return;
   }
 
   if (!Object.values(FilterTypeEnum).includes(filterType)) {
-    handleError(event, channel + filterIndex, ErrorCode.INVALID_PARAMETER);
+    handleError(event, channel + filterId, ErrorCode.INVALID_PARAMETER);
     return;
   }
 
-  state.filters[filterIndex].type = filterType as FilterTypeEnum;
-  await handleUpdate(event, channel + filterIndex);
+  state.filters[filterId].type = filterType as FilterTypeEnum;
+  await handleUpdate(event, channel + filterId);
 });
 
 ipcMain.on(ChannelEnum.GET_FILTER_COUNT, async (event) => {
   const reply: TSuccess<number> = {
-    result: state.filters.length,
+    result: Object.keys(state.filters).length,
   };
   event.reply(ChannelEnum.GET_FILTER_COUNT, reply);
 });
 
 ipcMain.on(ChannelEnum.ADD_FILTER, async (event, arg) => {
   const channel = ChannelEnum.ADD_FILTER;
-  const insertIndex: number = arg[0];
+  const frequency: number = arg[0];
 
   // Cannot exceed the maximum number of filters
-  if (state.filters.length === MAX_NUM_FILTERS) {
+  // Frequency must be in valid range
+  if (
+    Object.keys(state.filters).length === MAX_NUM_FILTERS ||
+    frequency < MIN_FREQUENCY ||
+    frequency > MAX_FREQUENCY
+  ) {
     handleError(event, channel, ErrorCode.INVALID_PARAMETER);
     return;
   }
 
-  const frequency = computeAvgFreq(state.filters, insertIndex);
   const filterId = uid(8);
-  state.filters
-    .splice(insertIndex, 0, {
-      id: filterId,
-      frequency,
-      gain: 0,
-      quality: 1,
-      type: FilterTypeEnum.PK,
-    })
-    .sort(sortHelper);
+  state.filters[filterId] = {
+    ...getDefaultFilterWithId(),
+    id: filterId,
+    frequency,
+  };
   await handleUpdateHelper(event, channel, filterId);
 });
 
 ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
   const channel = ChannelEnum.REMOVE_FILTER;
-  const filterIndex: number = arg[0];
-
-  // Filter index must be within the length of the filters array
-  if (filterIndex < 0 || filterIndex >= state.filters.length) {
-    handleError(event, channel, ErrorCode.INVALID_PARAMETER);
-    return;
-  }
+  const filterId: string = arg[0];
 
   // Cannot fall below the minimum number of filters
-  if (state.filters.length === MIN_NUM_FILTERS) {
+  if (Object.keys(state.filters).length === MIN_NUM_FILTERS) {
     handleError(event, channel, ErrorCode.INVALID_PARAMETER);
     return;
   }
 
-  state.filters.splice(filterIndex, 1);
+  // Filter id must exist
+  if (!checkFilterIdExistence(event, channel, filterId)) {
+    return;
+  }
+
+  // delete does not throw exception even if the filterId does not exist
+  delete state.filters[filterId];
   await handleUpdate(event, channel);
 });
 

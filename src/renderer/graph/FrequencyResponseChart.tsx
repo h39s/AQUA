@@ -1,4 +1,4 @@
-import { IFilter } from 'common/constants';
+import { Filters, IFilter } from 'common/constants';
 import {
   useCallback,
   useEffect,
@@ -47,22 +47,16 @@ const FrequencyResponseChart = () => {
     preAmp,
     setPreAmp,
   } = useAquaContext();
-  const prevFilters = useRef<IFilter[]>([]);
+  const prevFilters = useRef<Filters>({});
   const prevFilterLines = useRef<IChartLineDataPointsById>({});
 
   const { chartData, autoPreAmpValue }: IGraphData = useMemo(() => {
     const controlPointByCurveId: { [id: string]: IChartPointData } = {};
 
-    // Identify the index of each filter by id from previous render
-    const prevIndices: { [id: string]: number } = {};
-    prevFilters.current.forEach((f, i) => {
-      prevIndices[f.id] = i;
-    });
-
     const updatedFilterLines: IChartLineDataPointsById = {};
 
     // Update filter lines that have changed
-    filters.forEach((filter) => {
+    Object.values(filters).forEach((filter) => {
       // Store control point info
       controlPointByCurveId[filter.id] = {
         x: filter.frequency,
@@ -70,14 +64,13 @@ const FrequencyResponseChart = () => {
       };
 
       // New filters have no previous data
-      const prevIndex = prevIndices[filter.id];
-      if (!prevIndex) {
+      if (!prevFilters.current[filter.id]) {
         updatedFilterLines[filter.id] = getFilterLineData(filter);
         return;
       }
 
       // Recompute filter line if it has been adjusted
-      if (!isFilterEqual(filter, prevFilters.current[prevIndex])) {
+      if (!isFilterEqual(filter, prevFilters.current[filter.id])) {
         updatedFilterLines[filter.id] = getFilterLineData(filter);
       } else {
         // Otherwise, reuse previous data

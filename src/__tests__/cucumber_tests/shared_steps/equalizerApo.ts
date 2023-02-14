@@ -1,5 +1,5 @@
 import { DefineStepFunction } from 'jest-cucumber';
-import { IState } from 'common/constants';
+import { getDefaultFilterWithId, IState } from 'common/constants';
 import { flush } from 'main/flush';
 import { getConfigPath, isEqualizerAPOInstalled } from 'main/registry';
 
@@ -19,7 +19,7 @@ export const givenCanWriteToAquaConfig = (given: DefineStepFunction) => {
       isAutoPreAmpOn: false,
       isGraphViewOn: false,
       preAmp: 0,
-      filters: [],
+      filters: { unique_id: getDefaultFilterWithId() },
     };
     const configDirPath = await getConfigPath();
     flush(emptyState, configDirPath);

@@ -6,6 +6,7 @@ import {
   IState,
   PRESETS_DIR,
 } from '../common/constants';
+import { validatePreset, validateState } from '../common/constants.validator';
 
 export const stateToString = (state: IState) => {
   if (!state.isEnabled) {
@@ -21,9 +22,10 @@ export const stateToString = (state: IState) => {
 
   // Using individual filter bands
   output = output.concat(
-    state.filters.flatMap(
-      ({ frequency, gain, type, quality }, index) =>
-        `Filter${index}: ON ${type} Fc ${frequency} Hz Gain ${gain} dB Q ${quality}`
+    Object.values(state.filters).map(
+      ({ frequency, gain, type, quality }, index) => {
+        return `Filter${index}: ON ${type} Fc ${frequency} Hz Gain ${gain} dB Q ${quality}`;
+      }
     )
   );
 
@@ -55,8 +57,13 @@ export const fetchSettings = () => {
     const content = fs.readFileSync(AQUA_LOCAL_CONFIG_FILENAME, {
       encoding: 'utf8',
     });
-    return JSON.parse(content) as IState;
+    const input = JSON.parse(content);
+    if (!validateState(input)) {
+      throw new Error('Invalid state file loaded. Using default state.');
+    }
+    return input as IState;
   } catch (ex) {
+    console.log(ex);
     // if unable to fetch the state, use a default one
     return getDefaultState();
   }
@@ -79,9 +86,13 @@ export const fetchPreset = (presetName: string) => {
     const content = fs.readFileSync(presetPath, {
       encoding: 'utf8',
     });
+    if (!validatePreset(content)) {
+      throw new Error('Invalid preset file');
+    }
     return JSON.parse(content) as IPreset;
   } catch (ex) {
     console.log('Failed to get presets!!');
+    console.log(ex);
     throw ex;
   }
 };

@@ -75,7 +75,7 @@ const FrequencyBand = forwardRef(
           id: filter.id,
           newValue,
         });
-        await setGain(sliderIndex, newValue);
+        await setGain(filter.id, newValue);
       },
       [dispatchFilter, filter.id, sliderIndex]
     );
@@ -92,7 +92,7 @@ const FrequencyBand = forwardRef(
           id: filter.id,
           newValue,
         });
-        await setQuality(sliderIndex, newValue);
+        await setQuality(filter.id, newValue);
       },
       [dispatchFilter, filter.id, sliderIndex]
     );
@@ -116,7 +116,7 @@ const FrequencyBand = forwardRef(
 
     const handleFrequencySubmit = async (newValue: number) => {
       try {
-        await setFrequency(sliderIndex, newValue);
+        await setFrequency(filter.id, newValue);
         dispatchFilter({
           type: FilterActionEnum.FREQUENCY,
           id: filter.id,
@@ -137,7 +137,7 @@ const FrequencyBand = forwardRef(
 
     const handleFilterTypeSubmit = async (newValue: string) => {
       try {
-        await setType(sliderIndex, newValue);
+        await setType(filter.id, newValue);
         dispatchFilter({
           type: FilterActionEnum.TYPE,
           id: filter.id,
@@ -155,7 +155,7 @@ const FrequencyBand = forwardRef(
 
       setIsLoading(true);
       try {
-        await removeEqualizerSlider(sliderIndex);
+        await removeEqualizerSlider(filter.id);
         dispatchFilter({ type: FilterActionEnum.REMOVE, id: filter.id });
       } catch (e) {
         setGlobalError(e as ErrorDescription);

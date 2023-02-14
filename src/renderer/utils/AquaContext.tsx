@@ -7,18 +7,16 @@ import {
   useReducer,
   useState,
 } from 'react';
-import { uid } from 'uid';
 import {
   FilterTypeEnum,
-  getDefaultFilter,
+  getDefaultFilterWithId,
   getDefaultState,
-  IFilter,
+  Filters,
   IState,
 } from '../../common/constants';
 import { ErrorDescription } from '../../common/errors';
-import { computeAvgFreq } from '../../common/utils';
+import { cloneFilters } from '../../common/utils';
 import { getEqualizerState } from './equalizerApi';
-import { sortHelper } from './utils';
 
 export enum FilterActionEnum {
   INIT,
@@ -36,10 +34,10 @@ type NumericalFilterAction =
   | FilterActionEnum.QUALITY;
 
 export type FilterAction =
-  | { type: FilterActionEnum.INIT; filters: IFilter[] }
+  | { type: FilterActionEnum.INIT; filters: Filters }
   | { type: NumericalFilterAction; id: string; newValue: number }
   | { type: FilterActionEnum.TYPE; id: string; newValue: FilterTypeEnum }
-  | { type: FilterActionEnum.ADD; id: string; index: number }
+  | { type: FilterActionEnum.ADD; id: string; frequency: number }
   | { type: FilterActionEnum.REMOVE; id: string };
 
 type FilterDispatch = (action: FilterAction) => void;
@@ -58,49 +56,50 @@ export interface IAquaContext extends IState {
 
 const AquaContext = createContext<IAquaContext | undefined>(undefined);
 
-type IFilterReducer = (filters: IFilter[], action: FilterAction) => IFilter[];
+type IFilterReducer = (filters: Filters, action: FilterAction) => Filters;
 
 const filterReducer: IFilterReducer = (
-  filters: IFilter[],
+  filters: Filters,
   action: FilterAction
 ) => {
   switch (action.type) {
     case FilterActionEnum.INIT:
-      // Keeping the check for the id for backwards compatibility
-      // TODO: Remove the id check once this is no longer a concern
-      return action.filters
-        .map((filter) => (filter.id ? filter : { ...filter, id: uid(8) }))
-        .sort(sortHelper);
-    case FilterActionEnum.FREQUENCY:
-      return filters
-        .map((f) =>
-          f.id === action.id ? { ...f, frequency: action.newValue } : f
-        )
-        .sort(sortHelper);
-    case FilterActionEnum.GAIN:
-      return filters.map((f) =>
-        f.id === action.id ? { ...f, gain: action.newValue } : f
-      );
-    case FilterActionEnum.QUALITY:
-      return filters.map((f) =>
-        f.id === action.id ? { ...f, quality: action.newValue } : f
-      );
-    case FilterActionEnum.TYPE:
-      return filters.map((f) =>
-        f.id === action.id ? { ...f, type: action.newValue } : f
-      );
-    case FilterActionEnum.ADD:
-      return [
-        ...filters.slice(0, action.index),
-        {
-          ...getDefaultFilter(),
-          id: action.id,
-          frequency: computeAvgFreq(filters, action.index),
-        },
-        ...filters.slice(action.index),
-      ].sort(sortHelper);
-    case FilterActionEnum.REMOVE:
-      return filters.filter(({ id }) => id !== action.id);
+      return action.filters;
+    case FilterActionEnum.FREQUENCY: {
+      const filtersCloned = cloneFilters(filters);
+      filtersCloned[action.id].frequency = action.newValue;
+      return filtersCloned;
+    }
+    case FilterActionEnum.GAIN: {
+      const filtersCloned = cloneFilters(filters);
+      console.log(filters);
+      filtersCloned[action.id].gain = action.newValue;
+      return filtersCloned;
+    }
+    case FilterActionEnum.QUALITY: {
+      const filtersCloned = cloneFilters(filters);
+      filtersCloned[action.id].quality = action.newValue;
+      return filtersCloned;
+    }
+    case FilterActionEnum.TYPE: {
+      const filtersCloned = cloneFilters(filters);
+      filtersCloned[action.id].type = action.newValue;
+      return filtersCloned;
+    }
+    case FilterActionEnum.ADD: {
+      const filtersCloned = cloneFilters(filters);
+      filtersCloned[action.id] = {
+        ...getDefaultFilterWithId(),
+        id: action.id,
+        frequency: action.frequency,
+      };
+      return filtersCloned;
+    }
+    case FilterActionEnum.REMOVE: {
+      const filtersCloned = cloneFilters(filters);
+      delete filtersCloned[action.id];
+      return filtersCloned;
+    }
     default:
       // This throw does not actually do anything because
       // we are in a reducer

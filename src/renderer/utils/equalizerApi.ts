@@ -197,12 +197,24 @@ export const getEqualizerState = (): Promise<IState> => {
 };
 
 /**
+ * Get the current equalizer status
+ * @deprecated - Removing with the context refactor
+ * @returns { Promise<boolean> } true for on, false for off, exception otherwise
+ */
+export const getEqualizerStatus = (): Promise<boolean> => {
+  const channel = ChannelEnum.GET_ENABLE;
+  window.electron.ipcRenderer.sendMessage(channel, []);
+
+  return promisifyResult(simpleResponseHandler<boolean>(), channel);
+};
+
+/**
  * Enable Equalizer
  * @returns { Promise<void> } exception if failed.
  */
 export const enableEqualizer = (): Promise<void> => {
   const channel = ChannelEnum.SET_ENABLE;
-  window.electron.ipcRenderer.sendMessage(channel, [1]);
+  window.electron.ipcRenderer.sendMessage(channel, [true]);
   return promisifyResult(setterResponseHandler, channel);
 };
 
@@ -212,7 +224,7 @@ export const enableEqualizer = (): Promise<void> => {
  */
 export const disableEqualizer = (): Promise<void> => {
   const channel = ChannelEnum.SET_ENABLE;
-  window.electron.ipcRenderer.sendMessage(channel, [0]);
+  window.electron.ipcRenderer.sendMessage(channel, [false]);
   return promisifyResult(setterResponseHandler, channel);
 };
 
@@ -257,18 +269,6 @@ export const disableGraphView = (): Promise<void> => {
 };
 
 /**
- * Get the current equalizer status
- * @deprecated - Removing with the context refactor
- * @returns { Promise<boolean> } true for on, false for off, exception otherwise
- */
-export const getEqualizerStatus = (): Promise<boolean> => {
-  const channel = ChannelEnum.GET_ENABLE;
-  window.electron.ipcRenderer.sendMessage(channel, []);
-
-  return promisifyResult(simpleResponseHandler<boolean>(), channel);
-};
-
-/**
  * Get the current main preamplification gain value
  * @deprecated - Removing with the context refactor
  * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
@@ -297,111 +297,111 @@ export const setMainPreAmp = (gain: number) => {
 /**
  * Get the a slider's gain value
  * @deprecated - Removing with the context refactor
- * @param {number} index - index of the slider being adjusted
+ * @param {string} filterId - id of the slider being adjusted
  * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
  */
-export const getGain = (index: number): Promise<number> => {
+export const getGain = (filterId: string): Promise<number> => {
   const channel = ChannelEnum.GET_FILTER_GAIN;
-  window.electron.ipcRenderer.sendMessage(channel, [index]);
-  return promisifyResult(simpleResponseHandler<number>(), channel + index);
+  window.electron.ipcRenderer.sendMessage(channel, [filterId]);
+  return promisifyResult(simpleResponseHandler<number>(), channel + filterId);
 };
 
 /**
  * Adjusts a slider's gain value
- * @param {number} index - index of the slider being adjusted
+ * @param {string} filterId - id of the slider being adjusted
  * @param {number} gain - new gain value in [-30, 30]
  */
-export const setGain = (index: number, gain: number) => {
+export const setGain = (filterId: string, gain: number) => {
   const channel = ChannelEnum.SET_FILTER_GAIN;
   if (gain > MAX_GAIN || gain < MIN_GAIN) {
     throw new Error(
       `Invalid gain value - outside of range [${MIN_GAIN}, ${MAX_GAIN}]`
     );
   }
-  window.electron.ipcRenderer.sendMessage(channel, [index, gain]);
-  return promisifyResult(setterResponseHandler, channel + index);
+  window.electron.ipcRenderer.sendMessage(channel, [filterId, gain]);
+  return promisifyResult(setterResponseHandler, channel + filterId);
 };
 
 /**
  * Get a slider's frequency
  * @deprecated - Removing with the context refactor
- * @param {number} index - index of the slider being adjusted
+ * @param {string} filterId - id of the slider being adjusted
  * @returns { Promise<number> } frequency - frequency value in the range [0, 20000]
  */
-export const getFrequency = (index: number): Promise<number> => {
+export const getFrequency = (filterId: string): Promise<number> => {
   const channel = ChannelEnum.GET_FILTER_FREQUENCY;
-  window.electron.ipcRenderer.sendMessage(channel, [index]);
-  return promisifyResult(simpleResponseHandler<number>(), channel + index);
+  window.electron.ipcRenderer.sendMessage(channel, [filterId]);
+  return promisifyResult(simpleResponseHandler<number>(), channel + filterId);
 };
 
 /**
  * Adjusts a slider's frequency
- * @param {number} index - index of the slider being adjusted
+ * @param {string} filterId - id of the slider being adjusted
  * @param {frequency} frequency - new frequency value in [0, 20000]
  */
-export const setFrequency = (index: number, frequency: number) => {
+export const setFrequency = (filterId: string, frequency: number) => {
   const channel = ChannelEnum.SET_FILTER_FREQUENCY;
   if (frequency < MIN_FREQUENCY || frequency > MAX_FREQUENCY) {
     throw new Error(
       `Invalid gain value - outside of range (${MIN_FREQUENCY}, ${MAX_FREQUENCY}]`
     );
   }
-  window.electron.ipcRenderer.sendMessage(channel, [index, frequency]);
-  return promisifyResult(setterResponseHandler, channel + index);
+  window.electron.ipcRenderer.sendMessage(channel, [filterId, frequency]);
+  return promisifyResult(setterResponseHandler, channel + filterId);
 };
 
 /**
  * Get a slider's quality
  * @deprecated - Removing with the context refactor
- * @param {number} index - index of the slider being adjusted
+ * @param {string} filterId - id of the slider being adjusted
  * @returns { Promise<number> } quality - value in the range [0.001, 999.999]
  */
-export const getQuality = (index: number): Promise<number> => {
+export const getQuality = (filterId: string): Promise<number> => {
   const channel = ChannelEnum.GET_FILTER_QUALITY;
-  window.electron.ipcRenderer.sendMessage(channel, [index]);
-  return promisifyResult(simpleResponseHandler<number>(), channel + index);
+  window.electron.ipcRenderer.sendMessage(channel, [filterId]);
+  return promisifyResult(simpleResponseHandler<number>(), channel + filterId);
 };
 
 /**
  * Adjusts a slider's quality
- * @param {number} index - index of the slider being adjusted
+ * @param {string} filterId - id of the slider being adjusted
  * @param {number} quality - new quality value in [0.001, 999.999]
  */
-export const setQuality = (index: number, quality: number) => {
+export const setQuality = (filterId: string, quality: number) => {
   const channel = ChannelEnum.SET_FILTER_QUALITY;
   if (quality < MIN_QUALITY || quality > MAX_QUALITY) {
     throw new Error(
       `Invalid quality value - outside of range [${MIN_QUALITY}, ${MAX_QUALITY}]`
     );
   }
-  window.electron.ipcRenderer.sendMessage(channel, [index, quality]);
-  return promisifyResult(setterResponseHandler, channel + index);
+  window.electron.ipcRenderer.sendMessage(channel, [filterId, quality]);
+  return promisifyResult(setterResponseHandler, channel + filterId);
 };
 
 /**
- * Get a slider's quality
+ * Get a slider's filter type
  * @deprecated - Removing with the context refactor
- * @param {number} index - index of the slider being adjusted
+ * @param {string} filterId - id of the slider being adjusted
  * @returns { Promise<FilterTypeEnum> } filter type - value in FilterTypeEnum
  */
-export const getType = (index: number): Promise<FilterTypeEnum> => {
+export const getType = (filterId: string): Promise<FilterTypeEnum> => {
   const channel = ChannelEnum.GET_FILTER_TYPE;
-  window.electron.ipcRenderer.sendMessage(channel, [index]);
+  window.electron.ipcRenderer.sendMessage(channel, [filterId]);
   return promisifyResult<FilterTypeEnum>(
     simpleResponseHandler<FilterTypeEnum>(),
-    channel + index
+    channel + filterId
   );
 };
 
 /**
  * Adjusts a slider's quality
- * @param {number} index - index of the slider being adjusted
+ * @param {string} filterId - id of the slider being adjusted
  * @param {string} filterType - new filter type
  */
-export const setType = (index: number, filterType: string) => {
+export const setType = (filterId: string, filterType: string) => {
   const channel = ChannelEnum.SET_FILTER_TYPE;
-  window.electron.ipcRenderer.sendMessage(channel, [index, filterType]);
-  return promisifyResult(setterResponseHandler, channel + index);
+  window.electron.ipcRenderer.sendMessage(channel, [filterId, filterType]);
+  return promisifyResult(setterResponseHandler, channel + filterId);
 };
 
 /**
@@ -417,21 +417,23 @@ export const getEqualizerSliderCount = (): Promise<number> => {
 
 /**
  * Add another slider
+ * @param {number} frequency - frequency of the new slider
  * @returns { Promise<void> } exception if failed
  */
-export const addEqualizerSlider = (index: number): Promise<string> => {
+export const addEqualizerSlider = (frequency: number): Promise<string> => {
   const channel = ChannelEnum.ADD_FILTER;
-  window.electron.ipcRenderer.sendMessage(channel, [index]);
+  window.electron.ipcRenderer.sendMessage(channel, [frequency]);
   return promisifyResult(simpleResponseHandler<string>(), channel);
 };
 
 /**
- * Remove rightmost slider
+ * Remove slider
+ * @param {string} filterId - id of the slider to be removed
  * @returns { Promise<void> } exception if failed
  */
-export const removeEqualizerSlider = (index: number): Promise<void> => {
+export const removeEqualizerSlider = (filterId: string): Promise<void> => {
   const channel = ChannelEnum.REMOVE_FILTER;
-  window.electron.ipcRenderer.sendMessage(channel, [index]);
+  window.electron.ipcRenderer.sendMessage(channel, [filterId]);
   return promisifyResult(setterResponseHandler, channel);
 };
 

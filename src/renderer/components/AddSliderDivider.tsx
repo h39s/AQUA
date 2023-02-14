@@ -6,13 +6,13 @@ import { FilterActionEnum, useAquaContext } from '../utils/AquaContext';
 import '../styles/AddSliderDivider.scss';
 
 interface IAddSliderDividerProps {
-  sliderIndex: number;
+  newSliderFrequency: number;
   isMaxSliderCount: boolean;
   style?: CSSProperties;
 }
 
 const AddSliderDivider = ({
-  sliderIndex,
+  newSliderFrequency,
   isMaxSliderCount,
   style,
 }: IAddSliderDividerProps) => {
@@ -24,18 +24,18 @@ const AddSliderDivider = ({
     [isLoading, isMaxSliderCount]
   );
 
-  const onAddEqualizerSlider = async (insertIndex: number) => {
+  const onAddEqualizerSlider = async (sliderFrequency: number) => {
     if (isAddDisabled) {
       return;
     }
 
     setIsLoading(true);
     try {
-      const filterId = await addEqualizerSlider(insertIndex);
+      const filterId = await addEqualizerSlider(sliderFrequency);
       dispatchFilter({
         type: FilterActionEnum.ADD,
         id: filterId,
-        index: insertIndex,
+        frequency: sliderFrequency,
       });
     } catch (e) {
       setGlobalError(e as ErrorDescription);
@@ -44,12 +44,9 @@ const AddSliderDivider = ({
     setIsLoading(false);
   };
 
-  const handleKeyUp = (
-    e: KeyboardEvent<HTMLDivElement>,
-    insertIndex: number
-  ) => {
+  const handleKeyUp = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.code === 'Enter') {
-      onAddEqualizerSlider(insertIndex);
+      onAddEqualizerSlider(newSliderFrequency);
     }
   };
 
@@ -58,8 +55,8 @@ const AddSliderDivider = ({
       role="button"
       ref={ref}
       className="col center addFilter"
-      onClick={() => onAddEqualizerSlider(sliderIndex + 1)}
-      onKeyUp={(e) => handleKeyUp(e, sliderIndex + 1)}
+      onClick={() => onAddEqualizerSlider(newSliderFrequency)}
+      onKeyUp={(e) => handleKeyUp(e)}
       tabIndex={0}
       aria-disabled={isAddDisabled}
       style={style}
