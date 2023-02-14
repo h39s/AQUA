@@ -7,26 +7,26 @@ import AddSliderDivider from './components/AddSliderDivider';
 import Spinner from './icons/Spinner';
 
 const MainContent = () => {
-  const { filters: sortedFilters, isLoading } = useAquaContext();
+  const { filters: freqSortedFilters, isLoading } = useAquaContext();
 
   // Store widths for AddSliderDividers and FrequencyBands so we can manually position them
   const DIVIDER_WIDTH = 28;
   const BAND_WIDTH = 72.94;
 
-  const [filters, sortIndexMap] = useMemo(() => {
+  const [idSortedFilters, sortIndexMap] = useMemo(() => {
     // Obtain a fixed order list of the filters
-    const fixedSort = sortedFilters
+    const fixedSort = freqSortedFilters
       .slice()
       .sort((a, b) => a.id.localeCompare(b.id));
 
     // Compute a mapping from a filter id to its sorted index
     const map: { [key: string]: number } = {};
-    sortedFilters.forEach((f, index) => {
+    freqSortedFilters.forEach((f, index) => {
       map[f.id] = index;
     });
 
     return [fixedSort, map];
-  }, [sortedFilters]);
+  }, [freqSortedFilters]);
 
   return isLoading ? (
     <div className="center full row">
@@ -48,16 +48,16 @@ const MainContent = () => {
       <div className="bands row center">
         <AddSliderDivider
           sliderIndex={-1}
-          isMaxSliderCount={filters.length >= MAX_NUM_FILTERS}
+          isMaxSliderCount={idSortedFilters.length >= MAX_NUM_FILTERS}
         />
-        {filters.map((filter) => {
+        {idSortedFilters.map((filter) => {
           const sliderIndex = sortIndexMap[filter.id];
           return (
             <Fragment key={`slider-${filter.id}`}>
               <FrequencyBand
                 sliderIndex={sliderIndex}
                 filter={filter}
-                isMinSliderCount={filters.length <= MIN_NUM_FILTERS}
+                isMinSliderCount={idSortedFilters.length <= MIN_NUM_FILTERS}
                 // Manually position the frequency band
                 style={{
                   transform: `translateX(${
@@ -67,7 +67,7 @@ const MainContent = () => {
               />
               <AddSliderDivider
                 sliderIndex={sliderIndex}
-                isMaxSliderCount={filters.length >= MAX_NUM_FILTERS}
+                isMaxSliderCount={idSortedFilters.length >= MAX_NUM_FILTERS}
                 // Manually position the divider
                 style={{
                   transform: `translateX(${
