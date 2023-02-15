@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { app } from 'electron';
-import { FilterTypeEnum, IPreset } from '../common/constants';
+import { FilterTypeEnum, IFilter, IPreset } from '../common/constants';
 
 let AUTOEQ_DIR = './resources/autoeq';
 if (!app.isPackaged) {
@@ -18,18 +18,81 @@ export const getAutoEqResponseList = (device: string) => {
 };
 
 export const getAutoEqPreset = (device: string, response: string) => {
-  // TODO: parse equalizer apo file and return data as a state
+  const PREAMP_REGEX = new RegExp('Preamp:[\\s]*([-][\\d]*[.][\\d]*)');
+
+  //         filter#               PK/LS/HS            <freq> HZ                 Gain <gain>     dB  Q         <quality>
+  const LINE_REGEX = new RegExp(
+    'Filter ([\\d]+)[:][a-zA-Z\\s]+(PK|LS|HS)[a-zA-Z\\s]+([\\d]+)[a-zA-Z\\s]+([-]?[\\d]*[.][\\d]*)[a-zA-Z\\s]+([\\d]*[.][\\d]*)'
+  );
+
+  let preAmpParsed = 0;
+  const filterIds: string[] = [];
+  const filterTypes: FilterTypeEnum[] = [];
+  const frequencies: number[] = [];
+  const gains: number[] = [];
+  const qualities: number[] = [];
+
+  // todo: how to use device and string??
+  const file = fs.readFileSync(
+    'A-Audio Elite (bass mode) ParametricEQ.txt',
+    'utf8'
+  );
+  file.split('\n').forEach((line) => {
+    if (line.match(PREAMP_REGEX)) {
+      const match = line.match(PREAMP_REGEX);
+      if (match == null || match.length !== 2) {
+        throw new Error(
+          `Preamp regex matched but could not extract all information for preamp: Length is: ${match.length}`
+        );
+      }
+      preAmpParsed = parseFloat(match[1]);
+    } else if (line.match(LINE_REGEX)) {
+      const match = line.match(LINE_REGEX);
+      if (match == null || match.length !== 6) {
+        throw new Error(
+          `Line regex matched but could not extract all information for filters. Length is: ${match.length}`
+        );
+      }
+      const filterId = match[1];
+      let filterType;
+      if (match[2] === 'PK') {
+        filterType = FilterTypeEnum.PK;
+      } else if (match[2] === 'LS') {
+        filterType = FilterTypeEnum.LSC;
+      } else if (match[2] === 'HS') {
+        filterType = FilterTypeEnum.HSC;
+      } else {
+        throw new Error('Unknown filter type');
+      }
+      const frequency = parseInt(match[3], 10);
+      const gain = parseFloat(match[4]);
+      const quality = parseFloat(match[5]);
+      filterIds.push(filterId);
+      filterTypes.push(filterType);
+      frequencies.push(frequency);
+      gains.push(gain);
+      qualities.push(quality);
+    }
+  });
+
+  const filtersList: IFilter[] = [];
+
+  // what is id here???
+  for (let i = 0; i < filterIds.length; i += 1) {
+    filtersList.push({
+      id: filterIds[i],
+      frequency: frequencies[i],
+      gain: gains[i],
+      type: filterTypes[i],
+      quality: qualities[i],
+    });
+  }
   const preset: IPreset = {
-    preAmp: 0.0,
-    filters: [
-      {
-        id: '0',
-        frequency: 100,
-        gain: 0.0,
-        type: FilterTypeEnum.PK,
-        quality: 1.0,
-      },
-    ],
+    preAmp: preAmpParsed,
+    filters: filtersList,
   };
+
+  console.log(preset);
+
   return preset;
 };
