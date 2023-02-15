@@ -40,6 +40,13 @@
       }
     }
 
+    // Clip content in the selected entry that exceeds the container
+    div:first-child {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow-x: clip;
+    }
+
     svg {
       width: 36px;
       height: auto;
@@ -55,12 +62,12 @@
     }
   }
 
-  .list {
+  .list-wrapper {
     // Position the drop down menu
     position: absolute;
     margin-block-start: -4px;
 
-    z-index: 1;
+    z-index: 2;
 
     svg {
       width: 36px;

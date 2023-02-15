@@ -262,6 +262,7 @@ const PresetsBar = () => {
         value={presetName}
         handleChange={handleChangeSelectedPreset}
         isDisabled={!!globalError}
+        emptyOptionsPlaceholder="No presets found."
       />
       <Button
         ariaLabel="Load selected preset"

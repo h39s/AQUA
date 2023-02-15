@@ -10,6 +10,7 @@ import ArrowIcon from '../icons/ArrowIcon';
 import '../styles/Dropdown.scss';
 import { useClickOutside, useFocusOutside } from '../utils/utils';
 import List from './List';
+import TextInput from './TextInput';
 
 interface IOptionEntry {
   value: string;
@@ -24,6 +25,7 @@ interface IDropdownProps {
   isDisabled: boolean;
   noSelectionPlaceholder?: JSX.Element | string;
   emptyOptionsPlaceholder?: JSX.Element | string;
+  isFilterable?: boolean;
   handleChange: (newValue: string) => void;
 }
 
@@ -35,10 +37,21 @@ const Dropdown = ({
   noSelectionPlaceholder,
   emptyOptionsPlaceholder,
   handleChange,
+  isFilterable = false,
 }: IDropdownProps) => {
   const nullElement = createElement('div');
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const [searchString, setSearchString] = useState<string>('');
+
+  const filteredOptions = useMemo(
+    () =>
+      options.filter((o) =>
+        o.value.toLowerCase().startsWith(searchString.toLowerCase())
+      ),
+    [options, searchString]
+  );
 
   useEffect(() => {
     if (isDisabled) {
@@ -107,10 +120,21 @@ const Dropdown = ({
         <List
           name={name}
           value={value}
-          options={options}
+          options={filteredOptions}
           isDisabled={isDisabled}
           handleChange={onChange}
-          focusOnRender
+          focusOnRender={!isFilterable}
+          startingItem={
+            isFilterable ? (
+              <TextInput
+                value={searchString}
+                ariaLabel="Filter audio devices"
+                isDisabled={isDisabled}
+                errorMessage=""
+                handleChange={(newValue) => setSearchString(newValue)}
+              />
+            ) : undefined
+          }
         />
       )}
     </div>
