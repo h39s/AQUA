@@ -20,6 +20,11 @@ $auto-eq-dropdown-width: 220px;
       width: $auto-eq-dropdown-width;
     }
 
+    // Add padding around the text input for filtering the drop down
+    .starting-item {
+      padding: $spacing-xs;
+    }
+
     .list {
       // Assign fixed width to dropdown menu
       width: $auto-eq-dropdown-width + $spacing-s;
