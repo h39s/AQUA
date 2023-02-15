@@ -1,5 +1,5 @@
 import { ErrorDescription } from 'common/errors';
-import { KeyboardEvent, useMemo, useRef, useState } from 'react';
+import { KeyboardEvent, useMemo, useRef, useState, CSSProperties } from 'react';
 import { addEqualizerSlider } from '../utils/equalizerApi';
 import PlusIcon from '../icons/PlusIcon';
 import { FilterActionEnum, useAquaContext } from '../utils/AquaContext';
@@ -8,11 +8,13 @@ import '../styles/AddSliderDivider.scss';
 interface IAddSliderDividerProps {
   sliderIndex: number;
   isMaxSliderCount: boolean;
+  style?: CSSProperties;
 }
 
 const AddSliderDivider = ({
   sliderIndex,
   isMaxSliderCount,
+  style,
 }: IAddSliderDividerProps) => {
   const { dispatchFilter, setGlobalError } = useAquaContext();
   const ref = useRef<HTMLDivElement>(null);
@@ -38,7 +40,6 @@ const AddSliderDivider = ({
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
-
     ref.current?.blur();
     setIsLoading(false);
   };
@@ -61,6 +62,7 @@ const AddSliderDivider = ({
       onKeyUp={(e) => handleKeyUp(e, sliderIndex + 1)}
       tabIndex={0}
       aria-disabled={isAddDisabled}
+      style={style}
     >
       <div className="divider" />
       <PlusIcon />

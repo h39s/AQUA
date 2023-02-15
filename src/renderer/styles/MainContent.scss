@@ -41,7 +41,10 @@
   .bands {
     position: relative;
     justify-content: flex-start;
-    padding: 0 $spacing-xxs; // add some horizontal padding so the outline isn't cut off at either end
+    padding: $spacing-xs $spacing-xxs; // add some horizontal padding so the outline isn't cut off at either end
+    // Add vertical padding so that having absolute positioning of the sliders does not result in the main content
+    // div cutting off the trash can icon
+    height: 100%;
     width: 100%;
     overflow-x: auto;
     overflow-y: hidden;

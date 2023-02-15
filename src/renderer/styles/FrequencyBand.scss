@@ -3,6 +3,10 @@
 @import 'spacing';
 
 .bandWrapper {
+  // For sorting frequency bands
+  position: absolute;
+  transition-duration: $sort-animate-duration;
+
   &:hover {
     .removeFilter {
       opacity: 1;

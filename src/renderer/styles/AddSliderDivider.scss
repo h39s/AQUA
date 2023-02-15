@@ -1,10 +1,15 @@
 @import 'color';
+@import 'constant';
 @import 'spacing';
 
 .addFilter {
   cursor: pointer;
   gap: $spacing-m;
   padding: 0 $spacing-s;
+
+  // For sorting frequency bands
+  position: absolute;
+  transition-duration: $sort-animate-duration;
 
   .divider {
     width: $spacing-xxs;
