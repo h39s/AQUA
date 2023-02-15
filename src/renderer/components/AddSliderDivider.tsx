@@ -1,5 +1,5 @@
 import { ErrorDescription } from 'common/errors';
-import { KeyboardEvent, useMemo, useRef, useState } from 'react';
+import { KeyboardEvent, useMemo, useRef, useState, CSSProperties } from 'react';
 import { addEqualizerSlider } from '../utils/equalizerApi';
 import PlusIcon from '../icons/PlusIcon';
 import { FilterActionEnum, useAquaContext } from '../utils/AquaContext';
@@ -8,7 +8,7 @@ import '../styles/AddSliderDivider.scss';
 interface IAddSliderDividerProps {
   sliderIndex: number;
   isMaxSliderCount: boolean;
-  style?: object;
+  style?: CSSProperties;
 }
 
 const AddSliderDivider = ({

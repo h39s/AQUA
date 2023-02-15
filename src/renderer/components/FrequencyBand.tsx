@@ -10,7 +10,14 @@ import {
   MIN_QUALITY,
 } from 'common/constants';
 import IconButton, { IconName } from 'renderer/widgets/IconButton';
-import { ForwardedRef, forwardRef, useMemo, useState, WheelEvent } from 'react';
+import {
+  ForwardedRef,
+  forwardRef,
+  useMemo,
+  useState,
+  WheelEvent,
+  CSSProperties,
+} from 'react';
 import { useThrottleAndExecuteLatest } from 'renderer/utils/utils';
 import { FILTER_OPTIONS } from '../icons/FilterTypeIcon';
 import Dropdown from '../widgets/Dropdown';
@@ -30,7 +37,7 @@ interface IFrequencyBandProps {
   sliderIndex: number;
   filter: IFilter;
   isMinSliderCount: boolean;
-  style?: object;
+  style?: CSSProperties;
 }
 
 const FrequencyBand = forwardRef(
