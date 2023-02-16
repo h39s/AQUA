@@ -57,7 +57,8 @@ export const getAutoEqPreset = (device: string, response: string) => {
       } else if (match[2] === 'HS') {
         filter.type = FilterTypeEnum.HSC;
       } else {
-        throw new Error(`Unknown filter type ${match[2]}`);
+        // We don't support other filters right now, use PK as default.
+        filter.type = FilterTypeEnum.PK;
       }
       filter.frequency = parseInt(match[3], 10);
       filter.gain = parseFloat(match[4]);
