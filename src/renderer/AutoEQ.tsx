@@ -36,21 +36,16 @@ const AutoEQ = () => {
   }, [setGlobalError]);
 
   // When user changes the current selected device, fetch the supported responses
-  useEffect(() => {
-    const fetchResponses = async () => {
-      try {
-        setResponses(await getAutoEqResponseList(currentDevice));
-        // Reset currentReponse to blank whenever it changes.
-        setCurrentResponse('');
-      } catch (e) {
-        setGlobalError(e as ErrorDescription);
-      }
-    };
-    // Skip checking for responses when we don't have a selected current device
-    if (currentDevice !== '') {
-      fetchResponses();
+  const handleDeviceChange = async (newValue: string) => {
+    try {
+      setResponses(await getAutoEqResponseList(newValue));
+      setCurrentDevice(newValue);
+      // Reset currentResponse to blank whenever it changes.
+      setCurrentResponse('');
+    } catch (e) {
+      setGlobalError(e as ErrorDescription);
     }
-  }, [currentDevice, setGlobalError]);
+  };
 
   const applyAutoEQ = async () => {
     try {
@@ -92,7 +87,7 @@ const AutoEQ = () => {
         name="Audio Device"
         options={deviceOptions}
         value={currentDevice}
-        handleChange={(newValue) => setCurrentDevice(newValue)}
+        handleChange={handleDeviceChange}
         isDisabled={!!globalError}
         noSelectionPlaceholder={NO_DEVICE_SELECTION}
       />
