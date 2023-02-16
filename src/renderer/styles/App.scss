@@ -28,7 +28,7 @@ body {
       'side-bar middle-content presets-bar'
       'graph-wrapper graph-wrapper graph-wrapper';
     grid-template-columns: minmax($sidebar-width, max-content) 1fr $preset-bar-width;
-    grid-template-rows: $equalizer-height repeat(1fr, 2);
+    grid-template-rows: $equalizer-height 1fr;
     gap: $spacing-s;
   }
 }

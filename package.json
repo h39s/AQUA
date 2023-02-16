@@ -252,7 +252,7 @@
           "**/*"
         ]
       },
-      "./auto_eq/**"
+      "./autoeq/**"
     ],
     "publish": {
       "provider": "github",
