@@ -11,7 +11,7 @@ import {
   FilterTypeEnum,
   getDefaultFilterWithId,
   getDefaultState,
-  Filters,
+  IFiltersMap,
   IState,
 } from '../../common/constants';
 import { ErrorDescription } from '../../common/errors';
@@ -34,7 +34,7 @@ type NumericalFilterAction =
   | FilterActionEnum.QUALITY;
 
 export type FilterAction =
-  | { type: FilterActionEnum.INIT; filters: Filters }
+  | { type: FilterActionEnum.INIT; filters: IFiltersMap }
   | { type: NumericalFilterAction; id: string; newValue: number }
   | { type: FilterActionEnum.TYPE; id: string; newValue: FilterTypeEnum }
   | { type: FilterActionEnum.ADD; id: string; frequency: number }
@@ -56,10 +56,13 @@ export interface IAquaContext extends IState {
 
 const AquaContext = createContext<IAquaContext | undefined>(undefined);
 
-type IFilterReducer = (filters: Filters, action: FilterAction) => Filters;
+type IFilterReducer = (
+  filters: IFiltersMap,
+  action: FilterAction
+) => IFiltersMap;
 
 const filterReducer: IFilterReducer = (
-  filters: Filters,
+  filters: IFiltersMap,
   action: FilterAction
 ) => {
   switch (action.type) {
@@ -72,7 +75,6 @@ const filterReducer: IFilterReducer = (
     }
     case FilterActionEnum.GAIN: {
       const filtersCloned = cloneFilters(filters);
-      console.log(filters);
       filtersCloned[action.id].gain = action.newValue;
       return filtersCloned;
     }

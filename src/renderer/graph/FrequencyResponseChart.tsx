@@ -1,4 +1,4 @@
-import { Filters, IFilter } from 'common/constants';
+import { IFiltersMap, IFilter } from 'common/constants';
 import {
   useCallback,
   useEffect,
@@ -47,7 +47,7 @@ const FrequencyResponseChart = () => {
     preAmp,
     setPreAmp,
   } = useAquaContext();
-  const prevFilters = useRef<Filters>({});
+  const prevFilters = useRef<IFiltersMap>({});
   const prevFilterLines = useRef<IChartLineDataPointsById>({});
 
   const { chartData, autoPreAmpValue }: IGraphData = useMemo(() => {
@@ -64,7 +64,7 @@ const FrequencyResponseChart = () => {
       };
 
       // New filters have no previous data
-      if (!prevFilters.current[filter.id]) {
+      if (!(filter.id in prevFilters.current)) {
         updatedFilterLines[filter.id] = getFilterLineData(filter);
         return;
       }

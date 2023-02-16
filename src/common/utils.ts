@@ -1,5 +1,5 @@
 import {
-  Filters,
+  IFiltersMap,
   IFilter,
   MAX_FREQUENCY,
   MIN_FREQUENCY,
@@ -27,10 +27,10 @@ export const computeAvgFreq = (
 export const isRestrictedPresetName = (newName: string) =>
   RESERVED_FILE_NAMES_SET.has(newName.toUpperCase());
 
-export const cloneFilters = (filters: Filters) => {
-  const filtersClone: Filters = {};
+export const cloneFilters = (filters: IFiltersMap) => {
+  const filtersClone: IFiltersMap = {};
   Object.entries(filters).forEach(([id, filter]) => {
-    filtersClone[id] = filter;
+    filtersClone[id] = { ...filter };
   });
   return filtersClone;
 };

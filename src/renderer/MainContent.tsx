@@ -6,6 +6,7 @@ import { useAquaContext } from './utils/AquaContext';
 import './styles/MainContent.scss';
 import AddSliderDivider from './components/AddSliderDivider';
 import Spinner from './icons/Spinner';
+import { sortHelper } from './utils/utils';
 
 const MainContent = () => {
   const { filters, isLoading } = useAquaContext();
@@ -21,13 +22,7 @@ const MainContent = () => {
     );
 
     // Obtain a visually sorted list of the filters
-    const visualSort = Object.values(filters).sort(
-      (a, b) =>
-        a.frequency - b.frequency ||
-        a.gain - b.gain ||
-        a.quality - b.quality ||
-        a.type.localeCompare(b.type)
-    );
+    const visualSort = Object.values(filters).sort(sortHelper);
 
     // Compute a mapping from a filter id to its sorted index
     const map: { [key: string]: number } = {};

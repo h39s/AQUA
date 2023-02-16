@@ -54,7 +54,7 @@ export const FILTER_REGEX = new RegExp(
 
 /** ----- Application Interfaces ----- */
 
-export interface Filters {
+export interface IFiltersMap {
   [key: string]: IFilter;
 } // key is the same id as whats in IFilter
 
@@ -71,12 +71,12 @@ export interface IState {
   isAutoPreAmpOn: boolean;
   isGraphViewOn: boolean;
   preAmp: number;
-  filters: Filters;
+  filters: IFiltersMap;
 }
 
 export interface IPreset {
   preAmp: number;
-  filters: Filters;
+  filters: IFiltersMap;
 }
 
 /** ----- Default Values ----- */
@@ -99,8 +99,8 @@ export const getDefaultFilterWithId = (): IFilter => {
   };
 };
 
-const getDefaultFilters = (): Filters => {
-  const filters: Filters = {};
+const getDefaultFilters = (): IFiltersMap => {
+  const filters: IFiltersMap = {};
   FIXED_FREQUENCIES.forEach((f) => {
     const filter: IFilter = { ...getDefaultFilterWithId(), frequency: f };
     filters[filter.id] = filter;

@@ -12,7 +12,6 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
-import { uid } from 'uid';
 import fs from 'fs';
 import { exec } from 'child_process';
 import {
@@ -34,6 +33,7 @@ import {
   FilterTypeEnum,
   IState,
   IPreset,
+  IFilter,
   MAX_FREQUENCY,
   MAX_GAIN,
   MAX_NUM_FILTERS,
@@ -199,7 +199,7 @@ const handleUpdate = async (
   return handleUpdateHelper<void>(event, channel, undefined);
 };
 
-const checkFilterIdExistence = (
+const doesFilterIdExist = (
   event: Electron.IpcMainEvent,
   channel: ChannelEnum,
   filterId: string
@@ -422,7 +422,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_GAIN, async (event, arg) => {
   const filterId = arg[0];
 
   // Filter id must exist
-  if (!checkFilterIdExistence(event, channel, filterId)) {
+  if (!doesFilterIdExist(event, channel, filterId)) {
     return;
   }
 
@@ -438,7 +438,7 @@ ipcMain.on(ChannelEnum.SET_FILTER_GAIN, async (event, arg) => {
   const gain = parseFloat(arg[1]) || 0;
 
   // Filter id must exist
-  if (!checkFilterIdExistence(event, channel, filterId)) {
+  if (!doesFilterIdExist(event, channel, filterId)) {
     return;
   }
 
@@ -456,7 +456,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_FREQUENCY, async (event, arg) => {
   const filterId = arg[0];
 
   // Filter id must exist
-  if (!checkFilterIdExistence(event, channel, filterId)) {
+  if (!doesFilterIdExist(event, channel, filterId)) {
     return;
   }
 
@@ -472,7 +472,7 @@ ipcMain.on(ChannelEnum.SET_FILTER_FREQUENCY, async (event, arg) => {
   const frequency = parseInt(arg[1], 10) || 0;
 
   // Filter id must exist
-  if (!checkFilterIdExistence(event, channel, filterId)) {
+  if (!doesFilterIdExist(event, channel, filterId)) {
     return;
   }
 
@@ -490,7 +490,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_QUALITY, async (event, arg) => {
   const filterId = arg[0];
 
   // Filter id must exist
-  if (!checkFilterIdExistence(event, channel, filterId)) {
+  if (!doesFilterIdExist(event, channel, filterId)) {
     return;
   }
 
@@ -506,7 +506,7 @@ ipcMain.on(ChannelEnum.SET_FILTER_QUALITY, async (event, arg) => {
   const quality = parseFloat(arg[1]) || 0;
 
   // Filter id must exist
-  if (!checkFilterIdExistence(event, channel, filterId)) {
+  if (!doesFilterIdExist(event, channel, filterId)) {
     return;
   }
 
@@ -524,7 +524,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_TYPE, async (event, arg) => {
   const filterId = arg[0];
 
   // Filter id must exist
-  if (!checkFilterIdExistence(event, channel, filterId)) {
+  if (!doesFilterIdExist(event, channel, filterId)) {
     return;
   }
 
@@ -540,7 +540,7 @@ ipcMain.on(ChannelEnum.SET_FILTER_TYPE, async (event, arg) => {
   const filterType = arg[1];
 
   // Filter id must exist
-  if (!checkFilterIdExistence(event, channel, filterId)) {
+  if (!doesFilterIdExist(event, channel, filterId)) {
     return;
   }
 
@@ -575,13 +575,9 @@ ipcMain.on(ChannelEnum.ADD_FILTER, async (event, arg) => {
     return;
   }
 
-  const filterId = uid(8);
-  state.filters[filterId] = {
-    ...getDefaultFilterWithId(),
-    id: filterId,
-    frequency,
-  };
-  await handleUpdateHelper(event, channel, filterId);
+  const newFilter: IFilter = { ...getDefaultFilterWithId(), frequency };
+  state.filters[newFilter.id] = newFilter;
+  await handleUpdateHelper(event, channel, newFilter.id);
 });
 
 ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
@@ -595,7 +591,7 @@ ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
   }
 
   // Filter id must exist
-  if (!checkFilterIdExistence(event, channel, filterId)) {
+  if (!doesFilterIdExist(event, channel, filterId)) {
     return;
   }
 
