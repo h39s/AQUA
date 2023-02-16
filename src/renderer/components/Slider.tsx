@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import NumberInput from '../widgets/NumberInput';
 import RangeInput from '../widgets/RangeInput';
 import { useAquaContext } from '../utils/AquaContext';
@@ -9,7 +9,7 @@ interface ISliderProps {
   min: number;
   max: number;
   value: number;
-  sliderHeight?: number;
+  sliderHeight?: string;
   label?: string;
   setValue: (newValue: number) => Promise<void>;
 }
@@ -19,7 +19,7 @@ const Slider = ({
   min,
   max,
   value,
-  sliderHeight = 150,
+  sliderHeight = '150px',
   label,
   setValue,
 }: ISliderProps) => {
@@ -33,9 +33,12 @@ const Slider = ({
     setSliderValue(value);
   }, [value]);
 
-  const handleChangeValue = async (newValue: number) => {
-    await setValue(newValue);
-  };
+  const handleChangeValue = useCallback(
+    async (newValue: number) => {
+      await setValue(newValue);
+    },
+    [setValue]
+  );
 
   const handleInput = async (newValue: number) => {
     setSliderValue(newValue);
@@ -49,7 +52,7 @@ const Slider = ({
         value={sliderValue}
         min={min}
         max={max}
-        width={sliderHeight}
+        height={sliderHeight}
         handleChange={handleInput}
         handleMouseUp={handleInput}
         isDisabled={!!globalError}

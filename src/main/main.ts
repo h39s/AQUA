@@ -64,14 +64,18 @@ let mainWindow: BrowserWindow | null = null;
 
 const setWindowDimension = (isExpanded: boolean) => {
   if (mainWindow) {
+    // The "-2" is necessary because otherwise the width will progressively keep increasing by 2
+    const currWidth = mainWindow.getSize()[0] - 2;
+    const currHeight = mainWindow.getSize()[1] - 2;
     if (isExpanded) {
-      mainWindow.setMaximumSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
-      mainWindow.setSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
       mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
+      mainWindow.setSize(
+        currWidth,
+        Math.max(currHeight, WINDOW_HEIGHT_EXPANDED)
+      );
     } else {
       mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-      mainWindow.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-      mainWindow.setMaximumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+      mainWindow.setSize(currWidth, WINDOW_HEIGHT);
     }
   }
 };
@@ -595,12 +599,10 @@ const createMainWindow = async () => {
     show: false,
     width: WINDOW_WIDTH,
     minWidth: WINDOW_WIDTH,
-    maxWidth: WINDOW_WIDTH,
     height: WINDOW_HEIGHT,
     minHeight: WINDOW_HEIGHT,
-    maxHeight: WINDOW_HEIGHT,
     icon: getAssetPath('icon.png'),
-    resizable: false,
+    resizable: true,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')

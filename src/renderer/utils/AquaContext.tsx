@@ -135,7 +135,7 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
   const [isAutoPreAmpOn, setAutoPreAmpOn] = useState<boolean>(
     DEFAULT_STATE.isAutoPreAmpOn
   );
-  const [isGraphViewOn, setGraphViewOn] = useState<boolean>(
+  const [isGraphViewOn, setIsGraphViewOn] = useState<boolean>(
     DEFAULT_STATE.isGraphViewOn
   );
   const [preAmp, setPreAmp] = useState<number>(DEFAULT_STATE.preAmp);
@@ -145,6 +145,12 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
   );
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const setGraphViewOn = (newValue: boolean) => {
+    setIsGraphViewOn(newValue);
+    const root = document.getElementById('root');
+    root?.setAttribute('class', newValue ? '' : 'minimized');
+  };
 
   const performHealthCheck = useCallback(async () => {
     setIsLoading(true);

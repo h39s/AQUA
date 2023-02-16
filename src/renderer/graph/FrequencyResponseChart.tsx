@@ -1,9 +1,16 @@
 import { IFilter } from 'common/constants';
-import { useEffect, useMemo, useRef } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import Spinner from 'renderer/icons/Spinner';
 import { useAquaContext } from 'renderer/utils/AquaContext';
 import { setMainPreAmp } from 'renderer/utils/equalizerApi';
-import { clamp } from 'renderer/utils/utils';
+import { clamp, useThrottleAndExecuteLatest } from 'renderer/utils/utils';
 import Chart, { ChartDimensions } from './Chart';
 import {
   IChartCurveData,
@@ -143,9 +150,36 @@ const FrequencyResponseChart = () => {
     }
   }, [autoPreAmpValue, isAutoPreAmpOn, isLoading, setPreAmp]);
 
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState<number>(1396);
+  const [height, setHeight] = useState<number>(380);
+
+  const updateDimensions = useCallback(() => {
+    const newWidth = ref.current?.clientWidth;
+    if (newWidth && newWidth > 0) {
+      setWidth(newWidth);
+    }
+    const newHeight = ref.current?.clientHeight;
+    if (newHeight && newHeight > 0) {
+      setHeight(newHeight);
+    }
+  }, []);
+
+  const throttle = useThrottleAndExecuteLatest(updateDimensions, 100);
+
+  useEffect(() => {
+    window.addEventListener('resize', throttle);
+    return () => window.removeEventListener('resize', throttle);
+  }, [throttle]);
+
+  useLayoutEffect(() => {
+    // Compute dimensions on initial render and when graph view is toggled
+    updateDimensions();
+  }, [isGraphViewOn, updateDimensions]);
+
   const dimensions: ChartDimensions = {
-    width: 1396,
-    height: 380,
+    width,
+    height,
     margins: {
       top: 30,
       right: 30,
@@ -157,7 +191,7 @@ const FrequencyResponseChart = () => {
   return (
     <>
       {isGraphViewOn && (
-        <div className="graph-wrapper">
+        <div className="graph-wrapper" ref={ref}>
           {isLoading ? (
             <div className="center full row">
               <Spinner />

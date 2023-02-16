@@ -1,4 +1,5 @@
 import { ErrorDescription } from 'common/errors';
+import { useCallback, useMemo } from 'react';
 import { disableAutoPreAmp, setMainPreAmp } from './utils/equalizerApi';
 import EqualizerEnablerSwitch from './components/EqualizerEnablerSwitch';
 import Slider from './components/Slider';
@@ -12,19 +13,34 @@ const SideBar = () => {
   const MIN = -30;
   const MAX = 30;
 
-  const { isLoading, preAmp, setGlobalError, setPreAmp, setAutoPreAmpOn } =
-    useAquaContext();
+  const {
+    isGraphViewOn,
+    isLoading,
+    preAmp,
+    setGlobalError,
+    setPreAmp,
+    setAutoPreAmpOn,
+  } = useAquaContext();
 
-  const setGain = async (newValue: number) => {
-    try {
-      setAutoPreAmpOn(false);
-      await disableAutoPreAmp();
-      await setMainPreAmp(newValue);
-      setPreAmp(newValue);
-    } catch (e) {
-      setGlobalError(e as ErrorDescription);
-    }
-  };
+  const setGain = useCallback(
+    async (newValue: number) => {
+      try {
+        setAutoPreAmpOn(false);
+        await disableAutoPreAmp();
+        await setMainPreAmp(newValue);
+        setPreAmp(newValue);
+      } catch (e) {
+        setGlobalError(e as ErrorDescription);
+      }
+    },
+    [setAutoPreAmpOn, setGlobalError, setPreAmp]
+  );
+
+  const sliderHeight = useMemo(
+    // Manually determine slider height
+    () => (isGraphViewOn ? '102px' : 'calc(100vh - 524px)'),
+    [isGraphViewOn]
+  );
 
   return (
     <div className="col side-bar center">
@@ -46,7 +62,7 @@ const SideBar = () => {
               min={MIN}
               max={MAX}
               value={preAmp}
-              sliderHeight={110}
+              sliderHeight={sliderHeight}
               setValue={setGain}
               label="-30 dB"
             />

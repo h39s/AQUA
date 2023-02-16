@@ -99,7 +99,7 @@ export const getDefaultState = (): IState => {
   return {
     isEnabled: true,
     isAutoPreAmpOn: true,
-    isGraphViewOn: true,
+    isGraphViewOn: true, // true as default so that spinner can be seen on initial load
     preAmp: 0,
     filters: getDefaultFilters(),
   };

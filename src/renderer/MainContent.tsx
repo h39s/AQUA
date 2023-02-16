@@ -35,15 +35,19 @@ const MainContent = () => {
   ) : (
     <div className="center main-content">
       <div className="col center band-label">
+        <span />
         <span className="row-label">Filter Type</span>
         <span className="row-label">Frequency (Hz)</span>
-        <div className="col">
-          <span>+30dB</span>
-          <span>0dB</span>
-          <span>-30dB</span>
-        </div>
+        <span />
+        <span>+30dB</span>
+        <span />
+        <span>0dB</span>
+        <span />
+        <span>-30dB</span>
+        <span />
         <span className="row-label">Gain (dB)</span>
         <span className="row-label">Quality</span>
+        <span />
       </div>
       <div className="bands row center">
         <AddSliderDivider

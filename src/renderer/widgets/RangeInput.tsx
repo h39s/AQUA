@@ -11,7 +11,7 @@ interface IRangeInputProps {
   isDisabled: boolean;
   incrementPrecision?: number;
   displayPrecision?: number;
-  width: number;
+  height: string;
   handleChange: (newValue: number) => Promise<void>;
   handleMouseUp: (newValue: number) => Promise<void>;
 }
@@ -24,7 +24,7 @@ const RangeInput = ({
   isDisabled,
   incrementPrecision = 0,
   displayPrecision = 1,
-  width,
+  height,
   handleChange,
   handleMouseUp,
 }: IRangeInputProps) => {
@@ -101,8 +101,8 @@ const RangeInput = ({
             '--min': min,
             '--max': max,
             '--val': rangeValue,
-            width: `${width}px`,
-            margin: `${width / 2}px 0px`,
+            width: `${height}`,
+            margin: `calc(${height} / 2) 0px`,
           } as CSSProperties
         }
       />

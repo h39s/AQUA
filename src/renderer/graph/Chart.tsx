@@ -19,11 +19,11 @@ interface IChartProps {
 const Chart = ({ data = [], dimensions }: IChartProps) => {
   const { width, height, margins } = dimensions;
   const svgWidth = useMemo(
-    () => width - margins.left - margins.right,
+    () => Math.max(width - margins.left - margins.right, 0),
     [width, margins]
   );
   const svgHeight = useMemo(
-    () => height - margins.top - margins.bottom,
+    () => Math.max(height - margins.top - margins.bottom, 0),
     [height, margins]
   );
 

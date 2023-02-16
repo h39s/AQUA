@@ -27,9 +27,18 @@ body {
     grid-template-areas:
       'side-bar main-content presets-bar'
       'graph-wrapper graph-wrapper graph-wrapper';
-    grid-template-columns: minmax($sidebar-width, max-content) 1fr $preset-bar-width;
+    grid-template-columns: $sidebar-width 1fr $preset-bar-width;
+
+    // Keep fixed height for equalizer when graph view is on
     grid-template-rows: $equalizer-height 1fr;
-    gap: $spacing-s;
+
+    &.minimized {
+      // Forcibly allow equalizer content to grow when graph view is off
+      grid-template-rows: 1fr;
+      row-gap: 0px;
+    }
+
+    gap: $spacing-m $spacing-s;
   }
 }
 
@@ -54,6 +63,9 @@ body {
   grid-area: graph-wrapper;
   border-radius: $spacing-m;
   border: $spacing-xxs solid $secondary-default;
+
+  // Prevent graph from overflowing out of the wrapper's available space
+  overflow: hidden;
 }
 
 .row {
