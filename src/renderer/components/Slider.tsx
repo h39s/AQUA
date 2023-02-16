@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import NumberInput from '../widgets/NumberInput';
 import RangeInput from '../widgets/RangeInput';
 import { useAquaContext } from '../utils/AquaContext';
-import { useThrottle } from '../utils/utils';
 import '../styles/Slider.scss';
 
 interface ISliderProps {
@@ -24,7 +23,6 @@ const Slider = ({
   label,
   setValue,
 }: ISliderProps) => {
-  const INTERVAL = 100;
   const { globalError } = useAquaContext();
 
   // Local copy of slider value used so that the number input increases smoothly while throttling EQ APO writes
@@ -47,18 +45,6 @@ const Slider = ({
     handleChangeValue(newValue);
   };
 
-  const throttledSetValue = useThrottle(handleChangeValue, INTERVAL);
-
-  // Helpers for adjusting the preAmp gain value
-  const handleChangeValueWithThrottle = async (newValue: number) => {
-    setSliderValue(newValue);
-    throttledSetValue(newValue);
-  };
-  const handleChangeValueWithoutThrottle = async (newValue: number) => {
-    setSliderValue(newValue);
-    handleChangeValue(newValue);
-  };
-
   return (
     <div className="col center slider">
       <RangeInput
@@ -67,8 +53,8 @@ const Slider = ({
         min={min}
         max={max}
         height={sliderHeight}
-        handleChange={handleChangeValueWithThrottle}
-        handleMouseUp={handleChangeValueWithoutThrottle}
+        handleChange={handleInput}
+        handleMouseUp={handleInput}
         isDisabled={!!globalError}
         incrementPrecision={0}
         displayPrecision={2}
