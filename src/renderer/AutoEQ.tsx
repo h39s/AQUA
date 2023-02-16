@@ -90,6 +90,7 @@ const AutoEQ = () => {
         handleChange={handleDeviceChange}
         isDisabled={!!globalError}
         noSelectionPlaceholder={NO_DEVICE_SELECTION}
+        isFilterable
       />
       Target Frequency Response:
       <Dropdown
