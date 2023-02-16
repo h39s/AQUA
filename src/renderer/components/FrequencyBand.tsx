@@ -35,7 +35,6 @@ import Slider from './Slider';
 import '../styles/FrequencyBand.scss';
 
 interface IFrequencyBandProps {
-  sliderIndex: number;
   filter: IFilter;
   isMinSliderCount: boolean;
   style?: CSSProperties;
@@ -43,7 +42,7 @@ interface IFrequencyBandProps {
 
 const FrequencyBand = forwardRef(
   (
-    { sliderIndex, filter, isMinSliderCount, style }: IFrequencyBandProps,
+    { filter, isMinSliderCount, style }: IFrequencyBandProps,
     ref: ForwardedRef<HTMLDivElement>
   ) => {
     const INTERVAL = 100;

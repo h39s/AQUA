@@ -64,7 +64,6 @@ const MainContent = () => {
           return (
             <Fragment key={`slider-${filter.id}`}>
               <FrequencyBand
-                sliderIndex={sliderIndex}
                 filter={filter}
                 isMinSliderCount={idSortedFilters.length <= MIN_NUM_FILTERS}
                 // Manually position the frequency band
