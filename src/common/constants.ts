@@ -47,6 +47,11 @@ export const WINDOW_HEIGHT_EXPANDED = 1036;
 
 export const PRESETS_DIR = 'presets';
 
+export const PREAMP_REGEX = new RegExp('^Preamp: (-\\d\\.\\d) dB$');
+export const FILTER_REGEX = new RegExp(
+  '^Filter [1-9]\\d?: ON (PK|LS|HS) Fc ([1-9]\\d{0,3}|[1,2]\\d{4}) Hz Gain (-?[1,2]?\\d\\.\\d) dB Q (\\d\\.\\d\\d)$'
+);
+
 /** ----- Application Interfaces ----- */
 
 export interface IFilter {

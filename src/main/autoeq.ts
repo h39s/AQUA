@@ -7,6 +7,8 @@ import {
   getDefaultFilter,
   IFilter,
   IPreset,
+  PREAMP_REGEX,
+  FILTER_REGEX,
 } from '../common/constants';
 
 let AUTOEQ_DIR = './resources/autoeq';
@@ -24,45 +26,64 @@ export const getAutoEqResponseList = (device: string) => {
 };
 
 export const getAutoEqPreset = (device: string, response: string) => {
-  const PREAMP_REGEX = new RegExp('Preamp:[\\s]*([-][\\d]*[.][\\d]*)');
-
-  // filter #: PK/LS/HS <freq> HZ Gain <gain> dB Q <quality>
-  const LINE_REGEX = new RegExp(
-    'Filter ([\\d]+)[:][a-zA-Z\\s]+(PK|LS|HS)[a-zA-Z\\s]+([\\d]+)[a-zA-Z\\s]+([-]?[\\d]*[.][\\d]*)[a-zA-Z\\s]+([\\d]*[.][\\d]*)'
-  );
-
   let preAmpParsed = 0;
   const filtersList: IFilter[] = [];
 
-  const file = fs.readFileSync(path.join(AUTOEQ_DIR, device, response), 'utf8');
-  file.split('\n').forEach((line) => {
-    let match = line.match(PREAMP_REGEX);
-    if (match) {
-      if (match.length !== 2) {
-        throw new Error(`Regex match error on ${line}`);
+  const filePath = path.join(AUTOEQ_DIR, device, response);
+  const file = fs.readFileSync(filePath, 'utf8');
+
+  file.split('\n').forEach((line, i) => {
+    const preampMatch = line.match(PREAMP_REGEX);
+    if (preampMatch) {
+      if (preampMatch.length !== 2) {
+        throw new Error(
+          `Preamp regex match error for AutoEQ file: ${filePath}`
+        );
       }
-      preAmpParsed = parseFloat(match[1]);
+
+      try {
+        preAmpParsed = parseFloat(preampMatch[1]);
+      } catch (err) {
+        throw new Error(
+          `Preamp float parse error for AutoEQ file: ${filePath}`
+        );
+      }
       return;
     }
-    const filter: IFilter = getDefaultFilter();
-    match = line.match(LINE_REGEX);
-    if (match) {
-      if (match.length !== 6) {
-        throw new Error(`Regex match error on ${line}`);
+
+    const filterMatch = line.match(FILTER_REGEX);
+    if (filterMatch) {
+      if (filterMatch.length !== 5) {
+        throw new Error(
+          `Filter regex match error on line ${i} for AutoEQ file: ${filePath}`
+        );
       }
-      if (match[2] === 'PK') {
-        filter.type = FilterTypeEnum.PK;
-      } else if (match[2] === 'LS') {
-        filter.type = FilterTypeEnum.LSC;
-      } else if (match[2] === 'HS') {
-        filter.type = FilterTypeEnum.HSC;
-      } else {
-        // We don't support other filters right now, use PK as default.
-        filter.type = FilterTypeEnum.PK;
+
+      const filter: IFilter = getDefaultFilter();
+      switch (filterMatch[1]) {
+        case 'PK':
+          filter.type = FilterTypeEnum.PK;
+          break;
+        case 'LS':
+          filter.type = FilterTypeEnum.LSC;
+          break;
+        case 'HS':
+          filter.type = FilterTypeEnum.HSC;
+          break;
+        default:
+          throw new Error(
+            `Filter type not (PK|LS|HS) on line ${i} for AutoEQ file: ${filePath}`
+          );
       }
-      filter.frequency = parseInt(match[3], 10);
-      filter.gain = parseFloat(match[4]);
-      filter.quality = parseFloat(match[5]);
+      try {
+        filter.frequency = Math.min(parseInt(filterMatch[2], 10), 20000);
+        filter.gain = parseFloat(filterMatch[3]);
+        filter.quality = parseFloat(filterMatch[4]);
+      } catch (err) {
+        throw new Error(
+          `Filter parameter parse error on line ${i} for AutoEQ file: ${filePath}`
+        );
+      }
       filtersList.push(filter);
     }
     // Ignore any lines which we do not recognize
