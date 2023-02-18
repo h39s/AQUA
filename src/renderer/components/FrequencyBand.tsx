@@ -76,7 +76,7 @@ const FrequencyBand = forwardRef(
         });
         await setGain(filter.id, newValue);
       },
-      [dispatchFilter, filter.id, sliderIndex]
+      [dispatchFilter, filter.id]
     );
 
     const throttleSetGain = useThrottleAndExecuteLatest(
@@ -93,7 +93,7 @@ const FrequencyBand = forwardRef(
         });
         await setQuality(filter.id, newValue);
       },
-      [dispatchFilter, filter.id, sliderIndex]
+      [dispatchFilter, filter.id]
     );
 
     const throttleSetQuality = useThrottleAndExecuteLatest(
