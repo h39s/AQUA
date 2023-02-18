@@ -56,7 +56,7 @@ describe('flush', () => {
           },
         },
       });
-      fs.writeFileSync(presetName, content, {
+      fs.writeFileSync(path.join(PRESETS_DIR, presetName), content, {
         encoding: 'utf8',
       });
     });
