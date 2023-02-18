@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import { app } from 'electron';
-import { uid } from 'uid';
 import {
   FilterTypeEnum,
   getDefaultFilter,
@@ -94,8 +93,6 @@ export const getAutoEqPreset = (device: string, response: string) => {
     preAmp: preAmpParsed,
     filters: filtersList.slice(0, MAX_NUM_FILTERS),
   };
-
-  console.log(preset);
 
   return preset;
 };
