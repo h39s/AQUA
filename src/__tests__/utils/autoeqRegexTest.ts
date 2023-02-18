@@ -19,16 +19,10 @@ headphones.forEach((headphone) => {
       throw new Error(
         `Preamp regex match error for AutoEQ file: ${eqFilePath}`
       );
-    } else {
-      let preamp = 0.0;
-      try {
-        preamp = parseFloat(preampMatch[1]);
-        // console.log(`Preamp: ${preamp} dB`);
-      } catch (err) {
-        throw new Error(
-          `Preamp float parse error for AutoEQ file: ${eqFilePath}`
-        );
-      }
+    } else if (Number.isNaN(parseFloat(preampMatch[1]))) {
+      throw new Error(
+        `Preamp float parse error for AutoEQ file: ${eqFilePath}`
+      );
     }
 
     for (let i = 1; i < eqLines.length; i += 1) {
