@@ -7,6 +7,7 @@ import {
   getDefaultFilter,
   IFilter,
   IPreset,
+  MAX_NUM_FILTERS,
   PREAMP_REGEX,
   FILTER_REGEX,
 } from '../common/constants';
@@ -91,7 +92,7 @@ export const getAutoEqPreset = (device: string, response: string) => {
 
   const preset: IPreset = {
     preAmp: preAmpParsed,
-    filters: filtersList,
+    filters: filtersList.slice(0, MAX_NUM_FILTERS),
   };
 
   console.log(preset);
