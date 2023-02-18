@@ -74,7 +74,12 @@ export interface IState {
   filters: IFiltersMap;
 }
 
-export interface IPreset {
+export interface IPresetV1 {
+  preAmp: number;
+  filters: IFilter[];
+}
+
+export interface IPresetV2 {
   preAmp: number;
   filters: IFiltersMap;
 }

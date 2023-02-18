@@ -24,6 +24,8 @@ import {
   fetchPreset,
   renamePreset,
   doesPresetExist,
+  PRESETS_DIR,
+  deletePreset,
 } from './flush';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -32,7 +34,7 @@ import ChannelEnum from '../common/channels';
 import {
   FilterTypeEnum,
   IState,
-  IPreset,
+  IPresetV2,
   IFilter,
   MAX_FREQUENCY,
   MAX_GAIN,
@@ -45,7 +47,6 @@ import {
   WINDOW_HEIGHT,
   WINDOW_HEIGHT_EXPANDED,
   WINDOW_WIDTH,
-  PRESETS_DIR,
   getDefaultFilterWithId,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
@@ -227,7 +228,7 @@ ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, arg) => {
 
   // TODO: should we do some str checking here?
   try {
-    const presetSettings: IPreset = fetchPreset(presetName);
+    const presetSettings: IPresetV2 = fetchPreset(presetName, PRESETS_DIR);
     state.preAmp = presetSettings.preAmp;
     state.filters = presetSettings.filters;
     await handleUpdate(event, channel);
@@ -249,10 +250,14 @@ ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, arg) => {
       return;
     }
 
-    savePreset(presetName, {
-      preAmp: state.preAmp,
-      filters: state.filters,
-    });
+    savePreset(
+      presetName,
+      {
+        preAmp: state.preAmp,
+        filters: state.filters,
+      },
+      PRESETS_DIR
+    );
     await handleUpdate(event, channel);
   } catch (e) {
     handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
@@ -265,11 +270,9 @@ ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, arg) => {
   const pathToDelete = path.join(PRESETS_DIR, presetName);
   console.log(`Deleting preset: ${presetName} at location ${pathToDelete}`);
   try {
-    fs.unlinkSync(pathToDelete);
+    deletePreset(presetName, PRESETS_DIR);
     await handleUpdate(event, channel);
   } catch (e) {
-    console.log('Failed to delete preset');
-    console.log(e);
     handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
   }
 });
@@ -286,12 +289,15 @@ ipcMain.on(ChannelEnum.RENAME_PRESET, async (event, arg) => {
 
   try {
     // Validate the provided name
-    if (isRestrictedPresetName(newName) || doesPresetExist(newName)) {
+    if (
+      isRestrictedPresetName(newName) ||
+      doesPresetExist(newName, PRESETS_DIR)
+    ) {
       handleError(event, channel, ErrorCode.INVALID_PRESET_NAME);
       return;
     }
 
-    renamePreset(oldName, newName);
+    renamePreset(oldName, newName, PRESETS_DIR);
     await handleUpdate(event, channel);
   } catch (e) {
     handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);

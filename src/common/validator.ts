@@ -23,7 +23,7 @@ const IStateSchema = {
       enum: ['HSC', 'LSC', 'PK'],
       type: 'string',
     },
-    Filters: {
+    IFiltersMap: {
       additionalProperties: {
         $ref: '#/definitions/IFilter',
       },
@@ -56,7 +56,7 @@ const IStateSchema = {
   },
   properties: {
     filters: {
-      $ref: '#/definitions/Filters',
+      $ref: '#/definitions/IFiltersMap',
     },
     isAutoPreAmpOn: {
       type: 'boolean',
@@ -81,7 +81,53 @@ const IStateSchema = {
   type: 'object',
 };
 
-const IPresetSchema = {
+export const IPresetSchemaV1 = {
+  $schema: 'http://json-schema.org/draft-07/schema#',
+  defaultProperties: [],
+  definitions: {
+    FilterTypeEnum: {
+      enum: ['HSC', 'LSC', 'PK'],
+      type: 'string',
+    },
+    IFilter: {
+      defaultProperties: [],
+      properties: {
+        frequency: {
+          type: 'number',
+        },
+        gain: {
+          type: 'number',
+        },
+        id: {
+          type: 'string',
+        },
+        quality: {
+          type: 'number',
+        },
+        type: {
+          $ref: '#/definitions/FilterTypeEnum',
+        },
+      },
+      required: ['frequency', 'gain', 'id', 'quality', 'type'],
+      type: 'object',
+    },
+  },
+  properties: {
+    filters: {
+      items: {
+        $ref: '#/definitions/IFilter',
+      },
+      type: 'array',
+    },
+    preAmp: {
+      type: 'number',
+    },
+  },
+  required: ['filters', 'preAmp'],
+  type: 'object',
+};
+
+const IPresetSchemaV2 = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   defaultProperties: [],
   definitions: {
@@ -133,4 +179,5 @@ const IPresetSchema = {
 };
 
 export const validateState = ajv.compile(IStateSchema);
-export const validatePreset = ajv.compile(IPresetSchema);
+export const validatePresetV1 = ajv.compile(IPresetSchemaV1);
+export const validatePresetV2 = ajv.compile(IPresetSchemaV2);
