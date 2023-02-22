@@ -91,7 +91,9 @@ export const getAutoEqPreset = (device: string, response: string) => {
 
   const preset: IPreset = {
     preAmp: preAmpParsed,
-    filters: filtersList.slice(0, MAX_NUM_FILTERS),
+    filters: filtersList
+      .sort((a: IFilter, b: IFilter) => a.frequency - b.frequency)
+      .slice(0, MAX_NUM_FILTERS),
   };
 
   return preset;
