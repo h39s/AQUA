@@ -174,7 +174,7 @@ const FrequencyBand = forwardRef(
 
     const sliderHeight = useMemo(
       // Manually determine slider height
-      () => (isGraphViewOn ? '286px' : 'calc(100vh - 340px)'),
+      () => (isGraphViewOn ? '228px' : 'calc(100vh - 398px)'),
       [isGraphViewOn]
     );
 
