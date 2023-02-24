@@ -88,13 +88,15 @@ const setWindowDimension = (isExpanded: boolean) => {
 /** ----- Equalizer APO Implementation ----- */
 
 // Load initial state from local state file
-const state: IState = fetchSettings();
+const userDataDir = app.getPath('userData');
+const presetPath = path.join(userDataDir, PRESETS_DIR);
+const state: IState = fetchSettings(userDataDir);
 let configPath = '';
 
 try {
   // create presets dir if it doesn't exist
-  if (!fs.existsSync(PRESETS_DIR)) {
-    fs.mkdirSync(PRESETS_DIR);
+  if (!fs.existsSync(presetPath)) {
+    fs.mkdirSync(presetPath);
   }
 } catch (e) {
   console.error('Failed to make presets directory!!');
@@ -104,8 +106,6 @@ try {
 
 try {
   // update presets folder to support case-sensitive files
-  const presetPath = path.join(process.cwd(), PRESETS_DIR);
-
   exec(
     `fsutil.exe file SetCaseSensitiveInfo "${presetPath}"`,
     (err, stdout) => {
@@ -190,7 +190,7 @@ const handleUpdateHelper = async <T>(
   event.reply(channel, reply);
 
   // Flush changes to our local state file after informing UI that the changes have been applied
-  save(state);
+  save(state, userDataDir);
 };
 
 const handleUpdate = async (
@@ -228,7 +228,7 @@ ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, arg) => {
 
   // TODO: should we do some str checking here?
   try {
-    const presetSettings: IPresetV2 = fetchPreset(presetName, PRESETS_DIR);
+    const presetSettings: IPresetV2 = fetchPreset(presetName, presetPath);
     state.preAmp = presetSettings.preAmp;
     state.filters = presetSettings.filters;
     await handleUpdate(event, channel);
@@ -256,7 +256,7 @@ ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, arg) => {
         preAmp: state.preAmp,
         filters: state.filters,
       },
-      PRESETS_DIR
+      presetPath
     );
     await handleUpdate(event, channel);
   } catch (e) {
@@ -267,10 +267,10 @@ ipcMain.on(ChannelEnum.SAVE_PRESET, async (event, arg) => {
 ipcMain.on(ChannelEnum.DELETE_PRESET, async (event, arg) => {
   const channel = ChannelEnum.DELETE_PRESET;
   const presetName = arg[0];
-  const pathToDelete = path.join(PRESETS_DIR, presetName);
+  const pathToDelete = path.join(presetPath, presetName);
   console.log(`Deleting preset: ${presetName} at location ${pathToDelete}`);
   try {
-    deletePreset(presetName, PRESETS_DIR);
+    deletePreset(presetName, presetPath);
     await handleUpdate(event, channel);
   } catch (e) {
     handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
@@ -291,13 +291,13 @@ ipcMain.on(ChannelEnum.RENAME_PRESET, async (event, arg) => {
     // Validate the provided name
     if (
       isRestrictedPresetName(newName) ||
-      doesPresetExist(newName, PRESETS_DIR)
+      doesPresetExist(newName, presetPath)
     ) {
       handleError(event, channel, ErrorCode.INVALID_PRESET_NAME);
       return;
     }
 
-    renamePreset(oldName, newName, PRESETS_DIR);
+    renamePreset(oldName, newName, presetPath);
     await handleUpdate(event, channel);
   } catch (e) {
     handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
@@ -309,7 +309,7 @@ ipcMain.on(ChannelEnum.GET_PRESET_FILE_LIST, async (event) => {
   console.log(`Getting Preset List`);
 
   try {
-    const fileNames: string[] = fs.readdirSync(PRESETS_DIR);
+    const fileNames: string[] = fs.readdirSync(presetPath);
     console.log(fileNames);
     const reply: TSuccess<string[]> = { result: fileNames };
     event.reply(channel, reply);

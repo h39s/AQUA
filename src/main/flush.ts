@@ -48,7 +48,7 @@ export const serializePreset = (preset: IPresetV2) => {
 };
 
 const CONFIG_CONTENT = 'Include: aqua.txt';
-export const AQUA_LOCAL_CONFIG_FILENAME = 'state.txt';
+const AQUA_LOCAL_CONFIG_FILENAME = 'state.txt';
 export const AQUA_CONFIG_FILENAME = 'aqua.txt';
 const CONFIG_FILENAME = 'config.txt';
 export const PRESETS_DIR = 'presets';
@@ -57,9 +57,10 @@ const addFileToPath = (pathPrefix: string, fileName: string) => {
   return path.join(pathPrefix, fileName);
 };
 
-export const fetchSettings = () => {
+export const fetchSettings = (settingsDir: string) => {
+  const settingsPath = path.join(settingsDir, AQUA_LOCAL_CONFIG_FILENAME);
   try {
-    const content = fs.readFileSync(AQUA_LOCAL_CONFIG_FILENAME, {
+    const content = fs.readFileSync(settingsPath, {
       encoding: 'utf8',
     });
     const input = JSON.parse(content);
@@ -74,13 +75,14 @@ export const fetchSettings = () => {
   }
 };
 
-export const save = (state: IState) => {
+export const save = (state: IState, settingsDir: string) => {
+  const settingsPath = path.join(settingsDir, AQUA_LOCAL_CONFIG_FILENAME);
   try {
-    fs.writeFileSync(AQUA_LOCAL_CONFIG_FILENAME, serializeState(state), {
+    fs.writeFileSync(settingsPath, serializeState(state), {
       encoding: 'utf8',
     });
   } catch (ex) {
-    console.log('Failed to save to %d', AQUA_LOCAL_CONFIG_FILENAME);
+    console.log(`Failed to save to ${settingsPath}`);
     throw ex;
   }
 };
