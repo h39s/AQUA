@@ -17,7 +17,7 @@ $auto-eq-dropdown-width: 220px;
 
   .dropdown {
     [role='menu'] {
-      width: $auto-eq-dropdown-width;
+      width: calc(100% - $spacing-m);
     }
 
     // Add padding around the text input for filtering the drop down
@@ -25,9 +25,13 @@ $auto-eq-dropdown-width: 220px;
       padding: $spacing-xs;
     }
 
+    .list-wrapper {
+      // For some reason the spacing is 4px off from the .dropdown class, this adjustment is necessary for the menu and the dropdown to have the same width
+      width: calc(100% - $spacing-s);
+    }
+
     .list {
       // Assign fixed width to dropdown menu
-      width: $auto-eq-dropdown-width + $spacing-s;
       max-height: 150px;
     }
   }

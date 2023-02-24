@@ -69,9 +69,8 @@ let mainWindow: BrowserWindow | null = null;
 
 const setWindowDimension = (isExpanded: boolean) => {
   if (mainWindow) {
-    // The "-2" is necessary because otherwise the width will progressively keep increasing by 2
-    const currWidth = mainWindow.getSize()[0] - 2;
-    const currHeight = mainWindow.getSize()[1] - 2;
+    const currWidth = mainWindow.getSize()[0];
+    const currHeight = mainWindow.getSize()[1];
     if (isExpanded) {
       mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
       mainWindow.setSize(
