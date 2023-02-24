@@ -98,7 +98,8 @@ export const healthCheck = (): Promise<void> => {
 };
 
 /**
- * Load preset into the current equalizer sliders
+ * Load preset into backend state
+ * @param {string} presetName - name of preset to load
  * @returns { Promise<void> } exception if failed
  */
 export const loadPreset = (presetName: string): Promise<void> => {
@@ -109,6 +110,7 @@ export const loadPreset = (presetName: string): Promise<void> => {
 
 /**
  * Save preset into preset file
+ * @param {string} presetName - name to save preset under
  * @returns { Promise<void> } if save was successful
  */
 export const savePreset = (presetName: string): Promise<void> => {
@@ -119,6 +121,7 @@ export const savePreset = (presetName: string): Promise<void> => {
 
 /**
  * Delete a preset file in preset folder
+ * @param {string} presetName - preset to delete
  * @returns { Promise<void> } if delete was successful
  */
 export const deletePreset = (presetName: string): Promise<void> => {
@@ -127,8 +130,10 @@ export const deletePreset = (presetName: string): Promise<void> => {
   return promisifyResult(setterResponseHandler, channel);
 };
 
-/*
+/**
  * Rename preset from an old name to a new one
+ * @param {string} oldName - preset name to change
+ * @param {string} newName - new preset name
  * @returns { Promise<void> } if rename was successful
  */
 export const renamePreset = (
@@ -162,6 +167,7 @@ export const getAutoEqDeviceList = (): Promise<string[]> => {
 
 /**
  * Get a list of supported auto eq responses for the given device
+ * @param {string} deviceName - device to search auto eq presets under
  * @returns { Promise<string[]> } exception if failed.
  */
 export const getAutoEqResponseList = (
@@ -173,7 +179,9 @@ export const getAutoEqResponseList = (
 };
 
 /**
- * Load autoeq preset for given device name and response into the current equalizer sliders
+ * Load autoeq preset for given device name and response into the backend state
+ * @param {string} deviceName - device to search auto eq presets under
+ * @param {string} responseName - response to load
  * @returns { Promise<void> } exception if failed
  */
 export const loadAutoEqPreset = (
@@ -394,7 +402,7 @@ export const getType = (filterId: string): Promise<FilterTypeEnum> => {
 };
 
 /**
- * Adjusts a slider's quality
+ * Adjusts a slider's filter type
  * @param {string} filterId - id of the slider being adjusted
  * @param {string} filterType - new filter type
  */

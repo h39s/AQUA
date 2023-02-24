@@ -358,7 +358,7 @@ ipcMain.on(ChannelEnum.LOAD_AUTO_EQ_PRESET, async (event, arg) => {
   const [deviceName, responseName] = arg;
 
   try {
-    const presetSettings: IPreset = getAutoEqPreset(deviceName, responseName);
+    const presetSettings: IPresetV2 = getAutoEqPreset(deviceName, responseName);
     state.preAmp = presetSettings.preAmp;
     state.filters = presetSettings.filters;
     await handleUpdate(event, channel);

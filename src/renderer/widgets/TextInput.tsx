@@ -111,6 +111,9 @@ const TextInput = forwardRef(
     );
 
     const onClick = useCallback((e: MouseEvent) => {
+      // When double clicking, consume the event so that user manipulations
+      // on the textbox don't trigger behaviour of parent elements that are
+      // technically not in focus
       if (e?.detail === 2) {
         e.stopPropagation();
       }
