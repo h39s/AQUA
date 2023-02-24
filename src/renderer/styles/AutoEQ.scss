@@ -1,11 +1,12 @@
 @import 'color';
+@import 'constant';
 @import 'spacing';
 
 $auto-eq-dropdown-width: 220px;
 
 .auto-eq {
   display: grid;
-  grid-template-columns: max-content 1fr max-content 1fr max-content;
+  grid-template-columns: max-content minmax(0, 1fr) max-content minmax(0, 1fr) max-content;
   height: min-content;
 
   padding: $spacing-s $spacing-m;
