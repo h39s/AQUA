@@ -23,6 +23,8 @@ interface IListProps {
   className?: string;
   itemClassName?: string;
   focusOnRender?: boolean;
+  startingItem?: JSX.Element;
+  emptyOptionsPlaceholder?: JSX.Element | string;
 }
 
 const List = ({
@@ -34,6 +36,8 @@ const List = ({
   className,
   itemClassName,
   focusOnRender = false,
+  startingItem,
+  emptyOptionsPlaceholder = 'No options found.',
 }: IListProps) => {
   const inputRefs = useMemo(
     () =>
@@ -91,28 +95,44 @@ const List = ({
   );
 
   return (
-    <ul className={`list ${className || ''}`} aria-label={`${name}-items`}>
-      {options.map((entry: IOptionEntry, index: number) => {
-        return (
+    <div className={`list-wrapper ${className || ''}`}>
+      {startingItem && (
+        <div role="menuitem" className="row starting-item">
+          {startingItem}
+        </div>
+      )}
+      <ul className={`list ${className || ''}`} aria-label={`${name}-items`}>
+        {options.map((entry: IOptionEntry, index: number) => {
+          return (
+            <li
+              role="menuitem"
+              ref={inputRefs[index]}
+              className={`row ${itemClassName || ''} ${
+                entry.value === value ? 'selected' : ''
+              }`}
+              key={entry.value}
+              value={entry.value}
+              aria-label={entry.label}
+              onClick={onClick(entry.value)}
+              onKeyDown={handleItemKeyPress(entry, index)}
+              onMouseEnter={onMouseEnter(index)}
+              tabIndex={0}
+            >
+              {entry.display}
+            </li>
+          );
+        })}
+        {options.length === 0 && (
           <li
             role="menuitem"
-            ref={inputRefs[index]}
-            className={`row ${itemClassName || ''} ${
-              entry.value === value ? 'selected' : ''
-            }`}
-            key={entry.value}
-            value={entry.value}
-            aria-label={entry.label}
-            onClick={onClick(entry.value)}
-            onKeyDown={handleItemKeyPress(entry, index)}
-            onMouseEnter={onMouseEnter(index)}
+            className={`row ${itemClassName || ''} `}
             tabIndex={0}
           >
-            {entry.display}
+            {emptyOptionsPlaceholder}
           </li>
-        );
-      })}
-    </ul>
+        )}
+      </ul>
+    </div>
   );
 };
 

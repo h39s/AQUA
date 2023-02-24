@@ -13,7 +13,6 @@
     border-radius: 4px;
     padding: $spacing-xs;
     font-size: small;
-    width: 52px;
     height: 18px;
     justify-content: space-between;
     align-content: center;
@@ -41,6 +40,13 @@
       }
     }
 
+    // Clip content in the selected entry that exceeds the container
+    div:first-child {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow-x: clip;
+    }
+
     svg {
       width: 36px;
       height: auto;
@@ -56,14 +62,12 @@
     }
   }
 
-  .list {
+  .list-wrapper {
     // Position the drop down menu
     position: absolute;
     margin-block-start: -4px;
 
-    // Assign fixed width to dropdown menu
-    width: 60px;
-    z-index: 1;
+    z-index: 2;
 
     svg {
       width: 36px;

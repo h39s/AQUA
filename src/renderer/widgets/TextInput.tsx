@@ -1,5 +1,6 @@
 import {
   ChangeEvent,
+  MouseEvent,
   ForwardedRef,
   forwardRef,
   KeyboardEvent,
@@ -109,6 +110,12 @@ const TextInput = forwardRef(
       [formatInput, updateValue]
     );
 
+    const onClick = useCallback((e: MouseEvent) => {
+      if (e?.detail === 2) {
+        e.stopPropagation();
+      }
+    }, []);
+
     return (
       <div className="col text-input">
         <input
@@ -123,6 +130,7 @@ const TextInput = forwardRef(
           onKeyUp={onKeyUp}
           tabIndex={isDisabled ? -1 : 0}
           aria-disabled={isDisabled}
+          onClick={onClick}
         />
         {errorMessage && <div className="errorText">{errorMessage}</div>}
       </div>

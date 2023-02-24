@@ -1,0 +1,39 @@
+@import 'color';
+@import 'constant';
+@import 'spacing';
+
+$auto-eq-dropdown-width: 220px;
+
+.auto-eq {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content minmax(0, 1fr) max-content;
+  height: min-content;
+
+  padding: $spacing-s $spacing-m;
+  border-radius: $spacing-m;
+  background: $primary-default;
+
+  align-items: center;
+  gap: $spacing-s;
+
+  .dropdown {
+    [role='menu'] {
+      width: calc(100% - $spacing-m);
+    }
+
+    // Add padding around the text input for filtering the drop down
+    .starting-item {
+      padding: $spacing-xs;
+    }
+
+    .list-wrapper {
+      // For some reason the spacing is 4px off from the .dropdown class, this adjustment is necessary for the menu and the dropdown to have the same width
+      width: calc(100% - $spacing-s);
+    }
+
+    .list {
+      // Assign fixed width to dropdown menu
+      max-height: 150px;
+    }
+  }
+}
