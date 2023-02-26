@@ -45,14 +45,16 @@ export const WINDOW_WIDTH = 1428;
 export const WINDOW_HEIGHT = 625;
 export const WINDOW_HEIGHT_EXPANDED = 1036;
 
-export const PRESETS_DIR = 'presets';
-
 export const PREAMP_REGEX = new RegExp('^Preamp: (-\\d\\.\\d) dB$');
 export const FILTER_REGEX = new RegExp(
   '^Filter [1-9]\\d?: ON (PK|LS|HS) Fc ([1-9]\\d{0,3}|[1,2]\\d{4}) Hz Gain (-?[1,2]?\\d\\.\\d) dB Q (\\d\\.\\d\\d)$'
 );
 
 /** ----- Application Interfaces ----- */
+
+export interface IFiltersMap {
+  [key: string]: IFilter;
+} // key is the same id as whats in IFilter
 
 export interface IFilter {
   id: string;
@@ -67,12 +69,17 @@ export interface IState {
   isAutoPreAmpOn: boolean;
   isGraphViewOn: boolean;
   preAmp: number;
+  filters: IFiltersMap;
+}
+
+export interface IPresetV1 {
+  preAmp: number;
   filters: IFilter[];
 }
 
-export interface IPreset {
+export interface IPresetV2 {
   preAmp: number;
-  filters: IFilter[];
+  filters: IFiltersMap;
 }
 
 /** ----- Default Values ----- */
@@ -88,17 +95,21 @@ const DEFAULT_FILTER_TEMPLATE = {
   type: FilterTypeEnum.PK,
 };
 
-export const getDefaultFilter = () => {
+export const getDefaultFilterWithId = (): IFilter => {
   return {
     id: uid(8),
     ...DEFAULT_FILTER_TEMPLATE,
   };
 };
 
-const getDefaultFilters = (): IFilter[] =>
-  FIXED_FREQUENCIES.map((f) => {
-    return { ...getDefaultFilter(), frequency: f };
+const getDefaultFilters = (): IFiltersMap => {
+  const filters: IFiltersMap = {};
+  FIXED_FREQUENCIES.forEach((f) => {
+    const filter: IFilter = { ...getDefaultFilterWithId(), frequency: f };
+    filters[filter.id] = filter;
   });
+  return filters;
+};
 
 export const getDefaultState = (): IState => {
   return {

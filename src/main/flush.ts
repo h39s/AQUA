@@ -2,10 +2,15 @@ import fs from 'fs';
 import path from 'path';
 import {
   getDefaultState,
-  IPreset,
+  IPresetV1,
+  IPresetV2,
   IState,
-  PRESETS_DIR,
 } from '../common/constants';
+import {
+  validatePresetV1,
+  validatePresetV2,
+  validateState,
+} from '../common/validator';
 
 export const stateToString = (state: IState) => {
   if (!state.isEnabled) {
@@ -21,9 +26,10 @@ export const stateToString = (state: IState) => {
 
   // Using individual filter bands
   output = output.concat(
-    state.filters.flatMap(
-      ({ frequency, gain, type, quality }, index) =>
-        `Filter${index}: ON ${type} Fc ${frequency} Hz Gain ${gain} dB Q ${quality}`
+    Object.values(state.filters).map(
+      ({ frequency, gain, type, quality }, index) => {
+        return `Filter${index}: ON ${type} Fc ${frequency} Hz Gain ${gain} dB Q ${quality}`;
+      }
     )
   );
 
@@ -37,58 +43,91 @@ export const serializeState = (state: IState) => {
   return JSON.stringify(state);
 };
 
-export const serializePreset = (preset: IPreset) => {
+export const serializePreset = (preset: IPresetV2) => {
   return JSON.stringify(preset);
 };
 
 const CONFIG_CONTENT = 'Include: aqua.txt';
-export const AQUA_LOCAL_CONFIG_FILENAME = 'state.txt';
+const AQUA_LOCAL_CONFIG_FILENAME = 'state.txt';
 export const AQUA_CONFIG_FILENAME = 'aqua.txt';
 const CONFIG_FILENAME = 'config.txt';
+export const PRESETS_DIR = 'presets';
 
 const addFileToPath = (pathPrefix: string, fileName: string) => {
   return path.join(pathPrefix, fileName);
 };
 
-export const fetchSettings = () => {
+export const fetchSettings = (settingsDir: string) => {
+  const settingsPath = path.join(settingsDir, AQUA_LOCAL_CONFIG_FILENAME);
   try {
-    const content = fs.readFileSync(AQUA_LOCAL_CONFIG_FILENAME, {
+    const content = fs.readFileSync(settingsPath, {
       encoding: 'utf8',
     });
-    return JSON.parse(content) as IState;
+    const input = JSON.parse(content);
+    if (!validateState(input)) {
+      throw new Error('Invalid state file loaded. Using default state.');
+    }
+    return input as IState;
   } catch (ex) {
+    console.log(ex);
     // if unable to fetch the state, use a default one
     return getDefaultState();
   }
 };
 
-export const save = (state: IState) => {
+export const save = (state: IState, settingsDir: string) => {
+  const settingsPath = path.join(settingsDir, AQUA_LOCAL_CONFIG_FILENAME);
   try {
-    fs.writeFileSync(AQUA_LOCAL_CONFIG_FILENAME, serializeState(state), {
+    fs.writeFileSync(settingsPath, serializeState(state), {
       encoding: 'utf8',
     });
   } catch (ex) {
-    console.log('Failed to save to %d', AQUA_LOCAL_CONFIG_FILENAME);
+    console.log(`Failed to save to ${settingsPath}`);
     throw ex;
   }
 };
 
-export const fetchPreset = (presetName: string) => {
+export const fetchPreset = (presetName: string, presetsDir: string) => {
   try {
-    const presetPath = path.join(PRESETS_DIR, presetName);
+    const presetPath = path.join(presetsDir, presetName);
     const content = fs.readFileSync(presetPath, {
       encoding: 'utf8',
     });
-    return JSON.parse(content) as IPreset;
+    const json = JSON.parse(content);
+    if (validatePresetV1(json)) {
+      const oldFormat = json as IPresetV1;
+      const newFormat: IPresetV2 = { preAmp: oldFormat.preAmp, filters: {} };
+      oldFormat.filters.forEach((filter) => {
+        // Its okay to shallow copy the filter because we won't give oldFormat to anyone else.
+        newFormat.filters[filter.id] = filter;
+      });
+      try {
+        // Try to update our file.
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        savePreset(presetName, newFormat, presetsDir);
+      } catch {
+        // Ignore failed updates.
+      }
+      return newFormat;
+    }
+    if (!validatePresetV2(json)) {
+      throw new Error('Invalid preset file');
+    }
+    return json as IPresetV2;
   } catch (ex) {
     console.log('Failed to get presets!!');
+    console.log(ex);
     throw ex;
   }
 };
 
-export const savePreset = (presetName: string, preset_info: IPreset) => {
+export const savePreset = (
+  presetName: string,
+  preset_info: IPresetV2,
+  presetsDir: string
+) => {
   try {
-    const presetPath = path.join(PRESETS_DIR, presetName);
+    const presetPath = path.join(presetsDir, presetName);
     fs.writeFileSync(presetPath, serializePreset(preset_info), {
       encoding: 'utf8',
     });
@@ -96,12 +135,22 @@ export const savePreset = (presetName: string, preset_info: IPreset) => {
     console.log('Failed to save to preset %d', presetName);
     throw ex;
   }
-
   console.log(`Wrote preset for: ${presetName}`);
 };
 
-export const doesPresetExist = (presetName: string) => {
-  const testPath = addFileToPath(PRESETS_DIR, presetName);
+export const deletePreset = (presetName: string, presetsDir: string) => {
+  try {
+    const presetPath = path.join(presetsDir, presetName);
+    fs.unlinkSync(presetPath);
+  } catch (ex) {
+    console.log('Failed to delete preset');
+    throw ex;
+  }
+  console.log(`Deleted preset: ${presetName}`);
+};
+
+export const doesPresetExist = (presetName: string, presetsDir: string) => {
+  const testPath = addFileToPath(presetsDir, presetName);
   try {
     return fs.existsSync(testPath);
   } catch (ex) {
@@ -110,9 +159,13 @@ export const doesPresetExist = (presetName: string) => {
   }
 };
 
-export const renamePreset = (oldName: string, newName: string) => {
-  const oldPath = addFileToPath(PRESETS_DIR, oldName);
-  const newPath = addFileToPath(PRESETS_DIR, newName);
+export const renamePreset = (
+  oldName: string,
+  newName: string,
+  presetsDir: string
+) => {
+  const oldPath = addFileToPath(presetsDir, oldName);
+  const newPath = addFileToPath(presetsDir, newName);
   try {
     fs.renameSync(oldPath, newPath);
   } catch (ex) {

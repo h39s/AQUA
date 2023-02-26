@@ -10,7 +10,11 @@ export const clamp = (num: number, min: number, max: number) => {
   return Math.min(Math.max(num, min), max);
 };
 
-export const sortHelper = (a: IFilter, b: IFilter) => a.frequency - b.frequency;
+export const sortHelper = (a: IFilter, b: IFilter) =>
+  a.frequency - b.frequency ||
+  a.gain - b.gain ||
+  a.quality - b.quality ||
+  a.type.localeCompare(b.type);
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from#sequence_generator_range
 export const range = (start: number, stop: number, step: number) =>

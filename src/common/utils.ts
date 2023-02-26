@@ -1,4 +1,5 @@
 import {
+  IFiltersMap,
   IFilter,
   MAX_FREQUENCY,
   MIN_FREQUENCY,
@@ -10,10 +11,12 @@ export const roundToPrecision = (value: number, precision: number) => {
   return Math.round(value * precisionFactor) / precisionFactor;
 };
 
-export const computeAvgFreq = (filters: IFilter[], index: number) => {
-  const lo = index === 0 ? MIN_FREQUENCY : filters[index - 1].frequency;
-  const hi =
-    index === filters.length ? MAX_FREQUENCY : filters[index].frequency;
+export const computeAvgFreq = (
+  leftFilter: IFilter | null,
+  rightFilter: IFilter | null
+) => {
+  const lo = leftFilter ? leftFilter.frequency : MIN_FREQUENCY;
+  const hi = rightFilter ? rightFilter.frequency : MAX_FREQUENCY;
   const exponent = (Math.log10(lo) + Math.log10(hi)) / 2;
   return roundToPrecision(10 ** exponent, 0);
 };
@@ -23,3 +26,11 @@ export const computeAvgFreq = (filters: IFilter[], index: number) => {
 // have manually confirmed this.
 export const isRestrictedPresetName = (newName: string) =>
   RESERVED_FILE_NAMES_SET.has(newName.toUpperCase());
+
+export const cloneFilters = (filters: IFiltersMap) => {
+  const filtersClone: IFiltersMap = {};
+  Object.entries(filters).forEach(([id, filter]) => {
+    filtersClone[id] = { ...filter };
+  });
+  return filtersClone;
+};

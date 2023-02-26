@@ -3,12 +3,13 @@ import path from 'path';
 import { app } from 'electron';
 import {
   FilterTypeEnum,
-  getDefaultFilter,
+  getDefaultFilterWithId,
   IFilter,
-  IPreset,
+  IPresetV2,
   MAX_NUM_FILTERS,
   PREAMP_REGEX,
   FILTER_REGEX,
+  IFiltersMap,
 } from '../common/constants';
 
 let AUTOEQ_DIR = './resources/autoeq';
@@ -27,12 +28,16 @@ export const getAutoEqResponseList = (device: string) => {
 
 export const getAutoEqPreset = (device: string, response: string) => {
   let preAmpParsed = 0;
-  const filtersList: IFilter[] = [];
+  const filters: IFiltersMap = {};
 
   const filePath = path.join(AUTOEQ_DIR, device, response);
   const file = fs.readFileSync(filePath, 'utf8');
 
   file.split('\n').forEach((line, i) => {
+    if (Object.keys(filters).length >= MAX_NUM_FILTERS) {
+      // Ensure filters doesn't exceed filter count cap
+      return;
+    }
     const preampMatch = line.match(PREAMP_REGEX);
     if (preampMatch) {
       if (preampMatch.length !== 2) {
@@ -59,7 +64,7 @@ export const getAutoEqPreset = (device: string, response: string) => {
         );
       }
 
-      const filter: IFilter = getDefaultFilter();
+      const filter: IFilter = getDefaultFilterWithId();
       switch (filterMatch[1]) {
         case 'PK':
           filter.type = FilterTypeEnum.PK;
@@ -84,16 +89,14 @@ export const getAutoEqPreset = (device: string, response: string) => {
           `Filter parameter parse error on line ${i} for AutoEQ file: ${filePath}`
         );
       }
-      filtersList.push(filter);
+      filters[filter.id] = filter;
     }
     // Ignore any lines which we do not recognize
   });
 
-  const preset: IPreset = {
+  const preset: IPresetV2 = {
     preAmp: preAmpParsed,
-    filters: filtersList
-      .sort((a: IFilter, b: IFilter) => a.frequency - b.frequency)
-      .slice(0, MAX_NUM_FILTERS),
+    filters,
   };
 
   return preset;

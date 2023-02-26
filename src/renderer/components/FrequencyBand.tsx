@@ -18,6 +18,7 @@ import {
   WheelEvent,
   CSSProperties,
   useCallback,
+  useEffect,
 } from 'react';
 import { useThrottleAndExecuteLatest } from 'renderer/utils/utils';
 import { FILTER_OPTIONS } from '../icons/FilterTypeIcon';
@@ -35,7 +36,6 @@ import Slider from './Slider';
 import '../styles/FrequencyBand.scss';
 
 interface IFrequencyBandProps {
-  sliderIndex: number;
   filter: IFilter;
   isMinSliderCount: boolean;
   style?: CSSProperties;
@@ -43,7 +43,7 @@ interface IFrequencyBandProps {
 
 const FrequencyBand = forwardRef(
   (
-    { sliderIndex, filter, isMinSliderCount, style }: IFrequencyBandProps,
+    { filter, isMinSliderCount, style }: IFrequencyBandProps,
     ref: ForwardedRef<HTMLDivElement>
   ) => {
     const INTERVAL = 100;
@@ -54,6 +54,19 @@ const FrequencyBand = forwardRef(
       () => isMinSliderCount || isLoading,
       [isLoading, isMinSliderCount]
     );
+    // Local copy of quality/freq value used so that the number input increases smoothly while throttling EQ APO writes
+    const [qualityValue, setQualityValue] = useState<number>(filter.quality);
+    const [frequencyValue, setFrequencyValue] = useState<number>(
+      filter.frequency
+    );
+
+    useEffect(() => {
+      setQualityValue(filter.quality);
+    }, [filter.quality]);
+
+    useEffect(() => {
+      setFrequencyValue(filter.frequency);
+    }, [filter.frequency]);
 
     // *** Define functions for updating filter values and obtain throttled versions of them  ***
     const normalSetGain = useCallback(
@@ -75,9 +88,9 @@ const FrequencyBand = forwardRef(
           id: filter.id,
           newValue,
         });
-        await setGain(sliderIndex, newValue);
+        await setGain(filter.id, newValue);
       },
-      [dispatchFilter, filter.id, sliderIndex]
+      [dispatchFilter, filter.id]
     );
 
     const throttleSetGain = useThrottleAndExecuteLatest(
@@ -92,13 +105,30 @@ const FrequencyBand = forwardRef(
           id: filter.id,
           newValue,
         });
-        await setQuality(sliderIndex, newValue);
+        await setQuality(filter.id, newValue);
       },
-      [dispatchFilter, filter.id, sliderIndex]
+      [dispatchFilter, filter.id]
     );
 
     const throttleSetQuality = useThrottleAndExecuteLatest(
       normalSetQuality,
+      INTERVAL
+    );
+
+    const normalSetFrequency = useCallback(
+      async (newValue: number) => {
+        dispatchFilter({
+          type: FilterActionEnum.FREQUENCY,
+          id: filter.id,
+          newValue,
+        });
+        await setFrequency(filter.id, newValue);
+      },
+      [dispatchFilter, filter.id]
+    );
+
+    const throttleSetFrequency = useThrottleAndExecuteLatest(
+      normalSetFrequency,
       INTERVAL
     );
 
@@ -115,21 +145,18 @@ const FrequencyBand = forwardRef(
     );
 
     const handleFrequencySubmit = async (newValue: number) => {
+      setFrequencyValue(newValue);
       try {
-        await setFrequency(sliderIndex, newValue);
-        dispatchFilter({
-          type: FilterActionEnum.FREQUENCY,
-          id: filter.id,
-          newValue,
-        });
+        throttleSetFrequency(newValue);
       } catch (e) {
         setGlobalError(e as ErrorDescription);
       }
     };
 
     const handleQualitySubmit = async (newValue: number) => {
+      setQualityValue(newValue);
       try {
-        await throttleSetQuality(newValue);
+        throttleSetQuality(newValue);
       } catch (e) {
         setGlobalError(e as ErrorDescription);
       }
@@ -137,7 +164,7 @@ const FrequencyBand = forwardRef(
 
     const handleFilterTypeSubmit = async (newValue: string) => {
       try {
-        await setType(sliderIndex, newValue);
+        await setType(filter.id, newValue);
         dispatchFilter({
           type: FilterActionEnum.TYPE,
           id: filter.id,
@@ -155,7 +182,7 @@ const FrequencyBand = forwardRef(
 
       setIsLoading(true);
       try {
-        await removeEqualizerSlider(sliderIndex);
+        await removeEqualizerSlider(filter.id);
         dispatchFilter({ type: FilterActionEnum.REMOVE, id: filter.id });
       } catch (e) {
         setGlobalError(e as ErrorDescription);
@@ -164,7 +191,7 @@ const FrequencyBand = forwardRef(
     };
 
     const onWheelFrequency = (e: WheelEvent) => {
-      const ranges = [10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 1];
+      const ranges = [10000, 5000, 2000, 1000, 500, 200, 100, 50, 20];
       const range = ranges.find((bound) => bound <= filter.frequency);
       const offset = range ? range / 10 : 1;
       return e.deltaY < 0
@@ -189,17 +216,17 @@ const FrequencyBand = forwardRef(
         />
         <div className="col band">
           <Dropdown
-            name={`${filter.frequency}-filter-type`}
+            name={`${frequencyValue}-filter-type`}
             value={filter.type}
             options={FILTER_OPTIONS}
             isDisabled={!!globalError}
             handleChange={handleFilterTypeSubmit}
           />
           <NumberInput
-            value={filter.frequency}
+            value={frequencyValue}
             min={MIN_FREQUENCY}
             max={MAX_FREQUENCY}
-            name={`${filter.frequency}-frequency`}
+            name={`${frequencyValue}-frequency`}
             isDisabled={!!globalError}
             showArrows
             handleSubmit={handleFrequencySubmit}
@@ -207,7 +234,7 @@ const FrequencyBand = forwardRef(
           />
           <div className="col center slider">
             <Slider
-              name={`${filter.frequency}-gain`}
+              name={`${frequencyValue}-gain`}
               min={MIN_GAIN}
               max={MAX_GAIN}
               value={filter.gain}
@@ -216,10 +243,10 @@ const FrequencyBand = forwardRef(
             />
           </div>
           <NumberInput
-            value={filter.quality}
+            value={qualityValue}
             min={MIN_QUALITY}
             max={MAX_QUALITY}
-            name={`${filter.frequency}-quality`}
+            name={`${frequencyValue}-quality`}
             isDisabled={!!globalError}
             floatPrecision={2}
             showArrows
