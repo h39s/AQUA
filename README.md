@@ -4,19 +4,30 @@ Quick link to download latest release: <https://github.com/h39s/AQUA/releases/la
 
 Discord Server: <https://discord.gg/44WDeRrr2d>
 
-Welcome to AQUA, a modern platform for audio equalization on Windows. Our goal is to provide a clean user experience and to support many features such as parametric equalization, user friendly graph interfaces, and, in the future, saving/loading presets and AutoEQ integration. Please note that EqualizerAPO is a prerequisite for our application. We would love to get your feedback, address any bugs you encounter, and take any feature requests into consideration as we develop AQUA further, so please join our [discord server](https://discord.gg/44WDeRrr2d)  to share your thoughts with us and stay tuned for more!
+Welcome to AQUA, a modern platform for audio equalization on Windows. Welcome to AQUA, a modern platform for audio equalization on Windows. Our current features include
 
-![AQUA](https://user-images.githubusercontent.com/20293445/201550335-1963cd93-e0ed-44a7-8a7a-bf328371c204.png)
+* System-wide parametric audio equalization (through [EqualizerAPO](https://sourceforge.net/projects/equalizerapo/))
+* AutoEQ integration (credit to [Jaakko Pasanen](https://github.com/jaakkopasanen/AutoEq/tree/master/results) and [Ian Walton](https://github.com/iwalton3/AutoEq) for their preset results for the Harman, IEF, and IEF with bass targets)
+* Auto Pre-amp Gain to ensure your maximum gain never exceeds 0dB
+* Saving/loading equalizer presets
+* Graph visualizer for equalizer settings (between 10 Hz and 20 KHz)
+* Up to 20 filters (+ preamp gain) with adjustable
+  * Filter type (low shelf, peak, or high shelf)
+  * Centre frequency (1 Hz - 20 KHz)
+  * Gain (-30dB to 30dB)
+  * Quality (0.01 - 100.00)
+
+
+Please note that EqualizerAPO is a prerequisite for our application. We would love to get your feedback, address any bugs you encounter, and take any feature requests into consideration as we develop AQUA further, so please join our [discord server](https://discord.gg/44WDeRrr2d)  to share your thoughts with us and stay tuned for more!
+
+![image](https://user-images.githubusercontent.com/20293445/222267346-b0e2064d-92c2-4334-9bff-d638f9535d12.png)
+
 
 ## Getting Started
 
 To get started using AQUA, it only takes two easy steps:
 1. Install [EqualizerAPO](https://sourceforge.net/projects/equalizerapo/) if you don't have it currently installed (and make sure you run `configurator.exe` included as a part of EqualizerAPO to install the required drivers for the devices you would like to EQ).
-2. Download and run the executable `AQUA.Setup.x.x.x.exe` from the latest [release](https://github.com/h39s/AQUA/releases).
-
-## Future UI Goal (Rough)
-
-![Presets](https://user-images.githubusercontent.com/20293445/201551324-ae29956b-b2a4-4d96-81ea-f4560a0c8e42.png)
+2. Download and run the executable `AQUAsetup.exe` from the latest [release](https://github.com/h39s/AQUA/releases).
 
 ## Get In Touch
 
@@ -24,7 +35,7 @@ If you find any bugs, have any feature requests, or want to give us any kind of 
 
 ## About the Developers
 
-We are a group of university students in our final year. This is both a passion project and capstone endeavour for us. We will be actively developing the application for the next 6 months and aim to add EQ presets, graphic EQ manipulation, and AutoEQ. Please note that we may not always be available to address your messages on discord as we are all full-time students.
+We are a group of university students in our final year. This is both a passion project and capstone endeavour for us. We will be actively developing the application for the next few months and aim to add graphic EQ manipulation, and full AutoEQ capabilities. Please note that we may not always be available to address your messages on discord as we are all full-time students.
 
 ## Development Prerequisites
 
@@ -37,4 +48,19 @@ We are a group of university students in our final year. This is both a passion 
 
 ## License
 
-MIT © [Electron React Boilerplate](https://github.com/electron-react-boilerplate)
+AQUA: System-wide parametric audio equalizer interface
+
+Copyright (C) 2023  AQUA Dev Team
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
