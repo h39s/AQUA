@@ -28,7 +28,12 @@ headphones.forEach((headphone) => {
     const eqFilePath = `${headphonePath}/${eqFile}`;
     const eqParams = fs.readFileSync(eqFilePath, { encoding: 'utf8' });
     const eqLines = eqParams.split('\n');
-    eqLines.pop();
+    if (eqLines[eqLines.length - 1] === '') {
+      eqLines.pop();
+    }
+    if (eqLines.length === 0) {
+      throw new Error(`Empty AutoEQ file: ${eqFilePath}`);
+    }
 
     // console.log(eqParams);
 
@@ -62,9 +67,9 @@ headphones.forEach((headphone) => {
           );
       }
       try {
-        const frequency = parseInt(filterMatch[2], 10);
-        const gain = parseFloat(filterMatch[3]);
-        const quality = parseFloat(filterMatch[4]);
+        parseInt(filterMatch[2], 10);
+        parseFloat(filterMatch[3]);
+        parseFloat(filterMatch[4]);
         // console.log(`Filter ${i}: ON ${filterType} Fc ${frequency} Hz Gain ${gain.toFixed(1)} dB Q ${quality.toFixed(2)}`);
       } catch (err) {
         throw new Error(
