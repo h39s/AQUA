@@ -4,7 +4,7 @@ Quick link to download latest release: <https://github.com/h39s/AQUA/releases/la
 
 Discord Server: <https://discord.gg/44WDeRrr2d>
 
-Welcome to AQUA, a modern platform for audio equalization on Windows. Welcome to AQUA, a modern platform for audio equalization on Windows. Our current features include
+Welcome to AQUA, a modern platform for audio equalization on Windows. Our current features include
 
 * System-wide parametric audio equalization (through [EqualizerAPO](https://sourceforge.net/projects/equalizerapo/))
 * AutoEQ integration (credit to [Jaakko Pasanen](https://github.com/jaakkopasanen/AutoEq/tree/master/results) and [Ian Walton](https://github.com/iwalton3/AutoEq) for their preset results for the Harman, IEF, and IEF with bass targets)
