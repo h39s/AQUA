@@ -27,7 +27,13 @@ import {
   isRestrictedPresetName,
   roundToPrecision,
 } from 'common/utils';
-import { sortHelper } from 'renderer/utils/utils';
+import {
+  comparePaddedStrings,
+  decodePresetName,
+  encodePresetName,
+  padPresetName,
+  sortHelper,
+} from 'renderer/utils/utils';
 
 describe('utils', () => {
   describe('roundToPrecision', () => {
@@ -92,6 +98,42 @@ describe('utils', () => {
       Object.entries(copy).forEach(([id, filter]) => {
         expect(filter.id).toBe(`${id}`);
       });
+    });
+  });
+
+  describe('Preset Name encoding/decoding', () => {
+    const decoded = '7Hz Salnotes Dioko( sample 2)';
+    const encoded = '7^hz ^salnotes ^dioko( sample 2)';
+    const invalidEncoded = '^7^^hz ^salnotes ^dioko( sample 2)';
+    it('should encode preset name by removing upper letters and prepending with the carat', () => {
+      expect(encodePresetName(decoded)).toBe(encoded);
+    });
+
+    it('should decode preset name parsing carat', () => {
+      expect(decodePresetName(encoded)).toBe(decoded);
+    });
+
+    it('operations should be the inverse of each other', () => {
+      expect(decodePresetName(encodePresetName(decoded))).toBe(decoded);
+    });
+
+    it('should clean out any invalid characters after decoding', () => {
+      expect(decodePresetName(invalidEncoded)).toBe(decoded);
+    });
+
+    it('should pad a string correctly', () => {
+      expect(padPresetName('ab', ['aB', 'Ab\xa0\xa0'])).toBe('ab\xa0');
+      expect(padPresetName('ab', ['aB', 'Ab\xa0'])).toBe('ab\xa0\xa0');
+      expect(padPresetName('ab', ['aB\xa0', 'Ab\xa0'])).toBe('ab');
+      expect(padPresetName('ab', ['aB\xa0\xa0', 'Ab\xa0'])).toBe('ab');
+      expect(padPresetName('ab', [])).toBe('ab');
+    });
+
+    it('should compare padded strings with non-padded strings', () => {
+      expect(comparePaddedStrings('ab', 'ab')).toBe(true);
+      expect(comparePaddedStrings('ab\xa0', 'ab')).toBe(true);
+      expect(comparePaddedStrings('ab', 'aB')).toBe(false);
+      expect(comparePaddedStrings('ab\xa0', 'aB')).toBe(false);
     });
   });
 });
