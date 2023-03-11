@@ -85,7 +85,8 @@ export const fetchSettings = (settingsDir: string) => {
     if (!validateState(input)) {
       throw new Error('Invalid state file loaded. Using default state.');
     }
-    return input as IState;
+    // Manually set case sensitivity as false until it is confirmed in app that it can be enabled
+    return { ...input, isCaseSensitiveFs: false } as IState;
   } catch (ex) {
     console.log(ex);
     // if unable to fetch the state, use a default one

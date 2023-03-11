@@ -122,21 +122,22 @@ try {
   throw e;
 }
 
-try {
-  // update presets folder to support case-sensitive files
-  exec(
-    `fsutil.exe file SetCaseSensitiveInfo "${presetPath}"`,
-    (err, stdout) => {
-      if (err) {
-        throw err;
-      }
-      console.log(stdout);
+// spawn child process to update presets folder so that it can support case-sensitive files
+exec(
+  `fsutil.exe file SetCaseSensitiveInfo "${presetPath}"`,
+  (err, stdout, stderr) => {
+    // Error handling should occur in this callback function
+    if (err) {
+      console.error(err.message.trim());
+      console.error(stdout.trim());
+      console.error(stderr.trim());
+      return;
     }
-  );
-  state.isCaseSensitiveFs = true;
-} catch (e) {
-  console.error(e);
-}
+
+    // Set case sensitive to true if an error was not thrown
+    state.isCaseSensitiveFs = true;
+  }
+);
 
 const retryHelper = async (attempts: number, f: () => unknown) => {
   for (let i = 0; i < attempts; i += 1) {
@@ -244,7 +245,6 @@ ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, arg) => {
   const presetName = arg[0];
   console.log(`Loading preset: ${presetName}`);
 
-  // TODO: should we do some str checking here?
   try {
     const presetSettings: IPresetV2 = fetchPreset(presetName, presetPath);
     state.preAmp = presetSettings.preAmp;
@@ -306,10 +306,23 @@ ipcMain.on(ChannelEnum.RENAME_PRESET, async (event, arg) => {
   }
 
   try {
-    // Validate the provided name
+    /**
+     * Validate the provided name acording to the following rules:
+     * - Disallow renaming to a restricted name
+     * - Disallow renaming to an existing preset name
+     *
+     * Note: the function doesPresetExist performs comparisons based on the file system, meaning it whether the comparison
+     * is case sensitive depends on the file system settings. For case sensitive systems, the existence of a preset that
+     * matches the new name exactly is guaranteed to be an invalid operation (since we already handled the case where the
+     * old and new names are exactly equal). For case insensitive systems, there is an edge case where we want to allow
+     * the new name to be a duplicate of an existing preset. This is the case where we are renaming a preset to change the
+     * casing of the characters.
+     */
     if (
       isRestrictedPresetName(newName) ||
-      doesPresetExist(newName, presetPath)
+      (doesPresetExist(newName, presetPath) &&
+        (state.isCaseSensitiveFs ||
+          oldName.toLocaleLowerCase() !== newName.toLocaleLowerCase()))
     ) {
       handleError(event, channel, ErrorCode.INVALID_PRESET_NAME);
       return;
@@ -328,7 +341,7 @@ ipcMain.on(ChannelEnum.GET_PRESET_FILE_LIST, async (event) => {
 
   try {
     const fileNames: string[] = fs.readdirSync(presetPath);
-    console.log(fileNames);
+    console.log(`Fetched ${fileNames.length} files`);
     const reply: TSuccess<string[]> = { result: fileNames };
     event.reply(channel, reply);
   } catch (e) {
@@ -344,7 +357,7 @@ ipcMain.on(ChannelEnum.GET_AUTO_EQ_DEVICE_LIST, async (event) => {
 
   try {
     const fileNames: string[] = getAutoEqDeviceList();
-    console.log(fileNames);
+    console.log(`Fetched ${fileNames.length} files`);
     const reply: TSuccess<string[]> = { result: fileNames };
     event.reply(channel, reply);
   } catch (e) {
@@ -361,7 +374,7 @@ ipcMain.on(ChannelEnum.GET_AUTO_EQ_RESPONSE_LIST, async (event, arg) => {
 
   try {
     const fileNames: string[] = getAutoEqResponseList(deviceName);
-    console.log(fileNames);
+    console.log(`Fetched ${fileNames.length} files`);
     const reply: TSuccess<string[]> = { result: fileNames };
     event.reply(channel, reply);
   } catch (e) {
