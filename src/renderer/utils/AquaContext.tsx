@@ -157,6 +157,9 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
   const [isGraphViewOn, setIsGraphViewOn] = useState<boolean>(
     DEFAULT_STATE.isGraphViewOn
   );
+  const [isCaseSensitiveFs, setIsCaseSensitiveFs] = useState<boolean>(
+    DEFAULT_STATE.isCaseSensitiveFs
+  );
   const [preAmp, setPreAmp] = useState<number>(DEFAULT_STATE.preAmp);
   const [filters, dispatchFilter] = useReducer<IFilterReducer>(
     filterReducer,
@@ -181,6 +184,7 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
       setPreAmp(state.preAmp);
       dispatchFilter({ type: FilterActionEnum.INIT, filters: state.filters });
       setGlobalError(undefined);
+      setIsCaseSensitiveFs(state.isCaseSensitiveFs);
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
@@ -199,6 +203,7 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
         isEnabled,
         isAutoPreAmpOn,
         isGraphViewOn,
+        isCaseSensitiveFs,
         preAmp,
         filters,
         performHealthCheck,

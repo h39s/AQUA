@@ -85,7 +85,8 @@ const presetReducer: IPresetReducer = (
 };
 
 const PresetsBar = () => {
-  const { globalError, performHealthCheck, setGlobalError } = useAquaContext();
+  const { globalError, isCaseSensitiveFs, performHealthCheck, setGlobalError } =
+    useAquaContext();
 
   const [presetName, setPresetName] = useState<string>('');
   const [newPresetNameError, setNewPresetNameError] = useState<string>('');
@@ -117,7 +118,7 @@ const PresetsBar = () => {
   }, [setGlobalError]);
 
   // Creating a new preset
-  const handleCreatePreset = useCallback(async () => {
+  const handleCreateOrSavePreset = useCallback(async () => {
     try {
       await savePreset(presetName);
 
@@ -154,26 +155,61 @@ const PresetsBar = () => {
     return '';
   }, []);
 
+  const validatePresetNew = useCallback(
+    (newValue: string) => {
+      /**
+       * For a not case sensitive file system (apple is equal to ApPlE), we want to prevent users from creating a new preset
+       * that has the same characters that differs only in case. However, we want to allow users to specify an exact duplicate
+       * (where the characters and the case both match) so they can overwrite their existing presets.
+       */
+      if (
+        !isCaseSensitiveFs &&
+        presetNames.some(
+          (value) =>
+            newValue.toLocaleLowerCase() === value.toLocaleLowerCase() &&
+            value !== newValue
+        )
+      ) {
+        return PresetErrorEnum.DUPLICATE;
+      }
+      return validatePresetName(newValue);
+    },
+    [isCaseSensitiveFs, presetNames, validatePresetName]
+  );
+
   // Validating a preset rename
   const validatePresetRename = useCallback(
     (newValue: string) => {
       if (!newValue) {
         return PresetErrorEnum.EMPTY;
       }
-      if (presetNames.some((value) => value === newValue)) {
+
+      /**
+       *  Should cover the following cases for duplicate detection and case sensitivity:
+       *   - rename "apple" to "Apple" -> Windows: allowed, Linux: allowed
+       *   - rename "banana" to "Apple" when another "apple" preset exists -> Windows: DUPLICATE, Linux: allowed
+       */
+      if (
+        presetNames.some((value) =>
+          isCaseSensitiveFs
+            ? value.toLocaleLowerCase() === newValue.toLocaleLowerCase() &&
+              value !== newValue
+            : value === newValue
+        )
+      ) {
         return PresetErrorEnum.DUPLICATE;
       }
 
       return validatePresetName(newValue);
     },
-    [presetNames, validatePresetName]
+    [isCaseSensitiveFs, presetNames, validatePresetName]
   );
 
   const handleChangeNewPresetName = (newValue: string) => {
     setPresetName(newValue);
 
     // Validate new preset name and update error message accordingly
-    const msg = validatePresetName(newValue);
+    const msg = validatePresetNew(newValue);
     setNewPresetNameError(msg);
   };
 
@@ -261,7 +297,7 @@ const PresetsBar = () => {
           isDisabled={!!globalError}
           errorMessage={newPresetNameError}
           handleChange={handleChangeNewPresetName}
-          handleSubmit={handleCreatePreset}
+          handleSubmit={handleCreateOrSavePreset}
           formatInput={formatPresetName}
         />
       </div>
@@ -269,7 +305,7 @@ const PresetsBar = () => {
         ariaLabel="Save settings to preset"
         className="small"
         isDisabled={!!globalError || !presetName || !!newPresetNameError}
-        handleChange={handleCreatePreset}
+        handleChange={handleCreateOrSavePreset}
       >
         Save current settings to preset
       </Button>

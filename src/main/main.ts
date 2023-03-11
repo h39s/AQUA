@@ -133,9 +133,9 @@ try {
       console.log(stdout);
     }
   );
+  state.isCaseSensitiveFs = true;
 } catch (e) {
   console.error(e);
-  throw e;
 }
 
 const retryHelper = async (attempts: number, f: () => unknown) => {

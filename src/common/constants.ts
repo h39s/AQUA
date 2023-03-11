@@ -85,6 +85,7 @@ export interface IState {
   isEnabled: boolean;
   isAutoPreAmpOn: boolean;
   isGraphViewOn: boolean;
+  isCaseSensitiveFs: boolean;
   preAmp: number;
   filters: IFiltersMap;
 }
@@ -133,6 +134,7 @@ export const getDefaultState = (): IState => {
     isEnabled: true,
     isAutoPreAmpOn: true,
     isGraphViewOn: true, // true as default so that spinner can be seen on initial load
+    isCaseSensitiveFs: false, // false as default so we assume windows fs behavior
     preAmp: 0,
     filters: getDefaultFilters(),
   };

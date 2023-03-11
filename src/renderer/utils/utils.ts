@@ -42,52 +42,6 @@ export const formatPresetName = (s: string) => {
   return s.replaceAll(/[^a-zA-Z0-9|_|\-()| ]+/g, '');
 };
 
-export const encodePresetName = (s: string) => {
-  return s.replaceAll(/[A-Z]/g, (x) => `^${x.toLocaleLowerCase()}`);
-};
-
-export const decodePresetName = (s: string) => {
-  return formatPresetName(
-    s.replaceAll(/\^[a-z]/g, (x) => `${x[1].toLocaleUpperCase()}`)
-  );
-};
-
-export const findMissingGap = (arr: number[]) => {
-  if (arr.length === 0) {
-    return 0;
-  }
-
-  for (let i = 0; i < arr.length; i += 1) {
-    const temp = arr[i];
-    if (temp < arr.length && temp !== i) {
-      arr[i] = arr[temp];
-      arr[temp] = temp;
-    }
-  }
-
-  for (let i = 0; i < arr.length; i += 1) {
-    if (arr[i] !== i) {
-      return i;
-    }
-  }
-
-  return arr.length;
-};
-
-export const padPresetName = (s: string, names: string[]) => {
-  const spaceCounts = names
-    .filter((n) => n.trim().toLocaleLowerCase() === s.toLocaleLowerCase())
-    .map((n) => n.length - s.length);
-
-  const numSpaces = findMissingGap(spaceCounts);
-
-  return s.padEnd(s.length + numSpaces, String.fromCharCode(160));
-};
-
-export const comparePaddedStrings = (a: string, b: string) => {
-  return a.trim() === b.trim();
-};
-
 // *** CUSTOM HOOKS ***
 
 // https://overreacted.io/making-setinterval-declarative-with-react-hooks/
