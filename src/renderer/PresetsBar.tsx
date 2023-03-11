@@ -27,13 +27,6 @@ import {
 import './styles/PresetsBar.scss';
 import { ErrorDescription } from 'common/errors';
 import { isRestrictedPresetName } from 'common/utils';
-import {
-  deletePreset,
-  getPresetListFromFiles,
-  loadPreset,
-  renamePreset,
-  savePreset,
-} from './utils/equalizerApi';
 import { useAquaContext } from './utils/AquaContext';
 import TextInput from './widgets/TextInput';
 import Button from './widgets/Button';
@@ -41,7 +34,7 @@ import List, { IOptionEntry } from './widgets/List';
 import PresetListItem from './components/PresetListItem';
 import { formatPresetName } from './utils/utils';
 
-enum PresetErrorEnum {
+export enum PresetErrorEnum {
   EMPTY = 'Preset name cannot be empty.',
   RESTRICTED = 'Invalid preset name, please use another.',
   DUPLICATE = 'Duplicate name found, please use another.',
@@ -84,7 +77,21 @@ const presetReducer: IPresetReducer = (
   }
 };
 
-const PresetsBar = () => {
+interface IPresetsBarProps {
+  fetchPresets: () => Promise<string[]>;
+  loadPreset: (presetName: string) => Promise<void>;
+  savePreset: (presetName: string) => Promise<void>;
+  renamePreset: (oldName: string, newName: string) => Promise<void>;
+  deletePreset: (presetName: string) => Promise<void>;
+}
+
+const PresetsBar = ({
+  fetchPresets,
+  loadPreset,
+  savePreset,
+  renamePreset,
+  deletePreset,
+}: IPresetsBarProps) => {
   const { globalError, isCaseSensitiveFs, performHealthCheck, setGlobalError } =
     useAquaContext();
 
@@ -104,7 +111,7 @@ const PresetsBar = () => {
   useEffect(() => {
     const fetchPresetNames = async () => {
       try {
-        const result = await getPresetListFromFiles();
+        const result = await fetchPresets();
         dispatchPresetNames({
           type: PresetActionEnum.INIT,
           presetNames: result,
@@ -115,10 +122,15 @@ const PresetsBar = () => {
     };
 
     fetchPresetNames();
-  }, [setGlobalError]);
+  }, [fetchPresets, setGlobalError]);
 
   // Creating a new preset
   const handleCreateOrSavePreset = useCallback(async () => {
+    // Do not create or save a preset if there is no name or if there is an error present
+    if (!presetName || newPresetNameError) {
+      return;
+    }
+
     try {
       await savePreset(presetName);
 
@@ -132,7 +144,13 @@ const PresetsBar = () => {
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
-  }, [isExistingPresetSelected, presetName, setGlobalError]);
+  }, [
+    isExistingPresetSelected,
+    newPresetNameError,
+    presetName,
+    savePreset,
+    setGlobalError,
+  ]);
 
   // Loading audio settings from an existing preset
   const handleLoadPreset = async () => {
@@ -179,22 +197,23 @@ const PresetsBar = () => {
 
   // Validating a preset rename
   const validatePresetRename = useCallback(
-    (newValue: string) => {
+    (oldValue: string) => (newValue: string) => {
       if (!newValue) {
         return PresetErrorEnum.EMPTY;
       }
 
       /**
        *  Should cover the following cases for duplicate detection and case sensitivity:
-       *   - rename "apple" to "Apple" -> Windows: allowed, Linux: allowed
-       *   - rename "banana" to "Apple" when another "apple" preset exists -> Windows: DUPLICATE, Linux: allowed
+       *   - rename "apple" to "Apple" -> Case Insensitive: allowed, Case Sensitive: allowed
+       *   - rename "banana" to "Apple" when another "apple" preset exists -> Case Insensitive: DUPLICATE, Case Sensitive: allowed
        */
       if (
-        presetNames.some((value) =>
-          isCaseSensitiveFs
-            ? value.toLocaleLowerCase() === newValue.toLocaleLowerCase() &&
-              value !== newValue
-            : value === newValue
+        presetNames.some(
+          (value) =>
+            value !== oldValue &&
+            (isCaseSensitiveFs
+              ? value === newValue
+              : value.toLocaleLowerCase() === newValue.toLocaleLowerCase())
         )
       ) {
         return PresetErrorEnum.DUPLICATE;
@@ -239,7 +258,7 @@ const PresetsBar = () => {
         // continue to run, the worst case is that the file still exists and that's all.
       }
     },
-    []
+    [deletePreset]
   );
 
   // Renaming an existing preset
@@ -259,7 +278,7 @@ const PresetsBar = () => {
         setGlobalError(e as ErrorDescription);
       }
     },
-    [setGlobalError]
+    [renamePreset, setGlobalError]
   );
 
   const options: IOptionEntry[] = useMemo(() => {
@@ -273,7 +292,7 @@ const PresetsBar = () => {
             handleRename={handleRenameExistingPresetName(n)}
             handleDelete={handleDeletePreset(n)}
             isDisabled={!!globalError}
-            validate={validatePresetRename}
+            validate={validatePresetRename(n)}
           />
         ),
       };

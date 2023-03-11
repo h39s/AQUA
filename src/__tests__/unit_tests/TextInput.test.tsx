@@ -132,11 +132,11 @@ describe('TextInput', () => {
 
   it('should be disabled', async () => {
     const testValue = 'Standard';
-    setup(
+    const { user } = setup(
       <TextInput
         value={testValue}
         ariaLabel={name}
-        handleChange={handleChange}
+        handleSubmit={handleSubmit}
         handleEscape={handleEscape}
         isDisabled
         errorMessage=""
@@ -147,5 +147,8 @@ describe('TextInput', () => {
       'aria-disabled',
       'true'
     );
+    const editInput = screen.getByLabelText(name);
+    await user.type(editInput, '{Enter}');
+    expect(handleSubmit).toBeCalledTimes(0);
   });
 });

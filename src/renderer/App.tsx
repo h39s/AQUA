@@ -25,6 +25,13 @@ import SideBar from './SideBar';
 import FrequencyResponseChart from './graph/FrequencyResponseChart';
 import PresetsBar from './PresetsBar';
 import AutoEQ from './AutoEQ';
+import {
+  deletePreset,
+  getPresetListFromFiles,
+  loadPreset,
+  renamePreset,
+  savePreset,
+} from './utils/equalizerApi';
 
 const AppContent = () => {
   const { isLoading, globalError, performHealthCheck } = useAquaContext();
@@ -36,7 +43,13 @@ const AppContent = () => {
         <AutoEQ />
         <MainContent />
       </div>
-      <PresetsBar />
+      <PresetsBar
+        fetchPresets={getPresetListFromFiles}
+        loadPreset={loadPreset}
+        savePreset={savePreset}
+        renamePreset={renamePreset}
+        deletePreset={deletePreset}
+      />
       <FrequencyResponseChart />
       {globalError && (
         <PrereqMissingModal
