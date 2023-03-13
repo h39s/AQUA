@@ -252,25 +252,31 @@ describe('PresetListItem', () => {
       );
     });
 
+    // Assume we click the edit icon of the first preset which is Apple
     const editIcon = screen.getAllByLabelText(editIconLabel)[0];
     await user.click(editIcon);
     const editInput = screen.getByLabelText(editModeLabel);
     expect(editInput).toBeInTheDocument();
 
+    // Restricted preset name
     await clearAndType(user, editInput, 'COM1');
     await user.keyboard('{Enter}');
     expect(screen.getByText(PresetErrorEnum.RESTRICTED)).toBeInTheDocument();
 
-    // Assume we click the edit icon of the first preset which is Apple
+    // Exact duplicate exists
     await clearAndType(user, editInput, 'Banana');
     await user.keyboard('{Enter}');
     expect(screen.getByText(PresetErrorEnum.DUPLICATE)).toBeInTheDocument();
 
+    // Allow name that differs by case only
     await clearAndType(user, editInput, 'bAnAnA');
     await user.keyboard('{Enter}');
     expect(screen.getByText('bAnAnA')).toBeInTheDocument();
 
-    await clearAndType(user, editInput, 'aPpLe');
+    // Refetch editIcon and editInput because the elemnts were rerendered
+    await user.click(screen.getAllByLabelText(editIconLabel)[0]);
+    // Allow rename to the same name that differs by case only
+    await clearAndType(user, screen.getByLabelText(editModeLabel), 'aPpLe');
     await user.keyboard('{Enter}');
     expect(screen.getByText('aPpLe')).toBeInTheDocument();
   });
@@ -293,24 +299,28 @@ describe('PresetListItem', () => {
       );
     });
 
+    // Assume we click the edit icon of the first preset which is Apple
     const editIcon = screen.getAllByLabelText(editIconLabel)[0];
     await user.click(editIcon);
     const editInput = screen.getByLabelText(editModeLabel);
     expect(editInput).toBeInTheDocument();
 
+    // Restricted preset name
     await clearAndType(user, editInput, 'COM1');
     await user.keyboard('{Enter}');
     expect(screen.getByText(PresetErrorEnum.RESTRICTED)).toBeInTheDocument();
 
-    // Assume we click the edit icon of the first preset which is Apple
+    // Exact duplicate exists
     await clearAndType(user, editInput, 'Banana');
     await user.keyboard('{Enter}');
     expect(screen.getByText(PresetErrorEnum.DUPLICATE)).toBeInTheDocument();
 
+    // Duplicate that differs only by case exists
     await clearAndType(user, editInput, 'bAnAnA');
     await user.keyboard('{Enter}');
     expect(screen.getByText(PresetErrorEnum.DUPLICATE)).toBeInTheDocument();
 
+    // Allow rename to the same name that differs by case only
     await clearAndType(user, editInput, 'aPpLe');
     await user.keyboard('{Enter}');
     expect(screen.getByText('aPpLe')).toBeInTheDocument();
