@@ -54,6 +54,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     justify-content: space-between;
     align-items: center;
 
+    // Ensure icons don't get pushed out of the way
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    column-gap: $spacing-s;
+
+    .preset-name {
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+    }
+
     .icons {
       display: none;
       gap: $spacing-s;

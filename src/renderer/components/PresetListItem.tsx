@@ -84,7 +84,7 @@ const PresetListItem = ({
         />
       ) : (
         <>
-          {value}
+          <div className="preset-name">{value}</div>
           <div className="row icons">
             <IconButton
               icon={IconName.EDIT}

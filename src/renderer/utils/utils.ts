@@ -39,7 +39,7 @@ export const range = (start: number, stop: number, step: number) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
 
 export const formatPresetName = (s: string) => {
-  return s.replace(/[^a-zA-Z0-9|_|\-| ]+/, '');
+  return s.replaceAll(/[^a-zA-Z0-9|_|\-()| ]+/g, '');
 };
 
 // *** CUSTOM HOOKS ***

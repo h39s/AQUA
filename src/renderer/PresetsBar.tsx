@@ -27,13 +27,6 @@ import {
 import './styles/PresetsBar.scss';
 import { ErrorDescription } from 'common/errors';
 import { isRestrictedPresetName } from 'common/utils';
-import {
-  deletePreset,
-  getPresetListFromFiles,
-  loadPreset,
-  renamePreset,
-  savePreset,
-} from './utils/equalizerApi';
 import { useAquaContext } from './utils/AquaContext';
 import TextInput from './widgets/TextInput';
 import Button from './widgets/Button';
@@ -41,7 +34,7 @@ import List, { IOptionEntry } from './widgets/List';
 import PresetListItem from './components/PresetListItem';
 import { formatPresetName } from './utils/utils';
 
-enum PresetErrorEnum {
+export enum PresetErrorEnum {
   EMPTY = 'Preset name cannot be empty.',
   RESTRICTED = 'Invalid preset name, please use another.',
   DUPLICATE = 'Duplicate name found, please use another.',
@@ -84,8 +77,23 @@ const presetReducer: IPresetReducer = (
   }
 };
 
-const PresetsBar = () => {
-  const { globalError, performHealthCheck, setGlobalError } = useAquaContext();
+interface IPresetsBarProps {
+  fetchPresets: () => Promise<string[]>;
+  loadPreset: (presetName: string) => Promise<void>;
+  savePreset: (presetName: string) => Promise<void>;
+  renamePreset: (oldName: string, newName: string) => Promise<void>;
+  deletePreset: (presetName: string) => Promise<void>;
+}
+
+const PresetsBar = ({
+  fetchPresets,
+  loadPreset,
+  savePreset,
+  renamePreset,
+  deletePreset,
+}: IPresetsBarProps) => {
+  const { globalError, isCaseSensitiveFs, performHealthCheck, setGlobalError } =
+    useAquaContext();
 
   const [presetName, setPresetName] = useState<string>('');
   const [newPresetNameError, setNewPresetNameError] = useState<string>('');
@@ -103,7 +111,7 @@ const PresetsBar = () => {
   useEffect(() => {
     const fetchPresetNames = async () => {
       try {
-        const result = await getPresetListFromFiles();
+        const result = await fetchPresets();
         dispatchPresetNames({
           type: PresetActionEnum.INIT,
           presetNames: result,
@@ -114,10 +122,15 @@ const PresetsBar = () => {
     };
 
     fetchPresetNames();
-  }, [setGlobalError]);
+  }, [fetchPresets, setGlobalError]);
 
   // Creating a new preset
-  const handleCreatePreset = useCallback(async () => {
+  const handleCreateOrSavePreset = useCallback(async () => {
+    // Do not create or save a preset if there is no name or if there is an error present
+    if (!presetName || newPresetNameError) {
+      return;
+    }
+
     try {
       await savePreset(presetName);
 
@@ -131,7 +144,13 @@ const PresetsBar = () => {
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
-  }, [isExistingPresetSelected, presetName, setGlobalError]);
+  }, [
+    isExistingPresetSelected,
+    newPresetNameError,
+    presetName,
+    savePreset,
+    setGlobalError,
+  ]);
 
   // Loading audio settings from an existing preset
   const handleLoadPreset = async () => {
@@ -154,26 +173,65 @@ const PresetsBar = () => {
     return '';
   }, []);
 
+  const validatePresetNew = useCallback(
+    (newName: string) => {
+      /**
+       * For a not case sensitive file system (apple is equal to ApPlE), we want to prevent users from creating a new preset
+       * that has the same characters that differ only in case. However, we want to allow users to specify an exact duplicate
+       * (where the characters and the case both match) so they can overwrite their existing presets.
+       */
+      if (
+        !isCaseSensitiveFs &&
+        presetNames.some(
+          (existingName) =>
+            newName.toLocaleLowerCase() === existingName.toLocaleLowerCase() &&
+            existingName !== newName
+        )
+      ) {
+        return PresetErrorEnum.DUPLICATE;
+      }
+      return validatePresetName(newName);
+    },
+    [isCaseSensitiveFs, presetNames, validatePresetName]
+  );
+
   // Validating a preset rename
   const validatePresetRename = useCallback(
-    (newValue: string) => {
-      if (!newValue) {
+    (oldName: string) => (newName: string) => {
+      if (!newName) {
         return PresetErrorEnum.EMPTY;
       }
-      if (presetNames.some((value) => value === newValue)) {
+
+      /**
+       *  Should cover the following cases for duplicate detection and case sensitivity:
+       *   - rename "apple" to "Apple" -> Case Insensitive: allowed, Case Sensitive: allowed
+       *   - rename "banana" to "Apple" when another "apple" preset exists -> Case Insensitive: DUPLICATE, Case Sensitive: allowed
+       */
+      if (
+        isCaseSensitiveFs
+          ? presetNames.some(
+              (existingName) =>
+                existingName !== oldName && existingName === newName
+            )
+          : presetNames.some(
+              (existingName) =>
+                existingName !== oldName &&
+                existingName.toLocaleLowerCase() === newName.toLocaleLowerCase()
+            )
+      ) {
         return PresetErrorEnum.DUPLICATE;
       }
 
-      return validatePresetName(newValue);
+      return validatePresetName(newName);
     },
-    [presetNames, validatePresetName]
+    [isCaseSensitiveFs, presetNames, validatePresetName]
   );
 
   const handleChangeNewPresetName = (newValue: string) => {
     setPresetName(newValue);
 
     // Validate new preset name and update error message accordingly
-    const msg = validatePresetName(newValue);
+    const msg = validatePresetNew(newValue);
     setNewPresetNameError(msg);
   };
 
@@ -203,7 +261,7 @@ const PresetsBar = () => {
         // continue to run, the worst case is that the file still exists and that's all.
       }
     },
-    []
+    [deletePreset]
   );
 
   // Renaming an existing preset
@@ -223,7 +281,7 @@ const PresetsBar = () => {
         setGlobalError(e as ErrorDescription);
       }
     },
-    [setGlobalError]
+    [renamePreset, setGlobalError]
   );
 
   const options: IOptionEntry[] = useMemo(() => {
@@ -237,7 +295,7 @@ const PresetsBar = () => {
             handleRename={handleRenameExistingPresetName(n)}
             handleDelete={handleDeletePreset(n)}
             isDisabled={!!globalError}
-            validate={validatePresetRename}
+            validate={validatePresetRename(n)}
           />
         ),
       };
@@ -261,7 +319,7 @@ const PresetsBar = () => {
           isDisabled={!!globalError}
           errorMessage={newPresetNameError}
           handleChange={handleChangeNewPresetName}
-          handleSubmit={handleCreatePreset}
+          handleSubmit={handleCreateOrSavePreset}
           formatInput={formatPresetName}
         />
       </div>
@@ -269,7 +327,7 @@ const PresetsBar = () => {
         ariaLabel="Save settings to preset"
         className="small"
         isDisabled={!!globalError || !presetName || !!newPresetNameError}
-        handleChange={handleCreatePreset}
+        handleChange={handleCreateOrSavePreset}
       >
         Save current settings to preset
       </Button>

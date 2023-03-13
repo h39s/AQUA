@@ -29,6 +29,7 @@ const defaultAquaContext: IAquaContext = {
   isEnabled: DEFAULT_STATE.isEnabled,
   isAutoPreAmpOn: DEFAULT_STATE.isAutoPreAmpOn,
   isGraphViewOn: DEFAULT_STATE.isGraphViewOn,
+  isCaseSensitiveFs: DEFAULT_STATE.isCaseSensitiveFs,
   preAmp: DEFAULT_STATE.preAmp,
   filters: DEFAULT_STATE.filters,
   performHealthCheck: () => {},

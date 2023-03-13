@@ -108,12 +108,12 @@ const TextInput = forwardRef(
           handleEscape();
         }
 
-        // Submit changes when the Enter key is pressed
-        if (e.code === 'Enter') {
+        // Submit changes when the Enter key is pressed (prevent this action if the input is disabled!)
+        if (e.code === 'Enter' && !isDisabled) {
           submitValue(storedValue);
         }
       },
-      [handleEscape, submitValue, storedValue]
+      [handleEscape, isDisabled, submitValue, storedValue]
     );
 
     const onChange = useCallback(
