@@ -189,6 +189,16 @@ describe('PresetListItem', () => {
     // Submitting with an error present should not save
     await user.type(presetNameInput, '{Enter}');
     expect(savePreset).toHaveBeenCalledTimes(0);
+
+    // Allow preset name that isn't an exact match
+    await clearAndType(
+      user,
+      presetNameInput,
+      samplePresetNames[0].toLocaleLowerCase()
+    );
+    expect(saveButton).toHaveAttribute('aria-disabled', 'false');
+    await user.type(presetNameInput, '{Enter}');
+    expect(savePreset).toHaveBeenCalledTimes(1);
   });
 
   it('should disallow invalid new preset names for case insensitive systems', async () => {
@@ -259,6 +269,10 @@ describe('PresetListItem', () => {
     await clearAndType(user, editInput, 'bAnAnA');
     await user.keyboard('{Enter}');
     expect(screen.getByText('bAnAnA')).toBeInTheDocument();
+
+    // await clearAndType(user, editInput, 'aPpLe');
+    // await user.keyboard('{Enter}');
+    // expect(screen.getByText('aPpLe')).toBeInTheDocument();
   });
 
   it('should disallow invalid renamed presets for case insensitive systems', async () => {

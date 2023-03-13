@@ -174,31 +174,31 @@ const PresetsBar = ({
   }, []);
 
   const validatePresetNew = useCallback(
-    (newValue: string) => {
+    (newName: string) => {
       /**
        * For a not case sensitive file system (apple is equal to ApPlE), we want to prevent users from creating a new preset
-       * that has the same characters that differs only in case. However, we want to allow users to specify an exact duplicate
+       * that has the same characters that differ only in case. However, we want to allow users to specify an exact duplicate
        * (where the characters and the case both match) so they can overwrite their existing presets.
        */
       if (
         !isCaseSensitiveFs &&
         presetNames.some(
-          (value) =>
-            newValue.toLocaleLowerCase() === value.toLocaleLowerCase() &&
-            value !== newValue
+          (existingName) =>
+            newName.toLocaleLowerCase() === existingName.toLocaleLowerCase() &&
+            existingName !== newName
         )
       ) {
         return PresetErrorEnum.DUPLICATE;
       }
-      return validatePresetName(newValue);
+      return validatePresetName(newName);
     },
     [isCaseSensitiveFs, presetNames, validatePresetName]
   );
 
   // Validating a preset rename
   const validatePresetRename = useCallback(
-    (oldValue: string) => (newValue: string) => {
-      if (!newValue) {
+    (oldName: string) => (newName: string) => {
+      if (!newName) {
         return PresetErrorEnum.EMPTY;
       }
 
@@ -208,18 +208,21 @@ const PresetsBar = ({
        *   - rename "banana" to "Apple" when another "apple" preset exists -> Case Insensitive: DUPLICATE, Case Sensitive: allowed
        */
       if (
-        presetNames.some(
-          (value) =>
-            value !== oldValue &&
-            (isCaseSensitiveFs
-              ? value === newValue
-              : value.toLocaleLowerCase() === newValue.toLocaleLowerCase())
-        )
+        isCaseSensitiveFs
+          ? presetNames.some(
+              (existingName) =>
+                existingName !== oldName && existingName === newName
+            )
+          : presetNames.some(
+              (existingName) =>
+                existingName !== oldName &&
+                existingName.toLocaleLowerCase() === newName.toLocaleLowerCase()
+            )
       ) {
         return PresetErrorEnum.DUPLICATE;
       }
 
-      return validatePresetName(newValue);
+      return validatePresetName(newName);
     },
     [isCaseSensitiveFs, presetNames, validatePresetName]
   );

@@ -134,7 +134,7 @@ export const getDefaultState = (): IState => {
     isEnabled: true,
     isAutoPreAmpOn: true,
     isGraphViewOn: true, // true as default so that spinner can be seen on initial load
-    isCaseSensitiveFs: false, // false as default so we assume windows fs behavior
+    isCaseSensitiveFs: false, // false as default so we assume windows case insensitive behavior (foo = FoO)
     preAmp: 0,
     filters: getDefaultFilters(),
   };
