@@ -270,9 +270,9 @@ describe('PresetListItem', () => {
     await user.keyboard('{Enter}');
     expect(screen.getByText('bAnAnA')).toBeInTheDocument();
 
-    // await clearAndType(user, editInput, 'aPpLe');
-    // await user.keyboard('{Enter}');
-    // expect(screen.getByText('aPpLe')).toBeInTheDocument();
+    await clearAndType(user, editInput, 'aPpLe');
+    await user.keyboard('{Enter}');
+    expect(screen.getByText('aPpLe')).toBeInTheDocument();
   });
 
   it('should disallow invalid renamed presets for case insensitive systems', async () => {
