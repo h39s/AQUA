@@ -261,7 +261,7 @@ export default class MenuBuilder {
           {
             label: 'Documentation',
             click() {
-              shell.openExternal('https://github.com/hemit-s/AQUA');
+              shell.openExternal('https://github.com/h39s/AQUA');
             },
           },
         ],

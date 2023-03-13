@@ -11,12 +11,12 @@
     "hot",
     "reload"
   ],
-  "homepage": "https://github.com/hemit-s/AQUA",
+  "homepage": "https://github.com/h39s/AQUA",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hemit-s/AQUA.git"
+    "url": "git+https://github.com/h39s/AQUA.git"
   },
-  "license": "MIT",
+  "license": "GPLv3",
   "author": {
     "name": "JATY"
   },
@@ -258,7 +258,7 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "hemit-s",
+      "owner": "h39s",
       "repo": "AQUA"
     }
   },
