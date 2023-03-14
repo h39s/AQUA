@@ -245,6 +245,9 @@ describe('NumberInput', () => {
     const input = screen.getByLabelText(id);
     expect(input).toHaveValue(`${testValue}`);
     expect(input).toBeDisabled();
+
+    fireEvent.wheel(input, { deltaY: -100 });
+    expect(handleSubmit).not.toHaveBeenCalled();
   });
 
   it('should not accept bad inputs for float input', async () => {

@@ -36,6 +36,7 @@ export const givenCanWriteToAquaConfig = (given: DefineStepFunction) => {
       isEnabled: false,
       isAutoPreAmpOn: false,
       isGraphViewOn: false,
+      isCaseSensitiveFs: false,
       preAmp: 0,
       filters: { unique_id: getDefaultFilterWithId() },
     };
