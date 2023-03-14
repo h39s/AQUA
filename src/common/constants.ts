@@ -35,10 +35,10 @@ export const MIN_NUM_FILTERS = 1;
 // Need to use LSC and HSC to allow users to adjust quality for low/high shelf filters
 export enum FilterTypeEnum {
   PK = 'PK', // Peak ["PK",True,True]
-  // LPQ = 'LPQ', // Low Pass ["LPQ",False,True]
-  // HPQ = 'HPQ', // High Pass ["HPQ",False,True]
-  // BP = 'BP', // Band Pass ["BP",False,True]
-  // NO = 'NO', // Notch ["NO",False,True]
+  LPQ = 'LPQ', // Low Pass ["LPQ",False,True]
+  HPQ = 'HPQ', // High Pass ["HPQ",False,True]
+  BP = 'BP', // Band Pass ["BP",False,True]
+  NO = 'NO', // Notch ["NO",False,True]
   // AP = 'AP', // All Pass ["AP",False,True]
   LSC = 'LSC', // Low Shelf ["LSC",True,True]
   HSC = 'HSC', // High Shelf ["HSC",True,True]
@@ -52,11 +52,12 @@ export enum FilterTypeEnum {
 
 export const FilterTypeToLabelMap: Record<FilterTypeEnum, string> = {
   [FilterTypeEnum.PK]: 'Peak Filter',
-  // [FilterTypeEnum.LPQ]: 'Low Pass Filter',
-  // [FilterTypeEnum.HPQ]: 'High Pass Filter',
+  [FilterTypeEnum.LPQ]: 'Low Pass Filter',
+  [FilterTypeEnum.HPQ]: 'High Pass Filter',
+  [FilterTypeEnum.BP]: 'Band Pass Filter',
+  [FilterTypeEnum.NO]: 'Notch Filter',
   [FilterTypeEnum.LSC]: 'Low Shelf Filter',
   [FilterTypeEnum.HSC]: 'High Shelf Filter',
-  // [FilterTypeEnum.NO]: 'Notch Filter',
 };
 
 export const WINDOW_WIDTH = 1428;

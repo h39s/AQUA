@@ -51,6 +51,7 @@ const getTFCoefficients = (filter: IFilter) => {
     quality: userQuality,
   } = filter;
 
+  // TODO: add additional shelf filter cases when/if we add them in
   // Handle these filter types differently:
   // 'peak', 'low-shelf-fixed', 'high-shelf-fixed', 'low-shelf-q', 'high-shelf-q', 'low-shelf-db', 'high-shelf-db'
   const specialFilters = new Set([
@@ -77,7 +78,7 @@ const getTFCoefficients = (filter: IFilter) => {
 
   const shelfFilters = new Set([FilterTypeEnum.HSC, FilterTypeEnum.LSC]);
   if (shelfFilters.has(filterType)) {
-    // TODO: add additional shelf filter cases when /if we add them in
+    // TODO: add additional shelf filter cases when/if we add them in
     // if (filterType in {'low-shelf-fixed', 'high-shelf-fixed'}){
     //     quality = 0.9
     // } else
@@ -122,35 +123,35 @@ const getTFCoefficients = (filter: IFilter) => {
       a0 = 1 + alpha / gain;
       a1 = -2 * cosine;
       a2 = 1 - alpha / gain;
-      // TODO: Add these filters back in when we re-enable the filter types
-      // } else if ( filterType === FilterTypeEnum.NO){
-      //     b0 = 1
-      //     b1 = -2*cosine
-      //     b2 = 1
-      //     a0 = 1+alpha
-      //     a1 = -2*cosine
-      //     a2 = 1-alpha
-      // } else if (filterType === FilterTypeEnum.LPQ){
-      //     b0 = (1-cosine)/2
-      //     b1 = 1-cosine
-      //     b2 = (1-cosine)/2
-      //     a0 = 1+alpha;
-      //     a1 = -2*cosine;
-      //     a2 = 1-alpha;
-      // } else if (filterType === FilterTypeEnum.HPQ){
-      //     b0 = (1+cosine)/2
-      //     b1 = -(1+cosine)
-      //     b2 = (1+cosine) /2
-      //     a0 = 1+alpha
-      //     a1 = -2*cosine
-      //     a2 = 1-alpha
-      // } else if (filterType === FilterTypeEnum.BP){
-      //     b0 = alpha
-      //     b1 = 0
-      //     b2 = -alpha
-      //     a0 = 1+alpha
-      //     a1 = -2*cosine
-      //     a2 = 1-alpha
+    } else if (filterType === FilterTypeEnum.NO) {
+      b0 = 1;
+      b1 = -2 * cosine;
+      b2 = 1;
+      a0 = 1 + alpha;
+      a1 = -2 * cosine;
+      a2 = 1 - alpha;
+    } else if (filterType === FilterTypeEnum.LPQ) {
+      b0 = (1 - cosine) / 2;
+      b1 = 1 - cosine;
+      b2 = (1 - cosine) / 2;
+      a0 = 1 + alpha;
+      a1 = -2 * cosine;
+      a2 = 1 - alpha;
+    } else if (filterType === FilterTypeEnum.HPQ) {
+      b0 = (1 + cosine) / 2;
+      b1 = -(1 + cosine);
+      b2 = (1 + cosine) / 2;
+      a0 = 1 + alpha;
+      a1 = -2 * cosine;
+      a2 = 1 - alpha;
+    } else if (filterType === FilterTypeEnum.BP) {
+      b0 = alpha;
+      b1 = 0;
+      b2 = -alpha;
+      a0 = 1 + alpha;
+      a1 = -2 * cosine;
+      a2 = 1 - alpha;
+      // TODO: Add this filter back in when/if we decide to add all pass filter
       // } else if ( filterType === FilterTypeEnum.AP){
       //     b0 = 1-alpha
       //     b1 = -2*cosine

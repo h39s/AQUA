@@ -45,12 +45,31 @@ const Chart = ({ data = [], dimensions }: IChartProps) => {
     [height, margins]
   );
 
-  const padding = {
-    left: 50,
-    top: 0,
-    right: 0,
-    bottom: 30,
-  };
+  const padding = useMemo(() => {
+    return {
+      left: 50,
+      top: 0,
+      right: 0,
+      bottom: 30,
+    };
+  }, []);
+
+  const chartWidth = useMemo(
+    () =>
+      Math.max(
+        width - margins.left - margins.right - padding.left - padding.right,
+        0
+      ),
+    [width, margins, padding]
+  );
+  const chartHeight = useMemo(
+    () =>
+      Math.max(
+        height - margins.top - margins.bottom - padding.top - padding.bottom,
+        0
+      ),
+    [height, margins, padding]
+  );
 
   const { xTickFormat, yTickFormat, xScaleFreq, yScaleGain } = useController({
     data,
@@ -102,6 +121,9 @@ const Chart = ({ data = [], dimensions }: IChartProps) => {
       {data.map((e: IChartCurveData) => (
         <Curve key={e.id} data={e} xScale={xScaleFreq} yScale={yScaleGain} />
       ))}
+      <clipPath id="chart-clip-path">
+        <rect x={padding.left} width={chartWidth} height={chartHeight} />
+      </clipPath>
       <Axis
         type="left"
         scale={yScaleGain}
