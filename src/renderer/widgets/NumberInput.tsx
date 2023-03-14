@@ -264,6 +264,10 @@ const NumberInput = ({
   };
 
   const onWheel = (e: WheelEvent) => {
+    if (isDisabled) {
+      return;
+    }
+
     updateValue(
       onWheelValueChange ? onWheelValueChange(e) : onWheelDefaultValueChange(e)
     );
@@ -287,7 +291,7 @@ const NumberInput = ({
       // the ch unit supposedly uses the '0' as the per character valueLength
       style={{ '--input-width': `${valueLength}ch` } as CSSProperties}
     >
-      <div className="input-wrapper row center">
+      <div className="input-wrapper row center" aria-disabled={isDisabled}>
         <input
           ref={inputRef}
           type="text"

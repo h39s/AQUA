@@ -41,9 +41,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       outline: $spacing-xxs solid $white;
     }
 
-    &:disabled {
+    &[aria-disabled='true'] {
       border: $spacing-xxs solid $primary-lighter;
-      color: $primary-lighter;
     }
   }
 
@@ -55,6 +54,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     padding: $spacing-xs;
     height: $input-height;
     width: max($input-height, var(--input-width));
+
+    &:disabled {
+      color: $primary-lighter;
+    }
   }
 
   .asterisk {

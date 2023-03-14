@@ -53,6 +53,13 @@ import { FilterActionEnum, useAquaContext } from '../utils/AquaContext';
 import Slider from './Slider';
 import '../styles/FrequencyBand.scss';
 
+const NO_GAIN_FILTER_TYPES = new Set([
+  FilterTypeEnum.BP,
+  FilterTypeEnum.HPQ,
+  FilterTypeEnum.HPQ,
+  FilterTypeEnum.NO,
+]);
+
 interface IFrequencyBandProps {
   filter: IFilter;
   isMinSliderCount: boolean;
@@ -193,6 +200,11 @@ const FrequencyBand = forwardRef(
       }
     };
 
+    const isGainDisabled = useMemo(
+      () => NO_GAIN_FILTER_TYPES.has(filter.type),
+      [filter.type]
+    );
+
     const onRemoveEqualizerSlider = async () => {
       if (isRemoveDisabled) {
         return;
@@ -258,6 +270,7 @@ const FrequencyBand = forwardRef(
               value={filter.gain}
               sliderHeight={sliderHeight}
               setValue={handleGainSubmit}
+              isDisabled={isGainDisabled}
             />
           </div>
           <NumberInput
