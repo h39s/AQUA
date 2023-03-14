@@ -29,6 +29,15 @@ To get started using AQUA, it only takes two easy steps:
 1. Install [EqualizerAPO](https://sourceforge.net/projects/equalizerapo/) if you don't have it currently installed (and make sure you run `configurator.exe` included as a part of EqualizerAPO to install the required drivers for the devices you would like to EQ).
 2. Download and run the executable `AQUAsetup.exe` from the latest [release](https://github.com/h39s/AQUA/releases).
 
+## FAQ
+
+By default, the Windows file system does not support case sensitive file names (i.e. you cannot have files/folders named `AQUA` and `aqua` in the same directory). 
+
+- On Windows 11, AQUA is able to enable case sensitivity specifically for our `presets` folder so users can save presets with case-sensitive names.
+- On Windows 10, if you would like to enable this feature you will have to install [WSL](https://learn.microsoft.com/en-us/windows/wsl/). You can do so by opening a PowerShell window as an administrator and running `wsl --install`.
+   - If you have existing presets saved in AQUA, you will need to temporarily empty the presets folder (`C:\Users\<username>\AppData\Roaming\aqua\presets`) before starting the app to enable case sensitivity. Your existing presets can then be copied back into the presets folder.
+- On Windows 7, 8, and 8.1, case sensitive preset naming is not available.
+
 ## Get In Touch
 
 If you find any bugs, have any feature requests, or want to give us any kind of feedback, we'd love to hear it! Please join us in our [discord](https://discord.gg/44WDeRrr2d) to reach out and to keep up to date with new release information!
