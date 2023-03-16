@@ -44,6 +44,8 @@ export enum FilterActionEnum {
   TYPE,
   ADD,
   REMOVE,
+  CLEAR_GAINS,
+  FIXED_BAND,
 }
 
 type NumericalFilterAction =
@@ -56,7 +58,8 @@ export type FilterAction =
   | { type: NumericalFilterAction; id: string; newValue: number }
   | { type: FilterActionEnum.TYPE; id: string; newValue: FilterTypeEnum }
   | { type: FilterActionEnum.ADD; id: string; frequency: number }
-  | { type: FilterActionEnum.REMOVE; id: string };
+  | { type: FilterActionEnum.REMOVE; id: string }
+  | { type: FilterActionEnum.CLEAR_GAINS };
 
 type FilterDispatch = (action: FilterAction) => void;
 
@@ -118,6 +121,13 @@ const filterReducer: IFilterReducer = (
     case FilterActionEnum.REMOVE: {
       const filtersCloned = cloneFilters(filters);
       delete filtersCloned[action.id];
+      return filtersCloned;
+    }
+    case FilterActionEnum.CLEAR_GAINS: {
+      const filtersCloned = cloneFilters(filters);
+      Object.values(filtersCloned).forEach((f) => {
+        f.gain = 0;
+      });
       return filtersCloned;
     }
     default:

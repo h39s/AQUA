@@ -102,9 +102,28 @@ export interface IPresetV2 {
 
 /** ----- Default Values ----- */
 
-const FIXED_FREQUENCIES = [
-  32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000,
-];
+export enum FixedBandSizeEnum {
+  SIX = 6,
+  TEN = 10,
+  FIFTEEN = 15,
+  THIRTY_ONE = 31,
+}
+
+export const FIXED_BAND_FREQUENCIES: Record<FixedBandSizeEnum, number[]> = {
+  [FixedBandSizeEnum.SIX]: [100, 200, 400, 800, 1600, 3200],
+  [FixedBandSizeEnum.TEN]: [
+    32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000,
+  ],
+  [FixedBandSizeEnum.FIFTEEN]: [
+    25, 40, 63, 100, 160, 250, 400, 630, 1000, 1600, 2500, 4000, 6300, 10000,
+    16000,
+  ],
+  [FixedBandSizeEnum.THIRTY_ONE]: [
+    20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
+    800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000,
+    12500, 16000, 20000,
+  ],
+};
 
 const DEFAULT_FILTER_TEMPLATE = {
   frequency: 1000,
@@ -120,9 +139,11 @@ export const getDefaultFilterWithId = (): IFilter => {
   };
 };
 
-const getDefaultFilters = (): IFiltersMap => {
+export const getDefaultFilters = (
+  size: FixedBandSizeEnum = FixedBandSizeEnum.TEN
+): IFiltersMap => {
   const filters: IFiltersMap = {};
-  FIXED_FREQUENCIES.forEach((f) => {
+  FIXED_BAND_FREQUENCIES[size].forEach((f) => {
     const filter: IFilter = { ...getDefaultFilterWithId(), frequency: f };
     filters[filter.id] = filter;
   });

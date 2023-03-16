@@ -99,38 +99,41 @@ const AutoEQ = () => {
   );
 
   return (
-    <div className="auto-eq">
-      Audio Device:
-      <Dropdown
-        name="Audio Device"
-        options={deviceOptions}
-        value={currentDevice}
-        handleChange={handleDeviceChange}
-        isDisabled={!!globalError}
-        noSelectionPlaceholder={NO_DEVICE_SELECTION}
-        isFilterable
-      />
-      Target Frequency Response:
-      <Dropdown
-        name="Target Frequency Response"
-        options={responseOptions}
-        value={currentResponse}
-        handleChange={(newValue) => setCurrentResponse(newValue)}
-        isDisabled={!!globalError || responses.length === 0}
-        emptyOptionsPlaceholder={NO_RESPONSES}
-        noSelectionPlaceholder={NO_RESPONSE_SELECTION}
-      />
-      <Button
-        className="small"
-        ariaLabel="Apply Auto EQ"
-        isDisabled={
-          !!globalError || currentDevice === '' || currentResponse === ''
-        }
-        handleChange={applyAutoEQ}
-      >
-        Apply
-      </Button>
-    </div>
+    <>
+      <h4 className="auto-eq-title">Auto EQ</h4>
+      <div className="auto-eq">
+        Audio Device:
+        <Dropdown
+          name="Audio Device"
+          options={deviceOptions}
+          value={currentDevice}
+          handleChange={handleDeviceChange}
+          isDisabled={!!globalError}
+          noSelectionPlaceholder={NO_DEVICE_SELECTION}
+          isFilterable
+        />
+        Target Frequency Response:
+        <Dropdown
+          name="Target Frequency Response"
+          options={responseOptions}
+          value={currentResponse}
+          handleChange={(newValue) => setCurrentResponse(newValue)}
+          isDisabled={!!globalError || responses.length === 0}
+          emptyOptionsPlaceholder={NO_RESPONSES}
+          noSelectionPlaceholder={NO_RESPONSE_SELECTION}
+        />
+        <Button
+          className="small"
+          ariaLabel="Apply Auto EQ"
+          isDisabled={
+            !!globalError || currentDevice === '' || currentResponse === ''
+          }
+          handleChange={applyAutoEQ}
+        >
+          Apply
+        </Button>
+      </div>
+    </>
   );
 };
 

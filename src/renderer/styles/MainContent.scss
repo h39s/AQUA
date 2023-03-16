@@ -21,6 +21,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 @import 'spacing';
 
 // band width and height from constants file
+.main-content-title {
+  display: grid;
+  grid-template-columns: repeat(2, max-content) 1fr repeat(5, max-content);
+  align-items: center;
+
+  h4,
+  h5,
+  h6 {
+    margin: 0 $spacing-s;
+  }
+}
 
 .main-content {
   display: grid;
@@ -40,7 +51,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     display: grid;
 
     grid-template-rows:
-      0px // top padding
+      8px // top padding
       30px // filter type
       36px // frequency
       24px // top arrow
@@ -48,7 +59,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       24px // bottom arrow
       36px // gain
       36px // quality
-      0px; // bottom padding
+      16px; // bottom padding
     gap: 8px;
   }
 
@@ -58,7 +69,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     padding: 0 $spacing-xxs; // add some horizontal padding so the outline isn't cut off at either end
     height: 100%;
     width: 100%;
-    overflow-x: auto;
+
+    // Keep scrollbar visible to prevent filters' container height from changing
+    overflow-x: scroll;
     overflow-y: hidden;
   }
 }
