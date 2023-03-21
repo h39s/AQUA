@@ -51,9 +51,6 @@ export const stateToString = (state: IState) => {
     )
   );
 
-  // TODO: Figure out when to use GraphicEQ
-  // `${Frequency} ${Gain};`
-
   return output.join('\n\r');
 };
 
@@ -71,7 +68,7 @@ export const AQUA_CONFIG_FILENAME = 'aqua.txt';
 const CONFIG_FILENAME = 'config.txt';
 export const PRESETS_DIR = 'presets';
 
-const addFileToPath = (pathPrefix: string, fileName: string) => {
+export const addFileToPath = (pathPrefix: string, fileName: string) => {
   return path.join(pathPrefix, fileName);
 };
 
