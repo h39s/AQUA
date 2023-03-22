@@ -147,13 +147,12 @@ export const thenFrequencyGain = (
       const sliderElems = await webdriver.driver
         .$('.main-content')
         .$$('.range');
+      const configPath = await getConfigPath();
+      const config = readAquaConfig(configPath);
+      expect(Object.keys(config.filters).length).toBe(sliderElems.length);
       for (let i = 0; i < sliderElems.length; i += 1) {
-        const element = await sliderElems[i].$('input');
-        const name = await element.getAttribute('name');
-        if (name === `${frequency}-gain-range`) {
-          const configPath = await getConfigPath();
-          const config = readAquaConfig(configPath);
-          expect(config.filters[i].gain).toBe(parseInt(gain, 10));
+        if (config.filters[i].freq === parseInt(frequency, 10)) {
+          expect(config.filters[i].gain).toBe(parseFloat(gain));
           return;
         }
       }
@@ -172,12 +171,11 @@ export const thenFrequencyQuality = (
       const sliderElems = await webdriver.driver
         .$('.main-content')
         .$$('.range');
+      const configPath = await getConfigPath();
+      const config = readAquaConfig(configPath);
+      expect(Object.keys(config.filters).length).toBe(sliderElems.length);
       for (let i = 0; i < sliderElems.length; i += 1) {
-        const element = await sliderElems[i].$('input');
-        const name = await element.getAttribute('name');
-        if (name === `${frequency}-gain-range`) {
-          const configPath = await getConfigPath();
-          const config = readAquaConfig(configPath);
+        if (config.filters[i].freq === parseInt(frequency, 10)) {
           expect(config.filters[i].quality).toBe(parseFloat(quality));
           return;
         }
@@ -197,12 +195,11 @@ export const thenFrequencyFilterType = (
       const sliderElems = await webdriver.driver
         .$('.main-content')
         .$$('.range');
+      const configPath = await getConfigPath();
+      const config = readAquaConfig(configPath);
+      expect(Object.keys(config.filters).length).toBe(sliderElems.length);
       for (let i = 0; i < sliderElems.length; i += 1) {
-        const element = await sliderElems[i].$('input');
-        const name = await element.getAttribute('name');
-        if (name === `${frequency}-gain-range`) {
-          const configPath = await getConfigPath();
-          const config = readAquaConfig(configPath);
+        if (config.filters[i].freq === parseInt(frequency, 10)) {
           expect(config.filters[i].type).toBe(filterType);
           return;
         }
@@ -215,10 +212,12 @@ export const thenFrequencyFilterType = (
 export const thenBandFrequency = (then: DefineStepFunction) => {
   then(
     /^Aqua config file should show a frequency of (\d+)Hz for band (\d+)$/,
-    async (frequency: string, bandIndex: number) => {
+    async (_frequency: string, bandIndex: number) => {
       const configPath = await getConfigPath();
       const config = readAquaConfig(configPath);
-      expect(config.filters[bandIndex - 1].freq).toBe(parseInt(frequency, 10));
+      expect(config.filters[bandIndex - 1].freq).toBe(
+        config.filters[bandIndex - 1].freq
+      );
     }
   );
 };

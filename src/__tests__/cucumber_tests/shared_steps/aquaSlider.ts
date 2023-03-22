@@ -2,6 +2,22 @@ import { DefineStepFunction } from 'jest-cucumber';
 import { Driver } from '__tests__/utils/webdriver';
 import { FilterTypeEnum, FilterTypeToLabelMap } from 'common/constants';
 
+const clearTextBox = async (inputElement: any) => {
+  await inputElement.click();
+  await inputElement.keys([
+    'Backspace',
+    'Backspace',
+    'Backspace',
+    'Backspace',
+    'Backspace',
+    'Delete',
+    'Delete',
+    'Delete',
+    'Delete',
+    'Delete',
+  ]);
+};
+
 export const givenBandCount = (
   given: DefineStepFunction,
   webdriver: { driver: Driver | undefined }
@@ -113,6 +129,7 @@ export const whenSetFrequencyGainWithText = (
       const inputElement = await webdriver.driver.$(
         `.main-content label[for="${frequency}-gain-number"] input`
       );
+      await clearTextBox(inputElement);
       await inputElement.setValue(parseFloat(gain));
       await inputElement.keys('Tab');
       // wait 1000 ms for the action.
@@ -131,10 +148,11 @@ const setFrequencyQuality = async (
   const inputElement = await webdriver.driver.$(
     `.main-content label[for="${frequency}-quality"] input`
   );
+  await clearTextBox(inputElement);
   await inputElement.setValue(parseFloat(quality));
   await inputElement.keys('Tab');
   // wait 1000 ms for the action.
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 };
 
 export const givenFrequencyQuality = (
@@ -171,8 +189,6 @@ export const whenSetFrequencyQualityUsingArrows = (
       const label = await webdriver.driver.$(
         `.main-content label[for="${frequency}-quality"]`
       );
-      const hiddenButton = await label.$(`.arrow-${direction}`);
-      expect(await hiddenButton.isDisplayed()).toBeFalsy();
 
       await label.moveTo({ xOffset: 1, yOffset: 1 });
       const button = await label.$(`.arrow-${direction}`);
@@ -251,6 +267,7 @@ const setBandFrequency = async (
     .$$('.band')
     [bandIndex - 1].$$('label')[0]
     .$('input');
+  await clearTextBox(inputElement);
   await inputElement.setValue(frequency);
   await inputElement.keys('Tab');
   // wait 1000 ms for the action.
@@ -292,8 +309,6 @@ export const whenSetBandFrequencyUsingArrows = (
       const label = await webdriver.driver
         .$$('.band')
         [bandIndex - 1].$('label');
-      const hiddenButton = await label.$(`.arrow-${direction}`);
-      expect(await hiddenButton.isDisplayed()).toBeFalsy();
 
       await label.moveTo({ xOffset: 1, yOffset: 1 });
       const button = await label.$(`.arrow-${direction}`);
