@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
   addFileToPath,
+  checkConfigFile,
   deletePreset,
   doesPresetExist,
   fetchPreset,
@@ -28,6 +29,7 @@ import {
   serializePreset,
   serializeState,
   stateToString,
+  updateConfig,
 } from 'main/flush';
 import fs from 'fs';
 import {
@@ -37,8 +39,9 @@ import {
   IState,
 } from 'common/constants';
 
-const TEST_DATA_READ_DIR = 'src/__tests__/data/read_only';
-const TEST_DATA_WRITE_DIR = 'src/__tests__/data/write';
+const TEST_DATA_DIR = 'src/__tests__/data';
+const TEST_DATA_READ_DIR = addFileToPath(TEST_DATA_DIR, 'read_only');
+const TEST_DATA_WRITE_DIR = addFileToPath(TEST_DATA_DIR, 'write');
 const mockSettings = {
   isEnabled: true,
   isAutoPreAmpOn: true,
@@ -227,6 +230,23 @@ describe('flush', () => {
         preset
       );
       renamePreset(newPresetName, oldPresetName, TEST_DATA_WRITE_DIR);
+    });
+  });
+
+  describe('checkConfig', () => {
+    it('should return true for an existing preset', () => {
+      expect(() => checkConfigFile(TEST_DATA_DIR)).toThrow();
+    });
+
+    it('should return false for a non-existing preset', () => {
+      expect(checkConfigFile(TEST_DATA_READ_DIR)).toBe(false);
+    });
+  });
+
+  describe('updateConfig', () => {
+    it('should result in a valid config file', () => {
+      updateConfig(TEST_DATA_WRITE_DIR);
+      expect(checkConfigFile(TEST_DATA_WRITE_DIR)).toBe(true);
     });
   });
 });
