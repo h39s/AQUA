@@ -45,14 +45,14 @@ body {
     grid-template-areas:
       'side-bar middle-content presets-bar'
       'graph-wrapper graph-wrapper graph-wrapper';
-    grid-template-columns: minmax($sidebar-width, max-content) 1fr $preset-bar-width;
+    grid-template-columns: $sidebar-width 1fr $preset-bar-width;
     // Keep fixed height for equalizer when graph view is on
     grid-template-rows: $equalizer-height 1fr;
     gap: $spacing-s;
 
     &.minimized {
       // Forcibly allow equalizer content to grow when graph view is off
-      grid-template-rows: 1fr;
+      grid-template-rows: minmax(0px, 1fr);
       row-gap: 0px;
     }
   }
