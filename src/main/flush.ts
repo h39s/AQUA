@@ -219,7 +219,7 @@ export const checkConfigFile = (configDirPath: string) => {
 export const updateConfig = (configDirPath: string) => {
   const configPath = addFileToPath(configDirPath, CONFIG_FILENAME);
   try {
-    fs.writeFileSync(configPath, CONFIG_CONTENT, {
+    fs.appendFileSync(configPath, `\n${CONFIG_CONTENT}`, {
       encoding: 'utf8',
     });
   } catch (ex) {
