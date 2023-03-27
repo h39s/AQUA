@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import fs from 'fs';
 import path from 'path';
 import {
+  DEFAULT_CONFIG_FILENAME,
   getDefaultState,
   IPresetV1,
   IPresetV2,
@@ -65,7 +66,6 @@ export const serializePreset = (preset: IPresetV2) => {
 const CONFIG_CONTENT = 'Include: aqua.txt';
 const AQUA_LOCAL_CONFIG_FILENAME = 'state.txt';
 export const AQUA_CONFIG_FILENAME = 'aqua.txt';
-const CONFIG_FILENAME = 'config.txt';
 export const PRESETS_DIR = 'presets';
 
 export const addFileToPath = (pathPrefix: string, fileName: string) => {
@@ -201,8 +201,11 @@ export const flush = (state: IState, configDirPath: string) => {
   }
 };
 
-export const checkConfigFile = (configDirPath: string) => {
-  const configPath = addFileToPath(configDirPath, CONFIG_FILENAME);
+export const checkConfigFile = (
+  configDirPath: string,
+  configFileName: string = DEFAULT_CONFIG_FILENAME
+) => {
+  const configPath = addFileToPath(configDirPath, configFileName);
   try {
     const content = fs.readFileSync(configPath, {
       encoding: 'utf8',
@@ -213,8 +216,11 @@ export const checkConfigFile = (configDirPath: string) => {
   }
 };
 
-export const updateConfig = (configDirPath: string) => {
-  const configPath = addFileToPath(configDirPath, CONFIG_FILENAME);
+export const updateConfig = (
+  configDirPath: string,
+  configFileName: string = DEFAULT_CONFIG_FILENAME
+) => {
+  const configPath = addFileToPath(configDirPath, configFileName);
   try {
     fs.appendFileSync(configPath, `\n${CONFIG_CONTENT}`, {
       encoding: 'utf8',

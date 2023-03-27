@@ -180,8 +180,8 @@ const updateConfigPath = async (
     // Retrive configPath assuming EqualizerAPO is installed
     configPath = await getConfigPath();
     // Overwrite the config file if necessary
-    if (!checkConfigFile(configPath)) {
-      updateConfig(configPath);
+    if (!checkConfigFile(configPath, state.configFileName)) {
+      updateConfig(configPath, state.configFileName);
     }
   } catch (e) {
     handleError(event, channel, ErrorCode.CONFIG_NOT_FOUND);
@@ -663,6 +663,21 @@ ipcMain.on(ChannelEnum.SET_FIXED_BAND, async (event, arg) => {
   state.filters = getDefaultFilters(size);
 
   await handleUpdateHelper<IFiltersMap>(event, channel, state.filters);
+});
+
+ipcMain.on(ChannelEnum.UPDATE_CONFIG_FILE_NAME, async (event, arg) => {
+  const channel = ChannelEnum.UPDATE_CONFIG_FILE_NAME;
+  const fileName: string = arg[0];
+
+  // Cannot fall below the minimum number of filters
+  const filePath = path.join(configPath, fileName);
+  if (!fs.existsSync(filePath)) {
+    handleError(event, channel, ErrorCode.INVALID_PARAMETER);
+    return;
+  }
+
+  state.configFileName = fileName;
+  await handleUpdate(event, channel);
 });
 
 ipcMain.on(ChannelEnum.SET_WINDOW_SIZE, async (event, arg) => {
