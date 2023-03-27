@@ -504,6 +504,17 @@ export const setFixedBand = (size: FixedBandSizeEnum): Promise<IFiltersMap> => {
 };
 
 /**
+ * Update config file name
+ * @param {string} fileName - name of the new config file
+ * @returns { Promise<void> } exception if failed
+ */
+export const updateConfigFileName = (fileName: string): Promise<void> => {
+  const channel = ChannelEnum.UPDATE_CONFIG_FILE_NAME;
+  window.electron.ipcRenderer.sendMessage(channel, [fileName]);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
  * Increase Window Size
  * @returns { Promise<void> } exception if failed.
  */

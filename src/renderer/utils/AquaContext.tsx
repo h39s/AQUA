@@ -72,6 +72,7 @@ export interface IAquaContext extends IState {
   setAutoPreAmpOn: (newValue: boolean) => void;
   setGraphViewOn: (newValue: boolean) => void;
   setPreAmp: (newValue: number) => void;
+  setConfigFileName: (newValue: string) => void;
   dispatchFilter: FilterDispatch;
 }
 
@@ -176,6 +177,10 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
     DEFAULT_STATE.filters
   );
 
+  const [configFileName, setConfigFileName] = useState<string>(
+    DEFAULT_STATE.configFileName
+  );
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const setGraphViewOn = (newValue: boolean) => {
@@ -215,6 +220,7 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
         isGraphViewOn,
         isCaseSensitiveFs,
         preAmp,
+        configFileName,
         filters,
         performHealthCheck,
         setGlobalError,
@@ -222,6 +228,7 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
         setAutoPreAmpOn,
         setGraphViewOn,
         setPreAmp,
+        setConfigFileName,
         dispatchFilter,
       }}
     >

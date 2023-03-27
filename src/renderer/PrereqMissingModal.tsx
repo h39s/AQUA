@@ -16,8 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import Button from './widgets/Button';
-import './styles/Modal.scss';
+import Modal from './Modal';
 
 interface IPrereqMissingModalProps {
   isLoading: boolean;
@@ -32,38 +31,12 @@ export default function PrereqMissingModal({
   actionMsg,
   onRetry,
 }: IPrereqMissingModalProps) {
-  const handleClose = async () => {
-    window.electron.ipcRenderer.closeApp();
-  };
-
   return (
-    <div className="modal col">
-      <div className="modal-content">
-        <h1 className="header">Prerequisite Missing</h1>
-        <div className="body">
-          <p>
-            {errorMsg} {actionMsg}
-          </p>
-        </div>
-        <div className="footer row">
-          <Button
-            ariaLabel="Exit"
-            isDisabled={isLoading}
-            className="default"
-            handleChange={handleClose}
-          >
-            Exit
-          </Button>
-          <Button
-            ariaLabel="Retry"
-            isDisabled={isLoading}
-            className="default"
-            handleChange={onRetry}
-          >
-            Close & Retry
-          </Button>
-        </div>
-      </div>
-    </div>
+    <Modal
+      isLoading={isLoading}
+      headerText="Prerequisite Missing"
+      bodyText={`${errorMsg} ${actionMsg}`}
+      onRetry={onRetry}
+    />
   );
 }

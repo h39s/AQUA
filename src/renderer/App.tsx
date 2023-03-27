@@ -18,6 +18,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './styles/App.scss';
+import { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import { ErrorCode } from 'common/errors';
 import MainContent from './MainContent';
 import { AquaProvider, useAquaContext } from './utils/AquaContext';
 import PrereqMissingModal from './PrereqMissingModal';
@@ -31,10 +33,56 @@ import {
   loadPreset,
   renamePreset,
   savePreset,
+  updateConfigFileName,
 } from './utils/equalizerApi';
+import Modal from './Modal';
 
 const AppContent = () => {
-  const { isLoading, globalError, performHealthCheck } = useAquaContext();
+  const { isLoading, globalError, performHealthCheck, setConfigFileName } =
+    useAquaContext();
+
+  const [configFile, setConfigFile] = useState<string>('config.txt');
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) {
+      return;
+    }
+
+    setConfigFile(event.target.files[0].name);
+  };
+
+  const handleConfigUpdate = useCallback(async () => {
+    await updateConfigFileName(configFile);
+    setConfigFileName(configFile);
+    performHealthCheck();
+  }, [configFile, performHealthCheck, setConfigFileName]);
+
+  const modal = useMemo(() => {
+    if (!globalError) {
+      return undefined;
+    }
+
+    if (globalError.code === ErrorCode.CONFIG_NOT_FOUND) {
+      return (
+        <Modal
+          isLoading={isLoading}
+          onRetry={handleConfigUpdate}
+          headerText={globalError.shortError}
+          bodyText={globalError.action}
+        >
+          <input type="file" accept=".txt" onChange={handleChange} />
+        </Modal>
+      );
+    }
+    return (
+      <PrereqMissingModal
+        isLoading={isLoading}
+        onRetry={performHealthCheck}
+        errorMsg={globalError.shortError}
+        actionMsg={globalError.action}
+      />
+    );
+  }, [globalError, handleConfigUpdate, isLoading, performHealthCheck]);
 
   return (
     <>
@@ -51,14 +99,7 @@ const AppContent = () => {
         deletePreset={deletePreset}
       />
       <FrequencyResponseChart />
-      {globalError && (
-        <PrereqMissingModal
-          isLoading={isLoading}
-          onRetry={performHealthCheck}
-          errorMsg={globalError.shortError}
-          actionMsg={globalError.action}
-        />
-      )}
+      {modal}
     </>
   );
 };
