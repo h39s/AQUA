@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './styles/App.scss';
-import { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { ErrorCode } from 'common/errors';
 import MainContent from './MainContent';
 import { AquaProvider, useAquaContext } from './utils/AquaContext';
@@ -35,7 +35,8 @@ import {
   savePreset,
   updateConfigFileName,
 } from './utils/equalizerApi';
-import Modal from './Modal';
+import Modal from './widgets/Modal';
+import FilePicker from './widgets/FilePicker';
 
 const AppContent = () => {
   const { isLoading, globalError, performHealthCheck, setConfigFileName } =
@@ -43,12 +44,12 @@ const AppContent = () => {
 
   const [configFile, setConfigFile] = useState<string>('config.txt');
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files) {
+  const handleChange = (file: File) => {
+    if (!file) {
       return;
     }
 
-    setConfigFile(event.target.files[0].name);
+    setConfigFile(file.name);
   };
 
   const handleConfigUpdate = useCallback(async () => {
@@ -70,7 +71,11 @@ const AppContent = () => {
           headerText={globalError.shortError}
           bodyText={globalError.action}
         >
-          <input type="file" accept=".txt" onChange={handleChange} />
+          <FilePicker
+            label="Select a config file"
+            placeholder="No file selected."
+            handleChange={handleChange}
+          />
         </Modal>
       );
     }

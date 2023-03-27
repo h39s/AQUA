@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import Modal from './Modal';
+import Modal from './widgets/Modal';
 
 interface IPrereqMissingModalProps {
   isLoading: boolean;

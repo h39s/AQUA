@@ -16,8 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import Button from './widgets/Button';
-import './styles/Modal.scss';
+import Button from './Button';
+import '../styles/Modal.scss';
 
 interface IModalProps {
   isLoading: boolean;
