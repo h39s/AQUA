@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './styles/App.scss';
 import { useCallback, useMemo, useState } from 'react';
+import { DEFAULT_CONFIG_FILENAME } from 'common/constants';
 import { ErrorCode } from 'common/errors';
 import MainContent from './MainContent';
 import { AquaProvider, useAquaContext } from './utils/AquaContext';
@@ -42,7 +43,7 @@ const AppContent = () => {
   const { isLoading, globalError, performHealthCheck, setConfigFileName } =
     useAquaContext();
 
-  const [configFile, setConfigFile] = useState<string>('config.txt');
+  const [configFile, setConfigFile] = useState<string | undefined>();
 
   const handleChange = (file: File) => {
     if (!file) {
@@ -53,8 +54,8 @@ const AppContent = () => {
   };
 
   const handleConfigUpdate = useCallback(async () => {
-    await updateConfigFileName(configFile);
-    setConfigFileName(configFile);
+    await updateConfigFileName(configFile || DEFAULT_CONFIG_FILENAME);
+    setConfigFileName(configFile || DEFAULT_CONFIG_FILENAME);
     performHealthCheck();
   }, [configFile, performHealthCheck, setConfigFileName]);
 
@@ -67,6 +68,7 @@ const AppContent = () => {
       return (
         <Modal
           isLoading={isLoading}
+          isRetryDisabled={!configFile}
           onRetry={handleConfigUpdate}
           headerText={globalError.shortError}
           bodyText={globalError.action}
@@ -74,6 +76,8 @@ const AppContent = () => {
           <FilePicker
             label="Select a config file"
             placeholder="No file selected."
+            accept=".txt"
+            isDisabled={isLoading}
             handleChange={handleChange}
           />
         </Modal>
@@ -87,7 +91,13 @@ const AppContent = () => {
         actionMsg={globalError.action}
       />
     );
-  }, [globalError, handleConfigUpdate, isLoading, performHealthCheck]);
+  }, [
+    configFile,
+    globalError,
+    handleConfigUpdate,
+    isLoading,
+    performHealthCheck,
+  ]);
 
   return (
     <>

@@ -22,12 +22,16 @@ import '../styles/FilePicker.scss';
 interface IFilePickerProps {
   label: string;
   placeholder: string;
+  accept?: string;
+  isDisabled: boolean;
   handleChange: (newValue: File) => void;
 }
 
 export default function FilePicker({
   label,
   placeholder,
+  accept,
+  isDisabled,
   handleChange,
 }: IFilePickerProps) {
   const [file, setFile] = useState<File | undefined>(undefined);
@@ -43,9 +47,19 @@ export default function FilePicker({
 
   return (
     <div className="file-picker row">
-      <label className="button small" htmlFor="filePicker">
+      <label
+        className="button small"
+        htmlFor="filePicker"
+        aria-disabled={isDisabled}
+      >
         {label}
-        <input type="file" id="filePicker" accept=".txt" onChange={onChange} />
+        <input
+          type="file"
+          id="filePicker"
+          accept={accept}
+          onChange={onChange}
+          disabled={isDisabled}
+        />
       </label>
       {file?.name || placeholder}
     </div>

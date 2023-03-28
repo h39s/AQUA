@@ -17,12 +17,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 import Button from './Button';
+import electron from '../electron';
 import '../styles/Modal.scss';
 
 interface IModalProps {
   isLoading: boolean;
   headerText: string;
   bodyText: string;
+  isRetryDisabled?: boolean;
   onRetry: () => void;
   children?: JSX.Element | string;
 }
@@ -31,11 +33,12 @@ export default function Modal({
   isLoading,
   headerText,
   bodyText,
+  isRetryDisabled = false,
   onRetry,
   children,
 }: IModalProps) {
   const handleClose = async () => {
-    window.electron.ipcRenderer.closeApp();
+    electron.ipcRenderer.closeApp();
   };
 
   return (
@@ -57,7 +60,7 @@ export default function Modal({
           </Button>
           <Button
             ariaLabel="Retry"
-            isDisabled={isLoading}
+            isDisabled={isLoading || isRetryDisabled}
             className="default"
             handleChange={onRetry}
           >
