@@ -23,7 +23,6 @@ import { DEFAULT_CONFIG_FILENAME } from 'common/constants';
 import { ErrorCode } from 'common/errors';
 import MainContent from './MainContent';
 import { AquaProvider, useAquaContext } from './utils/AquaContext';
-import PrereqMissingModal from './PrereqMissingModal';
 import SideBar from './SideBar';
 import FrequencyResponseChart from './graph/FrequencyResponseChart';
 import PresetsBar from './PresetsBar';
@@ -39,7 +38,7 @@ import {
 import Modal from './widgets/Modal';
 import FilePicker from './widgets/FilePicker';
 
-const AppContent = () => {
+export const AppContent = () => {
   const { isLoading, globalError, performHealthCheck, setConfigFileName } =
     useAquaContext();
 
@@ -70,8 +69,8 @@ const AppContent = () => {
           isLoading={isLoading}
           isRetryDisabled={!configFile}
           onRetry={handleConfigUpdate}
-          headerText={globalError.shortError}
-          bodyText={globalError.action}
+          headerText={globalError.title}
+          bodyText={`${globalError.shortError} ${globalError.action}`}
         >
           <FilePicker
             label="Select a config file"
@@ -84,11 +83,11 @@ const AppContent = () => {
       );
     }
     return (
-      <PrereqMissingModal
+      <Modal
         isLoading={isLoading}
         onRetry={performHealthCheck}
-        errorMsg={globalError.shortError}
-        actionMsg={globalError.action}
+        headerText={globalError.title}
+        bodyText={`${globalError.shortError} ${globalError.action}`}
       />
     );
   }, [

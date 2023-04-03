@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 import Button from './Button';
-import electron from '../electron';
+// import electron from '../electron';
 import '../styles/Modal.scss';
 
 interface IModalProps {
@@ -38,7 +38,7 @@ export default function Modal({
   children,
 }: IModalProps) {
   const handleClose = async () => {
-    electron.ipcRenderer.closeApp();
+    window.electron.ipcRenderer.closeApp();
   };
 
   return (

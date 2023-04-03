@@ -16,24 +16,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/* eslint-disable import/first */
-
-const mockClose = jest.fn();
-
 import '@testing-library/jest-dom';
 import { screen } from '@testing-library/react';
 import { setup } from '__tests__/utils/userEventUtils';
+import mockElectronAPI from '__tests__/utils/mockElectronAPI';
 import Modal from '../../renderer/widgets/Modal';
-
-jest.mock('../../renderer/electron.ts', () => ({
-  ipcRenderer: {
-    on: jest.fn(),
-    once: jest.fn(),
-    send: jest.fn(),
-    removeAllListeners: jest.fn(),
-    closeApp: mockClose,
-  },
-}));
 
 describe('Modal', () => {
   const headerText = 'Header';
@@ -41,6 +28,11 @@ describe('Modal', () => {
   const retryText = 'Close & Retry';
   const exitText = 'Exit';
   const onRetry = jest.fn();
+  const mockClose = jest.fn();
+
+  beforeAll(() => {
+    mockElectronAPI({ closeApp: mockClose });
+  });
 
   beforeEach(() => {
     mockClose.mockClear();
