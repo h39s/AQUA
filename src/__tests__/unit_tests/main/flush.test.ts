@@ -17,23 +17,103 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 import {
+  addFileToPath,
+  checkConfigFile,
   deletePreset,
   doesPresetExist,
   fetchPreset,
+  fetchSettings,
   renamePreset,
+  save,
   savePreset,
+  serializePreset,
+  serializeState,
+  stateToString,
+  updateConfig,
 } from 'main/flush';
 import fs from 'fs';
-import { FilterTypeEnum, IPresetV2 } from 'common/constants';
-import path from 'path';
+import {
+  FilterTypeEnum,
+  getDefaultState,
+  IPresetV2,
+  IState,
+} from 'common/constants';
 
-const PRESETS_DIR = 'src/__tests__/test_presets';
+const TEST_DATA_DIR = 'src/__tests__/data';
+const TEST_DATA_READ_DIR = addFileToPath(TEST_DATA_DIR, 'read_only');
+const TEST_DATA_WRITE_DIR = addFileToPath(TEST_DATA_DIR, 'write');
+const mockSettings = {
+  isEnabled: true,
+  isAutoPreAmpOn: true,
+  isGraphViewOn: true,
+  isCaseSensitiveFs: false,
+  preAmp: 13,
+  filters: {
+    '7cf32e8a': {
+      id: '7cf32e8a',
+      frequency: 32,
+      gain: 8,
+      quality: 1.5,
+      type: FilterTypeEnum.PK,
+    },
+    '3e97b5dc': {
+      id: '3e97b5dc',
+      frequency: 16000,
+      gain: -10,
+      quality: 2.3,
+      type: FilterTypeEnum.HSC,
+    },
+  },
+};
 
 describe('flush', () => {
+  describe('stateToString', () => {
+    const defaultState = getDefaultState();
+    it('should return empty string if state is disabled', () => {
+      expect(stateToString({ ...defaultState, isEnabled: false })).toBe('');
+    });
+
+    it('should convert output to correct format', () => {
+      const returnedString = stateToString(defaultState);
+      expect(returnedString).toMatch(/Device: all\n\rChannel: all\n\r/);
+      expect(returnedString).toMatch(/Preamp: 0dB\n\r/);
+      expect(returnedString).toMatch(
+        /Filter0: ON PK Fc 32 Hz Gain 0 dB Q 1\n\r/
+      );
+      expect(returnedString).toMatch(
+        /Filter9: ON PK Fc 16000 Hz Gain 0 dB Q 1/
+      );
+    });
+  });
+
+  describe('fetchSettings', () => {
+    it('should succesfully fetch settings from the state file', () => {
+      const settings: IState = fetchSettings(TEST_DATA_READ_DIR);
+      expect(settings).toStrictEqual(mockSettings);
+    });
+  });
+
+  describe('save', () => {
+    it('should succesfully save settings to the state file', () => {
+      save(mockSettings, TEST_DATA_WRITE_DIR);
+      expect(
+        fs
+          .readFileSync(addFileToPath(TEST_DATA_WRITE_DIR, 'state.txt'))
+          .toString()
+      ).toBe(serializeState(mockSettings));
+    });
+  });
+
   describe('fetchPreset', () => {
+    beforeAll(() => {
+      fs.copyFileSync(
+        addFileToPath(TEST_DATA_READ_DIR, 'presetV1'),
+        addFileToPath(TEST_DATA_WRITE_DIR, 'presetV1')
+      );
+    });
     it('should read succesfully a preset of the IPresetV2 format', () => {
       const presetName = 'presetV2';
-      const preset = fetchPreset(presetName, PRESETS_DIR);
+      const preset = fetchPreset(presetName, TEST_DATA_READ_DIR);
       expect(preset).toStrictEqual({
         preAmp: 0,
         filters: {
@@ -56,11 +136,7 @@ describe('flush', () => {
     });
 
     it('should read succesfully a preset of the IPresetV1 format and replace it with a IPresetV2 format', () => {
-      const presetName = 'presetV1';
-      const content = fs.readFileSync(path.join(PRESETS_DIR, presetName), {
-        encoding: 'utf8',
-      });
-      const preset = fetchPreset('presetV1', PRESETS_DIR);
+      const preset = fetchPreset('presetV1', TEST_DATA_WRITE_DIR);
       expect(preset).toStrictEqual({
         preAmp: 0,
         filters: {
@@ -73,9 +149,6 @@ describe('flush', () => {
             type: FilterTypeEnum.PK,
           },
         },
-      });
-      fs.writeFileSync(path.join(PRESETS_DIR, presetName), content, {
-        encoding: 'utf8',
       });
     });
   });
@@ -95,45 +168,85 @@ describe('flush', () => {
           },
         },
       };
-      savePreset(presetName, preset, PRESETS_DIR);
-      expect(doesPresetExist(presetName, PRESETS_DIR)).toBe(true);
-      deletePreset(presetName, PRESETS_DIR);
-      expect(doesPresetExist(presetName, PRESETS_DIR)).toBe(false);
+      savePreset(presetName, preset, TEST_DATA_WRITE_DIR);
+      expect(doesPresetExist(presetName, TEST_DATA_WRITE_DIR)).toBe(true);
+      deletePreset(presetName, TEST_DATA_WRITE_DIR);
+      expect(doesPresetExist(presetName, TEST_DATA_WRITE_DIR)).toBe(false);
     });
   });
 
   describe('doesPresetExist', () => {
     it('should return true for an existing preset', () => {
       const presetName = 'presetV1';
-      expect(doesPresetExist(presetName, PRESETS_DIR)).toBe(true);
+      expect(doesPresetExist(presetName, TEST_DATA_READ_DIR)).toBe(true);
     });
 
     it('should return false for a non-existing preset', () => {
       const presetName = '404_not_found';
-      expect(doesPresetExist(presetName, PRESETS_DIR)).toBe(false);
+      expect(doesPresetExist(presetName, TEST_DATA_READ_DIR)).toBe(false);
     });
   });
 
   describe('renamePreset', () => {
-    it('should rename presets', () => {
-      const oldPresetName = 'presetV1';
-      const newPresetName = 'presetV11';
-      renamePreset(oldPresetName, newPresetName, PRESETS_DIR);
-      expect(() => fetchPreset(oldPresetName, PRESETS_DIR)).toThrow();
-      expect(fetchPreset(newPresetName, PRESETS_DIR)).toStrictEqual({
-        preAmp: 0,
-        filters: {
-          '123': { id: '123', frequency: 2, gain: -4, quality: 6, type: 'PK' },
-          '456': {
-            id: '456',
-            frequency: 8,
-            gain: -10,
-            quality: 1.2,
-            type: FilterTypeEnum.PK,
-          },
+    const oldPresetName = 'oldPresetName';
+    const newPresetName = 'newPresetName';
+    const preset: IPresetV2 = {
+      preAmp: 0,
+      filters: {
+        '123': {
+          id: '123',
+          frequency: 2,
+          gain: -4,
+          quality: 6,
+          type: FilterTypeEnum.PK,
         },
-      });
-      renamePreset(newPresetName, oldPresetName, PRESETS_DIR);
+        '456': {
+          id: '456',
+          frequency: 8,
+          gain: -10,
+          quality: 1.2,
+          type: FilterTypeEnum.PK,
+        },
+      },
+    };
+
+    beforeAll(() => {
+      // Create a file with the old file name in case if it doesn't exist
+      if (!doesPresetExist(oldPresetName, TEST_DATA_WRITE_DIR)) {
+        fs.writeFileSync(
+          addFileToPath(TEST_DATA_WRITE_DIR, oldPresetName),
+          serializePreset(preset),
+          {
+            encoding: 'utf8',
+          }
+        );
+      }
+    });
+
+    it('should sucessfully rename a preset', () => {
+      renamePreset(oldPresetName, newPresetName, TEST_DATA_WRITE_DIR);
+      expect(doesPresetExist(oldPresetName, TEST_DATA_WRITE_DIR)).toBe(false);
+      expect(fetchPreset(newPresetName, TEST_DATA_WRITE_DIR)).toStrictEqual(
+        preset
+      );
+      renamePreset(newPresetName, oldPresetName, TEST_DATA_WRITE_DIR);
+    });
+  });
+
+  describe('checkConfig', () => {
+    it('should return true for an existing preset', () => {
+      expect(() => checkConfigFile(TEST_DATA_DIR)).toThrow();
+    });
+
+    it('should return false for a non-existing preset', () => {
+      expect(checkConfigFile(TEST_DATA_READ_DIR)).toBe(false);
+    });
+  });
+
+  describe('updateConfig', () => {
+    it('should result in a valid config file', () => {
+      updateConfig(TEST_DATA_WRITE_DIR);
+      expect(checkConfigFile(TEST_DATA_WRITE_DIR)).toBe(true);
     });
   });
 });

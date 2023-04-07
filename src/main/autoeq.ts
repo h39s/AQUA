@@ -31,24 +31,31 @@ import {
 } from '../common/constants';
 
 let AUTOEQ_DIR = './resources/autoeq';
-if (!app.isPackaged) {
+if (!!app && !app.isPackaged) {
   // dev mode means there is no resources folder and we must access our repo's autoeq folder.
   AUTOEQ_DIR = path.join(__dirname, '../../autoeq');
 }
 
-export const getAutoEqDeviceList = () => {
-  return fs.readdirSync(AUTOEQ_DIR);
+export const getAutoEqDeviceList = (autoeqDir: string = AUTOEQ_DIR) => {
+  return fs.readdirSync(autoeqDir);
 };
 
-export const getAutoEqResponseList = (device: string) => {
-  return fs.readdirSync(path.join(AUTOEQ_DIR, device));
+export const getAutoEqResponseList = (
+  device: string,
+  autoeqDir: string = AUTOEQ_DIR
+) => {
+  return fs.readdirSync(path.join(autoeqDir, device));
 };
 
-export const getAutoEqPreset = (device: string, response: string) => {
+export const getAutoEqPreset = (
+  device: string,
+  response: string,
+  autoeqDir: string = AUTOEQ_DIR
+) => {
   let preAmpParsed = 0;
   const filters: IFiltersMap = {};
 
-  const filePath = path.join(AUTOEQ_DIR, device, response);
+  const filePath = path.join(autoeqDir, device, response);
   const file = fs.readFileSync(filePath, 'utf8');
 
   file.split('\n').forEach((line, i) => {

@@ -30,6 +30,4 @@ npm-debug.log.*
 *.scss.d.ts
 
 # App files
-state.txt
-aqua.txt
 presets/**
