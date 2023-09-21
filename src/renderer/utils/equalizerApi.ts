@@ -297,7 +297,7 @@ export const disableGraphView = (): Promise<void> => {
 /**
  * Get the current main preamplification gain value
  * @deprecated - Removing with the context refactor
- * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
+ * @returns { Promise<number> } gain - current system gain value in the range [-20, 20]
  */
 export const getMainPreAmp = (): Promise<number> => {
   const channel = ChannelEnum.GET_PREAMP;
@@ -307,7 +307,7 @@ export const getMainPreAmp = (): Promise<number> => {
 
 /**
  * Adjusts the main preamplification gain value
- * @param {number} gain - new gain value in [-30, 30]
+ * @param {number} gain - new gain value in [-20, 20]
  */
 export const setMainPreAmp = (gain: number) => {
   const channel = ChannelEnum.SET_PREAMP;
@@ -324,7 +324,7 @@ export const setMainPreAmp = (gain: number) => {
  * Get the a slider's gain value
  * @deprecated - Removing with the context refactor
  * @param {string} filterId - id of the slider being adjusted
- * @returns { Promise<number> } gain - current system gain value in the range [-30, 30]
+ * @returns { Promise<number> } gain - current system gain value in the range [-20, 20]
  */
 export const getGain = (filterId: string): Promise<number> => {
   const channel = ChannelEnum.GET_FILTER_GAIN;
@@ -335,7 +335,7 @@ export const getGain = (filterId: string): Promise<number> => {
 /**
  * Adjusts a slider's gain value
  * @param {string} filterId - id of the slider being adjusted
- * @param {number} gain - new gain value in [-30, 30]
+ * @param {number} gain - new gain value in [-20, 20]
  */
 export const setGain = (filterId: string, gain: number) => {
   const channel = ChannelEnum.SET_FILTER_GAIN;

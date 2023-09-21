@@ -20,8 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { uid } from 'uid';
 
-export const MAX_GAIN = 30;
-export const MIN_GAIN = -30;
+export const MAX_GAIN = 20;
+export const MIN_GAIN = -20;
 
 export const MAX_FREQUENCY = 20000;
 export const MIN_FREQUENCY = 1;
