@@ -55,7 +55,7 @@ import '../styles/FrequencyBand.scss';
 
 const NO_GAIN_FILTER_TYPES = new Set([
   FilterTypeEnum.BP,
-  FilterTypeEnum.HPQ,
+  FilterTypeEnum.LPQ,
   FilterTypeEnum.HPQ,
   FilterTypeEnum.NO,
 ]);

@@ -56,10 +56,24 @@ describe('FrequencyBand', () => {
           filter={{ ...filter, type: FilterTypeEnum.NO }}
           isMinSliderCount={false}
         />
+        <FrequencyBand
+          filter={{ ...filter, type: FilterTypeEnum.LPQ }}
+          isMinSliderCount={false}
+        />
+        <FrequencyBand
+          filter={{ ...filter, type: FilterTypeEnum.HPQ }}
+          isMinSliderCount={false}
+        />
+        <FrequencyBand
+          filter={{ ...filter, type: FilterTypeEnum.BP }}
+          isMinSliderCount={false}
+        />
       </AquaProviderWrapper>
     );
-    expect(screen.getByLabelText(filterGainNumberLabel)).toBeDisabled();
-    expect(screen.getByLabelText(filterGainRangeLabel)).toBeDisabled();
+    const gainNumberInputs = screen.getAllByLabelText(filterGainNumberLabel);
+    gainNumberInputs.forEach((input) => expect(input).toBeDisabled());
+    const gainRangeInputs = screen.getAllByLabelText(filterGainRangeLabel);
+    gainRangeInputs.forEach((input) => expect(input).toBeDisabled());
   });
 
   it('should prevent deleting when min slider count is met', () => {
