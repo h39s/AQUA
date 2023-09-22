@@ -88,7 +88,7 @@ const MainContent = () => {
     </div>
   ) : (
     <>
-      <div className="row main-content-title">
+      <div className="main-content-title">
         <h4>Parametric EQ</h4>
         <Button
           ariaLabel="Clear Gains"
@@ -108,9 +108,7 @@ const MainContent = () => {
               ariaLabel={`${size} Band`}
               isDisabled={false}
               className="small"
-              handleChange={handleFixedBand(
-                size as unknown as FixedBandSizeEnum
-              )}
+              handleChange={handleFixedBand(size as FixedBandSizeEnum)}
             >
               {`${size} Band`}
             </Button>
