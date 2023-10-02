@@ -69,7 +69,7 @@ const MainContent = () => {
         <span>-20dB</span>
         <span />
         <span className="row-label">Gain (dB)</span>
-        <span className="row-label">Quality</span>
+        <span className="row-label">Q Factor</span>
         <span />
       </div>
       <div className="bands row center">

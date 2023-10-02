@@ -40,7 +40,7 @@ export enum FilterActionEnum {
   INIT,
   FREQUENCY,
   GAIN,
-  QUALITY,
+  QFACTOR,
   TYPE,
   ADD,
   REMOVE,
@@ -49,7 +49,7 @@ export enum FilterActionEnum {
 type NumericalFilterAction =
   | FilterActionEnum.FREQUENCY
   | FilterActionEnum.GAIN
-  | FilterActionEnum.QUALITY;
+  | FilterActionEnum.QFACTOR;
 
 export type FilterAction =
   | { type: FilterActionEnum.INIT; filters: IFiltersMap }
@@ -96,9 +96,9 @@ const filterReducer: IFilterReducer = (
       filtersCloned[action.id].gain = action.newValue;
       return filtersCloned;
     }
-    case FilterActionEnum.QUALITY: {
+    case FilterActionEnum.QFACTOR: {
       const filtersCloned = cloneFilters(filters);
-      filtersCloned[action.id].quality = action.newValue;
+      filtersCloned[action.id].qfactor = action.newValue;
       return filtersCloned;
     }
     case FilterActionEnum.TYPE: {
