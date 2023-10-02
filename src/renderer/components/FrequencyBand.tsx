@@ -22,10 +22,10 @@ import {
   IFilter,
   MAX_FREQUENCY,
   MAX_GAIN,
-  MAX_QUALITY,
+  MAX_QFACTOR,
   MIN_FREQUENCY,
   MIN_GAIN,
-  MIN_QUALITY,
+  MIN_QFACTOR,
 } from 'common/constants';
 import IconButton, { IconName } from 'renderer/widgets/IconButton';
 import {
@@ -73,14 +73,14 @@ const FrequencyBand = forwardRef(
       [isLoading, isMinSliderCount]
     );
     // Local copy of quality/freq value used so that the number input increases smoothly while throttling EQ APO writes
-    const [qualityValue, setQualityValue] = useState<number>(filter.quality);
+    const [qualityValue, setQualityValue] = useState<number>(filter.qfactor);
     const [frequencyValue, setFrequencyValue] = useState<number>(
       filter.frequency
     );
 
     useEffect(() => {
-      setQualityValue(filter.quality);
-    }, [filter.quality]);
+      setQualityValue(filter.qfactor);
+    }, [filter.qfactor]);
 
     useEffect(() => {
       setFrequencyValue(filter.frequency);
@@ -119,7 +119,7 @@ const FrequencyBand = forwardRef(
     const normalSetQuality = useCallback(
       async (newValue: number) => {
         dispatchFilter({
-          type: FilterActionEnum.QUALITY,
+          type: FilterActionEnum.QFACTOR,
           id: filter.id,
           newValue,
         });
@@ -262,8 +262,8 @@ const FrequencyBand = forwardRef(
           </div>
           <NumberInput
             value={qualityValue}
-            min={MIN_QUALITY}
-            max={MAX_QUALITY}
+            min={MIN_QFACTOR}
+            max={MAX_QFACTOR}
             name={`${frequencyValue}-quality`}
             isDisabled={!!globalError}
             floatPrecision={2}

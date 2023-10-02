@@ -31,7 +31,7 @@ export const clamp = (num: number, min: number, max: number) => {
 export const sortHelper = (a: IFilter, b: IFilter) =>
   a.frequency - b.frequency ||
   a.gain - b.gain ||
-  a.quality - b.quality ||
+  a.qfactor - b.qfactor ||
   a.type.localeCompare(b.type);
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from#sequence_generator_range

@@ -28,8 +28,8 @@ import GraphViewSwitch from './components/GraphViewSwitch';
 import Spinner from './icons/Spinner';
 
 const SideBar = () => {
-  const MIN = -30;
-  const MAX = 30;
+  const MIN = -20;
+  const MAX = 20;
 
   const {
     isGraphViewOn,
@@ -74,7 +74,7 @@ const SideBar = () => {
           </div>
           <div>
             <h4>Pre-Amp Gain</h4>
-            <div>+30 dB</div>
+            <div>+20 dB</div>
             <Slider
               name="Pre-Amplification Gain (dB)"
               min={MIN}
@@ -82,7 +82,7 @@ const SideBar = () => {
               value={preAmp}
               sliderHeight={sliderHeight}
               setValue={setGain}
-              label="-30 dB"
+              label="-20 dB"
             />
           </div>
           <div className="col center">

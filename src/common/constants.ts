@@ -20,13 +20,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { uid } from 'uid';
 
-export const MAX_GAIN = 30;
-export const MIN_GAIN = -30;
+export const MAX_GAIN = 20;
+export const MIN_GAIN = -20;
 
 export const MAX_FREQUENCY = 20000;
 export const MIN_FREQUENCY = 1;
-export const MAX_QUALITY = 100;
-export const MIN_QUALITY = 0.01;
+export const MAX_QFACTOR = 100;
+export const MIN_QFACTOR = 0.01;
 
 export const MAX_NUM_FILTERS = 20; // TODO: Investigate an appropriate value for this
 export const MIN_NUM_FILTERS = 1;
@@ -78,7 +78,7 @@ export interface IFilter {
   frequency: number;
   gain: number;
   type: FilterTypeEnum;
-  quality: number;
+  qfactor: number;
 }
 
 export interface IState {
@@ -109,7 +109,7 @@ const FIXED_FREQUENCIES = [
 const DEFAULT_FILTER_TEMPLATE = {
   frequency: 1000,
   gain: 0,
-  quality: 1,
+  qfactor: 1,
   type: FilterTypeEnum.PK,
 };
 

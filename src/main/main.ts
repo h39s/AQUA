@@ -57,11 +57,11 @@ import {
   MAX_FREQUENCY,
   MAX_GAIN,
   MAX_NUM_FILTERS,
-  MAX_QUALITY,
+  MAX_QFACTOR,
   MIN_FREQUENCY,
   MIN_GAIN,
   MIN_NUM_FILTERS,
-  MIN_QUALITY,
+  MIN_QFACTOR,
   WINDOW_HEIGHT,
   WINDOW_HEIGHT_EXPANDED,
   WINDOW_WIDTH,
@@ -532,7 +532,7 @@ ipcMain.on(ChannelEnum.GET_FILTER_QUALITY, async (event, arg) => {
   }
 
   const reply: TSuccess<number> = {
-    result: state.filters[filterId].quality || 10,
+    result: state.filters[filterId].qfactor || 10,
   };
   event.reply(channel + filterId, reply);
 });
@@ -540,19 +540,19 @@ ipcMain.on(ChannelEnum.GET_FILTER_QUALITY, async (event, arg) => {
 ipcMain.on(ChannelEnum.SET_FILTER_QUALITY, async (event, arg) => {
   const channel = ChannelEnum.SET_FILTER_QUALITY;
   const filterId = arg[0];
-  const quality = parseFloat(arg[1]) || 0;
+  const qfactor = parseFloat(arg[1]) || 0;
 
   // Filter id must exist
   if (!doesFilterIdExist(event, channel, filterId)) {
     return;
   }
 
-  if (quality < MIN_QUALITY || quality > MAX_QUALITY) {
+  if (qfactor < MIN_QFACTOR || qfactor > MAX_QFACTOR) {
     handleError(event, channel + filterId, ErrorCode.INVALID_PARAMETER);
     return;
   }
 
-  state.filters[filterId].quality = quality;
+  state.filters[filterId].qfactor = qfactor;
   await handleUpdate(event, channel + filterId);
 });
 

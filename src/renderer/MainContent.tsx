@@ -62,14 +62,14 @@ const MainContent = () => {
         <span className="row-label">Filter Type</span>
         <span className="row-label">Frequency (Hz)</span>
         <span />
-        <span>+30dB</span>
+        <span>+20dB</span>
         <span />
         <span>0dB</span>
         <span />
-        <span>-30dB</span>
+        <span>-20dB</span>
         <span />
         <span className="row-label">Gain (dB)</span>
-        <span className="row-label">Quality</span>
+        <span className="row-label">Q Factor</span>
         <span />
       </div>
       <div className="bands row center">
