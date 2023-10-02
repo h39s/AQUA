@@ -27,7 +27,7 @@ describe('Modal', () => {
   const bodyText = 'Body';
   const retryText = 'Close & Retry';
   const exitText = 'Exit';
-  const onRetry = jest.fn();
+  const onSubmit = jest.fn();
   const mockClose = jest.fn();
 
   beforeAll(() => {
@@ -36,7 +36,7 @@ describe('Modal', () => {
 
   beforeEach(() => {
     mockClose.mockClear();
-    onRetry.mockClear();
+    onSubmit.mockClear();
   });
 
   it('should render modal', async () => {
@@ -45,7 +45,7 @@ describe('Modal', () => {
         isLoading={false}
         headerText={headerText}
         bodyText={bodyText}
-        onRetry={onRetry}
+        onSubmit={onSubmit}
       />
     );
 
@@ -59,7 +59,7 @@ describe('Modal', () => {
         isLoading
         headerText={headerText}
         bodyText={bodyText}
-        onRetry={onRetry}
+        onSubmit={onSubmit}
       />
     );
 
@@ -74,10 +74,10 @@ describe('Modal', () => {
     setup(
       <Modal
         isLoading={false}
-        isRetryDisabled
+        isSumbitDisabled
         headerText={headerText}
         bodyText={bodyText}
-        onRetry={onRetry}
+        onSubmit={onSubmit}
       />
     );
 
@@ -97,14 +97,14 @@ describe('Modal', () => {
         isLoading={false}
         headerText={headerText}
         bodyText={bodyText}
-        onRetry={onRetry}
+        onSubmit={onSubmit}
       />
     );
 
     const retryButton = screen.getByText(retryText);
     expect(retryButton).toBeInTheDocument();
     await user.click(retryButton);
-    expect(onRetry).toHaveBeenCalledTimes(1);
+    expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 
   it('should close when clicked', async () => {
@@ -113,7 +113,7 @@ describe('Modal', () => {
         isLoading={false}
         headerText={headerText}
         bodyText={bodyText}
-        onRetry={onRetry}
+        onSubmit={onSubmit}
       />
     );
 

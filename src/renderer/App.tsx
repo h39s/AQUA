@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './styles/App.scss';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DEFAULT_CONFIG_FILENAME } from 'common/constants';
 import { ErrorCode } from 'common/errors';
 import MainContent from './MainContent';
@@ -39,10 +39,17 @@ import Modal from './widgets/Modal';
 import FilePicker from './widgets/FilePicker';
 
 export const AppContent = () => {
-  const { isLoading, globalError, performHealthCheck, setConfigFileName } =
-    useAquaContext();
+  const {
+    isLoading,
+    globalError,
+    configFileName,
+    performHealthCheck,
+    setConfigFileName,
+  } = useAquaContext();
 
-  const [configFile, setConfigFile] = useState<string | undefined>();
+  const [configFile, setConfigFile] = useState<string | undefined>(
+    configFileName
+  );
 
   const handleChange = (file: File) => {
     if (!file) {
@@ -58,7 +65,13 @@ export const AppContent = () => {
     performHealthCheck();
   }, [configFile, performHealthCheck, setConfigFileName]);
 
-  const modal = useMemo(() => {
+  useEffect(() => {
+    if (globalError && globalError.code === ErrorCode.CONFIG_NOT_FOUND) {
+      setConfigFile(undefined);
+    }
+  }, [globalError]);
+
+  const globalErrorModal = useMemo(() => {
     if (!globalError) {
       return undefined;
     }
@@ -67,8 +80,8 @@ export const AppContent = () => {
       return (
         <Modal
           isLoading={isLoading}
-          isRetryDisabled={!configFile}
-          onRetry={handleConfigUpdate}
+          isSumbitDisabled={!configFile}
+          onSubmit={handleConfigUpdate}
           headerText={globalError.title}
           bodyText={`${globalError.shortError} ${globalError.action}`}
         >
@@ -85,7 +98,7 @@ export const AppContent = () => {
     return (
       <Modal
         isLoading={isLoading}
-        onRetry={performHealthCheck}
+        onSubmit={performHealthCheck}
         headerText={globalError.title}
         bodyText={`${globalError.shortError} ${globalError.action}`}
       />
@@ -100,20 +113,25 @@ export const AppContent = () => {
 
   return (
     <>
-      <SideBar />
-      <div className="middle-content">
-        <AutoEQ />
-        <MainContent />
+      <header className="title-bar row">
+        <span className="brand">AQUA</span>
+      </header>
+      <div className="app">
+        <SideBar />
+        <div className="middle-content">
+          <AutoEQ />
+          <MainContent />
+        </div>
+        <PresetsBar
+          fetchPresets={getPresetListFromFiles}
+          loadPreset={loadPreset}
+          savePreset={savePreset}
+          renamePreset={renamePreset}
+          deletePreset={deletePreset}
+        />
+        <FrequencyResponseChart />
+        {globalErrorModal}
       </div>
-      <PresetsBar
-        fetchPresets={getPresetListFromFiles}
-        loadPreset={loadPreset}
-        savePreset={savePreset}
-        renamePreset={renamePreset}
-        deletePreset={deletePreset}
-      />
-      <FrequencyResponseChart />
-      {modal}
     </>
   );
 };

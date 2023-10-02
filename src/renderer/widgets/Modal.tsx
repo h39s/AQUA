@@ -17,25 +17,30 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 import Button from './Button';
-// import electron from '../electron';
 import '../styles/Modal.scss';
 
 interface IModalProps {
   isLoading: boolean;
   headerText: string;
   bodyText: string;
-  isRetryDisabled?: boolean;
-  onRetry: () => void;
+  isSumbitDisabled?: boolean;
+  onSubmit: () => void;
+  onCancel?: () => void;
   children?: JSX.Element | string;
+  cancelText?: string;
+  submitText?: string;
 }
 
 export default function Modal({
   isLoading,
   headerText,
   bodyText,
-  isRetryDisabled = false,
-  onRetry,
+  isSumbitDisabled = false,
+  onSubmit,
+  onCancel,
   children,
+  cancelText,
+  submitText,
 }: IModalProps) {
   const handleClose = async () => {
     window.electron.ipcRenderer.closeApp();
@@ -51,20 +56,20 @@ export default function Modal({
         </div>
         <div className="footer row">
           <Button
-            ariaLabel="Exit"
+            ariaLabel="Cancel"
             isDisabled={isLoading}
             className="default"
-            handleChange={handleClose}
+            handleChange={onCancel || handleClose}
           >
-            Exit
+            {cancelText || 'Exit'}
           </Button>
           <Button
-            ariaLabel="Retry"
-            isDisabled={isLoading || isRetryDisabled}
+            ariaLabel="Submit"
+            isDisabled={isLoading || isSumbitDisabled}
             className="default"
-            handleChange={onRetry}
+            handleChange={onSubmit}
           >
-            Close & Retry
+            {submitText || 'Close & Retry'}
           </Button>
         </div>
       </div>

@@ -33,7 +33,7 @@ body {
   align-items: center;
   margin: 0px;
 
-  #root {
+  .app {
     // Spacing and height
     padding: $spacing-m;
     padding-top: $spacing-s;
@@ -72,13 +72,12 @@ body {
   -webkit-app-region: drag; /* Allow user to drag the window using this titlebar */
   -webkit-user-select: none; /* Prevent user from selecting things */
   user-select: none;
+  justify-content: start;
+  align-items: end;
+  gap: $spacing-s;
 
-  span {
-    height: 100%;
-    display: flex;
+  .brand {
     margin-left: $spacing-m;
-    justify-content: end;
-    flex-direction: column;
   }
 }
 
