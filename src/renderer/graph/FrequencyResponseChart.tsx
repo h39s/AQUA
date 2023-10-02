@@ -162,8 +162,8 @@ const FrequencyResponseChart = () => {
   }, [autoPreAmpValue, isAutoPreAmpOn, isLoading, setPreAmp]);
 
   const ref = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState<number>(1396);
-  const [height, setHeight] = useState<number>(380);
+  const [width, setWidth] = useState<number>(0);
+  const [height, setHeight] = useState<number>(0);
 
   const updateDimensions = useCallback(() => {
     const newWidth = ref.current?.clientWidth;
