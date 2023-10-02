@@ -18,7 +18,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import '@testing-library/jest-dom';
 import { screen } from '@testing-library/react';
-import { FilterTypeEnum, getDefaultFilterWithId } from 'common/constants';
+import {
+  FilterTypeEnum,
+  NO_GAIN_FILTER_TYPES,
+  getDefaultFilterWithId,
+} from 'common/constants';
 import FrequencyBand from 'renderer/components/FrequencyBand';
 import { AquaProviderWrapper } from 'renderer/utils/AquaContext';
 import defaultAquaContext from '__tests__/utils/mockAquaProvider';
@@ -49,25 +53,43 @@ describe('FrequencyBand', () => {
     );
   });
 
+  it('should enable gain when filter type is affected by gain', () => {
+    setup(
+      <AquaProviderWrapper value={defaultAquaContext}>
+        {Object.values(FilterTypeEnum)
+          .filter(
+            (filterType) =>
+              !NO_GAIN_FILTER_TYPES.some(
+                (noGainFilterType) => noGainFilterType === filterType
+              )
+          )
+          .map((filterType) => {
+            return (
+              <FrequencyBand
+                key={filterType}
+                filter={{ ...filter, type: filterType }}
+                isMinSliderCount={false}
+              />
+            );
+          })}
+      </AquaProviderWrapper>
+    );
+    const gainNumberInputs = screen.getAllByLabelText(filterGainNumberLabel);
+    gainNumberInputs.forEach((input) => expect(input).not.toBeDisabled());
+    const gainRangeInputs = screen.getAllByLabelText(filterGainRangeLabel);
+    gainRangeInputs.forEach((input) => expect(input).not.toBeDisabled());
+  });
+
   it('should disable gain when filter type is not affected by gain', () => {
     setup(
       <AquaProviderWrapper value={defaultAquaContext}>
-        <FrequencyBand
-          filter={{ ...filter, type: FilterTypeEnum.NO }}
-          isMinSliderCount={false}
-        />
-        <FrequencyBand
-          filter={{ ...filter, type: FilterTypeEnum.LPQ }}
-          isMinSliderCount={false}
-        />
-        <FrequencyBand
-          filter={{ ...filter, type: FilterTypeEnum.HPQ }}
-          isMinSliderCount={false}
-        />
-        <FrequencyBand
-          filter={{ ...filter, type: FilterTypeEnum.BP }}
-          isMinSliderCount={false}
-        />
+        {NO_GAIN_FILTER_TYPES.map((filterType) => (
+          <FrequencyBand
+            key={filterType}
+            filter={{ ...filter, type: filterType }}
+            isMinSliderCount={false}
+          />
+        ))}
       </AquaProviderWrapper>
     );
     const gainNumberInputs = screen.getAllByLabelText(filterGainNumberLabel);

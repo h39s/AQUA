@@ -60,6 +60,13 @@ export const FilterTypeToLabelMap: Record<FilterTypeEnum, string> = {
   [FilterTypeEnum.BP]: 'Band Pass Filter',
 };
 
+export const NO_GAIN_FILTER_TYPES = [
+  FilterTypeEnum.BP,
+  FilterTypeEnum.LPQ,
+  FilterTypeEnum.HPQ,
+  FilterTypeEnum.NO,
+];
+
 export const WINDOW_WIDTH = 1428;
 export const WINDOW_HEIGHT = 625;
 export const WINDOW_HEIGHT_EXPANDED = 1036;

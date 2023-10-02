@@ -26,6 +26,7 @@ import {
   MIN_FREQUENCY,
   MIN_GAIN,
   MIN_QUALITY,
+  NO_GAIN_FILTER_TYPES,
 } from 'common/constants';
 import IconButton, { IconName } from 'renderer/widgets/IconButton';
 import {
@@ -52,13 +53,6 @@ import NumberInput from '../widgets/NumberInput';
 import { FilterActionEnum, useAquaContext } from '../utils/AquaContext';
 import Slider from './Slider';
 import '../styles/FrequencyBand.scss';
-
-const NO_GAIN_FILTER_TYPES = new Set([
-  FilterTypeEnum.BP,
-  FilterTypeEnum.LPQ,
-  FilterTypeEnum.HPQ,
-  FilterTypeEnum.NO,
-]);
 
 interface IFrequencyBandProps {
   filter: IFilter;
@@ -201,7 +195,8 @@ const FrequencyBand = forwardRef(
     };
 
     const isGainDisabled = useMemo(
-      () => NO_GAIN_FILTER_TYPES.has(filter.type),
+      () =>
+        NO_GAIN_FILTER_TYPES.some((filterType) => filterType === filter.type),
       [filter.type]
     );
 
