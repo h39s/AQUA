@@ -71,7 +71,10 @@ import {
   IFiltersMap,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
-import { isRestrictedPresetName } from '../common/utils';
+import {
+  isFixedBandSizeEnumValue,
+  isRestrictedPresetName,
+} from '../common/utils';
 import { TSuccess, TError } from '../renderer/utils/equalizerApi';
 import {
   getAutoEqDeviceList,
@@ -653,6 +656,9 @@ ipcMain.on(ChannelEnum.CLEAR_GAINS, async (event) => {
 ipcMain.on(ChannelEnum.SET_FIXED_BAND, async (event, arg) => {
   const channel = ChannelEnum.SET_FIXED_BAND;
   const size: FixedBandSizeEnum = arg[0];
+  if (!isFixedBandSizeEnumValue(size)) {
+    handleError(event, channel, ErrorCode.INVALID_PARAMETER);
+  }
 
   state.filters = getDefaultFilters(size);
 

@@ -22,6 +22,7 @@ import {
   MAX_FREQUENCY,
   MIN_FREQUENCY,
   RESERVED_FILE_NAMES_SET,
+  FixedBandSizeEnum,
 } from './constants';
 
 export const roundToPrecision = (value: number, precision: number) => {
@@ -52,3 +53,8 @@ export const cloneFilters = (filters: IFiltersMap) => {
   });
   return filtersClone;
 };
+
+export const isFixedBandSizeEnumValue = (value: number) =>
+  Object.values(FixedBandSizeEnum)
+    .filter((key) => !Number.isNaN(Number(key)))
+    .some((enumValue) => enumValue === value);
