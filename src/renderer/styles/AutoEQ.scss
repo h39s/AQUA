@@ -22,13 +22,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 $auto-eq-dropdown-width: 220px;
 
+.auto-eq-title {
+  margin: 0 $spacing-s;
+}
+
 .auto-eq {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr) max-content minmax(0, 1fr) max-content;
   height: min-content;
 
   padding: $spacing-s $spacing-m;
-  border-radius: $spacing-m;
+  border-radius: $spacing-s;
   background: $primary-default;
 
   align-items: center;

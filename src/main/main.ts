@@ -66,9 +66,15 @@ import {
   WINDOW_HEIGHT_EXPANDED,
   WINDOW_WIDTH,
   getDefaultFilterWithId,
+  FixedBandSizeEnum,
+  getDefaultFilters,
+  IFiltersMap,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
-import { isRestrictedPresetName } from '../common/utils';
+import {
+  isFixedBandSizeEnumValue,
+  isRestrictedPresetName,
+} from '../common/utils';
 import { TSuccess, TError } from '../renderer/utils/equalizerApi';
 import {
   getAutoEqDeviceList,
@@ -635,6 +641,28 @@ ipcMain.on(ChannelEnum.REMOVE_FILTER, async (event, arg) => {
   // delete does not throw exception even if the filterId does not exist
   delete state.filters[filterId];
   await handleUpdate(event, channel);
+});
+
+ipcMain.on(ChannelEnum.CLEAR_GAINS, async (event) => {
+  const channel = ChannelEnum.CLEAR_GAINS;
+
+  Object.keys(state.filters).forEach((key) => {
+    state.filters[key].gain = 0;
+  });
+
+  await handleUpdate(event, channel);
+});
+
+ipcMain.on(ChannelEnum.SET_FIXED_BAND, async (event, arg) => {
+  const channel = ChannelEnum.SET_FIXED_BAND;
+  const size: FixedBandSizeEnum = arg[0];
+  if (!isFixedBandSizeEnumValue(size)) {
+    handleError(event, channel, ErrorCode.INVALID_PARAMETER);
+  }
+
+  state.filters = getDefaultFilters(size);
+
+  await handleUpdateHelper<IFiltersMap>(event, channel, state.filters);
 });
 
 ipcMain.on(ChannelEnum.SET_WINDOW_SIZE, async (event, arg) => {

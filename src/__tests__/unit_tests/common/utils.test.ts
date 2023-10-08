@@ -24,6 +24,7 @@ import {
 import {
   cloneFilters,
   computeAvgFreq,
+  isFixedBandSizeEnumValue,
   isRestrictedPresetName,
   roundToPrecision,
 } from 'common/utils';
@@ -92,6 +93,21 @@ describe('utils', () => {
       Object.entries(copy).forEach(([id, filter]) => {
         expect(filter.id).toBe(`${id}`);
       });
+    });
+  });
+
+  describe('isFixedBandSizeEnumValue', () => {
+    it('should be true for valid fixed band size values', () => {
+      expect(isFixedBandSizeEnumValue(6)).toBeTruthy();
+      expect(isFixedBandSizeEnumValue(10)).toBeTruthy();
+      expect(isFixedBandSizeEnumValue(15)).toBeTruthy();
+      expect(isFixedBandSizeEnumValue(31)).toBeTruthy();
+    });
+
+    it('should be false for invalid fixed band size values', () => {
+      expect(isFixedBandSizeEnumValue(1)).toBeFalsy();
+      expect(isFixedBandSizeEnumValue(-1)).toBeFalsy();
+      expect(isFixedBandSizeEnumValue(16)).toBeFalsy();
     });
   });
 });

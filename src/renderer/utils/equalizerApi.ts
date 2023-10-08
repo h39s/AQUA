@@ -24,6 +24,8 @@ import {
 } from 'common/errors';
 import {
   FilterTypeEnum,
+  FixedBandSizeEnum,
+  IFiltersMap,
   IState,
   MAX_FREQUENCY,
   MAX_GAIN,
@@ -71,7 +73,14 @@ const promisifyResult = <Type>(
 };
 
 const buildResponseHandler = <
-  Type extends string | number | boolean | void | IState | string[]
+  Type extends
+    | string
+    | number
+    | boolean
+    | void
+    | IState
+    | IFiltersMap
+    | string[]
 >(
   resultEvaluator: (
     result: Type,
@@ -94,7 +103,14 @@ const buildResponseHandler = <
 };
 
 const simpleResponseHandler = <
-  Type extends string | number | boolean | void | IState | string[]
+  Type extends
+    | string
+    | number
+    | boolean
+    | void
+    | IState
+    | IFiltersMap
+    | string[]
 >() =>
   buildResponseHandler<Type>((result, resolve) => {
     resolve(result);
@@ -461,6 +477,30 @@ export const removeEqualizerSlider = (filterId: string): Promise<void> => {
   const channel = ChannelEnum.REMOVE_FILTER;
   window.electron.ipcRenderer.sendMessage(channel, [filterId]);
   return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Clear gains for all filters
+ * @returns { Promise<void> } exception if failed
+ */
+export const clearGains = (): Promise<void> => {
+  const channel = ChannelEnum.CLEAR_GAINS;
+  window.electron.ipcRenderer.sendMessage(channel, []);
+  return promisifyResult(setterResponseHandler, channel);
+};
+
+/**
+ * Sets filters to be the corresponding fixed band configuration
+ * @param { FixedBandSizeEnum } size - Number of bands in the fixed configuration
+ * @returns { Promise<void> } exception if failed
+ */
+export const setFixedBand = (size: FixedBandSizeEnum): Promise<IFiltersMap> => {
+  const channel = ChannelEnum.SET_FIXED_BAND;
+  window.electron.ipcRenderer.sendMessage(channel, [size]);
+  return promisifyResult<IFiltersMap>(
+    simpleResponseHandler<IFiltersMap>(),
+    channel
+  );
 };
 
 /**

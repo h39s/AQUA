@@ -38,6 +38,7 @@ $button-height: 100px;
   &.small {
     padding: $spacing-xs $spacing-s;
     height: fit-content;
+    font-size: small;
   }
 
   &.default {
