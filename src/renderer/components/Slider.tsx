@@ -27,6 +27,7 @@ interface ISliderProps {
   min: number;
   max: number;
   value: number;
+  isDisabled?: boolean;
   sliderHeight?: string;
   label?: string;
   setValue: (newValue: number) => Promise<void>;
@@ -39,6 +40,7 @@ const Slider = ({
   value,
   sliderHeight = '150px',
   label,
+  isDisabled = false,
   setValue,
 }: ISliderProps) => {
   const { globalError } = useAquaContext();
@@ -73,7 +75,7 @@ const Slider = ({
         height={sliderHeight}
         handleChange={handleInput}
         handleMouseUp={handleInput}
-        isDisabled={!!globalError}
+        isDisabled={isDisabled || !!globalError}
         incrementPrecision={0}
         displayPrecision={2}
       />
@@ -84,7 +86,7 @@ const Slider = ({
         min={min}
         max={max}
         handleSubmit={handleInput}
-        isDisabled={!!globalError}
+        isDisabled={isDisabled || !!globalError}
         floatPrecision={2}
         showArrows
       />

@@ -26,6 +26,7 @@ import {
   MIN_FREQUENCY,
   MIN_GAIN,
   MIN_QUALITY,
+  NO_GAIN_FILTER_TYPES,
 } from 'common/constants';
 import IconButton, { IconName } from 'renderer/widgets/IconButton';
 import {
@@ -193,6 +194,12 @@ const FrequencyBand = forwardRef(
       }
     };
 
+    const isGainDisabled = useMemo(
+      () =>
+        NO_GAIN_FILTER_TYPES.some((filterType) => filterType === filter.type),
+      [filter.type]
+    );
+
     const onRemoveEqualizerSlider = async () => {
       if (isRemoveDisabled) {
         return;
@@ -258,6 +265,7 @@ const FrequencyBand = forwardRef(
               value={filter.gain}
               sliderHeight={sliderHeight}
               setValue={handleGainSubmit}
+              isDisabled={isGainDisabled}
             />
           </div>
           <NumberInput

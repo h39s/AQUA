@@ -84,6 +84,10 @@ const RangeInput = ({
   };
 
   const onWheel = (e: WheelEvent) => {
+    if (isDisabled) {
+      return;
+    }
+
     if (e.deltaY >= 0) {
       // scroll down
       onArrowInput(false);

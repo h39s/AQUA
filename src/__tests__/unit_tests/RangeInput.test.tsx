@@ -241,5 +241,9 @@ describe('RangeInput', () => {
     expect(upArrow).toHaveAttribute('aria-disabled', 'true');
     await user.click(upArrow);
     expect(handleChange).not.toHaveBeenCalled();
+
+    const slider = screen.getByLabelText(`${name}`);
+    fireEvent.wheel(slider, { deltaY: -100 });
+    expect(handleChange).not.toHaveBeenCalled();
   });
 });

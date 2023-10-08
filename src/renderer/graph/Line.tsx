@@ -93,7 +93,9 @@ const Line = ({
 
   // Set initial path attribute
   const initRender = useCallback(() => {
-    d3.select(ref.current).attr('d', d);
+    d3.select(ref.current)
+      .attr('d', d)
+      .attr('clip-path', 'url(#chart-clip-path)');
   }, [d]);
 
   // Handle animation for the initial render
