@@ -68,17 +68,30 @@ body {
 .title-bar {
   background-color: $primary-dark;
   height: $title-bar-height;
-  width: 100%;
+  margin-right: 150px;
   -webkit-app-region: drag; /* Allow user to drag the window using this titlebar */
   -webkit-user-select: none; /* Prevent user from selecting things */
   user-select: none;
-  justify-content: start;
-  align-items: end;
+  justify-content: space-between;
+  align-items: center;
   gap: $spacing-s;
 
   .brand {
     margin-left: $spacing-m;
   }
+
+  .settings {
+    -webkit-app-region: none; /* Allow user to interact with the settings button */
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.config-file-content {
+  align-items: center;
 }
 
 .graph-wrapper {

@@ -19,107 +19,56 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import '@testing-library/jest-dom';
 import { screen } from '@testing-library/react';
 import { setup } from '__tests__/utils/userEventUtils';
-import mockElectronAPI from '__tests__/utils/mockElectronAPI';
-import Modal from '../../renderer/widgets/Modal';
+import Modal from 'renderer/widgets/Modal';
 
 describe('Modal', () => {
-  const headerText = 'Header';
-  const bodyText = 'Body';
-  const retryText = 'Close & Retry';
-  const exitText = 'Exit';
-  const onSubmit = jest.fn();
-  const mockClose = jest.fn();
-
-  beforeAll(() => {
-    mockElectronAPI({ closeApp: mockClose });
-  });
+  const headerContent = 'Header';
+  const bodyContent = 'Body';
+  const footerContent = 'Footer';
+  const onClose = jest.fn();
 
   beforeEach(() => {
-    mockClose.mockClear();
-    onSubmit.mockClear();
+    onClose.mockClear();
   });
 
   it('should render modal', async () => {
     setup(
       <Modal
-        isLoading={false}
-        headerText={headerText}
-        bodyText={bodyText}
-        onSubmit={onSubmit}
+        headerContent={headerContent}
+        bodyContent={bodyContent}
+        footerContent={footerContent}
+        onClose={onClose}
       />
     );
 
-    expect(screen.getByText(headerText)).toBeInTheDocument();
-    expect(screen.getByText(bodyText)).toBeInTheDocument();
+    expect(screen.getByText(headerContent)).toBeInTheDocument();
+    expect(screen.getByText(bodyContent)).toBeInTheDocument();
+    expect(screen.getByText(footerContent)).toBeInTheDocument();
+    expect(screen.getByLabelText('Close Icon')).toBeInTheDocument();
   });
 
-  it('should be disabled', async () => {
-    setup(
-      <Modal
-        isLoading
-        headerText={headerText}
-        bodyText={bodyText}
-        onSubmit={onSubmit}
-      />
-    );
+  it('should be empty', async () => {
+    setup(<Modal />);
 
-    expect(screen.getByText(retryText)).toHaveAttribute(
-      'aria-disabled',
-      'true'
-    );
-    expect(screen.getByText(exitText)).toHaveAttribute('aria-disabled', 'true');
-  });
-
-  it('should disable retry and enable exit', async () => {
-    setup(
-      <Modal
-        isLoading={false}
-        isSumbitDisabled
-        headerText={headerText}
-        bodyText={bodyText}
-        onSubmit={onSubmit}
-      />
-    );
-
-    expect(screen.getByText(retryText)).toHaveAttribute(
-      'aria-disabled',
-      'true'
-    );
-    expect(screen.getByText(exitText)).not.toHaveAttribute(
-      'aria-disabled',
-      'true'
-    );
-  });
-
-  it('should retry when clicked', async () => {
-    const { user } = setup(
-      <Modal
-        isLoading={false}
-        headerText={headerText}
-        bodyText={bodyText}
-        onSubmit={onSubmit}
-      />
-    );
-
-    const retryButton = screen.getByText(retryText);
-    expect(retryButton).toBeInTheDocument();
-    await user.click(retryButton);
-    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText(headerContent)).not.toBeInTheDocument();
+    expect(screen.queryByText(bodyContent)).not.toBeInTheDocument();
+    expect(screen.queryByText(footerContent)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Close Icon')).not.toBeInTheDocument();
   });
 
   it('should close when clicked', async () => {
     const { user } = setup(
       <Modal
-        isLoading={false}
-        headerText={headerText}
-        bodyText={bodyText}
-        onSubmit={onSubmit}
+        headerContent={headerContent}
+        bodyContent={bodyContent}
+        footerContent={footerContent}
+        onClose={onClose}
       />
     );
 
-    const exitButton = screen.getByText(exitText);
-    expect(exitButton).toBeInTheDocument();
-    await user.click(exitButton);
-    expect(mockClose).toHaveBeenCalledTimes(1);
+    const closeIcon = screen.getByLabelText('Close Icon');
+    expect(closeIcon).toBeInTheDocument();
+    await user.click(closeIcon);
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

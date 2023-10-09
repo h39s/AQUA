@@ -16,62 +16,33 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import Button from './Button';
 import '../styles/Modal.scss';
+import IconButton, { IconName } from './IconButton';
 
 interface IModalProps {
-  isLoading: boolean;
-  headerText: string;
-  bodyText: string;
-  isSumbitDisabled?: boolean;
-  onSubmit: () => void;
-  onCancel?: () => void;
-  children?: JSX.Element | string;
-  cancelText?: string;
-  submitText?: string;
+  onClose?: () => void;
+  headerContent?: JSX.Element | string;
+  bodyContent?: JSX.Element | string;
+  footerContent?: JSX.Element | string;
 }
 
 export default function Modal({
-  isLoading,
-  headerText,
-  bodyText,
-  isSumbitDisabled = false,
-  onSubmit,
-  onCancel,
-  children,
-  cancelText,
-  submitText,
+  onClose,
+  headerContent,
+  bodyContent,
+  footerContent,
 }: IModalProps) {
-  const handleClose = async () => {
-    window.electron.ipcRenderer.closeApp();
-  };
-
   return (
     <div className="modal col">
       <div className="modal-content">
-        <h1 className="header">{headerText}</h1>
-        <div className="body">
-          <p>{bodyText}</p>
-          {children}
+        <div className="header">
+          {headerContent}
+          {onClose && (
+            <IconButton icon={IconName.TIMES} handleClick={onClose} />
+          )}
         </div>
-        <div className="footer row">
-          <Button
-            ariaLabel="Cancel"
-            isDisabled={isLoading}
-            className="default"
-            handleChange={onCancel || handleClose}
-          >
-            {cancelText || 'Exit'}
-          </Button>
-          <Button
-            ariaLabel="Submit"
-            isDisabled={isLoading || isSumbitDisabled}
-            className="default"
-            handleChange={onSubmit}
-          >
-            {submitText || 'Close & Retry'}
-          </Button>
-        </div>
+        <div className="body">{bodyContent}</div>
+        <div className="footer row">{footerContent}</div>
       </div>
     </div>
   );

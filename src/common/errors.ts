@@ -51,7 +51,7 @@ export const errors: Record<ErrorCode, ErrorDescription> = {
     title: ErrorTitle.PREREQUISITE,
     shortError: 'Unable to locate the configuration file for EqualizerAPO.',
     action:
-      'Please check whether the config.txt file exists in the config folder of EqualizerAPO.',
+      'Please check whether your config file CONFIG_NAME exists in the config folder of EqualizerAPO or select a new config file.',
     code: ErrorCode.CONFIG_NOT_FOUND,
   },
   [ErrorCode.TIMEOUT]: {

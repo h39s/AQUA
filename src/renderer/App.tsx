@@ -18,9 +18,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './styles/App.scss';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { DEFAULT_CONFIG_FILENAME } from 'common/constants';
-import { ErrorCode } from 'common/errors';
+import { ErrorCode, ErrorDescription } from 'common/errors';
 import MainContent from './MainContent';
 import { AquaProvider, useAquaContext } from './utils/AquaContext';
 import SideBar from './SideBar';
@@ -37,6 +37,8 @@ import {
 } from './utils/equalizerApi';
 import Modal from './widgets/Modal';
 import FilePicker from './widgets/FilePicker';
+import IconButton, { IconName } from './widgets/IconButton';
+import ConfirmationModal from './widgets/ConfirmationModal';
 
 export const AppContent = () => {
   const {
@@ -45,31 +47,27 @@ export const AppContent = () => {
     configFileName,
     performHealthCheck,
     setConfigFileName,
+    setGlobalError,
   } = useAquaContext();
 
-  const [configFile, setConfigFile] = useState<string | undefined>(
-    configFileName
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+
+  const handleChangeConfigFile = useCallback(
+    async (file: File) => {
+      if (!file) {
+        return;
+      }
+
+      try {
+        await updateConfigFileName(file.name || DEFAULT_CONFIG_FILENAME);
+        setConfigFileName(file.name || DEFAULT_CONFIG_FILENAME);
+        performHealthCheck();
+      } catch (e) {
+        setGlobalError(e as ErrorDescription);
+      }
+    },
+    [setConfigFileName, performHealthCheck, setGlobalError]
   );
-
-  const handleChange = (file: File) => {
-    if (!file) {
-      return;
-    }
-
-    setConfigFile(file.name);
-  };
-
-  const handleConfigUpdate = useCallback(async () => {
-    await updateConfigFileName(configFile || DEFAULT_CONFIG_FILENAME);
-    setConfigFileName(configFile || DEFAULT_CONFIG_FILENAME);
-    performHealthCheck();
-  }, [configFile, performHealthCheck, setConfigFileName]);
-
-  useEffect(() => {
-    if (globalError && globalError.code === ErrorCode.CONFIG_NOT_FOUND) {
-      setConfigFile(undefined);
-    }
-  }, [globalError]);
 
   const globalErrorModal = useMemo(() => {
     if (!globalError) {
@@ -78,25 +76,27 @@ export const AppContent = () => {
 
     if (globalError.code === ErrorCode.CONFIG_NOT_FOUND) {
       return (
-        <Modal
+        <ConfirmationModal
           isLoading={isLoading}
-          isSumbitDisabled={!configFile}
-          onSubmit={handleConfigUpdate}
+          onSubmit={performHealthCheck}
           headerText={globalError.title}
-          bodyText={`${globalError.shortError} ${globalError.action}`}
+          bodyText={`${globalError.shortError} ${globalError.action.replace(
+            'CONFIG_NAME',
+            configFileName
+          )}`}
         >
           <FilePicker
             label="Select a config file"
             placeholder="No file selected."
             accept=".txt"
             isDisabled={isLoading}
-            handleChange={handleChange}
+            handleChange={handleChangeConfigFile}
           />
-        </Modal>
+        </ConfirmationModal>
       );
     }
     return (
-      <Modal
+      <ConfirmationModal
         isLoading={isLoading}
         onSubmit={performHealthCheck}
         headerText={globalError.title}
@@ -104,17 +104,44 @@ export const AppContent = () => {
       />
     );
   }, [
-    configFile,
     globalError,
-    handleConfigUpdate,
     isLoading,
     performHealthCheck,
+    configFileName,
+    handleChangeConfigFile,
   ]);
+
+  const settingsModal = (
+    <Modal
+      onClose={() => setShowSettingsModal(false)}
+      headerContent={<h1 className="header">Settings</h1>}
+      bodyContent={
+        <>
+          <h2>Config File</h2>
+          <div className="row config-file-content">
+            Current Path: {configFileName}
+            <FilePicker
+              label="Select a config file"
+              placeholder="No file selected."
+              accept=".txt"
+              isDisabled={isLoading}
+              handleChange={handleChangeConfigFile}
+            />
+          </div>
+        </>
+      }
+    />
+  );
 
   return (
     <>
       <header className="title-bar row">
         <span className="brand">AQUA</span>
+        <IconButton
+          icon={IconName.GEAR}
+          className="settings"
+          handleClick={() => setShowSettingsModal(true)}
+        />
       </header>
       <div className="app">
         <SideBar />
@@ -130,6 +157,7 @@ export const AppContent = () => {
           deletePreset={deletePreset}
         />
         <FrequencyResponseChart />
+        {showSettingsModal && settingsModal}
         {globalErrorModal}
       </div>
     </>

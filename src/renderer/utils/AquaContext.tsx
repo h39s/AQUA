@@ -200,6 +200,7 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
       dispatchFilter({ type: FilterActionEnum.INIT, filters: state.filters });
       setGlobalError(undefined);
       setIsCaseSensitiveFs(state.isCaseSensitiveFs);
+      setConfigFileName(state.configFileName);
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
