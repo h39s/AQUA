@@ -71,7 +71,12 @@ describe('App', () => {
 
       expect(screen.getByText(error.title)).toBeInTheDocument();
       expect(
-        screen.getByText(`${error.shortError} ${error.action}`)
+        screen.getByText(
+          `${error.shortError} ${error.action.replace(
+            'CONFIG_NAME',
+            'config.txt'
+          )}`
+        )
       ).toBeInTheDocument();
       expect(screen.getByText(configFilePickerText)).toBeInTheDocument();
     });

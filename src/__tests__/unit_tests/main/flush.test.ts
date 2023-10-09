@@ -42,11 +42,12 @@ import {
 const TEST_DATA_DIR = 'src/__tests__/data';
 const TEST_DATA_READ_DIR = addFileToPath(TEST_DATA_DIR, 'read_only');
 const TEST_DATA_WRITE_DIR = addFileToPath(TEST_DATA_DIR, 'write');
-const mockSettings = {
+const mockSettings: IState = {
   isEnabled: true,
   isAutoPreAmpOn: true,
   isGraphViewOn: true,
   isCaseSensitiveFs: false,
+  configFileName: 'config.txt',
   preAmp: 13,
   filters: {
     '7cf32e8a': {
