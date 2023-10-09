@@ -77,11 +77,28 @@ describe('flush', () => {
       const returnedString = stateToString(defaultState);
       expect(returnedString).toMatch(/Device: all\n\rChannel: all\n\r/);
       expect(returnedString).toMatch(/Preamp: 0dB\n\r/);
+
+      // Check for that filters for each frequency exists
+      // Note: the order of filters in the string is determined by the generated filter id and not the frequency value
+      expect(returnedString).toMatch(/Filter\d: ON PK Fc 32 Hz Gain 0 dB Q 1/);
+      expect(returnedString).toMatch(/Filter\d: ON PK Fc 64 Hz Gain 0 dB Q 1/);
+      expect(returnedString).toMatch(/Filter\d: ON PK Fc 125 Hz Gain 0 dB Q 1/);
+      expect(returnedString).toMatch(/Filter\d: ON PK Fc 250 Hz Gain 0 dB Q 1/);
+      expect(returnedString).toMatch(/Filter\d: ON PK Fc 500 Hz Gain 0 dB Q 1/);
       expect(returnedString).toMatch(
-        /Filter0: ON PK Fc 32 Hz Gain 0 dB Q 1\n\r/
+        /Filter\d: ON PK Fc 1000 Hz Gain 0 dB Q 1/
       );
       expect(returnedString).toMatch(
-        /Filter9: ON PK Fc 16000 Hz Gain 0 dB Q 1/
+        /Filter\d: ON PK Fc 2000 Hz Gain 0 dB Q 1/
+      );
+      expect(returnedString).toMatch(
+        /Filter\d: ON PK Fc 4000 Hz Gain 0 dB Q 1/
+      );
+      expect(returnedString).toMatch(
+        /Filter\d: ON PK Fc 8000 Hz Gain 0 dB Q 1/
+      );
+      expect(returnedString).toMatch(
+        /Filter\d: ON PK Fc 16000 Hz Gain 0 dB Q 1/
       );
     });
   });
