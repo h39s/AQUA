@@ -43,6 +43,7 @@ import ConfirmationModal from './widgets/ConfirmationModal';
 export const AppContent = () => {
   const {
     isLoading,
+    isGraphViewOn,
     globalError,
     configFileName,
     performHealthCheck,
@@ -143,7 +144,7 @@ export const AppContent = () => {
           handleClick={() => setShowSettingsModal(true)}
         />
       </header>
-      <div className="app">
+      <div className={`app ${isGraphViewOn ? '' : 'minimized'}`}>
         <SideBar />
         <div className="middle-content">
           <AutoEQ />

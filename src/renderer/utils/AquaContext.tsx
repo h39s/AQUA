@@ -70,7 +70,7 @@ export interface IAquaContext extends IState {
   setGlobalError: (newValue?: ErrorDescription) => void;
   setIsEnabled: (newValue: boolean) => void;
   setAutoPreAmpOn: (newValue: boolean) => void;
-  setGraphViewOn: (newValue: boolean) => void;
+  setIsGraphViewOn: (newValue: boolean) => void;
   setPreAmp: (newValue: number) => void;
   setConfigFileName: (newValue: string) => void;
   dispatchFilter: FilterDispatch;
@@ -183,19 +183,13 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const setGraphViewOn = (newValue: boolean) => {
-    setIsGraphViewOn(newValue);
-    const root = document.getElementById('root');
-    root?.setAttribute('class', newValue ? '' : 'minimized');
-  };
-
   const performHealthCheck = useCallback(async () => {
     setIsLoading(true);
     try {
       const state = await getEqualizerState();
       setIsEnabled(state.isEnabled);
       setAutoPreAmpOn(state.isAutoPreAmpOn);
-      setGraphViewOn(state.isGraphViewOn);
+      setIsGraphViewOn(state.isGraphViewOn);
       setPreAmp(state.preAmp);
       dispatchFilter({ type: FilterActionEnum.INIT, filters: state.filters });
       setGlobalError(undefined);
@@ -227,7 +221,7 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
         setGlobalError,
         setIsEnabled,
         setAutoPreAmpOn,
-        setGraphViewOn,
+        setIsGraphViewOn,
         setPreAmp,
         setConfigFileName,
         dispatchFilter,
