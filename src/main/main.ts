@@ -168,7 +168,7 @@ const handleError = (
   errorCode: ErrorCode
 ) => {
   const reply: TError = { errorCode };
-  console.log(channel);
+  console.log(`Error code ${errorCode} detected on channel ${channel}`);
   event.reply(channel, reply);
 };
 
@@ -199,6 +199,14 @@ const handleUpdateHelper = async <T>(
   const isInstalled = await isEqualizerAPOInstalled();
   if (!isInstalled) {
     handleError(event, channel, ErrorCode.EQUALIZER_APO_NOT_INSTALLED);
+    return;
+  }
+
+  // Check that the config file exists
+  try {
+    checkConfigFile(configPath, state.configFileName);
+  } catch (e) {
+    handleError(event, channel, ErrorCode.CONFIG_NOT_FOUND);
     return;
   }
 
@@ -414,8 +422,6 @@ ipcMain.on(ChannelEnum.GET_STATE, async (event) => {
   if (res) {
     const reply: TSuccess<IState> = { result: state };
     event.reply(channel, reply);
-  } else {
-    handleError(event, channel, ErrorCode.CONFIG_NOT_FOUND);
   }
 });
 
