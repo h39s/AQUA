@@ -25,6 +25,7 @@ export enum ErrorCode {
   PRESET_FILE_ERROR,
   INVALID_PRESET_NAME,
   AUTO_EQ_READ_ERROR,
+  FILE_SYSTEM_ERROR,
 }
 
 enum ErrorTitle {
@@ -94,6 +95,11 @@ export const errors: Record<ErrorCode, ErrorDescription> = {
     shortError: 'Failed to get supported AutoEQ devices.',
     action: 'Please reach out to the developers to resolve the issue.',
     code: ErrorCode.AUTO_EQ_READ_ERROR,
+  },
+  [ErrorCode.FILE_SYSTEM_ERROR]: {
+    shortError: 'Internal Error: Failed to open file system.',
+    action: 'Please reach out to the developers to resolve the issue.',
+    code: ErrorCode.FILE_SYSTEM_ERROR,
   },
 };
 

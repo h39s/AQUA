@@ -44,6 +44,10 @@ import {
   doesPresetExist,
   PRESETS_DIR,
   deletePreset,
+  openFsDirectoryDialog,
+  openFsFileDialog,
+  readEqualizerApoFile,
+  flushExplicit,
 } from './flush';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -70,6 +74,8 @@ import {
   getDefaultFilters,
   IFiltersMap,
   DEFAULT_CONFIG_FILENAME,
+  importPresetIntoState,
+  getDefaultState,
 } from '../common/constants';
 import { ErrorCode } from '../common/errors';
 import {
@@ -275,8 +281,7 @@ ipcMain.on(ChannelEnum.LOAD_PRESET, async (event, arg) => {
 
   try {
     const presetSettings: IPresetV2 = fetchPreset(presetName, presetPath);
-    state.preAmp = presetSettings.preAmp;
-    state.filters = presetSettings.filters;
+    importPresetIntoState(presetSettings, state);
     await handleUpdate(event, channel);
   } catch (ex) {
     console.log('Failed to read preset: ', presetName);
@@ -418,8 +423,7 @@ ipcMain.on(ChannelEnum.LOAD_AUTO_EQ_PRESET, async (event, arg) => {
 
   try {
     const presetSettings: IPresetV2 = getAutoEqPreset(deviceName, responseName);
-    state.preAmp = presetSettings.preAmp;
-    state.filters = presetSettings.filters;
+    importPresetIntoState(presetSettings, state);
     await handleUpdate(event, channel);
   } catch (ex) {
     console.log(
@@ -705,6 +709,76 @@ ipcMain.on(ChannelEnum.SET_WINDOW_SIZE, async (event, arg) => {
 
   const reply: TSuccess<void> = { result: undefined };
   event.reply(channel, reply);
+});
+
+ipcMain.on(ChannelEnum.IMPORT_PRESET, async (event) => {
+  const channel = ChannelEnum.IMPORT_PRESET;
+  const reply: TSuccess<void> = { result: undefined };
+  let ret: Electron.OpenDialogReturnValue;
+  try {
+    ret = await openFsFileDialog();
+    if (ret.canceled || ret.filePaths.length === 0) {
+      event.reply(channel, reply);
+      return;
+      // getAutoEqPreset
+      // set state to the new state
+    }
+  } catch (ex) {
+    console.log(ex);
+    handleError(event, channel, ErrorCode.FILE_SYSTEM_ERROR);
+    return;
+  }
+
+  try {
+    const presetSettings: IPresetV2 = readEqualizerApoFile(ret.filePaths[0]);
+    importPresetIntoState(presetSettings, state);
+    await handleUpdate(event, channel);
+  } catch (ex) {
+    console.log(`Failed to load EqualizerAPO file ${ret.filePaths[0]}`);
+    console.log(ex);
+    handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
+  }
+});
+
+ipcMain.on(ChannelEnum.EXPORT_PRESET, async (event, arg) => {
+  const channel = ChannelEnum.EXPORT_PRESET;
+  const presetName = arg[0];
+  const reply: TSuccess<void> = { result: undefined };
+  let ret: Electron.OpenDialogReturnValue;
+  try {
+    ret = await openFsFileDialog();
+    if (ret.canceled || ret.filePaths.length === 0) {
+      event.reply(channel, reply);
+      return;
+      // getAutoEqPreset
+      // set state to the new state
+    }
+  } catch (ex) {
+    console.log(ex);
+    handleError(event, channel, ErrorCode.FILE_SYSTEM_ERROR);
+    return;
+  }
+
+  let presetSettings: IPresetV2;
+  try {
+    presetSettings = fetchPreset(presetName, presetPath);
+  } catch (ex) {
+    console.log('Failed to read preset: ', presetName);
+    console.log(ex);
+    handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
+    return;
+  }
+
+  try {
+    const tempState: IState = getDefaultState();
+    importPresetIntoState(presetSettings, tempState);
+    flushExplicit(tempState, ret.filePaths[0]);
+    event.reply(channel, reply);
+  } catch (ex) {
+    console.log(`Failed to export EqualizerAPO file ${ret.filePaths[0]}`);
+    console.log(ex);
+    handleError(event, channel, ErrorCode.PRESET_FILE_ERROR);
+  }
 });
 
 ipcMain.on('quit-app', () => {

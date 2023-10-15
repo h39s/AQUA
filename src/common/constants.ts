@@ -101,6 +101,11 @@ export interface IState {
   filters: IFiltersMap;
 }
 
+export const importPresetIntoState = (preset: IPresetV2, state: IState) => {
+  state.preAmp = preset.preAmp;
+  state.filters = preset.filters;
+};
+
 export interface IPresetV1 {
   preAmp: number;
   filters: IFilter[];

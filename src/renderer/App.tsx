@@ -37,6 +37,8 @@ import {
   renamePreset,
   savePreset,
   updateConfigFilePath,
+  importPreset,
+  exportPreset,
 } from './utils/equalizerApi';
 import Modal from './widgets/Modal';
 import FilePicker from './widgets/FilePicker';
@@ -160,6 +162,8 @@ export const AppContent = () => {
           savePreset={savePreset}
           renamePreset={renamePreset}
           deletePreset={deletePreset}
+          importPreset={importPreset}
+          exportPreset={exportPreset}
         />
         <FrequencyResponseChart />
         {showSettingsModal && settingsModal}
