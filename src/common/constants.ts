@@ -97,7 +97,7 @@ export interface IState {
   isGraphViewOn: boolean;
   isCaseSensitiveFs: boolean;
   preAmp: number;
-  configFileName: string;
+  configFilePath: string;
   filters: IFiltersMap;
 }
 
@@ -168,7 +168,7 @@ export const getDefaultState = (): IState => {
     isGraphViewOn: true, // true as default so that spinner can be seen on initial load
     isCaseSensitiveFs: false, // false as default so we assume windows case insensitive behavior (foo = FoO)
     preAmp: 0,
-    configFileName: DEFAULT_CONFIG_FILENAME,
+    configFilePath: '',
     filters: getDefaultFilters(),
   };
 };

@@ -504,13 +504,13 @@ export const setFixedBand = (size: FixedBandSizeEnum): Promise<IFiltersMap> => {
 };
 
 /**
- * Update config file name
- * @param {string} fileName - name of the new config file
+ * Update config file path
+ * @param {string} filePath - name of the new config file
  * @returns { Promise<void> } exception if failed
  */
-export const updateConfigFileName = (fileName: string): Promise<void> => {
-  const channel = ChannelEnum.UPDATE_CONFIG_FILE_NAME;
-  window.electron.ipcRenderer.sendMessage(channel, [fileName]);
+export const updateConfigFilePath = (filePath: string): Promise<void> => {
+  const channel = ChannelEnum.UPDATE_CONFIG_FILE_PATH;
+  window.electron.ipcRenderer.sendMessage(channel, [filePath]);
   return promisifyResult(setterResponseHandler, channel);
 };
 

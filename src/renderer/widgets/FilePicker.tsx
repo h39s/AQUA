@@ -47,7 +47,7 @@ export default function FilePicker({
 
   return (
     <div className="file-picker row">
-      {file?.name || placeholder}
+      {file?.path || placeholder}
       <label
         className="button small"
         htmlFor="filePicker"

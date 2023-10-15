@@ -19,8 +19,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './styles/App.scss';
 import { useCallback, useMemo, useState } from 'react';
-import { DEFAULT_CONFIG_FILENAME } from 'common/constants';
-import { ErrorCode, ErrorDescription } from 'common/errors';
+import {
+  CONFIG_FILE_PATH_PLACEHOLDER,
+  ErrorCode,
+  ErrorDescription,
+} from 'common/errors';
 import MainContent from './MainContent';
 import { AquaProvider, useAquaContext } from './utils/AquaContext';
 import SideBar from './SideBar';
@@ -33,7 +36,7 @@ import {
   loadPreset,
   renamePreset,
   savePreset,
-  updateConfigFileName,
+  updateConfigFilePath,
 } from './utils/equalizerApi';
 import Modal from './widgets/Modal';
 import FilePicker from './widgets/FilePicker';
@@ -45,9 +48,9 @@ export const AppContent = () => {
     isLoading,
     isGraphViewOn,
     globalError,
-    configFileName,
+    configFilePath,
     performHealthCheck,
-    setConfigFileName,
+    setConfigFilePath,
     setGlobalError,
   } = useAquaContext();
 
@@ -60,14 +63,14 @@ export const AppContent = () => {
       }
 
       try {
-        await updateConfigFileName(file.name || DEFAULT_CONFIG_FILENAME);
-        setConfigFileName(file.name || DEFAULT_CONFIG_FILENAME);
+        await updateConfigFilePath(file.path);
+        setConfigFilePath(file.path);
         performHealthCheck();
       } catch (e) {
         setGlobalError(e as ErrorDescription);
       }
     },
-    [setConfigFileName, performHealthCheck, setGlobalError]
+    [setConfigFilePath, performHealthCheck, setGlobalError]
   );
 
   const globalErrorModal = useMemo(() => {
@@ -82,8 +85,8 @@ export const AppContent = () => {
           onSubmit={performHealthCheck}
           headerText={globalError.title}
           bodyText={`${globalError.shortError} ${globalError.action.replace(
-            'CONFIG_NAME',
-            configFileName
+            CONFIG_FILE_PATH_PLACEHOLDER,
+            configFilePath
           )}`}
         >
           <FilePicker
@@ -108,7 +111,7 @@ export const AppContent = () => {
     globalError,
     isLoading,
     performHealthCheck,
-    configFileName,
+    configFilePath,
     handleChangeConfigFile,
   ]);
 
@@ -124,7 +127,7 @@ export const AppContent = () => {
             <div className="label-m">Current Path</div>
             <FilePicker
               label="Select a config file"
-              placeholder={configFileName}
+              placeholder={configFilePath}
               accept=".txt"
               isDisabled={isLoading}
               handleChange={handleChangeConfigFile}

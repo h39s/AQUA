@@ -19,7 +19,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import fs from 'fs';
 import path from 'path';
 import {
-  DEFAULT_CONFIG_FILENAME,
   getDefaultState,
   IPresetV1,
   IPresetV2,
@@ -201,31 +200,23 @@ export const flush = (state: IState, configDirPath: string) => {
   }
 };
 
-export const checkConfigFile = (
-  configDirPath: string,
-  configFileName: string = DEFAULT_CONFIG_FILENAME
-) => {
-  const configPath = addFileToPath(configDirPath, configFileName);
+export const checkConfigFilePath = (configFilePath: string) => {
   try {
-    const content = fs.readFileSync(configPath, {
+    const content = fs.readFileSync(configFilePath, {
       encoding: 'utf8',
     });
     return content.search(CONFIG_CONTENT) !== -1;
   } catch (ex) {
-    throw new Error(`Unable to locate config file at ${configPath}`);
+    throw new Error(`Unable to locate config file at ${configFilePath}`);
   }
 };
 
-export const updateConfig = (
-  configDirPath: string,
-  configFileName: string = DEFAULT_CONFIG_FILENAME
-) => {
-  const configPath = addFileToPath(configDirPath, configFileName);
+export const updateConfigFilePath = (configFilePath: string) => {
   try {
-    fs.appendFileSync(configPath, `\n${CONFIG_CONTENT}`, {
+    fs.appendFileSync(configFilePath, `\n${CONFIG_CONTENT}`, {
       encoding: 'utf8',
     });
   } catch (ex) {
-    throw new Error(`Unable to locate config file at ${configPath}`);
+    throw new Error(`Unable to locate config file at ${configFilePath}`);
   }
 };

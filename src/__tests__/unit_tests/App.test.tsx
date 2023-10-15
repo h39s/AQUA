@@ -20,8 +20,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import defaultAquaContext from '__tests__/utils/mockAquaProvider';
-import { ErrorCode, getErrorDescription } from 'common/errors';
+import {
+  CONFIG_FILE_PATH_PLACEHOLDER,
+  ErrorCode,
+  getErrorDescription,
+} from 'common/errors';
 import mockElectronAPI from '__tests__/utils/mockElectronAPI';
+import { DEFAULT_CONFIG_FILENAME } from 'common/constants';
 import App, { AppContent } from '../../renderer/App';
 import { AquaProviderWrapper } from '../../renderer/utils/AquaContext';
 
@@ -63,6 +68,7 @@ describe('App', () => {
           value={{
             ...defaultAquaContext,
             globalError: error,
+            configFilePath: DEFAULT_CONFIG_FILENAME,
           }}
         >
           <AppContent />
@@ -73,8 +79,8 @@ describe('App', () => {
       expect(
         screen.getByText(
           `${error.shortError} ${error.action.replace(
-            'CONFIG_NAME',
-            'config.txt'
+            CONFIG_FILE_PATH_PLACEHOLDER,
+            DEFAULT_CONFIG_FILENAME
           )}`
         )
       ).toBeInTheDocument();

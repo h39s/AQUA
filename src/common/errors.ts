@@ -40,6 +40,8 @@ export type ErrorDescription = {
   code: ErrorCode;
 };
 
+export const CONFIG_FILE_PATH_PLACEHOLDER = 'CONFIG_FILE_PATH_PLACEHOLDER';
+
 export const errors: Record<ErrorCode, ErrorDescription> = {
   [ErrorCode.EQUALIZER_APO_NOT_INSTALLED]: {
     title: ErrorTitle.PREREQUISITE,
@@ -50,8 +52,7 @@ export const errors: Record<ErrorCode, ErrorDescription> = {
   [ErrorCode.CONFIG_NOT_FOUND]: {
     title: ErrorTitle.PREREQUISITE,
     shortError: 'Unable to locate the configuration file for EqualizerAPO.',
-    action:
-      'Please check whether your config file CONFIG_NAME exists in the config folder of EqualizerAPO or select a new config file.',
+    action: `Please check whether your config file at ${CONFIG_FILE_PATH_PLACEHOLDER} exists or select a new config file.`,
     code: ErrorCode.CONFIG_NOT_FOUND,
   },
   [ErrorCode.TIMEOUT]: {

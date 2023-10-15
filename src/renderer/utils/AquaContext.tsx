@@ -72,7 +72,7 @@ export interface IAquaContext extends IState {
   setAutoPreAmpOn: (newValue: boolean) => void;
   setIsGraphViewOn: (newValue: boolean) => void;
   setPreAmp: (newValue: number) => void;
-  setConfigFileName: (newValue: string) => void;
+  setConfigFilePath: (newValue: string) => void;
   dispatchFilter: FilterDispatch;
 }
 
@@ -177,8 +177,8 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
     DEFAULT_STATE.filters
   );
 
-  const [configFileName, setConfigFileName] = useState<string>(
-    DEFAULT_STATE.configFileName
+  const [configFilePath, setConfigFilePath] = useState<string>(
+    DEFAULT_STATE.configFilePath
   );
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -194,7 +194,7 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
       dispatchFilter({ type: FilterActionEnum.INIT, filters: state.filters });
       setGlobalError(undefined);
       setIsCaseSensitiveFs(state.isCaseSensitiveFs);
-      setConfigFileName(state.configFileName);
+      setConfigFilePath(state.configFilePath);
     } catch (e) {
       setGlobalError(e as ErrorDescription);
     }
@@ -215,7 +215,7 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
         isGraphViewOn,
         isCaseSensitiveFs,
         preAmp,
-        configFileName,
+        configFilePath,
         filters,
         performHealthCheck,
         setGlobalError,
@@ -223,7 +223,7 @@ export const AquaProvider = ({ children }: IAquaProviderProps) => {
         setAutoPreAmpOn,
         setIsGraphViewOn,
         setPreAmp,
-        setConfigFileName,
+        setConfigFilePath,
         dispatchFilter,
       }}
     >
