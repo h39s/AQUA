@@ -90,8 +90,26 @@ body {
   }
 }
 
-.config-file-content {
-  align-items: center;
+.settings-modal {
+  .label-l {
+    font-size: 16px;
+    margin: $spacing-m 0;
+    font-weight: bold;
+  }
+  .label-m {
+    font-size: 13px;
+    font-weight: bold;
+    margin-right: $spacing-m;
+  }
+
+  .config-file-content {
+    align-items: center;
+
+    .file-picker {
+      flex: 1;
+      justify-content: space-between;
+    }
+  }
 }
 
 .graph-wrapper {
@@ -119,6 +137,7 @@ body {
 }
 
 .center {
+  display: flex;
   align-content: center;
   align-items: center;
   justify-content: center;

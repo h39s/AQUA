@@ -24,6 +24,7 @@ interface IModalProps {
   headerContent?: JSX.Element | string;
   bodyContent?: JSX.Element | string;
   footerContent?: JSX.Element | string;
+  className?: string;
 }
 
 export default function Modal({
@@ -31,9 +32,10 @@ export default function Modal({
   headerContent,
   bodyContent,
   footerContent,
+  className,
 }: IModalProps) {
   return (
-    <div className="modal col">
+    <div className={`modal col ${className ?? ''}`}>
       <div className="modal-content">
         <div className="header">
           {headerContent}

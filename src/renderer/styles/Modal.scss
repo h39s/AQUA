@@ -36,13 +36,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     margin: 15% auto; // 15% from the top and centered
     padding: $spacing-l;
     border: 1px solid $primary-light;
-    width: 80%;
+    width: 60%;
   }
 
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: white 2px solid;
   }
 
   .footer {

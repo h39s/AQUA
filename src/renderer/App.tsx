@@ -114,16 +114,17 @@ export const AppContent = () => {
 
   const settingsModal = (
     <Modal
+      className="settings-modal"
       onClose={() => setShowSettingsModal(false)}
-      headerContent={<h1 className="header">Settings</h1>}
+      headerContent={<h1>Settings</h1>}
       bodyContent={
         <>
-          <h2>Config File</h2>
+          <div className="label-l">Config File</div>
           <div className="row config-file-content">
-            Current Path: {configFileName}
+            <div className="label-m">Current Path</div>
             <FilePicker
               label="Select a config file"
-              placeholder="No file selected."
+              placeholder={configFileName}
               accept=".txt"
               isDisabled={isLoading}
               handleChange={handleChangeConfigFile}
