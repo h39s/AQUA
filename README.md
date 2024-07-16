@@ -2,9 +2,7 @@
 
 Quick link to download latest release: <https://github.com/h39s/AQUA/releases/latest/download/AQUAsetup.exe>
 
-Discord Server: <https://discord.gg/44WDeRrr2d>
-
-Welcome to AQUA, a modern platform for audio equalization on Windows. Our current features include
+Welcome to AQUA, a modern platform for audio equalization on Windows. Please note that EqualizerAPO is a prerequisite for our application. Our current features include
 
 * System-wide parametric audio equalization (through [EqualizerAPO](https://sourceforge.net/projects/equalizerapo/))
 * AutoEQ integration (credit to [Jaakko Pasanen](https://github.com/jaakkopasanen/AutoEq/tree/master/results) and [Ian Walton](https://github.com/iwalton3/AutoEq) for their preset results for the Harman, IEF, and IEF with bass targets)
@@ -17,8 +15,7 @@ Welcome to AQUA, a modern platform for audio equalization on Windows. Our curren
   * Gain (-30dB to 30dB)
   * Quality (0.01 - 100.00)
 
-
-Please note that EqualizerAPO is a prerequisite for our application. We would love to get your feedback, address any bugs you encounter, and take any feature requests into consideration as we develop AQUA further, so please join our [discord server](https://discord.gg/44WDeRrr2d)  to share your thoughts with us and stay tuned for more!
+**AQUA is currently no longer under development. We really hope to be back with an update in the future with a potentially larger team of developers as our roadmap is still full of feature requests and substantial improvements. If you are interested in helping with development please reach out to us via [email](mailto:aqua.devteam@gmail.com) with a short introduction. Thank you for your understanding.**
 
 ![image](https://user-images.githubusercontent.com/20293445/222267346-b0e2064d-92c2-4334-9bff-d638f9535d12.png)
 
@@ -40,11 +37,7 @@ By default, the Windows file system does not support case sensitive file names (
 
 ## Get In Touch
 
-If you find any bugs, have any feature requests, or want to give us any kind of feedback, we'd love to hear it! Please join us in our [discord](https://discord.gg/44WDeRrr2d) to reach out and to keep up to date with new release information!
-
-## About the Developers
-
-We are a group of university students in our final year. This is both a passion project and capstone endeavour for us. We will be actively developing the application for the next few months and aim to add graphic EQ manipulation, and full AutoEQ capabilities. Please note that we may not always be available to address your messages on discord as we are all full-time students.
+If you find any bugs, have any feature requests, or want to give us any kind of feedback, we'd love to hear it! Please feel free to reach out to us via [email](mailto:aqua.devteam@gmail.com)!
 
 ## Development Prerequisites
 
