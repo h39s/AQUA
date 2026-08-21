@@ -41,7 +41,7 @@ export enum FilterTypeEnum {
   LPQ = 'LPQ', // Low Pass ["LPQ",False,True]
   HPQ = 'HPQ', // High Pass ["HPQ",False,True]
   BP = 'BP', // Band Pass ["BP",False,True]
-  // AP = 'AP', // All Pass ["AP",False,True]
+  AP = 'AP', // All Pass ["AP",False,True]
   // BWLP = 'BWLP', // Butterworth Low Pass ["BWLP",False,True]
   // BWHP = 'BWHP', // Butterworth High Pass ["BWHP",False,True]
   // LRLP = 'LRLP', // Linkwitz Riley Low Pass ["LRLP",False,True]
@@ -58,6 +58,7 @@ export const FilterTypeToLabelMap: Record<FilterTypeEnum, string> = {
   [FilterTypeEnum.LPQ]: 'Low Pass Filter',
   [FilterTypeEnum.HPQ]: 'High Pass Filter',
   [FilterTypeEnum.BP]: 'Band Pass Filter',
+  [FilterTypeEnum.AP]: 'All Pass Filter',
 };
 
 export const NO_GAIN_FILTER_TYPES = [
@@ -65,6 +66,7 @@ export const NO_GAIN_FILTER_TYPES = [
   FilterTypeEnum.LPQ,
   FilterTypeEnum.HPQ,
   FilterTypeEnum.NO,
+  FilterTypeEnum.AP,
 ];
 
 export const WINDOW_WIDTH = 1428;

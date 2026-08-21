@@ -151,22 +151,21 @@ const getTFCoefficients = (filter: IFilter) => {
       a0 = 1 + alpha;
       a1 = -2 * cosine;
       a2 = 1 - alpha;
-      // TODO: Add this filter back in when/if we decide to add all pass filter
-      // } else if ( filterType === FilterTypeEnum.AP){
-      //     b0 = 1-alpha
-      //     b1 = -2*cosine
-      //     b2 = 1+alpha
-      //     a0 = 1+alpha
-      //     a1 = -2*cosine
-      //     a2 = 1-alpha
+    } else if (filterType === FilterTypeEnum.AP) {
+      b0 = 1 - alpha;
+      b1 = -2 * cosine;
+      b2 = 1 + alpha;
+      a0 = 1 + alpha;
+      a1 = -2 * cosine;
+      a2 = 1 - alpha;
     }
-  }
+    }
 
-  b0 /= a0;
-  b1 /= a0;
-  b2 /= a0;
-  a1 /= a0;
-  a2 /= a0;
+      b0 /= a0;
+      b1 /= a0;
+      b2 /= a0;
+      a1 /= a0;
+      a2 /= a0;
 
   return { b0, b1, b2, a1, a2 } as ITransferFuncCoeffs;
 };

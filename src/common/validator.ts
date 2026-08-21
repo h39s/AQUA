@@ -38,7 +38,7 @@ const IStateSchema = {
   defaultProperties: [],
   definitions: {
     FilterTypeEnum: {
-      enum: ['HSC', 'LSC', 'PK'],
+      enum: ['HSC', 'LSC', 'PK', 'NO', 'LPQ', 'HPQ', 'BP', 'AP'],
       type: 'string',
     },
     IFiltersMap: {
@@ -104,7 +104,7 @@ export const IPresetSchemaV1 = {
   defaultProperties: [],
   definitions: {
     FilterTypeEnum: {
-      enum: ['HSC', 'LSC', 'PK'],
+      enum: ['HSC', 'LSC', 'PK', 'NO', 'LPQ', 'HPQ', 'BP', 'AP'],
       type: 'string',
     },
     IFilter: {
@@ -150,7 +150,7 @@ const IPresetSchemaV2 = {
   defaultProperties: [],
   definitions: {
     FilterTypeEnum: {
-      enum: ['HSC', 'LSC', 'PK'],
+      enum: ['HSC', 'LSC', 'PK', 'NO', 'LPQ', 'HPQ', 'BP', 'AP'],
       type: 'string',
     },
     Filters: {

@@ -19,11 +19,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import fs from 'fs';
 import path from 'path';
 import {
+  FilterTypeEnum,
   getDefaultState,
   IPresetV1,
   IPresetV2,
   IState,
 } from '../common/constants';
+
 import {
   validatePresetV1,
   validatePresetV2,
@@ -43,13 +45,23 @@ export const stateToString = (state: IState) => {
   output.push(`Preamp: ${state.preAmp}dB`);
 
   // Using individual filter bands
-  output = output.concat(
-    Object.values(state.filters).map(
-      ({ frequency, gain, type, quality }, index) => {
-        return `Filter${index}: ON ${type} Fc ${frequency} Hz Gain ${gain} dB Q ${quality}`;
+output = output.concat(
+  Object.values(state.filters).map(
+    ({ frequency, gain, type, quality }, index) => {
+      if (
+        type === FilterTypeEnum.NO ||
+        type === FilterTypeEnum.LPQ ||
+        type === FilterTypeEnum.HPQ ||
+        type === FilterTypeEnum.BP ||
+        type === FilterTypeEnum.AP
+      ) {
+        return `Filter${index}: ON ${type} Fc ${frequency} Hz Q ${quality}`;
       }
-    )
-  );
+
+      return `Filter${index}: ON ${type} Fc ${frequency} Hz Gain ${gain} dB Q ${quality}`;
+    }
+  )
+);
 
   return output.join('\n\r');
 };

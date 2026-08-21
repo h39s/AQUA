@@ -28,15 +28,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   text-align: start;
 
   .list {
-    // Remove default styles of the ul element
-    list-style-type: none;
-    padding-inline-start: 0px;
-    margin-block-start: 0px;
-    margin-block-end: 0px;
+  // Remove default styles of the ul element
+  list-style-type: none;
+  padding-inline-start: 0px;
+  margin-block-start: 0px;
+  margin-block-end: 0px;
 
-    // Apply custom styles
-    height: 100%;
-    overflow-y: auto;
+  // Allow dropdown to grow with all filter options
+  height: 100%;
+  overflow-y: auto;
+    
+    
+    
+    
+    
+
+    
+    
+    
 
     li {
       cursor: pointer;

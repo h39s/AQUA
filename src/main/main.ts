@@ -92,20 +92,9 @@ export default class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-const setWindowDimension = (isExpanded: boolean) => {
+const setWindowDimension = (_isExpanded: boolean) => {
   if (mainWindow) {
-    const currWidth = mainWindow.getSize()[0];
-    const currHeight = mainWindow.getSize()[1];
-    if (isExpanded) {
-      mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT_EXPANDED);
-      mainWindow.setSize(
-        currWidth,
-        Math.max(currHeight, WINDOW_HEIGHT_EXPANDED)
-      );
-    } else {
-      mainWindow.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-      mainWindow.setSize(currWidth, WINDOW_HEIGHT);
-    }
+    mainWindow.setMinimumSize(600, 400);
   }
 };
 
@@ -718,9 +707,9 @@ const createMainWindow = async () => {
   mainWindow = new BrowserWindow({
     show: false,
     width: WINDOW_WIDTH,
-    minWidth: WINDOW_WIDTH,
+    minWidth: 600,
     height: WINDOW_HEIGHT,
-    minHeight: WINDOW_HEIGHT,
+    minHeight: 400,
     icon: getAssetPath('icon.png'),
     resizable: true,
     webPreferences: {

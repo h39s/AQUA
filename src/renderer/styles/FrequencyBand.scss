@@ -45,12 +45,15 @@ $filter-dropdown-width: 52px;
       }
 
       .list {
-        // Hide scroll bar for the filter type dropdown
         overflow-y: hidden;
-
-        // Assign fixed width to dropdown menu
+      // Assign fixed width to dropdown menu
         width: $filter-dropdown-width + $spacing-s;
       }
+      
+      
+      
+      
+    
     }
 
     &::before,

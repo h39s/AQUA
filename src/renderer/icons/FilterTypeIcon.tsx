@@ -139,6 +139,23 @@ const FilterTypeIcon = ({ type }: { type: FilterTypeEnum }) => {
           />
         </svg>
       );
+      case FilterTypeEnum.AP:
+  return (
+    <svg
+      width="32"
+      height="16"
+      viewBox="0 0 32 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <title>All Pass Filter</title>
+      <path
+        d="M1 8H31"
+        stroke="#F7D84F"
+        strokeWidth="2"
+      />
+    </svg>
+  );
     default:
       return <></>;
   }
